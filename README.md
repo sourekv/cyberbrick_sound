@@ -1,20 +1,20 @@
 # cyberbrick_sound
 
-Zvukový modul (zvuk motoru) pro Bambu Lab CyberBrick RC. Modul odposlouchává PWM signál plynu ze serva portu přijímače, přehrává zvuk motoru podle plynu přes I2S zesilovač a původní signál nijak neovlivňuje.
+Engine sound module for Bambu Lab CyberBrick RC. The module taps the throttle PWM signal from the receiver's servo port, plays a throttle-dependent engine sound through an I2S amplifier, and never interferes with the original signal.
 
-## Stav
-Fáze 1: prototyp na vývojové desce (Waveshare ESP32-S3-Zero-N8R8-M + MAX98357A + reproduktor 4 Ω). Vlastní PCB až po funkčním prototypu.
+## Status
+Phase 1: prototype on a dev board (Waveshare ESP32-S3-Zero-N8R8-M + MAX98357A + 4 Ω speaker). A custom PCB comes only after the prototype works.
 
-## Struktura
-- `firmware/` – PlatformIO (Arduino) projekt
-- `docs/` – zapojení, naměřené hodnoty, poznámky
-- `3d/` – pouzdra, odkazy
-- `hardware/` – později KiCad
+## Structure
+- `firmware/` - PlatformIO (Arduino) project
+- `docs/` - wiring, measurements, notes
+- `3d/` - cases, links
+- `hardware/` - KiCad, later
 
-## Plán firmwaru
-1. Testovací tón přes I2S
-2. Měření šířky pulzu (50 Hz servo PWM) a výpis na sériovou linku
-3. Smyčka motoru s plynulou změnou rychlosti přehrávání podle plynu
+## Firmware plan
+1. Test tone over I2S
+2. Measure pulse width (50 Hz servo PWM) and print it to serial
+3. Engine loop with smooth playback-rate change driven by throttle
 
-## Zvukové vzorky
-Viz `firmware/data/samples/LICENSE-SAMPLES.md`.
+## Sound samples
+See `firmware/data/samples/LICENSE-SAMPLES.md`.

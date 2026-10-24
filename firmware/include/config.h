@@ -1,6 +1,6 @@
 #pragma once
-// Čísla pinů se doplní podle oficiálního schématu Waveshare ESP32-S3-Zero.
-// Zatím NEVYPLNĚNO – nehádat.
+// Pin numbers to be filled in from the official Waveshare ESP32-S3-Zero pinout.
+// Intentionally EMPTY for now - do not guess.
 // #define PIN_THROTTLE_IN  ?
 // #define PIN_I2S_BCLK     ?
 // #define PIN_I2S_LRC      ?
