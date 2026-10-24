@@ -3,7 +3,7 @@
 void setup() {
   Serial.begin(115200);
   delay(500);
-  Serial.println("cyberbrick-sound: boot");
+  Serial.println("cyberbrick_sound: boot");
 }
 
 void loop() {

@@ -1,4 +1,4 @@
-# cyberbrick-sound
+# cyberbrick_sound
 
 Zvukový modul (zvuk motoru) pro Bambu Lab CyberBrick RC. Modul odposlouchává PWM signál plynu ze serva portu přijímače, přehrává zvuk motoru podle plynu přes I2S zesilovač a původní signál nijak neovlivňuje.
 
