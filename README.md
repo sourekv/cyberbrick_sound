@@ -17,4 +17,9 @@ Phase 1: prototype on a dev board (Waveshare ESP32-S3-Zero-N8R8-M + MAX98357A + 
 3. Engine loop with smooth playback-rate change driven by throttle
 
 ## Sound samples
-See `firmware/data/samples/LICENSE-SAMPLES.md`.
+Originals and license: `assets/samples/` (see `LICENSE-SAMPLES.md`). The firmware embeds `firmware/include/engine_sample.h`, generated with:
+
+    python tools/make_sample.py assets/samples/loop_2.wav firmware/include/engine_sample.h
+
+## Building
+Open the `firmware/` folder in VS Code with the PlatformIO extension, or run `pio run -e <env> -t upload` with `<env>` one of `test_tone`, `pulse_measure`, `engine`. See `docs/bringup.md`.
