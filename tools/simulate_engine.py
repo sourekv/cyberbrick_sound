@@ -1,12 +1,12 @@
 """Offline simulation of the engine firmware (same algorithm as firmware/src/engine/main.cpp).
 
 Usage: python tools/simulate_engine.py
-Writes docs/audio-demo/engine_demo_full.wav and engine_demo_small_speaker.wav.
+Writes docs/audio-simulation/engine_simulation_full.wav and engine_simulation_small_speaker.wav.
 Keep the constants in sync with firmware/include/config.h and src/engine/main.cpp.
 """
 import os, re, wave, struct, math
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-OUT = os.path.join(ROOT, "docs", "audio-demo")
+OUT = os.path.join(ROOT, "docs", "audio-simulation")
 s = open(os.path.join(ROOT,"firmware","include","engine_sample.h")).read()
 S = [int(x) for x in re.findall(r"-?\d+", s.split("= {")[1])]
 N_S = len(S); RATE = 22050; MASTER = 0.35
@@ -42,6 +42,6 @@ def render(highpass_hz=None):
 def save(name,data):
     w=wave.open(name,"wb"); w.setnchannels(1); w.setsampwidth(2); w.setframerate(RATE)
     w.writeframes(struct.pack("<%dh"%len(data),*data)); w.close()
-save(os.path.join(OUT,"engine_demo_full.wav"), render())
-save(os.path.join(OUT,"engine_demo_small_speaker.wav"), render(800))
+save(os.path.join(OUT,"engine_simulation_full.wav"), render())
+save(os.path.join(OUT,"engine_simulation_small_speaker.wav"), render(800))
 print("ok")
