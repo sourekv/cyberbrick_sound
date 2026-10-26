@@ -14,6 +14,8 @@ Phase 1: prototype on a dev board (Waveshare ESP32-S3-Zero-N8R8-M + MAX98357A + 
 ## Wiring overview
 ![Wiring overview](docs/wiring-overview.png)
 
+Stage 2 (powered from the CyberBrick servo port): `docs/wiring-stage2.png`.
+
 Source: `docs/wiring-overview.svg`. Details and measurements: `docs/bringup.md`.
 
 ## Firmware plan
