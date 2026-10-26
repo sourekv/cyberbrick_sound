@@ -10,4 +10,4 @@ Our module listens to the PWM2 servo port; the motor keeps working as before. On
 Use: import the file in the CyberBrick app, then **Send to Device** to the transmitter and to the receiver (both load the same configuration; each uses its own part). Not yet tested on real hardware. See `docs/bringup.md`.
 
 ## Truck_stock.json (baseline without sound)
-The same configuration with the sound-module additions removed: PWM2 is empty and the L Stick Y channel drives only Throttle. It was derived from the engine-sound export by deleting those two entries, not exported from the app separately, so it may differ in small details from the original model's file. If exact fidelity matters, export the stock configuration from the app and replace this file.
+The original CyberBrick Truck configuration exactly as exported from the app, without any of our additions: PWM2 is empty and the L Stick Y channel drives only Throttle. Use it to restore the stock behaviour.
