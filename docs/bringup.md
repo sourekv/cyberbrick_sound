@@ -11,6 +11,15 @@ Record results in the table at the bottom.
 - [ ] Update the CyberBrick app/firmware first so receiver and transmitter match
 - [ ] In the app: the stock model maps the L stick to the DC motor port M1 (throttle) and R stick to a servo (steering). Try adding a continuous-rotation servo device on a free servo port (e.g. S2) and assign it the L stick too, so a copy of the throttle appears on a servo port. Then map the throttle stick to a servo channel and limit range to 1.0-2.0 ms if possible
 
+## 1b. Planned CyberBrick app mapping (app side confirmed, hardware side untested)
+The stock model drives the motor on M1 from the L Stick (channel Y, module "Throttle", direction Negative) and steering on PWM1.
+In the app (Truck -> Channel Binding for the L Stick) a second row can be added for the same channel:
+- Truck: add an Angular Servo, it is created as **PWM2 (Angular)** on servo port 2.
+- Channel Binding, L Stick: **Y -> PWM2 (Angular), Negative** (same as Throttle). The app accepts two modules on one channel.
+- PWM2 parameters: **Speed 100 %, Min angle 45 deg, Max angle 135 deg, Midpoint offset 0 deg**. From the official code an angle servo outputs about 0.5 ms at 0 deg, 1.5 ms at 90 deg and 2.5 ms at 180 deg, so 45-135 deg should give about 1.0-2.0 ms.
+- Nothing is sent to the device until "Send to Device". Verify with `pulse_measure`: about 1000-2000 us, 1500 us at stick centre.
+- The L Stick self-centres; the firmware uses |pulse - 1500|, so forward and reverse both raise the engine sound.
+
 ## 2. Wiring (breadboard) - pins from `firmware/include/config.h`
 Verify GPIO labels against the silkscreen on the Waveshare board first.
 
