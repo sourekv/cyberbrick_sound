@@ -5,11 +5,11 @@ Status: written before the hardware arrived. Nothing here has been tested on a r
 ## 1. Measurements on the CyberBrick receiver (multimeter, before connecting anything)
 Record results in the table at the bottom.
 - [ ] Servo port connector type (standard 3-pin 2.54 mm header?) and number of servo ports
-- [ ] Pin order of a servo port (signal / + / -): find GND by continuity to the battery negative or a motor-port ground, then measure the other two against it with the receiver powered
+- [ ] Pin order of a servo port. The CyberBrick app's board view labels each servo port S, V, G (signal, +, GND), 4 ports S1-S4 (GPIO 3, 2, 1, 0 per the official code) on two 2x3 headers. Confirm on the real board: find GND by continuity to the battery negative or a motor-port ground, then measure the other two against it with the receiver powered
 - [ ] Voltage on the + pin (expected 5 V)
 - [ ] Signal pin: idle voltage and, with the throttle channel mapped in the CyberBrick app, whether it is a 3.3 V or 5 V pulse (a multimeter shows only the average; if it reads well above ~0.5 V average it is probably active; if unsure, assume 5 V and use a divider)
 - [ ] Update the CyberBrick app/firmware first so receiver and transmitter match
-- [ ] In the app: map the throttle stick to a servo channel and limit range to 1.0-2.0 ms if possible
+- [ ] In the app: the stock model maps the L stick to the DC motor port M1 (throttle) and R stick to a servo (steering). Try adding a continuous-rotation servo device on a free servo port (e.g. S2) and assign it the L stick too, so a copy of the throttle appears on a servo port. Then map the throttle stick to a servo channel and limit range to 1.0-2.0 ms if possible
 
 ## 2. Wiring (breadboard) - pins from `firmware/include/config.h`
 Verify GPIO labels against the silkscreen on the Waveshare board first.
