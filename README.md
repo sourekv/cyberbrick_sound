@@ -11,6 +11,11 @@ Phase 1: prototype on a dev board (Waveshare ESP32-S3-Zero-N8R8-M + MAX98357A + 
 - `3d/` - cases, links
 - `hardware/` - KiCad, later
 
+## Wiring overview
+![Wiring overview](docs/wiring-overview.png)
+
+Source: `docs/wiring-overview.svg`. Details and measurements: `docs/bringup.md`.
+
 ## Firmware plan
 1. Test tone over I2S
 2. Measure pulse width (50 Hz servo PWM) and print it to serial

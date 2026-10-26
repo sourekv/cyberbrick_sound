@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 640" font-family="Helvetica, Arial, sans-serif">
+  <rect width="1100" height="640" fill="#ffffff"/>
+  <text x="30" y="40" font-size="22" font-weight="bold" fill="#1a1a1a">cyberbrick_sound: how the module connects to CyberBrick (prototype)</text>
+  <text x="30" y="64" font-size="13" fill="#555">Our module only listens to one servo-port signal. The CyberBrick keeps its own firmware and program unchanged.</text>
+
+  <!-- CyberBrick receiver -->
+  <rect x="30" y="110" width="280" height="330" rx="12" fill="#e8f0fb" stroke="#2b5fb4" stroke-width="2"/>
+  <text x="170" y="140" font-size="17" font-weight="bold" text-anchor="middle" fill="#1d3f7a">CyberBrick receiver</text>
+  <text x="170" y="160" font-size="12" text-anchor="middle" fill="#1d3f7a">(Core board + receiver shield)</text>
+  <rect x="55" y="185" width="230" height="55" rx="6" fill="#ffffff" stroke="#999"/>
+  <text x="170" y="210" font-size="13" text-anchor="middle" fill="#333">Motor ports (SH1.0)</text>
+  <text x="170" y="228" font-size="11" text-anchor="middle" fill="#888">not used by our module</text>
+  <rect x="55" y="260" width="230" height="135" rx="6" fill="#ffffff" stroke="#2b5fb4" stroke-width="2"/>
+  <text x="170" y="282" font-size="13" font-weight="bold" text-anchor="middle" fill="#1d3f7a">Free servo port (3-pin header)</text>
+  <text x="170" y="297" font-size="11" text-anchor="middle" fill="#555">throttle stick mapped here in the app</text>
+  <text x="170" y="311" font-size="10" text-anchor="middle" fill="#a33">pin order: measure on the real kit</text>
+  <circle cx="110" cy="335" r="12" fill="#f5b942" stroke="#333"/><text x="110" y="339" font-size="11" text-anchor="middle" font-weight="bold">S</text>
+  <circle cx="170" cy="335" r="12" fill="#e55" stroke="#333"/><text x="170" y="339" font-size="11" text-anchor="middle" font-weight="bold" fill="#fff">+</text>
+  <circle cx="230" cy="335" r="12" fill="#444" stroke="#333"/><text x="230" y="339" font-size="11" text-anchor="middle" font-weight="bold" fill="#fff">-</text>
+  
+  <text x="170" y="418" font-size="11" text-anchor="middle" fill="#1d3f7a">Battery 7.4 V</text>
+  <text x="170" y="433" font-size="10" text-anchor="middle" fill="#555">powers the receiver</text>
+
+  <!-- wires from servo port -->
+  <path d="M110 347 L110 500 L440 500 L440 470" fill="none" stroke="#e0a020" stroke-width="3"/>
+  <path d="M230 347 L230 530 L520 530 L520 470" fill="none" stroke="#333" stroke-width="3"/>
+  <text x="170" y="346" font-size="26" text-anchor="middle" fill="#d22" font-weight="bold" opacity="0.9">&#215;</text>
+  <text x="330" y="494" font-size="12" fill="#8a5a00">signal</text>
+  <text x="240" y="548" font-size="12" fill="#333">GND (to ESP GND)</text>
+  <text x="30" y="590" font-size="12" fill="#d22">The servo port's +5 V (red cross) stays UNCONNECTED for the first tests.</text>
+
+  <!-- resistor -->
+  <rect x="385" y="480" width="70" height="22" rx="4" fill="#d9b382" stroke="#333"/>
+  <text x="420" y="496" font-size="12" text-anchor="middle">1 k&#937;</text>
+  <text x="420" y="518" font-size="10" text-anchor="middle" fill="#555">series resistor</text>
+
+  <!-- ESP32 -->
+  <rect x="380" y="150" width="200" height="320" rx="10" fill="#e9f6ec" stroke="#2f8f4e" stroke-width="2"/>
+  <text x="480" y="180" font-size="14" font-weight="bold" text-anchor="middle" fill="#1d5e33">Waveshare ESP32-S3-Zero</text>
+  <text x="480" y="198" font-size="11" text-anchor="middle" fill="#1d5e33">on the breadboard</text>
+  <rect x="440" y="215" width="80" height="34" rx="4" fill="#cfe8d6" stroke="#2f8f4e"/><text x="480" y="237" font-size="12" text-anchor="middle">USB-C</text>
+  <text x="400" y="300" font-size="12" fill="#333">GPIO1  throttle in (via 1 k&#937;)</text>
+  <text x="400" y="330" font-size="12" fill="#333">GPIO4  I2S DOUT</text>
+  <text x="400" y="360" font-size="12" fill="#333">GPIO5  I2S BCLK</text>
+  <text x="400" y="390" font-size="12" fill="#333">GPIO6  I2S LRC</text>
+  <text x="400" y="420" font-size="12" fill="#333">5V / GND  from USB</text>
+  <text x="400" y="445" font-size="10" fill="#a33">pins to be verified on the board</text>
+
+  <!-- USB power -->
+  <rect x="400" y="40" width="0" height="0"/>
+  <rect x="610" y="125" width="150" height="50" rx="8" fill="#f3f3f3" stroke="#777"/>
+  <text x="685" y="148" font-size="13" text-anchor="middle">PC or powerbank</text>
+  <text x="685" y="165" font-size="11" text-anchor="middle" fill="#555">USB-C, powers the module</text>
+  <path d="M610 150 L520 232" fill="none" stroke="#777" stroke-width="3"/>
+
+  <!-- I2S wires -->
+  <path d="M580 330 L690 330" stroke="#8844aa" stroke-width="3" fill="none"/>
+  <path d="M580 360 L730 360" stroke="#2f8f4e" stroke-width="3" fill="none"/>
+  <path d="M580 390 L770 390" stroke="#c4571e" stroke-width="3" fill="none"/>
+  <path d="M580 420 L810 420" stroke="#d22" stroke-width="3" fill="none"/>
+
+  <!-- amplifier -->
+  <rect x="650" y="260" width="240" height="220" rx="10" fill="#f3e9fa" stroke="#7a3fa0" stroke-width="2"/>
+  <text x="770" y="290" font-size="16" font-weight="bold" text-anchor="middle" fill="#55207a">MAX98357A module</text>
+  <text x="670" y="334" font-size="12" fill="#333">DIN</text>
+  <text x="670" y="364" font-size="12" fill="#333">BCLK</text>
+  <text x="670" y="394" font-size="12" fill="#333">LRC</text>
+  <text x="670" y="424" font-size="12" fill="#333">Vin / GND</text>
+  <text x="670" y="454" font-size="10" fill="#555">SD, GAIN: leave open</text>
+  <rect x="840" y="425" width="50" height="40" rx="3" fill="#7bc17e" stroke="#333"/>
+  <text x="865" y="449" font-size="9" text-anchor="middle">screw</text><text x="865" y="460" font-size="9" text-anchor="middle">terminal</text>
+
+  <!-- speaker -->
+  <circle cx="1000" cy="470" r="58" fill="#f5f5f5" stroke="#333" stroke-width="3"/>
+  <circle cx="1000" cy="470" r="22" fill="#ddd" stroke="#333"/>
+  <text x="1000" y="555" font-size="13" text-anchor="middle">40 mm 4 &#937; speaker</text>
+  <path d="M890 435 L945 455" stroke="#d22" stroke-width="3" fill="none"/>
+  <path d="M890 455 L945 485" stroke="#333" stroke-width="3" fill="none"/>
+
+  <!-- legend -->
+  <text x="30" y="620" font-size="12" fill="#777">Signal and GND only from the receiver. USB power and servo-port 5 V are never connected at the same time.</text>
+</svg>
