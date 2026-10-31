@@ -10,6 +10,11 @@
 #define PIN_I2S_BCLK    5   // -> MAX98357A BCLK
 #define PIN_I2S_LRC     6   // -> MAX98357A LRC
 
+// Status colour on the Zero's onboard RGB LED (WS2812 on GPIO21), see include/status_led.h
+#define STATUS_LED_ENABLED 1
+#define PIN_STATUS_RGB    21
+#define STATUS_LED_MAX    40  // 0..255 brightness limit; the LED is very bright
+
 // Throttle pulse (microseconds)
 #define PULSE_MIN_US     800
 #define PULSE_MAX_US    2200

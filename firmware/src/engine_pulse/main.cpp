@@ -5,6 +5,7 @@
 #include "driver/i2s.h"
 #include "config.h"
 #include "engine_synth.h"
+#include "status_led.h"
 
 static volatile uint32_t riseUs = 0;
 static volatile uint32_t widthUs = 0;
@@ -33,10 +34,17 @@ static float readThrottle() {
   return t > 1.0f ? 1.0f : t;
 }
 
+// True while valid pulses keep arriving.
+static bool signalPresent() {
+  return lastEdgeMs != 0 && millis() - lastEdgeMs <= PULSE_TIMEOUT_MS;
+}
+
 static EngineSynth synth;
+static StatusLed statusLed;
 
 void setup() {
   Serial.begin(115200);
+  statusLed.begin();
   pinMode(PIN_THROTTLE_IN, INPUT);
   attachInterrupt(digitalPinToInterrupt(PIN_THROTTLE_IN), onEdge, CHANGE);
 
@@ -67,6 +75,7 @@ void loop() {
   int16_t buf[N * 2];  // interleaved L,R
 
   float target = readThrottle();
+  statusLed.update(signalPresent(), target);
   synth.block(target);
   for (int i = 0; i < N; i++) {
     float s = synth.sample() * MASTER_VOLUME * 32767.0f;
