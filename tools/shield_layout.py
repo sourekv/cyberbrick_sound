@@ -91,13 +91,14 @@ LABELS = [
 
 
 # Mounting holes matching the CyberBrick receiver shield (XA004, 29 x 30 mm).
-# Measured on the manufacturer's product image of the receiver shield XA004 (Bambu Lab store; "for reference only",
-# not stored in this repository because of its copyright):
-# four corner holes, diameter 2.7 mm (printed on the image), copper ring about 5.7 mm, centres about 2.9 mm from the
-# board edges, so a spacing of about 23.2 x 24.2 mm. VERIFY with calipers on the real receiver before ordering.
+# Four corner holes, diameter 2.7 mm and copper ring about 5.7 mm (read from the manufacturer's product image of the
+# receiver shield XA004, reference only, not stored here). The spacing is exactly 23.0 x 24.0 mm according to the
+# CAD model of the community "CyberBrick Remote Control Receiver Test Housing" (MakerWorld 1237405), whose four
+# heat-set insert holes (3.1 mm) are at +-11.5 / +-12.0 mm from the centre; the image gives 23.2 x 24.2 mm, i.e. the
+# same within the reading error. Still VERIFY with calipers on the real receiver before ordering.
 CB_W, CB_H = 29.0, 30.0
 CB_HOLE_D, CB_RING_D = 2.7, 5.7
-CB_DX, CB_DY = 23.2, 24.2                       # hole spacing
+CB_DX, CB_DY = 23.0, 24.0                       # hole spacing
 ZERO_CX, ZERO_CY = BOARD_W / 2, BOARD_H / 2     # centre of the Zero; the CyberBrick pattern is centred on it
 CB_HOLES = [[round(ZERO_CX + sx * CB_DX / 2, 2), round(ZERO_CY + sy * CB_DY / 2, 2), CB_HOLE_D]
             for sy in (-1, 1) for sx in (-1, 1)]

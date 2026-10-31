@@ -214,14 +214,14 @@ def build_holes_svg():
     MX = 130 + 5.5 * S
     hx0, hx1 = L.CB_HOLES[0][0], L.CB_HOLES[1][0]
     hy0, hy1 = L.CB_HOLES[0][1], L.CB_HOLES[2][1]
-    body += dim_line(hx0, -7.0, hx1, -7.0, f"{L.CB_DX:g}", off=(0, -0.55))
-    body += dim_line(25.3, hy0, 25.3, hy1, f"{L.CB_DY:g}", off=(0.9, 0), rot=-90)
+    body += dim_line(hx0, -7.0, hx1, -7.0, f"{L.CB_DX:.1f}", off=(0, -0.55))
+    body += dim_line(25.3, hy0, 25.3, hy1, f"{L.CB_DY:.1f}", off=(0.9, 0), rot=-90)
     body.append(text(hx0 - 0.2, hy0 - 3.9, f"hole {L.CB_HOLE_D:g} mm", 12, "middle", 600, "#c0392b"))
     body.append(text(0.0, L.BOARD_H + 7.4,
-                     "Hole pattern read from the manufacturer's product image (reference only): verify with calipers on the real receiver shield.",
+                     "Spacing 23.0 x 24.0 mm from the CAD model of a CyberBrick receiver test housing (matches the manufacturer's image); hole 2.7 mm from the image. Verify with calipers.",
                      12, "start", fill=MUTED, mono=False))
     body.append(text(0.0, L.BOARD_H + 8.3,
-                     "A M2.5 screw head (about 4.5 mm) clears the corner of the Zero by only about 0.1 mm; use a low or countersunk head, or shift the Zero.",
+                     f"A screw head of 4.5 mm leaves only {((L.CB_DX / 2 - L.BOARD_W / 2) ** 2 + (L.CB_DY / 2 - L.BOARD_H / 2) ** 2) ** 0.5 - 2.25:.2f} mm to the corner of the Zero; use a low or countersunk head, or shift the Zero.",
                      12, "start", fill=MUTED, mono=False))
     w = int(130 * 2 + pitch + 29 * S)
     h = int(MY + (L.BOARD_H + 5.5) * S + 140)
