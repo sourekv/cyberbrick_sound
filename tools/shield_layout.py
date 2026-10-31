@@ -48,6 +48,14 @@ PARTS = [
          name="MAX98357A amplifier", desc="I2S class-D amplifier, TQFN-16 3 x 3 mm. Receives BCLK, LRC and DIN from the ESP32 and drives the speaker directly."),
     dict(ref="J2", kind="jst_side", x=12.2, y=21.35, w=4.0, h=4.3, z=3.9,
          name="Speaker connector (JST SH 1.0)", desc="JST SH 1.0 mm 2-pin side-entry connector at the bottom edge, the same type as the CyberBrick motor ports (M1/M2) and button ports. The speaker cable (for example the 2-pin SH cable of a button module) plugs in from outside."),
+    # parts in the margin around the Zero (the board is larger than the Zero), so they stay visible from above
+    dict(ref="LED1", kind="led", x=-4.1, y=7.94, w=2.2, h=1.2, z=0.6, margin=True,
+         name="Power LED", desc="Lights when the servo-port 5 V is present (taken after the reverse-polarity diode D1), so you can see that the cable and the receiver are fine. Hardware only, no firmware needed. Placed beside the Zero because the Zero would hide it."),
+    dict(ref="R3", kind="chip_r", x=-1.4, y=7.94, w=2.8, h=1.5, z=0.5, body=(2.0, 1.25), margin=True,
+         name="LED resistor 1 kOhm", desc="Series resistor of the power LED (about 3 mA)."),
+    dict(ref="J3", kind="hdr_v", x=20.5, y=13.02, w=2.54, h=10.16, z=2.5, margin=True,
+         pins=[[20.5, 9.21], [20.5, 11.75], [20.5, 14.29], [20.5, 16.83]], pin_names=["IO12", "IO11", "IO10", "GND"],
+         name="Spare GPIO header", desc="1x4 pin header with three free GPIOs (IO12, IO11, IO10) and ground, for later inputs, for example a switch for an engine-stop sound."),
 ]
 
 # nets: pts are board coordinates; layer 'top' or 'bot'
@@ -74,9 +82,18 @@ NETS = [
     dict(net="SPK-", color="#ececec", pts=[[7.75, 20.3], [12.7, 20.3], [12.7, 19.7]]),
     # pull-down tap
     dict(net="S", color="#ffb347", pts=[[3.6, IO1_Y], [3.6, 10.6]]),
+    # power LED, from the 5 V rail between D2 and the hop
+    dict(net="5V", color="#ff7a6b", pts=[[4.0, 7.94], [-0.2, 7.94]]),
+    dict(net="5V", color="#ff7a6b", pts=[[-2.6, 7.94], [-3.25, 7.94]]),
+    dict(net="GND", color="#9aa7b4", pts=[[-4.95, 7.94], [-4.95, 9.0], [-4.2, 9.0]]),
+    # spare GPIO header
+    dict(net="IO12", color="#d6a8ff", pts=[[HDR_X[1], PIN_Y[3]], [20.5, PIN_Y[3]]]),
+    dict(net="IO11", color="#d6a8ff", pts=[[HDR_X[1], PIN_Y[4]], [20.5, PIN_Y[4]]]),
+    dict(net="IO10", color="#d6a8ff", pts=[[HDR_X[1], PIN_Y[5]], [20.5, PIN_Y[5]]]),
+    dict(net="GND", color="#9aa7b4", pts=[[20.5, PIN_Y[6]], [20.5, 18.9]]),
 ]
 # GND vias (GND plane on the bottom layer) and the hop vias
-GND_VIAS = [[3.6, 13.4], [4.2, 15.5], [10.4, 15.6], [13.5, 17.2], [6.0, 19.8], [14.6, 9.9]]
+GND_VIAS = [[3.6, 13.4], [4.2, 15.5], [10.4, 15.6], [13.5, 17.2], [6.0, 19.8], [14.6, 9.9], [-4.2, 9.0], [20.5, 18.9]]
 HOP_VIAS = [[5.0, 10.2], [5.0, 8.2]]
 
 J2_PADS = [[11.7, 19.7], [12.7, 19.7]]       # signal pads of J2 (1.0 mm pitch), + and -
@@ -107,8 +124,6 @@ CB_HOLES = [[round(ZERO_CX + sx * CB_DX / 2, 2), round(ZERO_CY + sy * CB_DY / 2,
 # Outline shapes are a union of ("rect", x0, y0, x1, y1, corner radius) and ("circle", cx, cy, r),
 # in the same coordinates as the parts (origin = top-left corner of the Zero).
 VARIANTS = [
-    dict(id="zero", name="Zero size", short="18 x 23.5 mm, no mounting holes",
-         shapes=[("rect", 0, 0, BOARD_W, BOARD_H, 1.2)], holes=[]),
     dict(id="cb", name="CyberBrick size", short="29 x 30 mm like the CyberBrick receiver shield, its four holes",
          shapes=[("rect", ZERO_CX - CB_W / 2, ZERO_CY - CB_H / 2, ZERO_CX + CB_W / 2, ZERO_CY + CB_H / 2, 1.5)],
          holes=CB_HOLES),
@@ -121,12 +136,27 @@ def bounds(outline):
     return min(xs), min(ys), max(xs), max(ys)
 
 
+def _circle_hits_rect(cx, cy, r, box):
+    nx = min(max(cx, box[0]), box[2]); ny = min(max(cy, box[1]), box[3])
+    return (cx - nx) ** 2 + (cy - ny) ** 2 < r * r
+
+
 def check():
-    """Print overlaps between part footprints and violations of the gap / board outline."""
+    """Print overlaps between part footprints and violations of the gap / board outline / holes."""
     ok = True
+    bx0, by0, bx1, by1 = bounds([[sh[1], sh[2]] for sh in VARIANT["cb"]["shapes"]] + [[sh[3], sh[4]] for sh in VARIANT["cb"]["shapes"]])
     boxes = {p["ref"]: (p["x"] - p["w"] / 2, p["y"] - p["h"] / 2, p["x"] + p["w"] / 2, p["y"] + p["h"] / 2) for p in PARTS}
-    for r, (x0, y0, x1, y1) in boxes.items():
-        if x0 < GAP_X[0] - 1e-6 or x1 > GAP_X[1] + 1e-6 or y0 < -1e-6 or y1 > BOARD_H + 1e-6:
+    for p in PARTS:
+        r = p["ref"]; x0, y0, x1, y1 = boxes[r]
+        if p.get("margin"):
+            if x0 < bx0 + 0.2 or x1 > bx1 - 0.2 or y0 < by0 + 0.2 or y1 > by1 - 0.2:
+                print("outside the board:", r); ok = False
+            if x1 > 0 and x0 < BOARD_W and y1 > 0 and y0 < BOARD_H:
+                print("margin part under the Zero:", r); ok = False
+            for hx, hy, _ in CB_HOLES:
+                if _circle_hits_rect(hx, hy, CB_RING_D / 2 + 0.2, boxes[r]):
+                    print("margin part touches a mounting hole:", r); ok = False
+        elif x0 < GAP_X[0] - 1e-6 or x1 > GAP_X[1] + 1e-6 or y0 < -1e-6 or y1 > BOARD_H + 1e-6:
             print("outside gap/board:", r, [round(v, 2) for v in (x0, y0, x1, y1)]); ok = False
     refs = list(boxes)
     for i, a in enumerate(refs):

@@ -98,8 +98,8 @@ def panel(vid, title, sub, tx_px=None):
     for i, y in enumerate(L.PIN_Y):
         for hx in L.HDR_X:
             o.append(f'<circle cx="{X(hx):.1f}" cy="{Y(y):.1f}" r="{0.62 * S / 2 + 3:.1f}" fill="#d8b04a"/>')
-        o.append(text(L.HDR_X[0] - 1.5, y, L.LEFT_PINS[i], 11, "end", fill=MUTED))
-        o.append(text(L.HDR_X[1] + 1.5, y, L.RIGHT_PINS[i], 11, "start", fill=MUTED))
+        o.append(text(L.HDR_X[0] - 1.5, y, L.LEFT_PINS[i], 11, "end", fill="#d9efe0"))
+        o.append(text(L.HDR_X[1] + 1.5, y, L.RIGHT_PINS[i], 11, "start", fill="#d9efe0"))
 
     # traces
     for n in L.NETS:
@@ -127,6 +127,16 @@ def panel(vid, title, sub, tx_px=None):
             for px, py in L.J2_PADS:
                 o.append(f'<circle cx="{X(px):.1f}" cy="{Y(py):.1f}" r="{0.5 * S / 2:.1f}" fill="#d8b04a"/>')
             o.append(text(L.J2_PADS[0][0], L.J2_PADS[0][1] - 0.9, "+", 12, "middle", 700)); o.append(text(L.J2_PADS[1][0], L.J2_PADS[1][1] - 0.9, "-", 12, "middle", 700))
+        elif k == "led":
+            o.append(rect(p["x"] - 0.8, p["y"] - 0.4, p["x"] + 0.8, p["y"] + 0.4, fill="#59e06f", stroke="#1f7a33", stroke_width=1))
+            o.append(rect(p["x"] - 1.1, p["y"] - 0.45, p["x"] - 0.7, p["y"] + 0.45, fill="#c9ced4", stroke="none"))
+            o.append(rect(p["x"] + 0.7, p["y"] - 0.45, p["x"] + 1.1, p["y"] + 0.45, fill="#c9ced4", stroke="none"))
+            o.append(rect(x0, y0, x1, y1, fill="none", stroke="#f4f4ee", stroke_width=0.8, stroke_dasharray="3 3"))
+        elif k == "hdr_v":
+            o.append(rect(x0, y0, x1, y1, fill="#222", stroke="#000", stroke_width=1))
+            for (px, py), nm in zip(p["pins"], p["pin_names"]):
+                o.append(circle(px, py, 0.35, fill="#d8b04a"))
+                o.append(text(px + 1.7, py, nm, 11, "start", fill="#d9efe0"))
         elif k == "qfn":
             bx0, by0, bx1, by1 = p["x"] - 1.5, p["y"] - 1.5, p["x"] + 1.5, p["y"] + 1.5
             o.append(rect(x0, y0, x1, y1, fill="none", stroke="#f4f4ee", stroke_width=1, stroke_dasharray="3 3"))
@@ -147,7 +157,7 @@ def panel(vid, title, sub, tx_px=None):
                 o.append(rect(p["x"] - bw / 2, yb, p["x"] + bw / 2, yb + 0.5, fill="#c9ced4", stroke="none"))
         # reference label
         lx = x1 + 0.25 if p["ref"] not in ("J1", "J2", "U1", "C2", "C3") else None
-        if p["ref"] in ("R1", "F1", "D1", "D2", "R2", "C1"):
+        if p["ref"] in ("R1", "F1", "D1", "D2", "R2", "C1", "LED1", "R3", "J3"):
             o.append(text(p["x"], y0 - 0.45 if p["ref"] != "C1" else y0 - 0.45, p["ref"], 12, "middle", 700, "#f4f4ee"))
     for ref, x, y in (("U1", 6.0, 17.35), ("C2", 5.2, 15.35), ("C3", 9.0, 15.35), ("J2", 12.2, 23.9)):
         pass
@@ -165,12 +175,13 @@ def legend():
     ly = L.BOARD_H + 6.2
     o.append(text(0, ly, "Top side (between the header strips)", 13, weight=600, mono=False))
     items = [("#ff7a6b", "5 V (servo V, through F1, D1)"), ("#ffb347", "throttle S to GPIO1"),
-             ("#6ec1ff", "I2S to the amplifier"), ("#ececec", "speaker")]
+             ("#6ec1ff", "I2S to the amplifier"), ("#ececec", "speaker"),
+             ("#d6a8ff", "spare GPIO to J3"), ("#9aa7b4", "ground (to the bottom plane)")]
     for i, (c, t) in enumerate(items):
         yy = ly + 1.05 * (i + 1)
         o.append(f'<line x1="{X(0):.1f}" x2="{X(1.4):.1f}" y1="{Y(yy):.1f}" y2="{Y(yy):.1f}" stroke="{c}" stroke-width="{0.35 * S:.1f}" stroke-linecap="round"/>')
         o.append(text(1.9, yy, t, 12, fill=FG, mono=False))
-    yy = ly + 1.05 * 5
+    yy = ly + 1.05 * 7
     o.append(f'<line x1="{X(0):.1f}" x2="{X(1.4):.1f}" y1="{Y(yy):.1f}" y2="{Y(yy):.1f}" stroke="#ff7a6b" stroke-width="{0.35 * S:.1f}" stroke-dasharray="6 5" stroke-linecap="round"/>')
     o.append(text(1.9, yy, "hop on the bottom layer (under the S trace)", 12, fill=FG, mono=False))
     o.append(text(9.0, ly, "Bottom side: GND plane, 7 test pads (5V, 3V3, GND, IO1, BCLK, LRC, DIN)", 11, "start", fill=MUTED, mono=False))
@@ -183,49 +194,38 @@ def wrap(w, h, body):
 
 
 def build_svg():
-    """The standard top view: Zero-sized board, with legend."""
-    global S, MX, MY
-    S, MX, MY = 34.0, 150, 260
-    body = panel("zero", "Sound shield, top view",
-                 f"{L.BOARD_W:g} x {L.BOARD_H:g} mm = outline of the ESP32-S3-Zero, which sits on top of it") + legend()
-    return wrap(int(L.BOARD_W * S + 2 * MX), int(L.BOARD_H * S + MY + 420), body)
-
-
-def build_holes_svg():
-    """The board with the CyberBrick mounting-hole pattern."""
+    """Top view of the shield on the CyberBrick-sized board, with dimensions and legend."""
     global S, MX, MY
     S, MY = 28.0, 330
-    pitch = 960
-    body = []
-    specs = [("cb", "Sound shield with the CyberBrick mounting holes (29 x 30 mm)",
-              "Same size and hole pattern as the CyberBrick receiver shield; the Zero sits in the middle")]
-    for i, (vid, t, sub) in enumerate(specs):
-        MX = 130 + i * pitch + 5.5 * S
-        body += panel(vid, t, sub, tx_px=130 + i * pitch)
-        # the Zero outline, dashed, to show where it sits
-        body.append(rect(0, 0, L.BOARD_W, L.BOARD_H, fill="none", stroke="#f4f4ee", stroke_width=1, stroke_dasharray="2 5", opacity="0.9"))
-    # dimensions on panel A
     MX = 130 + 5.5 * S
+    body = panel("cb", "Sound shield, top view",
+                 f"{L.CB_W:g} x {L.CB_H:g} mm, same size and mounting holes as the CyberBrick receiver shield; the ESP32-S3-Zero sits in the middle", tx_px=130)
+    # the Zero outline, dashed
+    body.append(rect(0, 0, L.BOARD_W, L.BOARD_H, fill="none", stroke="#f4f4ee", stroke_width=1, stroke_dasharray="2 5", opacity="0.9"))
     hx0, hx1 = L.CB_HOLES[0][0], L.CB_HOLES[1][0]
     hy0, hy1 = L.CB_HOLES[0][1], L.CB_HOLES[2][1]
     body += dim_line(hx0, -7.0, hx1, -7.0, f"{L.CB_DX:.1f}", off=(0, -0.55))
     body += dim_line(25.3, hy0, 25.3, hy1, f"{L.CB_DY:.1f}", off=(0.9, 0), rot=-90)
     body.append(text(hx0 - 0.2, hy0 - 3.9, f"hole {L.CB_HOLE_D:g} mm", 12, "middle", 600, "#c0392b"))
-    body.append(text(0.0, L.BOARD_H + 7.4,
-                     "Spacing 23.0 x 24.0 mm from the CAD model of a CyberBrick receiver test housing (matches the manufacturer's image); hole 2.7 mm from the image. Verify with calipers.",
+    body += legend()
+    ny = L.BOARD_H + 6.2 + 1.05 * 9
+    body.append(text(0.0, ny, "Hole spacing 23.0 x 24.0 mm from the CAD model of a CyberBrick receiver test housing (matches the manufacturer's image).",
                      12, "start", fill=MUTED, mono=False))
-    body.append(text(0.0, L.BOARD_H + 8.3,
-                     f"A screw head of 4.5 mm leaves only {((L.CB_DX / 2 - L.BOARD_W / 2) ** 2 + (L.CB_DY / 2 - L.BOARD_H / 2) ** 2) ** 0.5 - 2.25:.2f} mm to the corner of the Zero; use a low or countersunk head, or shift the Zero.",
+    body.append(text(0.0, ny + 0.9, "Hole diameter 2.7 mm from the manufacturer's image. Verify both with calipers on the real receiver.",
                      12, "start", fill=MUTED, mono=False))
-    w = int(130 * 2 + 29 * S)
-    h = int(MY + (L.BOARD_H + 5.5) * S + 140)
+    clr = ((L.CB_DX / 2 - L.BOARD_W / 2) ** 2 + (L.CB_DY / 2 - L.BOARD_H / 2) ** 2) ** 0.5 - 2.25
+    body.append(text(0.0, ny + 1.8, f"A screw head of 4.5 mm leaves only {clr:.2f} mm to the corner of the Zero; use a low or countersunk head.",
+                     12, "start", fill=MUTED, mono=False))
+    w = int(130 * 2 + L.CB_W * S)
+    h = int(MY + (ny + 3.1) * S)
     return wrap(w, h, body), w, h
 
 
 def build_3d():
     tpl = (Path(__file__).parent / "shield-3d.template.html").read_text(encoding="utf-8")
     data = dict(
-        board=dict(w=L.BOARD_W, h=L.BOARD_H, t=L.BOARD_T), hdrX=L.HDR_X, hdrH=L.HDR_H, pinY=L.PIN_Y,
+        board=dict(x0=L.ZERO_CX - L.CB_W / 2, y0=L.ZERO_CY - L.CB_H / 2, w=L.CB_W, h=L.CB_H, t=L.BOARD_T),
+        zero=dict(w=L.BOARD_W, l=L.BOARD_H), holes=L.CB_HOLES, ringD=L.CB_RING_D, hdrX=L.HDR_X, hdrH=L.HDR_H, pinY=L.PIN_Y,
         leftPins=L.LEFT_PINS, rightPins=L.RIGHT_PINS, j1x=L.J1_X, j1y=L.J1_Y, parts=L.PARTS, nets=L.NETS,
         j2Pads=L.J2_PADS, gndVias=L.GND_VIAS, hopVias=L.HOP_VIAS, tp=L.TP, tpNames=L.TP_NAMES,
     )
@@ -235,24 +235,19 @@ def build_3d():
 def main():
     if not L.check():
         sys.exit(1)
-    svg = build_svg()
+    svg, w, h = build_svg()
     (ROOT / "docs" / "shield-mock.svg").write_text(svg, encoding="utf-8")
     (ROOT / "docs" / "shield-3d.html").write_text(build_3d(), encoding="utf-8")
-    holes_svg, hw, hh = build_holes_svg()
-    (ROOT / "docs" / "shield-mock-holes.svg").write_text(holes_svg, encoding="utf-8")
-    print("wrote docs/shield-mock.svg, docs/shield-mock-holes.svg and docs/shield-3d.html")
+    print("wrote docs/shield-mock.svg and docs/shield-3d.html")
     if "--png" in sys.argv:
         from playwright.sync_api import sync_playwright
         with sync_playwright() as p:
             b = p.chromium.launch()
-            pg = b.new_page(viewport={"width": W, "height": H}, device_scale_factor=1)
+            pg = b.new_page(viewport={"width": w, "height": h}, device_scale_factor=1)
             pg.goto("file://" + str(ROOT / "docs" / "shield-mock.svg"))
             pg.screenshot(path=str(ROOT / "docs" / "shield-mock.png"))
-            pg = b.new_page(viewport={"width": hw, "height": hh}, device_scale_factor=1)
-            pg.goto("file://" + str(ROOT / "docs" / "shield-mock-holes.svg"))
-            pg.screenshot(path=str(ROOT / "docs" / "shield-mock-holes.png"))
             b.close()
-        print("wrote docs/shield-mock.png and docs/shield-mock-holes.png")
+        print("wrote docs/shield-mock.png")
 
 
 if __name__ == "__main__":

@@ -87,15 +87,16 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
     <div id="info"><strong>Pick a part</strong><span>Select a row or hover the model to see what it does.</span></div>
   </aside>
 </div>
-<p class="note">The board is exactly the outline of the ESP32-S3-Zero and sits under it. Everything else fits in the gap between the two socket strips. Footprints and heights are typical values, to be replaced by the real ones when the schematic is drawn. The same layout as the 2D mock (docs/shield-mock.png).</p>
+<p class="note">The board is the size of the CyberBrick receiver shield (29 &times; 30 mm) with the same four mounting holes. The ESP32-S3-Zero sits in the middle; most parts are in the gap between its two socket strips, the power LED and the spare GPIO header are beside it so they stay visible. Footprints and heights are typical values, to be replaced by the real ones when the schematic is drawn. The same layout as the 2D mock (docs/shield-mock.png).</p>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
 (function () {
-  var D = {"board": {"w": 18.0, "h": 23.5, "t": 1.6}, "hdrX": [1.38, 16.62], "hdrH": 8.5, "pinY": [1.59, 4.13, 6.67, 9.21, 11.75, 14.29, 16.83, 19.37, 21.91], "leftPins": ["5V", "GND", "3V3", "IO1", "IO2", "IO3", "IO4", "IO5", "IO6"], "rightPins": ["TX", "RX", "IO13", "IO12", "IO11", "IO10", "IO9", "IO8", "IO7"], "j1x": [6.46, 9.0, 11.54], "j1y": 1.27, "parts": [{"ref": "J1", "kind": "hdr_ra", "x": 9.0, "y": 1.27, "w": 7.62, "h": 2.54, "z": 2.54, "name": "Input header (S, V, G)", "desc": "3-pin right-angle header at the top edge; the servo cable from PWM2 plugs in from outside. S = throttle copy, V = 5 V, G = ground."}, {"ref": "R1", "kind": "chip_r", "x": 6.46, "y": 4.7, "w": 1.5, "h": 2.8, "z": 0.5, "body": [1.25, 2.0], "name": "Resistor 1 kOhm", "desc": "Series resistor between the throttle signal and GPIO1."}, {"ref": "F1", "kind": "chip_f", "x": 9.0, "y": 5.0, "w": 2.0, "h": 4.1, "z": 1.0, "body": [1.6, 3.2], "name": "Resettable fuse (PTC)", "desc": "1206 PTC, about 0.5 A hold. Limits the current drawn from the servo port (the module takes about 0.1 A)."}, {"ref": "D1", "kind": "diode", "x": 9.0, "y": 9.4, "w": 1.8, "h": 4.0, "z": 1.1, "band": "bottom", "name": "Reverse-polarity diode", "desc": "Schottky diode (SOD-123) protecting the module if the servo cable is plugged in the wrong way round."}, {"ref": "D2", "kind": "diode", "x": 4.0, "y": 5.3, "w": 1.8, "h": 4.0, "z": 1.1, "band": "top", "name": "5 V OR-ing diode", "desc": "Keeps USB 5 V and servo-port 5 V from fighting, so both can be connected at the same time."}, {"ref": "R2", "kind": "chip_r", "x": 3.6, "y": 11.6, "w": 1.5, "h": 2.8, "z": 0.5, "body": [1.25, 2.0], "name": "Resistor 100 kOhm", "desc": "Pull-down on GPIO1, so the input has a defined level when the cable is unplugged."}, {"ref": "C1", "kind": "cap_t", "x": 13.5, "y": 13.6, "w": 3.4, "h": 7.8, "z": 2.8, "body": [3.2, 6.0], "name": "Bulk capacitor 100 uF", "desc": "Polymer/tantalum 6032 case. Absorbs the current peaks of loud passages so the 5 V rail does not sag."}, {"ref": "C2", "kind": "chip_c", "x": 5.2, "y": 16.6, "w": 2.7, "h": 1.5, "z": 0.9, "body": [2.0, 1.25], "name": "Decoupling 10 uF", "desc": "Ceramic 0805 close to the amplifier supply pin."}, {"ref": "C3", "kind": "chip_c", "x": 9.0, "y": 16.6, "w": 2.7, "h": 1.5, "z": 0.6, "body": [2.0, 1.25], "name": "Decoupling 100 nF", "desc": "Ceramic 0805 close to the amplifier supply pin."}, {"ref": "U1", "kind": "qfn", "x": 6.0, "y": 19.8, "w": 4.2, "h": 4.2, "z": 0.8, "body": [3.0, 3.0], "name": "MAX98357A amplifier", "desc": "I2S class-D amplifier, TQFN-16 3 x 3 mm. Receives BCLK, LRC and DIN from the ESP32 and drives the speaker directly."}, {"ref": "J2", "kind": "jst_side", "x": 12.2, "y": 21.35, "w": 4.0, "h": 4.3, "z": 3.9, "name": "Speaker connector (JST SH 1.0)", "desc": "JST SH 1.0 mm 2-pin side-entry connector at the bottom edge, the same type as the CyberBrick motor ports (M1/M2) and button ports. The speaker cable (for example the 2-pin SH cable of a button module) plugs in from outside."}], "nets": [{"net": "S", "color": "#ffb347", "pts": [[6.46, 1.27], [6.46, 3.8]]}, {"net": "S", "color": "#ffb347", "pts": [[6.46, 5.6], [6.46, 9.21], [1.38, 9.21]]}, {"net": "V", "color": "#ff7a6b", "pts": [[9.0, 1.27], [9.0, 3.35]]}, {"net": "V", "color": "#ff7a6b", "pts": [[9.0, 6.65], [9.0, 7.9]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[9.0, 10.9], [13.5, 10.9], [13.5, 10.6]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[9.0, 10.9], [9.0, 12.2], [5.0, 12.2], [5.0, 10.2]]}, {"net": "5V", "color": "#ff7a6b", "layer": "bot", "pts": [[5.0, 10.2], [5.0, 8.2]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[5.0, 8.2], [4.0, 8.2], [4.0, 6.9]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[4.0, 3.7], [4.0, 1.59], [1.38, 1.59]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[11.0, 10.9], [11.0, 15.3], [7.15, 15.3], [7.15, 18.05]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[6.2, 16.6], [7.15, 16.6]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[7.15, 16.6], [8.0, 16.6]]}, {"net": "DIN", "color": "#6ec1ff", "pts": [[1.38, 16.83], [3.4, 16.83], [3.4, 19.3], [4.25, 19.3]]}, {"net": "BCLK", "color": "#6ec1ff", "pts": [[1.38, 19.37], [3.0, 19.37], [3.0, 19.8], [4.25, 19.8]]}, {"net": "LRC", "color": "#6ec1ff", "pts": [[1.38, 21.91], [3.6, 21.91], [3.6, 20.3], [4.25, 20.3]]}, {"net": "SPK+", "color": "#ececec", "pts": [[7.75, 19.7], [11.7, 19.7]]}, {"net": "SPK-", "color": "#ececec", "pts": [[7.75, 20.3], [12.7, 20.3], [12.7, 19.7]]}, {"net": "S", "color": "#ffb347", "pts": [[3.6, 9.21], [3.6, 10.6]]}], "j2Pads": [[11.7, 19.7], [12.7, 19.7]], "gndVias": [[3.6, 13.4], [4.2, 15.5], [10.4, 15.6], [13.5, 17.2], [6.0, 19.8], [14.6, 9.9]], "hopVias": [[5.0, 10.2], [5.0, 8.2]], "tp": [[3.4, 22.7], [5.4, 22.7], [7.4, 22.7], [9.4, 22.7], [11.4, 22.7], [13.4, 22.7], [15.4, 22.7]], "tpNames": ["5V", "3V3", "GND", "IO1", "BCLK", "LRC", "DIN"]};
-  var BW = D.board.w, BH = D.board.h, BT = D.board.t;
-  document.getElementById('sub').textContent = BW + ' × ' + BH + ' mm · same outline as the ESP32-S3-Zero · mock, not routed';
+  var D = {"board": {"x0": -5.5, "y0": -3.25, "w": 29.0, "h": 30.0, "t": 1.6}, "zero": {"w": 18.0, "l": 23.5}, "holes": [[-2.5, -0.25, 2.7], [20.5, -0.25, 2.7], [-2.5, 23.75, 2.7], [20.5, 23.75, 2.7]], "ringD": 5.7, "hdrX": [1.38, 16.62], "hdrH": 8.5, "pinY": [1.59, 4.13, 6.67, 9.21, 11.75, 14.29, 16.83, 19.37, 21.91], "leftPins": ["5V", "GND", "3V3", "IO1", "IO2", "IO3", "IO4", "IO5", "IO6"], "rightPins": ["TX", "RX", "IO13", "IO12", "IO11", "IO10", "IO9", "IO8", "IO7"], "j1x": [6.46, 9.0, 11.54], "j1y": 1.27, "parts": [{"ref": "J1", "kind": "hdr_ra", "x": 9.0, "y": 1.27, "w": 7.62, "h": 2.54, "z": 2.54, "name": "Input header (S, V, G)", "desc": "3-pin right-angle header at the top edge; the servo cable from PWM2 plugs in from outside. S = throttle copy, V = 5 V, G = ground."}, {"ref": "R1", "kind": "chip_r", "x": 6.46, "y": 4.7, "w": 1.5, "h": 2.8, "z": 0.5, "body": [1.25, 2.0], "name": "Resistor 1 kOhm", "desc": "Series resistor between the throttle signal and GPIO1."}, {"ref": "F1", "kind": "chip_f", "x": 9.0, "y": 5.0, "w": 2.0, "h": 4.1, "z": 1.0, "body": [1.6, 3.2], "name": "Resettable fuse (PTC)", "desc": "1206 PTC, about 0.5 A hold. Limits the current drawn from the servo port (the module takes about 0.1 A)."}, {"ref": "D1", "kind": "diode", "x": 9.0, "y": 9.4, "w": 1.8, "h": 4.0, "z": 1.1, "band": "bottom", "name": "Reverse-polarity diode", "desc": "Schottky diode (SOD-123) protecting the module if the servo cable is plugged in the wrong way round."}, {"ref": "D2", "kind": "diode", "x": 4.0, "y": 5.3, "w": 1.8, "h": 4.0, "z": 1.1, "band": "top", "name": "5 V OR-ing diode", "desc": "Keeps USB 5 V and servo-port 5 V from fighting, so both can be connected at the same time."}, {"ref": "R2", "kind": "chip_r", "x": 3.6, "y": 11.6, "w": 1.5, "h": 2.8, "z": 0.5, "body": [1.25, 2.0], "name": "Resistor 100 kOhm", "desc": "Pull-down on GPIO1, so the input has a defined level when the cable is unplugged."}, {"ref": "C1", "kind": "cap_t", "x": 13.5, "y": 13.6, "w": 3.4, "h": 7.8, "z": 2.8, "body": [3.2, 6.0], "name": "Bulk capacitor 100 uF", "desc": "Polymer/tantalum 6032 case. Absorbs the current peaks of loud passages so the 5 V rail does not sag."}, {"ref": "C2", "kind": "chip_c", "x": 5.2, "y": 16.6, "w": 2.7, "h": 1.5, "z": 0.9, "body": [2.0, 1.25], "name": "Decoupling 10 uF", "desc": "Ceramic 0805 close to the amplifier supply pin."}, {"ref": "C3", "kind": "chip_c", "x": 9.0, "y": 16.6, "w": 2.7, "h": 1.5, "z": 0.6, "body": [2.0, 1.25], "name": "Decoupling 100 nF", "desc": "Ceramic 0805 close to the amplifier supply pin."}, {"ref": "U1", "kind": "qfn", "x": 6.0, "y": 19.8, "w": 4.2, "h": 4.2, "z": 0.8, "body": [3.0, 3.0], "name": "MAX98357A amplifier", "desc": "I2S class-D amplifier, TQFN-16 3 x 3 mm. Receives BCLK, LRC and DIN from the ESP32 and drives the speaker directly."}, {"ref": "J2", "kind": "jst_side", "x": 12.2, "y": 21.35, "w": 4.0, "h": 4.3, "z": 3.9, "name": "Speaker connector (JST SH 1.0)", "desc": "JST SH 1.0 mm 2-pin side-entry connector at the bottom edge, the same type as the CyberBrick motor ports (M1/M2) and button ports. The speaker cable (for example the 2-pin SH cable of a button module) plugs in from outside."}, {"ref": "LED1", "kind": "led", "x": -4.1, "y": 7.94, "w": 2.2, "h": 1.2, "z": 0.6, "margin": true, "name": "Power LED", "desc": "Lights when the servo-port 5 V is present (taken after the reverse-polarity diode D1), so you can see that the cable and the receiver are fine. Hardware only, no firmware needed. Placed beside the Zero because the Zero would hide it."}, {"ref": "R3", "kind": "chip_r", "x": -1.4, "y": 7.94, "w": 2.8, "h": 1.5, "z": 0.5, "body": [2.0, 1.25], "margin": true, "name": "LED resistor 1 kOhm", "desc": "Series resistor of the power LED (about 3 mA)."}, {"ref": "J3", "kind": "hdr_v", "x": 20.5, "y": 13.02, "w": 2.54, "h": 10.16, "z": 2.5, "margin": true, "pins": [[20.5, 9.21], [20.5, 11.75], [20.5, 14.29], [20.5, 16.83]], "pin_names": ["IO12", "IO11", "IO10", "GND"], "name": "Spare GPIO header", "desc": "1x4 pin header with three free GPIOs (IO12, IO11, IO10) and ground, for later inputs, for example a switch for an engine-stop sound."}], "nets": [{"net": "S", "color": "#ffb347", "pts": [[6.46, 1.27], [6.46, 3.8]]}, {"net": "S", "color": "#ffb347", "pts": [[6.46, 5.6], [6.46, 9.21], [1.38, 9.21]]}, {"net": "V", "color": "#ff7a6b", "pts": [[9.0, 1.27], [9.0, 3.35]]}, {"net": "V", "color": "#ff7a6b", "pts": [[9.0, 6.65], [9.0, 7.9]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[9.0, 10.9], [13.5, 10.9], [13.5, 10.6]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[9.0, 10.9], [9.0, 12.2], [5.0, 12.2], [5.0, 10.2]]}, {"net": "5V", "color": "#ff7a6b", "layer": "bot", "pts": [[5.0, 10.2], [5.0, 8.2]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[5.0, 8.2], [4.0, 8.2], [4.0, 6.9]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[4.0, 3.7], [4.0, 1.59], [1.38, 1.59]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[11.0, 10.9], [11.0, 15.3], [7.15, 15.3], [7.15, 18.05]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[6.2, 16.6], [7.15, 16.6]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[7.15, 16.6], [8.0, 16.6]]}, {"net": "DIN", "color": "#6ec1ff", "pts": [[1.38, 16.83], [3.4, 16.83], [3.4, 19.3], [4.25, 19.3]]}, {"net": "BCLK", "color": "#6ec1ff", "pts": [[1.38, 19.37], [3.0, 19.37], [3.0, 19.8], [4.25, 19.8]]}, {"net": "LRC", "color": "#6ec1ff", "pts": [[1.38, 21.91], [3.6, 21.91], [3.6, 20.3], [4.25, 20.3]]}, {"net": "SPK+", "color": "#ececec", "pts": [[7.75, 19.7], [11.7, 19.7]]}, {"net": "SPK-", "color": "#ececec", "pts": [[7.75, 20.3], [12.7, 20.3], [12.7, 19.7]]}, {"net": "S", "color": "#ffb347", "pts": [[3.6, 9.21], [3.6, 10.6]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[4.0, 7.94], [-0.2, 7.94]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[-2.6, 7.94], [-3.25, 7.94]]}, {"net": "GND", "color": "#9aa7b4", "pts": [[-4.95, 7.94], [-4.95, 9.0], [-4.2, 9.0]]}, {"net": "IO12", "color": "#d6a8ff", "pts": [[16.62, 9.21], [20.5, 9.21]]}, {"net": "IO11", "color": "#d6a8ff", "pts": [[16.62, 11.75], [20.5, 11.75]]}, {"net": "IO10", "color": "#d6a8ff", "pts": [[16.62, 14.29], [20.5, 14.29]]}, {"net": "GND", "color": "#9aa7b4", "pts": [[20.5, 16.83], [20.5, 18.9]]}], "j2Pads": [[11.7, 19.7], [12.7, 19.7]], "gndVias": [[3.6, 13.4], [4.2, 15.5], [10.4, 15.6], [13.5, 17.2], [6.0, 19.8], [14.6, 9.9], [-4.2, 9.0], [20.5, 18.9]], "hopVias": [[5.0, 10.2], [5.0, 8.2]], "tp": [[3.4, 22.7], [5.4, 22.7], [7.4, 22.7], [9.4, 22.7], [11.4, 22.7], [13.4, 22.7], [15.4, 22.7]], "tpNames": ["5V", "3V3", "GND", "IO1", "BCLK", "LRC", "DIN"]};
+  var BW = D.board.w, BH = D.board.h, BT = D.board.t, BX0 = D.board.x0, BY0 = D.board.y0;
+  var CXM = BX0 + BW / 2, CYM = BY0 + BH / 2, ZW = D.zero.w, ZL = D.zero.l;
+  document.getElementById('sub').textContent = BW + ' × ' + BH + ' mm · same size and mounting holes as the CyberBrick receiver shield · mock, not routed';
 
   var canvas = document.getElementById('view');
   var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
@@ -106,13 +107,13 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
   var camera = new THREE.PerspectiveCamera(30, 1, 1, 400);
   var controls = new THREE.OrbitControls(camera, canvas);
   controls.enableDamping = true; controls.dampingFactor = 0.08;
-  controls.minDistance = 20; controls.maxDistance = 200;
+  controls.minDistance = 24; controls.maxDistance = 220;
 
   scene.add(new THREE.HemisphereLight(0xffffff, 0x8a96a3, 0.85));
   var sun = new THREE.DirectionalLight(0xffffff, 0.9);
   sun.position.set(30, 60, 35); sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
-  sun.shadow.camera.left = -25; sun.shadow.camera.right = 25; sun.shadow.camera.top = 25; sun.shadow.camera.bottom = -25;
+  sun.shadow.camera.left = -32; sun.shadow.camera.right = 32; sun.shadow.camera.top = 32; sun.shadow.camera.bottom = -32;
   sun.shadow.camera.far = 160; sun.shadow.bias = -0.0004;
   scene.add(sun);
   var fill = new THREE.DirectionalLight(0xbcd4ff, 0.35);
@@ -129,11 +130,11 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
     board: mat(0x1b6b36, { r: 0.7 }), black: mat(0x1c1c1e, { r: 0.6 }), gold: mat(0xd8b04a, { r: 0.3, m: 0.85 }),
     silver: mat(0xc9ced4, { r: 0.35, m: 0.85 }), ivory: mat(0xece6d6, { r: 0.7 }), ivoryD: mat(0xb9b29c, { r: 0.8 }),
     beige: mat(0xd6b77e, { r: 0.6 }), ptc: mat(0xe3cf5e, { r: 0.6 }), res: mat(0x2a2a2a, { r: 0.6 }),
-    tan: mat(0xe0a85b, { r: 0.55 }), tanD: mat(0x3a2a10, { r: 0.6 })
+    tan: mat(0xe0a85b, { r: 0.55 }), tanD: mat(0x3a2a10, { r: 0.6 }), ledG: mat(0x59e06f, { r: 0.3 })
   };
 
   // board coords (x right, y down from top-left) -> scene; base = bottom of the part above the board bottom face
-  function place(m, x, y, base, h) { m.position.set(x - BW / 2, base + h / 2, y - BH / 2); return m; }
+  function place(m, x, y, base, h) { m.position.set(x - CXM, base + h / 2, y - CYM); return m; }
   function box(x, y, w, d, h, material, base) {
     var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
     m.castShadow = true; m.receiveShadow = true;
@@ -153,6 +154,11 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
   shape.lineTo(BW / 2, BH / 2 - rr); shape.quadraticCurveTo(BW / 2, BH / 2, BW / 2 - rr, BH / 2);
   shape.lineTo(-BW / 2 + rr, BH / 2); shape.quadraticCurveTo(-BW / 2, BH / 2, -BW / 2, BH / 2 - rr);
   shape.lineTo(-BW / 2, -BH / 2 + rr); shape.quadraticCurveTo(-BW / 2, -BH / 2, -BW / 2 + rr, -BH / 2);
+  D.holes.forEach(function (h) {
+    var pth = new THREE.Path();
+    pth.absarc(h[0] - CXM, -(h[1] - CYM), h[2] / 2, 0, Math.PI * 2, true);
+    shape.holes.push(pth);
+  });
   var boardGeo = new THREE.ExtrudeGeometry(shape, { depth: BT, bevelEnabled: false, curveSegments: 24 });
   boardGeo.rotateX(-Math.PI / 2);
   var boardMesh = new THREE.Mesh(boardGeo, M.board);
@@ -168,7 +174,7 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
     return { c: c, x: c.getContext('2d'), t: t };
   }
   var top = mkSurface(false), bot = mkSurface(false);
-  function P(x, y) { return [x * PXMM, y * PXMM]; }
+  function P(x, y) { return [(x - BX0) * PXMM, (y - BY0) * PXMM]; }
   function line(cx, pts, color, w, dash) {
     cx.beginPath();
     pts.forEach(function (p, k) { var q = P(p[0], p[1]); if (k) cx.lineTo(q[0], q[1]); else cx.moveTo(q[0], q[1]); });
@@ -186,6 +192,8 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
 
   function paint() {
     var cx = top.x; cx.clearRect(0, 0, top.c.width, top.c.height);
+    function ring(c) { D.holes.forEach(function (h) { dot(c, h[0], h[1], D.ringD / 2, '#d8b04a'); c.globalCompositeOperation = 'destination-out'; dot(c, h[0], h[1], h[2] / 2, '#000'); c.globalCompositeOperation = 'source-over'; }); }
+    ring(cx);
     D.hdrX.forEach(function (hx) { D.pinY.forEach(function (py) { dot(cx, hx, py, 0.55, '#d8b04a'); dot(cx, hx, py, 0.3, '#14452a'); }); });
     if (showNets) {
       D.nets.forEach(function (n) { line(cx, n.pts, n.color, 0.35, n.layer === 'bot' ? [0.45, 0.35] : null); });
@@ -201,16 +209,20 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
       txt(cx, 'C2', 5.2, 15.6, 0.5, { align: 'center' }); txt(cx, 'C3', 9.0, 15.6, 0.5, { align: 'center' });
       txt(cx, 'U1', 6.0, 22.3, 0.5, { align: 'center' }); txt(cx, 'J2', 12.2, 22.9, 0.5, { align: 'center', color: '#1b2530' });
       txt(cx, 'SPK', 12.2, 18.2, 0.5, { align: 'center' });
+      txt(cx, 'LED1', -4.1, 6.6, 0.5, { align: 'center' }); txt(cx, 'R3', -1.4, 6.6, 0.5, { align: 'center' });
+      txt(cx, 'J3', 20.5, 7.4, 0.55, { align: 'center', bold: true });
+      D.parts.forEach(function (p) { if (p.kind === 'hdr_v') p.pins.forEach(function (q, k) { txt(cx, p.pin_names[k], q[0] + 1.9, q[1], 0.5, { align: 'left' }); }); });
     }
     top.t.needsUpdate = true;
 
     cx = bot.x; cx.clearRect(0, 0, bot.c.width, bot.c.height);
     cx.fillStyle = 'rgba(214,160,60,0.28)'; cx.fillRect(0.5 * PXMM, 0.5 * PXMM, (BW - 1) * PXMM, (BH - 1) * PXMM);
+    ring(cx);
     D.tp.forEach(function (p, k) {
       dot(cx, p[0], p[1], 0.55, '#d8b04a');
       txt(cx, D.tpNames[k], p[0], p[1] - 1.05, 0.5, { align: 'center', color: '#f4f4ee' });
     });
-    txt(cx, 'GND plane', 9.0, 4.0, 0.7, { align: 'center', color: '#f4f4ee', bold: true });
+    txt(cx, 'GND plane', 9.0, -1.0, 0.7, { align: 'center', color: '#f4f4ee', bold: true });
     txt(cx, 'TEST POINTS', 9.0, 20.9, 0.55, { align: 'center', color: '#f4f4ee', bold: true });
     bot.t.needsUpdate = true;
   }
@@ -261,6 +273,12 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
         if (s === 3) g.add(box(p.x + 1.55, p.y + off, 0.5, 0.28, 0.12, M.gold));
       }
       g.add(box(p.x - 1.0, p.y - 1.0, 0.4, 0.4, 0.82, M.silver));
+    } else if (k === 'led') {
+      g.add(box(p.x, p.y, 1.6, 0.8, p.z, M.ledG));
+      g.add(box(p.x - 0.85, p.y, 0.4, 0.8, p.z + 0.02, M.silver)); g.add(box(p.x + 0.85, p.y, 0.4, 0.8, p.z + 0.02, M.silver));
+    } else if (k === 'hdr_v') {
+      g.add(box(p.x, p.y, p.w, p.h, p.z, M.black));
+      p.pins.forEach(function (q) { g.add(box(q[0], q[1], 0.64, 0.64, 8.5, M.gold, BT + 0.5)); });
     } else if (k === 'jst_side') {
       g.add(box(p.x, p.y, p.w, p.h, p.z, M.ivory));
       g.add(box(p.x, p.y + p.h / 2 - 1.3, p.w - 1.0, 2.7, p.z - 1.0, M.ivoryD, BT + 0.5));   // opening towards the edge
@@ -285,24 +303,24 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
     var zb = BT + D.hdrH, zr = G();
     var mZ = zm(M.res), mS = zm(M.silver), mG = zm(M.gold), mD = zm(M.black), mB = zm(mat(0x8d949c, { r: 0.5, m: 0.4 }));
     mZ.color.set(0x15161a);
-    zr.add(box(BW / 2, BH / 2, BW, BH, 1.0, mZ, zb));
-    zr.add(box(BW / 2, 3.5, 8.94, 7.3, 3.26, mS, zb + 1.0));
-    zr.add(box(BW / 2, 3.5, 7.4, 6.0, 3.3, mD, zb + 1.0));
-    zr.add(box(BW / 2, 13.2, 12.5, 12.5, 2.3, mS, zb + 1.0));
+    zr.add(box(ZW / 2, ZL / 2, ZW, ZL, 1.0, mZ, zb));
+    zr.add(box(ZW / 2, 3.5, 8.94, 7.3, 3.26, mS, zb + 1.0));
+    zr.add(box(ZW / 2, 3.5, 7.4, 6.0, 3.3, mD, zb + 1.0));
+    zr.add(box(ZW / 2, 13.2, 12.5, 12.5, 2.3, mS, zb + 1.0));
     zr.add(box(5.6, 21.2, 3.0, 1.8, 1.4, mB, zb + 1.0)); zr.add(box(12.4, 21.2, 3.0, 1.8, 1.4, mB, zb + 1.0));
-    var c2 = document.createElement('canvas'); c2.width = BW * 50; c2.height = BH * 50;
+    var c2 = document.createElement('canvas'); c2.width = ZW * 50; c2.height = ZL * 50;
     var x2 = c2.getContext('2d'); x2.textBaseline = 'middle'; x2.fillStyle = '#e7e7e0';
     x2.font = '500 22px "IBM Plex Mono", monospace';
     for (var i = 0; i < 9; i++) {
       var yy = D.pinY[i] * 50;
       x2.textAlign = 'left'; x2.fillText(D.leftPins[i], 1.05 * 50, yy);
-      x2.textAlign = 'right'; x2.fillText(D.rightPins[i], (BW - 1.05) * 50, yy);
+      x2.textAlign = 'right'; x2.fillText(D.rightPins[i], (ZW - 1.05) * 50, yy);
     }
-    x2.textAlign = 'center'; x2.font = '600 24px "IBM Plex Mono", monospace'; x2.fillText('ESP32-S3-Zero', BW * 25, 16.6 * 50);
+    x2.textAlign = 'center'; x2.font = '600 24px "IBM Plex Mono", monospace'; x2.fillText('ESP32-S3-Zero', ZW * 25, 16.6 * 50);
     var t2 = new THREE.CanvasTexture(c2); t2.anisotropy = 8;
     var lm = new THREE.MeshBasicMaterial({ map: t2, transparent: true, depthWrite: false });
-    var lab = new THREE.Mesh(new THREE.PlaneGeometry(BW, BH), lm);
-    lab.rotation.x = -Math.PI / 2; lab.position.set(0, zb + 1.012, 0); lab.userData.noPick = true; zr.add(lab);
+    var lab = new THREE.Mesh(new THREE.PlaneGeometry(ZW, ZL), lm);
+    lab.rotation.x = -Math.PI / 2; lab.position.set(ZW / 2 - CXM, zb + 1.012, ZL / 2 - CYM); lab.userData.noPick = true; zr.add(lab);
     zeroGroup.add(zr);
   })();
   reg('U0', 'ESP32-S3-Zero', 'The controller module on two 9-pin female headers, 8.5 mm above the shield. Reads the throttle pulse on GPIO1 and plays the engine sound over I2S (GPIO4, 5, 6). USB-C and the Boot/Reset buttons stay reachable.', zeroGroup);
@@ -374,7 +392,7 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
   document.getElementById('tSilk').addEventListener('change', function (e) { showSilk = e.target.checked; paint(); });
 
   // ---------- camera presets ----------
-  var views = { iso: [27, 31, 41], top: [0, 62, 0.01], front: [0, 14, 100], back: [14, -52, 26] };
+  var views = { iso: [34, 40, 52], top: [0, 80, 0.01], front: [0, 16, 120], back: [18, -64, 32] };
   var target = new THREE.Vector3(0, 4, 0);
   function setView(name) { var v = views[name]; camera.position.set(v[0], v[1], v[2]); controls.target.copy(target); controls.update(); }
   Array.prototype.forEach.call(document.querySelectorAll('[data-view]'), function (b) { b.addEventListener('click', function () { setView(b.dataset.view); }); });
