@@ -31,7 +31,7 @@ The firmware embeds `firmware/include/engine_sample.h`, a synthesised engine loo
 The CC0 loops in `assets/samples/` (see `LICENSE-SAMPLES.md`) are almost pure low tones that a small speaker cannot play, so they are kept only for reference (`tools/make_sample.py` converts them).
 
 ## Building
-Open the `firmware/` folder in VS Code with the PlatformIO extension, or run `pio run -e <env> -t upload` with `<env>` one of `test_tone`, `pulse_measure`, `engine`, `engine_pulse` (default engine sound), `engine_diesel` (real diesel idle loop, pitch-shifted; also shows the status colours), `engine_real` (experiment, needs a locally generated header). See `docs/bringup.md`.
+Open the `firmware/` folder in VS Code with the PlatformIO extension, or run `pio run -e <env> -t upload` with `<env>` one of `test_tone`, `pulse_measure`, `engine`, `engine_pulse` (default engine sound), `engine_diesel` and `engine_truck` (real diesel and truck idle loops, pitch-shifted; also show the status colours), `engine_real` (experiment, needs a locally generated header). See `docs/bringup.md`.
 
 ## Status LED
 The `engine_pulse` firmware shows its state on the Zero's onboard RGB LED (GPIO21): a blue flash at start-up, **red** when no valid throttle pulse arrives (cable, port or receiver problem), **dim green** with the stick at rest and **cyan**, brightening with the throttle. Switch it off with `STATUS_LED_ENABLED` in `firmware/include/config.h`. Not tested on hardware yet.

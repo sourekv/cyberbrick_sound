@@ -5,10 +5,14 @@
 #include "driver/i2s.h"
 #include "config.h"
 #include "status_led.h"
-#ifdef ENGINE_DIESEL
-#include "engine_diesel.h"          // real diesel idle loop (CC0), see assets/samples/LICENSE-SAMPLES.md
+#if defined(ENGINE_TRUCK)
+#include "engine_truck.h"           // real truck idle loop (CC0), see assets/samples/LICENSE-SAMPLES.md
 static const float RATE_IDLE = 1.0f;  // playback rate at rest
 static const float RATE_FULL = 3.0f;  // playback rate at full throttle
+#elif defined(ENGINE_DIESEL)
+#include "engine_diesel.h"          // real diesel idle loop (CC0), see assets/samples/LICENSE-SAMPLES.md
+static const float RATE_IDLE = 1.0f;
+static const float RATE_FULL = 3.0f;
 #else
 #include "engine_sample.h"          // synthesised loop
 static const float RATE_IDLE = 0.7f;

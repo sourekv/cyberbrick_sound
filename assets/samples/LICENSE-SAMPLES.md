@@ -22,11 +22,12 @@ Original: "Diesel engine starting revving and stopping", Citroen Jumpy 2010 2.0 
 Derived file: `diesel_idle_loop.wav` (2.09 s, 22.05 kHz mono), cut from the steady idle part with `tools/make_diesel_loop.py`; `tools/make_engine_diesel.py` turns it into `firmware/include/engine_diesel.h`.
 Note: the same recording is also offered on Pixabay under the Pixabay licence; use the Freesound original (CC0).
 
-## Truck idle recording (under evaluation, not used by the firmware yet)
+## Truck idle recording (used by the `engine_truck` firmware)
 Source: https://freesound.org/people/wesleywestmusic/sounds/680686/
 Author: wesleywestmusic (recorded in Bellville, Western Cape, South Africa; uploaded 2023-03-27)
 License: CC0 1.0 (public domain dedication); the licence on the Freesound page was checked on 2026-10-31 from a screenshot of the page supplied by the project owner (the page itself could not be fetched from the build environment)
 Original: "Truck Revving Idling Engine Sound", 48 s, 48 kHz 16 bit stereo WAV, recorded and edited by the author in Logic Pro. The original is not stored here.
+Derived file: `truck_idle_loop.wav` (5.34 s, 22.05 kHz mono), cut from the idle part from 10 s with `python tools/make_diesel_loop.py <original> assets/samples/truck_idle_loop.wav --start 10 --min 3 --max 6`; `tools/make_engine_diesel.py assets/samples/truck_idle_loop.wav firmware/include/engine_truck.h` turns it into the firmware header.
 Content (own analysis): a steady idle of a larger diesel at about 8 crank revolutions per second (roughly 500 rpm, about 25 firing pulses per second), constant level from 2 s to 46 s, no real rev sweep; the first 2 s are louder and lower.
 The author asks (not a licence condition) that users of his sounds subscribe to his YouTube channel: https://www.youtube.com/@WesleyWestMusic
 
