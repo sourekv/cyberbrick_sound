@@ -11,10 +11,10 @@
 #include "engine_grains.h"
 
 #ifndef ENGINE_FIRE_IDLE_HZ
-#define ENGINE_FIRE_IDLE_HZ 38.0f    // firing pulses per second at idle
+#define ENGINE_FIRE_IDLE_HZ 30.0f    // firing pulses per second at idle
 #endif
 #ifndef ENGINE_FIRE_MAX_HZ
-#define ENGINE_FIRE_MAX_HZ 125.0f    // firing pulses per second at full throttle
+#define ENGINE_FIRE_MAX_HZ 100.0f    // firing pulses per second at full throttle
 #endif
 #ifndef ENGINE_OUT_GAIN
 #define ENGINE_OUT_GAIN 5.0f
