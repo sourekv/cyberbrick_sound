@@ -90,21 +90,39 @@ LABELS = [
 ]
 
 
-# Board variants. Outline polygons and holes are in the same coordinates as the parts (origin = top-left
-# corner of the Zero, which always keeps the same place on the board). Hole = (x, y, diameter).
-# The mounting hole positions for the CyberBrick-sized variant are PLACEHOLDERS: the real hole pattern of the
-# CyberBrick shields is not published and must be measured on the real receiver shield (30 x 29 mm).
+# Mounting holes matching the CyberBrick receiver shield (XA004, 29 x 30 mm).
+# Measured on the manufacturer's product image of the receiver shield XA004 (Bambu Lab store; "for reference only",
+# not stored in this repository because of its copyright):
+# four corner holes, diameter 2.7 mm (printed on the image), copper ring about 5.7 mm, centres about 2.9 mm from the
+# board edges, so a spacing of about 23.2 x 24.2 mm. VERIFY with calipers on the real receiver before ordering.
+CB_W, CB_H = 29.0, 30.0
+CB_HOLE_D, CB_RING_D = 2.7, 5.7
+CB_DX, CB_DY = 23.2, 24.2                       # hole spacing
+ZERO_CX, ZERO_CY = BOARD_W / 2, BOARD_H / 2     # centre of the Zero; the CyberBrick pattern is centred on it
+CB_HOLES = [[round(ZERO_CX + sx * CB_DX / 2, 2), round(ZERO_CY + sy * CB_DY / 2, 2), CB_HOLE_D]
+            for sy in (-1, 1) for sx in (-1, 1)]
+
+
+def _ear(h):
+    """Ear = round land around a hole plus a neck to the Zero-sized board."""
+    x, y, _ = h
+    nx = 0.5 if x < ZERO_CX else BOARD_W - 0.5
+    return [("circle", x, y, CB_RING_D / 2), ("rect", min(x, nx), y - 1.6, max(x, nx), y + 1.6, 0)]
+
+
+# Outline shapes are a union of ("rect", x0, y0, x1, y1, corner radius) and ("circle", cx, cy, r),
+# in the same coordinates as the parts (origin = top-left corner of the Zero).
 VARIANTS = [
-    dict(id="zero", name="Zero size", short="18 x 23.5 mm, same outline as the Zero, no mounting holes",
-         outline=[[0, 0], [18, 0], [18, 23.5], [0, 23.5]], holes=[]),
-    dict(id="ears", name="Compact + ears", short="two mounting ears at the sides of the Zero, M2 holes",
-         outline=[[0, 0], [18, 0], [18, 8.0], [22.0, 8.0], [22.0, 15.5], [18, 15.5], [18, 23.5], [0, 23.5],
-                  [0, 15.5], [-4.0, 15.5], [-4.0, 8.0], [0, 8.0]],
-         holes=[[-2.0, 11.75, 2.2], [20.0, 11.75, 2.2]]),
-    dict(id="cb", name="CyberBrick size", short="30 x 29 mm like the CyberBrick receiver shield, four corner holes (placeholder positions)",
-         outline=[[-6.0, -2.75], [24.0, -2.75], [24.0, 26.25], [-6.0, 26.25]],
-         holes=[[-3.5, -0.25, 2.2], [21.5, -0.25, 2.2], [-3.5, 23.75, 2.2], [21.5, 23.75, 2.2]]),
+    dict(id="zero", name="Zero size", short="18 x 23.5 mm, no mounting holes",
+         shapes=[("rect", 0, 0, BOARD_W, BOARD_H, 1.2)], holes=[]),
+    dict(id="cb", name="CyberBrick size", short="29 x 30 mm like the CyberBrick receiver shield, its four holes",
+         shapes=[("rect", ZERO_CX - CB_W / 2, ZERO_CY - CB_H / 2, ZERO_CX + CB_W / 2, ZERO_CY + CB_H / 2, 1.5)],
+         holes=CB_HOLES),
+    dict(id="ears", name="Zero size + four ears", short="the Zero-sized board with four small ears carrying the same four holes",
+         shapes=[("rect", 0, 0, BOARD_W, BOARD_H, 1.2)] + [sh for h in CB_HOLES for sh in _ear(h)],
+         holes=CB_HOLES),
 ]
+VARIANT = {v["id"]: v for v in VARIANTS}
 
 
 def bounds(outline):
