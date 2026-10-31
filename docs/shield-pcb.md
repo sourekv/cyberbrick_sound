@@ -37,3 +37,31 @@ Nothing else can be connected to PWM2: a servo there would follow the throttle. 
 On a classic RC model the receiver drives the ESC with a servo-type signal, so a module would sit between receiver and ESC: read the signal, play the sound and pass the signal on unchanged. That needs a different board (input from the receiver, output to the ESC, a pass-through path that never interferes). It is **not** needed for CyberBrick and is not planned now.
 
 Before such a variant, the signals of the target receiver would have to be measured, because they are more varied than the CyberBrick servo port: signal level (3.3 V or 5 V), pulse range and neutral point of the throttle channel, frame rate (50 Hz up to several hundred Hz for some receivers), behaviour at failsafe and whether the ESC's BEC powers the receiver (and so whether the module may take power from it). The firmware's pulse constants in `config.h` would then be re-derived from those measurements.
+
+## Component list (draft, independent of how the board is assembled)
+
+Part numbers are examples to be checked when the schematic is drawn; values marked "check" depend on a datasheet detail not yet verified.
+
+| Group | Component | Qty | Notes |
+|---|---|---|---|
+| Controller | Waveshare ESP32-S3-Zero-N8R8-M | 1 | as on the prototype |
+| | 2.54 mm female header, 9 pins | 2 | one per long edge of the Zero (5V, GND, 3V3, 1..6 and TX, RX, 13..7); omit if the Zero is soldered directly |
+| Amplifier | MAX98357AETE+ (I2S class-D amp, TQFN-16 3x3 mm) | 1 | alternative: MAX98357AEWL+ (WLP-9), smaller but harder to route; or a plug-in breakout module instead of the chip |
+| | Decoupling for the amp supply: 10 uF + 100 nF ceramic, close to VDD | 1 + 1 | |
+| | Bulk capacitor 100-470 uF, 10 V (polymer or electrolytic) | 1 | near the amplifier supply |
+| | GAIN and SD_MODE configuration: solder-jumper pads and 100 kOhm resistors | 2-3 | default GAIN open = 9 dB; the SD_MODE resistor values that give (L+R)/2 are to be checked in the datasheet (the firmware sends the same sample on both channels) |
+| | Optional 22-33 Ohm series resistors on BCLK, LRC, DIN | 3 | EMI damping; can be 0 Ohm |
+| | Optional ferrite beads and small capacitors on the speaker outputs | 2 + 2 | only if EMI becomes a problem with longer speaker wires |
+| Speaker | JST-PH 2-pin connector (for example S2B-PH-K or B2B-PH-K) + mating cable | 1 | or two solder pads |
+| Input | 3-pin 2.54 mm pin header (S, V, G) | 1 | mates with a 3-pin female servo/Dupont cable to PWM2 (check the orientation against the receiver's header) |
+| | Resistor 1 kOhm | 1 | series resistor S to GPIO1 |
+| | Resistor 100 kOhm | 1 | pull-down on GPIO1 (defined level when the cable is unplugged) |
+| | ESD/TVS diode, low capacitance (optional) | 1 | on the S line |
+| Power | Resettable fuse (PTC), about 0.5 A hold | 1 | the module draws about 0.1 A average |
+| | Reverse-polarity protection: Schottky diode (for example SS14) or P-MOSFET | 1 | a Schottky drops about 0.3-0.4 V, which is acceptable at this current (the amplifier needs 2.5-5.5 V) |
+| | Diode (or ideal diode) between servo 5 V and USB 5 V | 1 | so both can be connected; check first whether the Zero's 5V pin already has a diode towards USB |
+| | Ceramic capacitors 100 nF | 2-3 | general decoupling |
+| Service | Test points (5 V, 3.3 V, GND, GPIO1, BCLK, LRC, DIN) | 7 | 1 mm pads |
+| | Status LED + 1 kOhm resistor (optional) | 1 + 1 | |
+| | Spare GPIO header 1x4 (optional) | 1 | for later inputs, for example a switch for an engine-stop sound |
+| Mechanical | M2 mounting holes | 2-4 | position depends on the space in the model |
