@@ -1,31 +1,38 @@
 #!/usr/bin/env python3
-"""Cut a seamless idle loop out of the CC0 diesel recording and write assets/samples/diesel_idle_loop.wav.
+"""Cut a seamless idle loop out of a recording of a steady engine and write it as a 22.05 kHz mono WAV.
 
-Source: https://freesound.org/people/chlund/sounds/500193/  (chlund, CC0)
-        "Diesel engine starting revving and stopping", Citroen Jumpy 2010 2.0 HDI, 18.08 s, 44.1 kHz stereo.
-The original is not stored in the repository; download it from Freesound and pass its path.
+Used so far (originals are not stored in the repository, download them from Freesound):
+  Citroen diesel: https://freesound.org/people/chlund/sounds/500193/ (CC0)
+      python tools/make_diesel_loop.py 500193__chlund__...wav assets/samples/diesel_idle_loop.wav
+      (defaults: --start 4.0 --min 1.5 --max 3.2)
 
-Steps: mono, resample to 22.05 kHz, take the steady idle part (from 4.0 s), search the loop length (1.5..3.2 s)
+Steps: mono, resample to 22.05 kHz, take the steady part from --start, search the loop length (--min..--max seconds)
 whose end best continues into its start, and crossfade 50 ms (the loop start blends into the real continuation
 of the recording). Normalise to 0.85 of full scale.
 
-Usage: python tools/make_diesel_loop.py path/to/500193__chlund__diesel-engine-starting-revving-and-stopping.wav
+Usage: python tools/make_diesel_loop.py input.wav output.wav [--start S] [--min SECONDS] [--max SECONDS]
 Needs numpy and scipy.
 """
+import argparse
 import os, sys
 import numpy as np
 import scipy.io.wavfile as wav
 import scipy.signal as sg
 
 OUT = 22050
-START_S = 4.0
+ap = argparse.ArgumentParser()
+ap.add_argument("src"); ap.add_argument("dst")
+ap.add_argument("--start", type=float, default=4.0)
+ap.add_argument("--min", type=float, default=1.5)
+ap.add_argument("--max", type=float, default=3.2)
+args = ap.parse_args()
+START_S = args.start
 MATCH_S = 0.25
-LOOP_MIN_S, LOOP_MAX_S = 1.5, 3.2
+LOOP_MIN_S, LOOP_MAX_S = args.min, args.max
 XFADE_S = 0.05
 PEAK = 0.85
 
-src = sys.argv[1]
-dst = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "samples", "diesel_idle_loop.wav")
+src, dst = args.src, args.dst
 
 sr, x = wav.read(src)
 x = x.astype(float)
