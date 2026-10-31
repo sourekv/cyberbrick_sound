@@ -7,7 +7,7 @@ Phase 1: prototype on a dev board (Waveshare ESP32-S3-Zero-N8R8-M + MAX98357A + 
 
 ## Structure
 - `firmware/` - PlatformIO (Arduino) project
-- `docs/` - wiring, measurements, notes (sound research: `docs/sound-research.md`)
+- `docs/` - wiring, measurements, notes (sound research: `docs/sound-research.md`, shield PCB scope: `docs/shield-pcb.md`)
 - `3d/` - cases, links
 - `hardware/` - KiCad, later
 
