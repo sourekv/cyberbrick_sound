@@ -43,7 +43,7 @@ From the Maker's Supply CyberBrick user's manual (the Bambu store page names onl
 
 ## Decided
 
-- Board size: the outline of the ESP32-S3-Zero (see above).
+- Board size and shape: variant A, CyberBrick-sized rectangle (29 x 30 mm) with the four CyberBrick mounting holes (23.0 x 24.0 mm), Zero in the middle. The Zero-sized board with four ears (variant B) was rejected: thin ears would be fragile. The earlier Zero-sized layout without holes is kept as a drawing of what fits under the Zero.
 - Speaker connector J2: JST SH 1.0 mm 2-pin, as used by the CyberBrick motor and button ports.
 - The amplifier is a bare MAX98357A chip on the board, **assembled by a PCB service** (the TQFN-16 package is not practical to hand-solder). No plug-in breakout module.
 
