@@ -63,8 +63,8 @@ Tune `config.h`: `PULSE_CENTER_US`, `PULSE_RANGE_US`, `MASTER_VOLUME`.
 | Servo connector | |
 | Number of servo ports | |
 | Pin order (S/+/-) | S, V, G in a row; S is the leftmost pin, G the rightmost (PWM2 = lower row of the left header) |
-| + voltage | |
+| + voltage | 4.94 V on the servo port V pin (receiver on battery, no load; battery itself 7.1 V) |
 | Signal level | about 3.3 V (multimeter average on 200 mV range: 0.15 / 0.23 / 0.31 V at 1.0 / 1.5 / 2.0 ms) |
 | Pulse range (us) | 977 .. 1973 with L Stick Y bound to PWM2 (45..135 deg); at rest 1445..1465 (duty steps of about 20 us) |
 | Pulse rate (Hz) | 50.0, measured on GPIO1 via 1 kOhm with `pulse_measure` |
-| Current draw of module at volume X | |
+| Current draw of module at volume X | MASTER_VOLUME 0.6, ESP32-S3-Zero + MAX98357A + 40 mm speaker powered from the PWM2 V pin: about 57 mA idle, about 105 mA at full throttle in either direction (multimeter average, 1 A range). Receiver stayed stable, motor kept responding |
