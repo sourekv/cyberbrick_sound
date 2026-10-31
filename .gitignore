@@ -1,3 +1,4 @@
 .pio/
 .vscode/
 *.pyc
+firmware/include/user_sounds.h

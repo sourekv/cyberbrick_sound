@@ -23,3 +23,7 @@ speaker response. Regenerate with `python tools/simulate_engine.py` after changi
 | `c_fast` | 55..180 Hz | faster, lighter engine |
 
 `*_small_speaker.wav` applies an 800 Hz two-pole high-pass, roughly what a 40 mm speaker does to the low end. Build: `g++ -O2 -std=c++17 -I firmware/include tools/render_engine_pulse.cpp -o render_engine_pulse`, run: `./render_engine_pulse <prefix> [idle_hz max_hz [volume]]`.
+
+## Real-recording engine (`engine_real` firmware)
+
+Plays the start-up part of a user-supplied recording once, then repeats a seamless idle loop; RPM raises the playback rate by up to 40 % and the volume. The recording's origin and license are unknown, so it is **not** in the repository: generate the header locally with `python tools/make_user_sounds.py "<path to warm start.wav>"` (writes the git-ignored `firmware/include/user_sounds.h`), then `pio run -e engine_real -t upload`. Host preview: `g++ -O2 -std=c++17 -I firmware/include tools/render_engine_real.cpp -o render_engine_real && ./render_engine_real <prefix>`.
