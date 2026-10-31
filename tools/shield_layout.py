@@ -104,13 +104,6 @@ CB_HOLES = [[round(ZERO_CX + sx * CB_DX / 2, 2), round(ZERO_CY + sy * CB_DY / 2,
             for sy in (-1, 1) for sx in (-1, 1)]
 
 
-def _ear(h):
-    """Ear = round land around a hole plus a neck to the Zero-sized board."""
-    x, y, _ = h
-    nx = 0.5 if x < ZERO_CX else BOARD_W - 0.5
-    return [("circle", x, y, CB_RING_D / 2), ("rect", min(x, nx), y - 1.6, max(x, nx), y + 1.6, 0)]
-
-
 # Outline shapes are a union of ("rect", x0, y0, x1, y1, corner radius) and ("circle", cx, cy, r),
 # in the same coordinates as the parts (origin = top-left corner of the Zero).
 VARIANTS = [
@@ -118,9 +111,6 @@ VARIANTS = [
          shapes=[("rect", 0, 0, BOARD_W, BOARD_H, 1.2)], holes=[]),
     dict(id="cb", name="CyberBrick size", short="29 x 30 mm like the CyberBrick receiver shield, its four holes",
          shapes=[("rect", ZERO_CX - CB_W / 2, ZERO_CY - CB_H / 2, ZERO_CX + CB_W / 2, ZERO_CY + CB_H / 2, 1.5)],
-         holes=CB_HOLES),
-    dict(id="ears", name="Zero size + four ears", short="the Zero-sized board with four small ears carrying the same four holes",
-         shapes=[("rect", 0, 0, BOARD_W, BOARD_H, 1.2)] + [sh for h in CB_HOLES for sh in _ear(h)],
          holes=CB_HOLES),
 ]
 VARIANT = {v["id"]: v for v in VARIANTS}

@@ -192,22 +192,16 @@ def build_svg():
 
 
 def build_holes_svg():
-    """Two board variants with the CyberBrick mounting-hole pattern, side by side."""
+    """The board with the CyberBrick mounting-hole pattern."""
     global S, MX, MY
     S, MY = 28.0, 330
     pitch = 960
     body = []
-    specs = [("cb", "A: same size as the CyberBrick receiver shield (29 x 30 mm)",
-              "Four holes in the same places as the receiver shield; the Zero sits in the middle"),
-             ("ears", "B: Zero-sized board with four ears",
-              "The same four holes on small ears; dashed = outline of the CyberBrick receiver shield")]
+    specs = [("cb", "Sound shield with the CyberBrick mounting holes (29 x 30 mm)",
+              "Same size and hole pattern as the CyberBrick receiver shield; the Zero sits in the middle")]
     for i, (vid, t, sub) in enumerate(specs):
         MX = 130 + i * pitch + 5.5 * S
         body += panel(vid, t, sub, tx_px=130 + i * pitch)
-        # outline of the real receiver shield for comparison (dashed)
-        b = L.VARIANT["cb"]["shapes"][0]
-        if vid == "ears":
-            body.append(rect(b[1], b[2], b[3], b[4], fill="none", stroke="#c0392b", stroke_width=1.2, stroke_dasharray="6 5"))
         # the Zero outline, dashed, to show where it sits
         body.append(rect(0, 0, L.BOARD_W, L.BOARD_H, fill="none", stroke="#f4f4ee", stroke_width=1, stroke_dasharray="2 5", opacity="0.9"))
     # dimensions on panel A
@@ -223,7 +217,7 @@ def build_holes_svg():
     body.append(text(0.0, L.BOARD_H + 8.3,
                      f"A screw head of 4.5 mm leaves only {((L.CB_DX / 2 - L.BOARD_W / 2) ** 2 + (L.CB_DY / 2 - L.BOARD_H / 2) ** 2) ** 0.5 - 2.25:.2f} mm to the corner of the Zero; use a low or countersunk head, or shift the Zero.",
                      12, "start", fill=MUTED, mono=False))
-    w = int(130 * 2 + pitch + 29 * S)
+    w = int(130 * 2 + 29 * S)
     h = int(MY + (L.BOARD_H + 5.5) * S + 140)
     return wrap(w, h, body), w, h
 
