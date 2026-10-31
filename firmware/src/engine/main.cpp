@@ -4,7 +4,16 @@
 #include <Arduino.h>
 #include "driver/i2s.h"
 #include "config.h"
-#include "engine_sample.h"
+#include "status_led.h"
+#ifdef ENGINE_DIESEL
+#include "engine_diesel.h"          // real diesel idle loop (CC0), see assets/samples/LICENSE-SAMPLES.md
+static const float RATE_IDLE = 1.0f;  // playback rate at rest
+static const float RATE_FULL = 3.0f;  // playback rate at full throttle
+#else
+#include "engine_sample.h"          // synthesised loop
+static const float RATE_IDLE = 0.7f;
+static const float RATE_FULL = 2.0f;
+#endif
 
 static volatile uint32_t riseUs = 0;
 static volatile uint32_t widthUs = 0;
@@ -33,8 +42,16 @@ static float readThrottle() {
   return t > 1.0f ? 1.0f : t;
 }
 
+// True while valid pulses keep arriving.
+static bool signalPresent() {
+  return lastEdgeMs != 0 && millis() - lastEdgeMs <= PULSE_TIMEOUT_MS;
+}
+
+static StatusLed statusLed;
+
 void setup() {
   Serial.begin(115200);
+  statusLed.begin();
   pinMode(PIN_THROTTLE_IN, INPUT);
   attachInterrupt(digitalPinToInterrupt(PIN_THROTTLE_IN), onEdge, CHANGE);
 
@@ -69,12 +86,13 @@ void loop() {
 
   // Update the smoothed RPM once per block (128 samples ~ 5.8 ms).
   float target = readThrottle();
+  statusLed.update(signalPresent(), target);
   // Rise faster than fall, like a real engine spooling up / coasting down.
   float k = target > rpm ? 0.02f : 0.008f;
   rpm += (target - rpm) * k;
 
-  // Playback rate: idle 0.7x .. full throttle 2.0x
-  float rate = 0.7f + 1.3f * rpm;
+  // Playback rate: RATE_IDLE at rest .. RATE_FULL at full throttle
+  float rate = RATE_IDLE + (RATE_FULL - RATE_IDLE) * rpm;
   // Volume rises a bit with throttle.
   float vol = MASTER_VOLUME * (0.55f + 0.45f * rpm);
 
