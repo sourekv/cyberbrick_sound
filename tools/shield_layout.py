@@ -90,6 +90,28 @@ LABELS = [
 ]
 
 
+# Board variants. Outline polygons and holes are in the same coordinates as the parts (origin = top-left
+# corner of the Zero, which always keeps the same place on the board). Hole = (x, y, diameter).
+# The mounting hole positions for the CyberBrick-sized variant are PLACEHOLDERS: the real hole pattern of the
+# CyberBrick shields is not published and must be measured on the real receiver shield (30 x 29 mm).
+VARIANTS = [
+    dict(id="zero", name="Zero size", short="18 x 23.5 mm, same outline as the Zero, no mounting holes",
+         outline=[[0, 0], [18, 0], [18, 23.5], [0, 23.5]], holes=[]),
+    dict(id="ears", name="Compact + ears", short="two mounting ears at the sides of the Zero, M2 holes",
+         outline=[[0, 0], [18, 0], [18, 8.0], [22.0, 8.0], [22.0, 15.5], [18, 15.5], [18, 23.5], [0, 23.5],
+                  [0, 15.5], [-4.0, 15.5], [-4.0, 8.0], [0, 8.0]],
+         holes=[[-2.0, 11.75, 2.2], [20.0, 11.75, 2.2]]),
+    dict(id="cb", name="CyberBrick size", short="30 x 29 mm like the CyberBrick receiver shield, four corner holes (placeholder positions)",
+         outline=[[-6.0, -2.75], [24.0, -2.75], [24.0, 26.25], [-6.0, 26.25]],
+         holes=[[-3.5, -0.25, 2.2], [21.5, -0.25, 2.2], [-3.5, 23.75, 2.2], [21.5, 23.75, 2.2]]),
+]
+
+
+def bounds(outline):
+    xs = [p[0] for p in outline]; ys = [p[1] for p in outline]
+    return min(xs), min(ys), max(xs), max(ys)
+
+
 def check():
     """Print overlaps between part footprints and violations of the gap / board outline."""
     ok = True
