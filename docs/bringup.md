@@ -1,6 +1,6 @@
 # Bring-up plan
 
-Status: written before the hardware arrived. Nothing here has been tested on a real board yet.
+Status: PWM2 throttle copy verified on the real receiver (see the measurements table). The engine firmware with the real throttle is the next test.
 
 ## 1. Measurements on the CyberBrick receiver (multimeter, before connecting anything)
 Record results in the table at the bottom.
@@ -62,9 +62,9 @@ Tune `config.h`: `PULSE_CENTER_US`, `PULSE_RANGE_US`, `MASTER_VOLUME`.
 |---|---|
 | Servo connector | |
 | Number of servo ports | |
-| Pin order (S/+/-) | |
+| Pin order (S/+/-) | S, V, G in a row; S is the leftmost pin, G the rightmost (PWM2 = lower row of the left header) |
 | + voltage | |
-| Signal level | |
-| Pulse range (us) | |
-| Pulse rate (Hz) | |
+| Signal level | about 3.3 V (multimeter average on 200 mV range: 0.15 / 0.23 / 0.31 V at 1.0 / 1.5 / 2.0 ms) |
+| Pulse range (us) | 977 .. 1973 with L Stick Y bound to PWM2 (45..135 deg); at rest 1445..1465 (duty steps of about 20 us) |
+| Pulse rate (Hz) | 50.0, measured on GPIO1 via 1 kOhm with `pulse_measure` |
 | Current draw of module at volume X | |

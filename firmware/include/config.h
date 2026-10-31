@@ -13,9 +13,9 @@
 // Throttle pulse (microseconds)
 #define PULSE_MIN_US     800
 #define PULSE_MAX_US    2200
-#define PULSE_CENTER_US 1500   // neutral; throttle = |pulse - center| / 500
-#define PULSE_RANGE_US   500
-#define PULSE_DEADBAND_US 25
+#define PULSE_CENTER_US 1475   // neutral (measured: full range 977..1973 us, stick at rest ~1455); throttle = |pulse - center| / RANGE
+#define PULSE_RANGE_US   490
+#define PULSE_DEADBAND_US 35   // rest value jitters 1445..1465 us
 #define PULSE_TIMEOUT_MS 150   // no pulse for this long -> treat as idle
 
 // Audio
