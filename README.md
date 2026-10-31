@@ -24,9 +24,11 @@ Source: `docs/wiring-overview.svg`. Details and measurements: `docs/bringup.md`.
 3. Engine loop with smooth playback-rate change driven by throttle
 
 ## Sound samples
-Originals and license: `assets/samples/` (see `LICENSE-SAMPLES.md`). The firmware embeds `firmware/include/engine_sample.h`, generated with:
+The firmware embeds `firmware/include/engine_sample.h`, a synthesised engine loop generated with:
 
-    python tools/make_sample.py assets/samples/loop_2.wav firmware/include/engine_sample.h
+    python tools/make_engine_synth.py
+
+The CC0 loops in `assets/samples/` (see `LICENSE-SAMPLES.md`) are almost pure low tones that a small speaker cannot play, so they are kept only for reference (`tools/make_sample.py` converts them).
 
 ## Building
 Open the `firmware/` folder in VS Code with the PlatformIO extension, or run `pio run -e <env> -t upload` with `<env>` one of `test_tone`, `pulse_measure`, `engine`. See `docs/bringup.md`.
