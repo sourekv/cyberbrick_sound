@@ -42,7 +42,7 @@ void setup() {
   cfg.mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX);
   cfg.sample_rate = AUDIO_RATE;
   cfg.bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT;
-  cfg.channel_format = I2S_CHANNEL_FMT_ONLY_LEFT;
+  cfg.channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT;  // same sample on both channels
   cfg.communication_format = I2S_COMM_FORMAT_STAND_I2S;
   cfg.intr_alloc_flags = ESP_INTR_FLAG_LEVEL1;
   cfg.dma_buf_count = 6;
@@ -65,7 +65,7 @@ void loop() {
   static uint32_t lastPrint = 0;
 
   const int N = 128;
-  int16_t buf[N];
+  int16_t buf[N * 2];  // interleaved L,R
 
   // Update the smoothed RPM once per block (128 samples ~ 5.8 ms).
   float target = readThrottle();
@@ -84,7 +84,9 @@ void loop() {
     int next = idx + 1;
     if (next >= ENGINE_SAMPLE_LEN) next = 0;
     float s = ENGINE_SAMPLE[idx] + (ENGINE_SAMPLE[next] - ENGINE_SAMPLE[idx]) * frac;
-    buf[i] = (int16_t)(s * vol);
+    int16_t v = (int16_t)(s * vol);
+    buf[2 * i] = v;      // left
+    buf[2 * i + 1] = v;  // right (the amp mixes (L+R)/2, so both must carry the signal)
     pos += rate;
     if (pos >= ENGINE_SAMPLE_LEN) pos -= ENGINE_SAMPLE_LEN;
   }

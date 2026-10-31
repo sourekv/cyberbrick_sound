@@ -20,4 +20,4 @@
 
 // Audio
 #define AUDIO_RATE        22050
-#define MASTER_VOLUME     0.35f   // 0..1, keep low: speaker is rated 2 W, amp can do ~3 W
+#define MASTER_VOLUME     0.6f    // 0..1; speaker is rated 2 W, amp can do ~3 W. Raise gradually.
