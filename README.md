@@ -7,7 +7,7 @@ Phase 1: prototype on a dev board (Waveshare ESP32-S3-Zero-N8R8-M + MAX98357A + 
 
 ## Structure
 - `firmware/` - PlatformIO (Arduino) project
-- `docs/` - wiring, measurements, notes
+- `docs/` - wiring, measurements, notes (sound research: `docs/sound-research.md`)
 - `3d/` - cases, links
 - `hardware/` - KiCad, later
 
@@ -31,4 +31,4 @@ The firmware embeds `firmware/include/engine_sample.h`, a synthesised engine loo
 The CC0 loops in `assets/samples/` (see `LICENSE-SAMPLES.md`) are almost pure low tones that a small speaker cannot play, so they are kept only for reference (`tools/make_sample.py` converts them).
 
 ## Building
-Open the `firmware/` folder in VS Code with the PlatformIO extension, or run `pio run -e <env> -t upload` with `<env>` one of `test_tone`, `pulse_measure`, `engine`. See `docs/bringup.md`.
+Open the `firmware/` folder in VS Code with the PlatformIO extension, or run `pio run -e <env> -t upload` with `<env>` one of `test_tone`, `pulse_measure`, `engine`, `engine_pulse` (default engine sound), `engine_real` (experiment, needs a locally generated header). See `docs/bringup.md`.
