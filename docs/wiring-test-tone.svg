@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 620" font-family="Helvetica, Arial, sans-serif"><rect width="1100" height="620" fill="#fff"/>
+<text x="30" y="40" font-size="22" font-weight="bold" fill="#1a1a1a">Test tone wiring (firmware: test_tone)</text>
+<text x="30" y="64" font-size="13" fill="#555">Wire with USB unplugged. 5 wires + speaker. SD and GAIN stay open.</text>
+<rect x="700" y="90" width="220" height="420" rx="10" fill="#e9f6ec" stroke="#2f8f4e" stroke-width="2"/>
+<rect x="765" y="70" width="90" height="34" rx="5" fill="#cfe8d6" stroke="#2f8f4e"/><text x="810" y="92" font-size="12" text-anchor="middle">USB-C</text>
+<text x="810" y="140" font-size="14" font-weight="bold" text-anchor="middle" fill="#1d5e33">Waveshare ESP32-S3-Zero</text><text x="810" y="158" font-size="11" text-anchor="middle" fill="#1d5e33">view from above, USB-C at the top</text>
+<circle cx="700" cy="190" r="8" fill="#ffe9a8" stroke="#2f8f4e" stroke-width="2"/>
+<text x="716" y="194" font-size="13" font-weight="bold" fill="#222">5V</text>
+<circle cx="700" cy="224" r="8" fill="#ffe9a8" stroke="#2f8f4e" stroke-width="2"/>
+<text x="716" y="228" font-size="13" font-weight="bold" fill="#222">GND</text>
+<circle cx="700" cy="258" r="8" fill="#fff" stroke="#2f8f4e" stroke-width="2"/>
+<text x="716" y="262" font-size="13" font-weight="normal" fill="#222">3V3</text>
+<circle cx="700" cy="292" r="8" fill="#fff" stroke="#2f8f4e" stroke-width="2"/>
+<text x="716" y="296" font-size="13" font-weight="normal" fill="#222">1</text>
+<circle cx="700" cy="326" r="8" fill="#fff" stroke="#2f8f4e" stroke-width="2"/>
+<text x="716" y="330" font-size="13" font-weight="normal" fill="#222">2</text>
+<circle cx="700" cy="360" r="8" fill="#fff" stroke="#2f8f4e" stroke-width="2"/>
+<text x="716" y="364" font-size="13" font-weight="normal" fill="#222">3</text>
+<circle cx="700" cy="394" r="8" fill="#ffe9a8" stroke="#2f8f4e" stroke-width="2"/>
+<text x="716" y="398" font-size="13" font-weight="bold" fill="#222">4</text>
+<circle cx="700" cy="428" r="8" fill="#ffe9a8" stroke="#2f8f4e" stroke-width="2"/>
+<text x="716" y="432" font-size="13" font-weight="bold" fill="#222">5</text>
+<circle cx="700" cy="462" r="8" fill="#ffe9a8" stroke="#2f8f4e" stroke-width="2"/>
+<text x="716" y="466" font-size="13" font-weight="bold" fill="#222">6</text>
+<circle cx="920" cy="190" r="8" fill="#fff" stroke="#2f8f4e" stroke-width="2"/><text x="904" y="194" font-size="13" text-anchor="end" fill="#888">TX</text>
+<circle cx="920" cy="224" r="8" fill="#fff" stroke="#2f8f4e" stroke-width="2"/><text x="904" y="228" font-size="13" text-anchor="end" fill="#888">RX</text>
+<circle cx="920" cy="258" r="8" fill="#fff" stroke="#2f8f4e" stroke-width="2"/><text x="904" y="262" font-size="13" text-anchor="end" fill="#888">13</text>
+<circle cx="920" cy="292" r="8" fill="#fff" stroke="#2f8f4e" stroke-width="2"/><text x="904" y="296" font-size="13" text-anchor="end" fill="#888">12</text>
+<circle cx="920" cy="326" r="8" fill="#fff" stroke="#2f8f4e" stroke-width="2"/><text x="904" y="330" font-size="13" text-anchor="end" fill="#888">11</text>
+<circle cx="920" cy="360" r="8" fill="#fff" stroke="#2f8f4e" stroke-width="2"/><text x="904" y="364" font-size="13" text-anchor="end" fill="#888">10</text>
+<circle cx="920" cy="394" r="8" fill="#fff" stroke="#2f8f4e" stroke-width="2"/><text x="904" y="398" font-size="13" text-anchor="end" fill="#888">9</text>
+<circle cx="920" cy="428" r="8" fill="#fff" stroke="#2f8f4e" stroke-width="2"/><text x="904" y="432" font-size="13" text-anchor="end" fill="#888">8</text>
+<circle cx="920" cy="462" r="8" fill="#fff" stroke="#2f8f4e" stroke-width="2"/><text x="904" y="466" font-size="13" text-anchor="end" fill="#888">7</text>
+<text x="716" y="492" font-size="10" fill="#a33">verify the numbers on the board</text>
+<rect x="330" y="150" width="210" height="340" rx="10" fill="#f3e9fa" stroke="#7a3fa0" stroke-width="2"/>
+<text x="435" y="180" font-size="15" font-weight="bold" text-anchor="middle" fill="#55207a">MAX98357A</text>
+<circle cx="540" cy="190" r="8" fill="#ffe9a8" stroke="#7a3fa0" stroke-width="2"/>
+<text x="524" y="194" font-size="13" text-anchor="end" font-weight="bold" fill="#222">Vin</text>
+<circle cx="540" cy="224" r="8" fill="#ffe9a8" stroke="#7a3fa0" stroke-width="2"/>
+<text x="524" y="228" font-size="13" text-anchor="end" font-weight="bold" fill="#222">GND</text>
+<circle cx="540" cy="258" r="8" fill="#fff" stroke="#7a3fa0" stroke-width="2"/>
+<text x="524" y="262" font-size="13" text-anchor="end" font-weight="normal" fill="#888">SD</text>
+<circle cx="540" cy="292" r="8" fill="#fff" stroke="#7a3fa0" stroke-width="2"/>
+<text x="524" y="296" font-size="13" text-anchor="end" font-weight="normal" fill="#888">GAIN</text>
+<circle cx="540" cy="326" r="8" fill="#ffe9a8" stroke="#7a3fa0" stroke-width="2"/>
+<text x="524" y="330" font-size="13" text-anchor="end" font-weight="bold" fill="#222">DIN</text>
+<circle cx="540" cy="360" r="8" fill="#ffe9a8" stroke="#7a3fa0" stroke-width="2"/>
+<text x="524" y="364" font-size="13" text-anchor="end" font-weight="bold" fill="#222">BCLK</text>
+<circle cx="540" cy="394" r="8" fill="#ffe9a8" stroke="#7a3fa0" stroke-width="2"/>
+<text x="524" y="398" font-size="13" text-anchor="end" font-weight="bold" fill="#222">LRC</text>
+<text x="524" y="430" font-size="10" text-anchor="end" fill="#777">SD, GAIN: no wire</text>
+<rect x="298" y="318" width="40" height="86" rx="4" fill="#7bc17e" stroke="#333"/><text x="318" y="347" font-size="12" text-anchor="middle" font-weight="bold">+</text><text x="318" y="383" font-size="12" text-anchor="middle" font-weight="bold">&#8722;</text>
+<text x="435" y="460" font-size="10" text-anchor="middle" fill="#555">screw terminal: + marked on the board</text>
+<path d="M692 190 L640 190 L600 190 L548 190" fill="none" stroke="#d22" stroke-width="4" stroke-linejoin="round"/>
+<path d="M692 224 L640 224 L600 224 L548 224" fill="none" stroke="#222" stroke-width="4" stroke-linejoin="round"/>
+<path d="M692 394 L640 394 L600 326 L548 326" fill="none" stroke="#8844aa" stroke-width="4" stroke-linejoin="round"/>
+<path d="M692 428 L640 428 L600 360 L548 360" fill="none" stroke="#2f8f4e" stroke-width="4" stroke-linejoin="round"/>
+<path d="M692 462 L640 462 L600 394 L548 394" fill="none" stroke="#e07a1e" stroke-width="4" stroke-linejoin="round"/>
+<circle cx="130" cy="361" r="62" fill="#f5f5f5" stroke="#333" stroke-width="3"/><circle cx="130" cy="361" r="24" fill="#ddd" stroke="#333"/>
+<text x="130" y="450" font-size="13" text-anchor="middle">40 mm 4 &#937; speaker</text><text x="130" y="466" font-size="11" text-anchor="middle" fill="#555">solder lugs marked + and -</text>
+<path d="M300 336 L205 336 L180 349" fill="none" stroke="#d22" stroke-width="3"/><path d="M300 386 L205 386 L180 374" fill="none" stroke="#222" stroke-width="3"/>
+<rect x="30" y="560" width="26" height="6" fill="#d22"/><text x="64" y="567" font-size="13" fill="#222">5V  to  Vin</text>
+<rect x="235" y="560" width="26" height="6" fill="#222"/><text x="269" y="567" font-size="13" fill="#222">GND  to  GND</text>
+<rect x="440" y="560" width="26" height="6" fill="#8844aa"/><text x="474" y="567" font-size="13" fill="#222">GPIO4  to  DIN</text>
+<rect x="645" y="560" width="26" height="6" fill="#2f8f4e"/><text x="679" y="567" font-size="13" fill="#222">GPIO5  to  BCLK</text>
+<rect x="850" y="560" width="26" height="6" fill="#e07a1e"/><text x="884" y="567" font-size="13" fill="#222">GPIO6  to  LRC</text>
+<text x="30" y="600" font-size="12" fill="#777">The amplifier is drawn with its pins on the right edge; on your breadboard the pin order reads LRC, BCLK, DIN, GAIN, SD, GND, Vin from the left.</text>
+</svg>

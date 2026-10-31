@@ -48,6 +48,8 @@ Rules:
 ### Stage 2: powering the module from the servo port
 Only after stage 1 works. See `docs/wiring-stage2.png` (source `.svg`): unplug USB, connect the servo port's V pin to the board's 5V pin, measure the voltage and the current (multimeter in series) before relying on it, and lower `MASTER_VOLUME` if the receiver resets. Reflash only with the V wire removed.
 
+Test-tone wiring only (no CyberBrick yet): `docs/wiring-test-tone.png`.
+
 ## 3. Test order
 1. `pio run -e test_tone -t upload` - expect a steady 440 Hz tone. Checks amplifier and speaker.
 2. `pio run -e pulse_measure -t upload` - move the stick, expect about 1000-2000 us at about 50 Hz.
