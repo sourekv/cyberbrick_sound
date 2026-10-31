@@ -132,11 +132,6 @@ def panel(vid, title, sub, tx_px=None):
             o.append(rect(p["x"] - 0.45, p["y"] - 1.1, p["x"] + 0.45, p["y"] - 0.7, fill="#c9ced4", stroke="none"))
             o.append(rect(p["x"] - 0.45, p["y"] + 0.7, p["x"] + 0.45, p["y"] + 1.1, fill="#c9ced4", stroke="none"))
             o.append(rect(x0, y0, x1, y1, fill="none", stroke="#f4f4ee", stroke_width=0.8, stroke_dasharray="3 3"))
-        elif k == "hdr_v":
-            o.append(rect(x0, y0, x1, y1, fill="#222", stroke="#000", stroke_width=1))
-            for (px, py), nm in zip(p["pins"], p["pin_names"]):
-                o.append(circle(px, py, 0.35, fill="#d8b04a"))
-                o.append(text(px + 1.7, py, nm, 11, "start", fill="#d9efe0"))
         elif k == "qfn":
             bx0, by0, bx1, by1 = p["x"] - 1.5, p["y"] - 1.5, p["x"] + 1.5, p["y"] + 1.5
             o.append(rect(x0, y0, x1, y1, fill="none", stroke="#f4f4ee", stroke_width=1, stroke_dasharray="3 3"))
@@ -159,7 +154,7 @@ def panel(vid, title, sub, tx_px=None):
         lx = x1 + 0.25 if p["ref"] not in ("J1", "J2", "U1", "C2", "C3") else None
         if p["ref"] == "LED1":
             o.append(text(x0 - 0.2, p["y"], "LED1", 12, "end", 700, "#f4f4ee"))
-        elif p["ref"] in ("R1", "F1", "D1", "D2", "R2", "C1", "R3", "J3"):
+        elif p["ref"] in ("R1", "F1", "D1", "D2", "R2", "C1", "R3"):
             o.append(text(p["x"], y0 - 0.45 if p["ref"] != "C1" else y0 - 0.45, p["ref"], 12, "middle", 700, "#f4f4ee"))
     for ref, x, y in (("U1", 6.0, 17.35), ("C2", 5.2, 15.35), ("C3", 9.0, 15.35), ("J2", 12.2, 23.9)):
         pass
@@ -178,12 +173,12 @@ def legend():
     o.append(text(0, ly, "Top side (between the header strips)", 13, weight=600, mono=False))
     items = [("#ff7a6b", "5 V (servo V, through F1, D1)"), ("#ffb347", "throttle S to GPIO1"),
              ("#6ec1ff", "I2S to the amplifier"), ("#ececec", "speaker"),
-             ("#d6a8ff", "spare GPIO to J3"), ("#9aa7b4", "ground (to the bottom plane)")]
+             ("#9aa7b4", "ground (to the bottom plane)")]
     for i, (c, t) in enumerate(items):
         yy = ly + 1.05 * (i + 1)
         o.append(f'<line x1="{X(0):.1f}" x2="{X(1.4):.1f}" y1="{Y(yy):.1f}" y2="{Y(yy):.1f}" stroke="{c}" stroke-width="{0.35 * S:.1f}" stroke-linecap="round"/>')
         o.append(text(1.9, yy, t, 12, fill=FG, mono=False))
-    yy = ly + 1.05 * 7
+    yy = ly + 1.05 * 6
     o.append(f'<line x1="{X(0):.1f}" x2="{X(1.4):.1f}" y1="{Y(yy):.1f}" y2="{Y(yy):.1f}" stroke="#ff7a6b" stroke-width="{0.35 * S:.1f}" stroke-dasharray="6 5" stroke-linecap="round"/>')
     o.append(text(1.9, yy, "hop on the bottom layer (under the S trace)", 12, fill=FG, mono=False))
     o.append(text(9.0, ly, "Bottom side: GND plane, 7 test pads (5V, 3V3, GND, IO1, BCLK, LRC, DIN)", 11, "start", fill=MUTED, mono=False))

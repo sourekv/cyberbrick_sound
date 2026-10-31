@@ -87,7 +87,7 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
     <div id="info"><strong>Pick a part</strong><span>Select a row or hover the model to see what it does.</span></div>
   </aside>
 </div>
-<p class="note">The board is the size of the CyberBrick receiver shield (29 &times; 30 mm) with the same four mounting holes. The ESP32-S3-Zero sits in the middle; most parts are in the gap between its two socket strips, the power LED and the spare GPIO header are beside it so they stay visible. Footprints and heights are typical values, to be replaced by the real ones when the schematic is drawn. The same layout as the 2D mock (docs/shield-mock.png).</p>
+<p class="note">The board is the size of the CyberBrick receiver shield (29 &times; 30 mm) with the same four mounting holes. The ESP32-S3-Zero sits in the middle; most parts are in the gap between its two socket strips, the power LED is beside it so it stays visible. Footprints and heights are typical values, to be replaced by the real ones when the schematic is drawn. The same layout as the 2D mock (docs/shield-mock.png).</p>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -210,8 +210,6 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
       txt(cx, 'U1', 6.0, 22.3, 0.5, { align: 'center' }); txt(cx, 'J2', 12.2, 22.9, 0.5, { align: 'center', color: '#1b2530' });
       txt(cx, 'SPK', 12.2, 18.2, 0.5, { align: 'center' });
       txt(cx, 'LED1', -4.1, 6.6, 0.5, { align: 'center' }); txt(cx, 'R3', -1.4, 6.6, 0.5, { align: 'center' });
-      txt(cx, 'J3', 20.5, 7.4, 0.55, { align: 'center', bold: true });
-      D.parts.forEach(function (p) { if (p.kind === 'hdr_v') p.pins.forEach(function (q, k) { txt(cx, p.pin_names[k], q[0] + 1.9, q[1], 0.5, { align: 'left' }); }); });
     }
     top.t.needsUpdate = true;
 
@@ -276,9 +274,6 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
     } else if (k === 'led') {
       g.add(box(p.x, p.y, 0.8, 1.6, p.z, M.ledG));
       g.add(box(p.x, p.y - 0.85, 0.8, 0.4, p.z + 0.02, M.silver)); g.add(box(p.x, p.y + 0.85, 0.8, 0.4, p.z + 0.02, M.silver));
-    } else if (k === 'hdr_v') {
-      g.add(box(p.x, p.y, p.w, p.h, p.z, M.black));
-      p.pins.forEach(function (q) { g.add(box(q[0], q[1], 0.64, 0.64, 8.5, M.gold, BT + 0.5)); });
     } else if (k === 'jst_side') {
       g.add(box(p.x, p.y, p.w, p.h, p.z, M.ivory));
       g.add(box(p.x, p.y + p.h / 2 - 1.3, p.w - 1.0, 2.7, p.z - 1.0, M.ivoryD, BT + 0.5));   // opening towards the edge

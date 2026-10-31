@@ -53,9 +53,6 @@ PARTS = [
          name="Power LED", desc="Lights when the servo-port 5 V is present (taken after the reverse-polarity diode D1), so you can see that the cable and the receiver are fine. Hardware only, no firmware needed. Placed beside the Zero because the Zero would hide it."),
     dict(ref="R3", kind="chip_r", x=-2.75, y=8.84, w=1.5, h=2.8, z=0.5, body=(1.25, 2.0), margin=True,
          name="LED resistor 1 kOhm", desc="Series resistor of the power LED (about 3 mA)."),
-    dict(ref="J3", kind="hdr_v", x=20.5, y=13.02, w=2.54, h=10.16, z=2.5, margin=True,
-         pins=[[20.5, 9.21], [20.5, 11.75], [20.5, 14.29], [20.5, 16.83]], pin_names=["IO12", "IO11", "IO10", "GND"],
-         name="Spare GPIO header", desc="1x4 pin header with three free GPIOs (IO12, IO11, IO10) and ground, for later inputs, for example a switch for an engine-stop sound."),
 ]
 
 # nets: pts are board coordinates; layer 'top' or 'bot'
@@ -86,14 +83,9 @@ NETS = [
     dict(net="5V", color="#ff7a6b", pts=[[4.0, 7.94], [-2.75, 7.94]]),
     dict(net="5V", color="#ff7a6b", pts=[[-2.75, 9.74], [-2.75, 10.9]]),
     dict(net="GND", color="#9aa7b4", pts=[[-2.75, 12.7], [-2.75, 13.6]]),
-    # spare GPIO header
-    dict(net="IO12", color="#d6a8ff", pts=[[HDR_X[1], PIN_Y[3]], [20.5, PIN_Y[3]]]),
-    dict(net="IO11", color="#d6a8ff", pts=[[HDR_X[1], PIN_Y[4]], [20.5, PIN_Y[4]]]),
-    dict(net="IO10", color="#d6a8ff", pts=[[HDR_X[1], PIN_Y[5]], [20.5, PIN_Y[5]]]),
-    dict(net="GND", color="#9aa7b4", pts=[[20.5, PIN_Y[6]], [20.5, 18.9]]),
 ]
 # GND vias (GND plane on the bottom layer) and the hop vias
-GND_VIAS = [[3.6, 13.4], [4.2, 15.5], [10.4, 15.6], [13.5, 17.2], [6.0, 19.8], [14.6, 9.9], [-2.75, 13.6], [20.5, 18.9]]
+GND_VIAS = [[3.6, 13.4], [4.2, 15.5], [10.4, 15.6], [13.5, 17.2], [6.0, 19.8], [14.6, 9.9], [-2.75, 13.6]]
 HOP_VIAS = [[5.0, 10.2], [5.0, 8.2]]
 
 J2_PADS = [[11.7, 19.7], [12.7, 19.7]]       # signal pads of J2 (1.0 mm pitch), + and -

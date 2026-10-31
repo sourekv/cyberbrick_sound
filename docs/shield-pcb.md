@@ -18,13 +18,13 @@ Nothing else can be connected to PWM2: a servo there would follow the throttle. 
 
 Mock of the layout (top view, illustrative placement, not routed). An interactive 3D model is `shield-3d.html`. Both are generated from the same layout data by `tools/make_shield_mock.py` (layout in `tools/shield_layout.py`).
 
-**Board: 29 x 30 mm, the size of the CyberBrick receiver shield, with its four mounting holes** (see below). The ESP32-S3-Zero (18 x 23.5 mm) sits in the middle in two 9-pin female header strips (15.24 mm apart, 8.5 mm tall). Most parts are in the 12.7 mm gap under the Zero (everything under it stays below about 4.4 mm); the power LED and the spare GPIO header are beside the Zero, where they stay visible. Only the two cable plugs stick out: the servo plug at the USB end (right-angle header J1) and the speaker plug at the opposite end (side-entry JST SH 1.0 mm J2). With the Zero the stack is about 14 mm high. All pins used by the firmware are on the left column of the Zero (5V, GPIO1, GPIO4-6); the right column carries three spare GPIOs to J3.
+**Board: 29 x 30 mm, the size of the CyberBrick receiver shield, with its four mounting holes** (see below). The ESP32-S3-Zero (18 x 23.5 mm) sits in the middle in two 9-pin female header strips (15.24 mm apart, 8.5 mm tall). Most parts are in the 12.7 mm gap under the Zero (everything under it stays below about 4.4 mm); the power LED is beside the Zero, where it stays visible. Only the two cable plugs stick out: the servo plug at the USB end (right-angle header J1) and the speaker plug at the opposite end (side-entry JST SH 1.0 mm J2). With the Zero the stack is about 14 mm high. All pins used by the firmware are on the left column of the Zero (5V, GPIO1, GPIO4-6); the right column is unused and stays free at the socket.
 
 1. **Socket or pads for the ESP32-S3-Zero**, same pin use as the prototype: GPIO1 throttle in, GPIO4 I2S DOUT, GPIO5 BCLK, GPIO6 LRC. The USB-C port and the Boot/Reset buttons must stay reachable for flashing.
 2. **Input connector** (3-pin servo type: S, V, G) to PWM2. S goes through a 1 kOhm series resistor to GPIO1, optionally with a large pull-down (for example 100 kOhm) so the input is defined when disconnected, and optionally an ESD/TVS device.
 3. **Power from the servo port**: reverse-polarity protection (Schottky diode or P-MOSFET), a resettable fuse, a bulk capacitor (about 100-470 uF) near the amplifier and small ceramic decoupling capacitors. A diode (or ideal diode) between the servo-port 5 V and the USB 5 V so both can be connected at the same time; on the breadboard only one of them may ever be connected.
 4. **MAX98357A amplifier**: gain and shutdown/channel pins configurable (resistors or jumpers), speaker output to a JST SH 1.0 mm 2-pin connector (see below) or solder pads. The chip is hard to solder by hand; assembly by a PCB service is likely.
-5. **Service items**: test points (5 V, 3.3 V, GND, GPIO1, I2S lines) as pads on the bottom side, four M2/M2.5 mounting holes in the CyberBrick pattern, a **power LED** (taken from the servo-port 5 V after the reverse-polarity diode, so it shows that cable and receiver are fine; the Zero has no power LED of its own, only a programmable RGB LED) and a **spare GPIO header** J3 (IO12, IO11, IO10 and GND) for later inputs. The status of the signal is shown by the Zero's own RGB LED from firmware (see the README).
+5. **Service items**: test points (5 V, 3.3 V, GND, GPIO1, I2S lines) as pads on the bottom side, four M2/M2.5 mounting holes in the CyberBrick pattern, a **power LED** (taken from the servo-port 5 V after the reverse-polarity diode, so it shows that cable and receiver are fine; the Zero has no power LED of its own, only a programmable RGB LED). The status of the signal is shown by the Zero's own RGB LED from firmware (see the README).
 
 ## Mounting holes matching the CyberBrick receiver shield
 
@@ -39,7 +39,8 @@ From the Maker's Supply CyberBrick user's manual (the Bambu store page names onl
 ## Decided
 
 - Board size and shape: CyberBrick-sized rectangle (29 x 30 mm) with the four CyberBrick mounting holes (23.0 x 24.0 mm), Zero in the middle.
-- Power LED on the board (from the servo-port 5 V) and a spare GPIO header J3; the signal status is shown by the Zero's RGB LED in firmware.
+- Power LED on the board (from the servo-port 5 V); the signal status is shown by the Zero's RGB LED in firmware.
+- No spare GPIO header in this iteration, to keep the scope small (see "Out of scope").
 - Speaker connector J2: JST SH 1.0 mm 2-pin, as used by the CyberBrick motor and button ports.
 - The amplifier is a bare MAX98357A chip on the board, **assembled by a PCB service** (the TQFN-16 package is not practical to hand-solder). No plug-in breakout module.
 
@@ -54,6 +55,7 @@ From the Maker's Supply CyberBrick user's manual (the Bambu store page names onl
 
 - ESP32 module directly on the board without the Zero (iteration 3, only if size or cost demands it).
 - Further sound features beyond the current firmware.
+- **Future option: spare inputs.** A connector for the unused GPIOs (IO12, IO11, IO10 and GND) for later inputs, for example a switch for an engine-stop sound. It has to be a cable connector, because a plain vertical pin header beside the Zero is hard to plug into from above; for example a JST SH 1.0 mm or a right-angle header at a board edge. Added only if a use turns up; the right-hand column of the Zero is left free for it.
 
 ## Possible future variant: classic RC receiver
 
@@ -86,5 +88,4 @@ Part numbers are examples to be checked when the schematic is drawn; values mark
 | | Ceramic capacitors 100 nF | 2-3 | general decoupling |
 | Service | Test points (5 V, 3.3 V, GND, GPIO1, BCLK, LRC, DIN) | 7 | 1 mm pads on the bottom side |
 | | Power LED (green, 0603) + 1 kOhm resistor | 1 + 1 | beside the Zero; about 3 mA from the servo-port 5 V |
-| | Spare GPIO header 1x4, 2.54 mm | 1 | IO12, IO11, IO10, GND, for later inputs |
 | Mechanical | Mounting holes 2.7 mm, 23.0 x 24.0 mm apart | 4 | same pattern as the CyberBrick receiver shield |
