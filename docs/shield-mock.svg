@@ -1,153 +1,142 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 720" font-family="Arial, Helvetica, sans-serif">
-<rect width="1080" height="720" fill="#ffffff"/>
-<text x="540" y="36" text-anchor="middle" font-size="22" font-weight="bold" fill="#111">Shield PCB for ESP32-S3-Zero - mock (top view)</text>
-<text x="540" y="58" text-anchor="middle" font-size="13" fill="#555">Illustrative placement only, not to scale and not a routed design. Board about 44 x 52 mm.</text>
-<rect x="60" y="90" width="484" height="572" rx="10" fill="#1f7a3a" stroke="#0d3d1c" stroke-width="3"/>
-<circle cx="82" cy="112" r="13" fill="#d8b04a"/><circle cx="82" cy="112" r="7" fill="#fff" stroke="#0d3d1c" stroke-width="2"/>
-<circle cx="82" cy="640" r="13" fill="#d8b04a"/><circle cx="82" cy="640" r="7" fill="#fff" stroke="#0d3d1c" stroke-width="2"/>
-<circle cx="522" cy="640" r="13" fill="#d8b04a"/><circle cx="522" cy="640" r="7" fill="#fff" stroke="#0d3d1c" stroke-width="2"/>
-<rect x="324" y="106" width="198" height="258" rx="4" fill="#232323" stroke="#000" stroke-width="2"/>
-<rect x="376" y="94" width="94" height="34" rx="6" fill="#c9ccd1" stroke="#555" stroke-width="2"/>
-<text x="423" y="116" text-anchor="middle" font-size="12" font-weight="bold" fill="#222">USB-C</text>
-<rect x="384" y="166" width="78" height="78" rx="4" fill="#3b3b3b" stroke="#777"/>
-<text x="423" y="201" text-anchor="middle" font-size="13" fill="#eee">ESP32-S3</text>
-<text x="423" y="218" text-anchor="middle" font-size="13" fill="#eee">-Zero</text>
-<text x="423" y="274" text-anchor="middle" font-size="11" fill="#aaa">Boot / Reset</text>
-<text x="423" y="288" text-anchor="middle" font-size="11" fill="#aaa">stay reachable</text>
-<rect x="320" y="119" width="12" height="10" fill="#d8b04a"/>
-<text x="336" y="128" font-size="11" fill="#fff">5V</text>
-<rect x="514" y="119" width="12" height="10" fill="#d8b04a"/>
-<text x="510" y="128" text-anchor="end" font-size="11" fill="#fff">TX</text>
-<rect x="320" y="147" width="12" height="10" fill="#d8b04a"/>
-<text x="336" y="156" font-size="11" fill="#fff">GND</text>
-<rect x="514" y="147" width="12" height="10" fill="#d8b04a"/>
-<text x="510" y="156" text-anchor="end" font-size="11" fill="#fff">RX</text>
-<rect x="320" y="175" width="12" height="10" fill="#d8b04a"/>
-<text x="336" y="184" font-size="11" fill="#fff">3V3</text>
-<rect x="514" y="175" width="12" height="10" fill="#d8b04a"/>
-<text x="510" y="184" text-anchor="end" font-size="11" fill="#fff">13</text>
-<rect x="320" y="203" width="12" height="10" fill="#d8b04a"/>
-<text x="336" y="212" font-size="11" fill="#fff">1</text>
-<rect x="514" y="203" width="12" height="10" fill="#d8b04a"/>
-<text x="510" y="212" text-anchor="end" font-size="11" fill="#fff">12</text>
-<rect x="320" y="231" width="12" height="10" fill="#d8b04a"/>
-<text x="336" y="240" font-size="11" fill="#fff">2</text>
-<rect x="514" y="231" width="12" height="10" fill="#d8b04a"/>
-<text x="510" y="240" text-anchor="end" font-size="11" fill="#fff">11</text>
-<rect x="320" y="259" width="12" height="10" fill="#d8b04a"/>
-<text x="336" y="268" font-size="11" fill="#fff">3</text>
-<rect x="514" y="259" width="12" height="10" fill="#d8b04a"/>
-<text x="510" y="268" text-anchor="end" font-size="11" fill="#fff">10</text>
-<rect x="320" y="287" width="12" height="10" fill="#d8b04a"/>
-<text x="336" y="296" font-size="11" fill="#fff">4</text>
-<rect x="514" y="287" width="12" height="10" fill="#d8b04a"/>
-<text x="510" y="296" text-anchor="end" font-size="11" fill="#fff">9</text>
-<rect x="320" y="315" width="12" height="10" fill="#d8b04a"/>
-<text x="336" y="324" font-size="11" fill="#fff">5</text>
-<rect x="514" y="315" width="12" height="10" fill="#d8b04a"/>
-<text x="510" y="324" text-anchor="end" font-size="11" fill="#fff">8</text>
-<rect x="320" y="343" width="12" height="10" fill="#d8b04a"/>
-<text x="336" y="352" font-size="11" fill="#fff">6</text>
-<rect x="514" y="343" width="12" height="10" fill="#d8b04a"/>
-<text x="510" y="352" text-anchor="end" font-size="11" fill="#fff">7</text>
-<rect x="74" y="209" width="30" height="18" fill="#e9e6da" stroke="#333"/>
-<circle cx="96" cy="218" r="5" fill="#d8b04a" stroke="#333"/>
-<text x="82" y="223" text-anchor="middle" font-size="13" font-weight="bold" fill="#222">G</text>
-<rect x="74" y="231" width="30" height="18" fill="#e9e6da" stroke="#333"/>
-<circle cx="96" cy="240" r="5" fill="#d8b04a" stroke="#333"/>
-<text x="82" y="245" text-anchor="middle" font-size="13" font-weight="bold" fill="#222">V</text>
-<rect x="74" y="253" width="30" height="18" fill="#e9e6da" stroke="#333"/>
-<circle cx="96" cy="262" r="5" fill="#d8b04a" stroke="#333"/>
-<text x="82" y="267" text-anchor="middle" font-size="13" font-weight="bold" fill="#222">S</text>
-<polyline points="96,240 120,240" fill="none" stroke="#ff5a4d" stroke-width="4" stroke-linejoin="round"/>
-<polyline points="160,240 190,240 190,124 320,124" fill="none" stroke="#ff5a4d" stroke-width="4" stroke-linejoin="round"/>
-<polyline points="190,240 190,254" fill="none" stroke="#ff5a4d" stroke-width="4" stroke-linejoin="round"/>
-<path d="M 190 254 A 8 8 0 0 1 190 270" fill="none" stroke="#ff5a4d" stroke-width="4"/>
-<polyline points="190,270 190,430 210,430" fill="none" stroke="#ff5a4d" stroke-width="4" stroke-linejoin="round"/>
-<polyline points="96,262 122,262" fill="none" stroke="#ffb347" stroke-width="4" stroke-linejoin="round"/>
-<polyline points="158,262 170,262 170,208 320,208" fill="none" stroke="#ffb347" stroke-width="4" stroke-linejoin="round"/>
-<polyline points="320,292 230,292 230,420" fill="none" stroke="#6ec1ff" stroke-width="3" stroke-linejoin="round"/>
-<polyline points="320,320 250,320 250,420" fill="none" stroke="#6ec1ff" stroke-width="3" stroke-linejoin="round"/>
-<polyline points="320,348 270,348 270,420" fill="none" stroke="#6ec1ff" stroke-width="3" stroke-linejoin="round"/>
-<rect x="120" y="230" width="40" height="20" rx="3" fill="#d9c56a" stroke="#222"/>
-<text x="140.0" y="244.0" text-anchor="middle" font-size="11" fill="#111">F1</text>
-<rect x="122" y="252" width="36" height="20" rx="3" fill="#cfd3d8" stroke="#222"/>
-<text x="140.0" y="266.0" text-anchor="middle" font-size="11" fill="#111">R1</text>
-<rect x="160" y="230" width="26" height="20" rx="3" fill="#2a2a2a" stroke="#222"/>
-<text x="173.0" y="244.0" text-anchor="middle" font-size="11" fill="#fff">D1</text>
-<rect x="157" y="286" width="26" height="18" rx="3" fill="#cfd3d8" stroke="#222"/>
-<text x="170.0" y="299.0" text-anchor="middle" font-size="11" fill="#111">R2</text>
-<polyline points="170,262 170,286" fill="none" stroke="#cccccc" stroke-width="2" stroke-linejoin="round" stroke-dasharray="4 3"/>
-<rect x="236" y="114" width="26" height="20" rx="3" fill="#2a2a2a" stroke="#222"/>
-<text x="249.0" y="128.0" text-anchor="middle" font-size="11" fill="#fff">D2</text>
-<rect x="210" y="420" width="70" height="50" rx="3" fill="#2d2d2d" stroke="#222"/>
-<text x="245.0" y="449.0" text-anchor="middle" font-size="11" fill="#fff">MAX98357A</text>
-<text x="245" y="482" text-anchor="middle" font-size="11" fill="#fff">U1</text>
-<circle cx="138" cy="442" r="24" fill="#b9c3d1" stroke="#222" stroke-width="2"/><text x="138" y="446" text-anchor="middle" font-size="11" fill="#111">C1</text><text x="138" y="472" text-anchor="middle" font-size="10" fill="#fff">bulk</text>
-<polyline points="162,442 190,442" fill="none" stroke="#ff5a4d" stroke-width="3" stroke-linejoin="round"/>
-<rect x="292" y="426" width="34" height="18" rx="3" fill="#d6b77e" stroke="#222"/>
-<text x="309.0" y="439.0" text-anchor="middle" font-size="11" fill="#111">C2</text>
-<rect x="292" y="450" width="34" height="18" rx="3" fill="#d6b77e" stroke="#222"/>
-<text x="309.0" y="463.0" text-anchor="middle" font-size="11" fill="#111">C3</text>
-<rect x="210" y="610" width="70" height="36" rx="4" fill="#e9e6da" stroke="#333" stroke-width="2"/>
-<circle cx="230" cy="628" r="6" fill="#d8b04a" stroke="#333"/><circle cx="260" cy="628" r="6" fill="#d8b04a" stroke="#333"/>
-<text x="292" y="632" font-size="11" fill="#fff">J2 speaker</text>
-<polyline points="232,470 232,560 230,560 230,622" fill="none" stroke="#f2f2f2" stroke-width="4" stroke-linejoin="round"/>
-<polyline points="258,470 258,560 260,560 260,622" fill="none" stroke="#f2f2f2" stroke-width="4" stroke-linejoin="round"/>
-<circle cx="332" cy="580" r="7" fill="#d8b04a" stroke="#333"/>
-<circle cx="356" cy="580" r="7" fill="#d8b04a" stroke="#333"/>
-<circle cx="380" cy="580" r="7" fill="#d8b04a" stroke="#333"/>
-<circle cx="404" cy="580" r="7" fill="#d8b04a" stroke="#333"/>
-<circle cx="428" cy="580" r="7" fill="#d8b04a" stroke="#333"/>
-<circle cx="452" cy="580" r="7" fill="#d8b04a" stroke="#333"/>
-<circle cx="476" cy="580" r="7" fill="#d8b04a" stroke="#333"/>
-<text x="322" y="560" font-size="11" fill="#fff">TP: 5V 3V3 GND IO1 BCLK LRC DIN</text>
-<rect x="360" y="420" width="20" height="14" rx="3" fill="#8be28b" stroke="#222"/>
-<text x="370.0" y="431.0" text-anchor="middle" font-size="9" fill="#111">LED</text>
-<text x="370" y="450" text-anchor="middle" font-size="10" fill="#fff">optional</text>
-<rect x="400" y="400" width="14" height="14" fill="#e9e6da" stroke="#333"/><circle cx="407" cy="407" r="4" fill="#d8b04a"/>
-<rect x="422" y="400" width="14" height="14" fill="#e9e6da" stroke="#333"/><circle cx="429" cy="407" r="4" fill="#d8b04a"/>
-<rect x="444" y="400" width="14" height="14" fill="#e9e6da" stroke="#333"/><circle cx="451" cy="407" r="4" fill="#d8b04a"/>
-<rect x="466" y="400" width="14" height="14" fill="#e9e6da" stroke="#333"/><circle cx="473" cy="407" r="4" fill="#d8b04a"/>
-<text x="446" y="430" text-anchor="middle" font-size="10" fill="#fff">J3 spare GPIO (optional)</text>
-<circle cx="423" cy="321" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="423" y="325" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">1</text>
-<circle cx="90" cy="194" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="90" y="198" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">2</text>
-<circle cx="140" cy="298" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="140" y="302" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">3</text>
-<circle cx="155" cy="214" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="155" y="218" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">4</text>
-<circle cx="275" cy="490" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="275" y="494" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">5</text>
-<circle cx="94" cy="442" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="94" y="446" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">6</text>
-<circle cx="184" cy="628" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="184" y="632" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">7</text>
-<circle cx="310" cy="580" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="310" y="584" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">8</text>
-<circle cx="506" cy="407" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="506" y="411" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">9</text>
-<text x="600" y="100" font-size="16" font-weight="bold" fill="#111">Callouts</text>
-<circle cx="611" cy="126" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="611" y="130" text-anchor="middle" font-size="12" font-weight="bold">1</text>
-<text x="630" y="124" font-size="13" fill="#222">ESP32-S3-Zero on 2 x 9-pin female headers; USB-C at</text>
-<text x="630" y="140" font-size="13" fill="#222">the board edge, Boot/Reset reachable</text>
-<circle cx="611" cy="168" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="611" y="172" text-anchor="middle" font-size="12" font-weight="bold">2</text>
-<text x="630" y="166" font-size="13" fill="#222">J1: 3-pin input from servo port PWM2 (S, V, G)</text>
-<circle cx="611" cy="210" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="611" y="214" text-anchor="middle" font-size="12" font-weight="bold">3</text>
-<text x="630" y="208" font-size="13" fill="#222">R1 1 kOhm series resistor, R2 100 kOhm pull-down on</text>
-<text x="630" y="224" font-size="13" fill="#222">GPIO1</text>
-<circle cx="611" cy="252" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="611" y="256" text-anchor="middle" font-size="12" font-weight="bold">4</text>
-<text x="630" y="250" font-size="13" fill="#222">F1 resettable fuse; D1 reverse-polarity protection;</text>
-<text x="630" y="266" font-size="13" fill="#222">D2 diode between servo 5 V and USB 5 V</text>
-<circle cx="611" cy="294" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="611" y="298" text-anchor="middle" font-size="12" font-weight="bold">5</text>
-<text x="630" y="292" font-size="13" fill="#222">U1 MAX98357A I2S amplifier; GAIN / SD_MODE jumper</text>
-<text x="630" y="308" font-size="13" fill="#222">pads next to it</text>
-<circle cx="611" cy="336" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="611" y="340" text-anchor="middle" font-size="12" font-weight="bold">6</text>
-<text x="630" y="334" font-size="13" fill="#222">C1 bulk capacitor; C2, C3 decoupling at the supply</text>
-<text x="630" y="350" font-size="13" fill="#222">amplifier</text>
-<circle cx="611" cy="378" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="611" y="382" text-anchor="middle" font-size="12" font-weight="bold">7</text>
-<text x="630" y="376" font-size="13" fill="#222">J2: JST-PH speaker connector (or pads)</text>
-<circle cx="611" cy="420" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="611" y="424" text-anchor="middle" font-size="12" font-weight="bold">8</text>
-<text x="630" y="418" font-size="13" fill="#222">Test points along the lower edge</text>
-<circle cx="611" cy="462" r="11" fill="#fff" stroke="#000" stroke-width="2"/><text x="611" y="466" text-anchor="middle" font-size="12" font-weight="bold">9</text>
-<text x="630" y="460" font-size="13" fill="#222">Optional: spare GPIO header, status LED, ESD diode</text>
-<text x="630" y="476" font-size="13" fill="#222">on S</text>
-<text x="600" y="528" font-size="16" font-weight="bold" fill="#111">Nets</text>
-<line x1="600" y1="546" x2="636" y2="546" stroke="#ff5a4d" stroke-width="4"/><text x="646" y="550" font-size="13" fill="#222">5 V from the servo port (V pin)</text>
-<line x1="600" y1="568" x2="636" y2="568" stroke="#ffb347" stroke-width="4"/><text x="646" y="572" font-size="13" fill="#222">throttle copy from PWM2 (S) to GPIO1</text>
-<line x1="600" y1="590" x2="636" y2="590" stroke="#6ec1ff" stroke-width="4"/><text x="646" y="594" font-size="13" fill="#222">I2S: GPIO4 DIN, GPIO5 BCLK, GPIO6 LRC</text>
-<line x1="600" y1="612" x2="636" y2="612" stroke="#f2f2f2" stroke-width="4"/><text x="646" y="616" font-size="13" fill="#222">speaker output</text>
-<text x="600" y="646" font-size="12" fill="#555">GND is a plane on the bottom layer (not drawn).</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 912 1479" width="912" height="1479">
+<rect width="912" height="1479" fill="#ffffff"/>
+<text x="13.6" y="15.2" font-family="system-ui,sans-serif" font-size="20" font-weight="600" text-anchor="start" dominant-baseline="middle" fill="#1b2530">Sound shield, top view</text>
+<text x="13.6" y="42.4" font-family="system-ui,sans-serif" font-size="13" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#5c6b7a">18 x 23.5 mm = outline of the ESP32-S3-Zero, which sits on top of it</text>
+<rect x="330.2" y="56.0" width="251.6" height="204.0" fill="none" stroke="#5c6b7a" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="456.0" y="158.0" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="500" text-anchor="middle" dominant-baseline="middle" fill="#5c6b7a">servo cable from PWM2</text>
+<rect x="464.5" y="1059.0" width="200.6" height="170.0" fill="none" stroke="#5c6b7a" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="564.8" y="1144.0" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="500" text-anchor="middle" dominant-baseline="middle" fill="#5c6b7a">speaker plug</text>
+<rect x="304.0" y="254.9" width="304.0" height="248.2" fill="none" stroke="#8d949c" stroke-width="1.2" stroke-dasharray="2 4"/>
+<text x="456.0" y="521.8" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="middle" dominant-baseline="middle" fill="#8d949c">USB-C of the Zero (above)</text>
+<rect x="150.0" y="260.0" width="612.0" height="799.0" fill="#2f8f4e" stroke="#1d6b36" stroke-width="2" rx="4"/>
+<rect x="153.7" y="270.9" width="86.4" height="777.2" fill="#1c1c1e" opacity="0.85" rx="2"/>
+<rect x="671.9" y="270.9" width="86.4" height="777.2" fill="#1c1c1e" opacity="0.85" rx="2"/>
+<circle cx="196.9" cy="314.1" r="13.5" fill="#d8b04a"/>
+<circle cx="715.1" cy="314.1" r="13.5" fill="#d8b04a"/>
+<text x="145.9" y="314.1" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="end" dominant-baseline="middle" fill="#5c6b7a">5V</text>
+<text x="766.1" y="314.1" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#5c6b7a">TX</text>
+<circle cx="196.9" cy="400.4" r="13.5" fill="#d8b04a"/>
+<circle cx="715.1" cy="400.4" r="13.5" fill="#d8b04a"/>
+<text x="145.9" y="400.4" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="end" dominant-baseline="middle" fill="#5c6b7a">GND</text>
+<text x="766.1" y="400.4" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#5c6b7a">RX</text>
+<circle cx="196.9" cy="486.8" r="13.5" fill="#d8b04a"/>
+<circle cx="715.1" cy="486.8" r="13.5" fill="#d8b04a"/>
+<text x="145.9" y="486.8" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="end" dominant-baseline="middle" fill="#5c6b7a">3V3</text>
+<text x="766.1" y="486.8" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#5c6b7a">IO13</text>
+<circle cx="196.9" cy="573.1" r="13.5" fill="#d8b04a"/>
+<circle cx="715.1" cy="573.1" r="13.5" fill="#d8b04a"/>
+<text x="145.9" y="573.1" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="end" dominant-baseline="middle" fill="#5c6b7a">IO1</text>
+<text x="766.1" y="573.1" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#5c6b7a">IO12</text>
+<circle cx="196.9" cy="659.5" r="13.5" fill="#d8b04a"/>
+<circle cx="715.1" cy="659.5" r="13.5" fill="#d8b04a"/>
+<text x="145.9" y="659.5" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="end" dominant-baseline="middle" fill="#5c6b7a">IO2</text>
+<text x="766.1" y="659.5" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#5c6b7a">IO11</text>
+<circle cx="196.9" cy="745.9" r="13.5" fill="#d8b04a"/>
+<circle cx="715.1" cy="745.9" r="13.5" fill="#d8b04a"/>
+<text x="145.9" y="745.9" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="end" dominant-baseline="middle" fill="#5c6b7a">IO3</text>
+<text x="766.1" y="745.9" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#5c6b7a">IO10</text>
+<circle cx="196.9" cy="832.2" r="13.5" fill="#d8b04a"/>
+<circle cx="715.1" cy="832.2" r="13.5" fill="#d8b04a"/>
+<text x="145.9" y="832.2" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="end" dominant-baseline="middle" fill="#5c6b7a">IO4</text>
+<text x="766.1" y="832.2" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#5c6b7a">IO9</text>
+<circle cx="196.9" cy="918.6" r="13.5" fill="#d8b04a"/>
+<circle cx="715.1" cy="918.6" r="13.5" fill="#d8b04a"/>
+<text x="145.9" y="918.6" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="end" dominant-baseline="middle" fill="#5c6b7a">IO5</text>
+<text x="766.1" y="918.6" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#5c6b7a">IO8</text>
+<circle cx="196.9" cy="1004.9" r="13.5" fill="#d8b04a"/>
+<circle cx="715.1" cy="1004.9" r="13.5" fill="#d8b04a"/>
+<text x="145.9" y="1004.9" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="end" dominant-baseline="middle" fill="#5c6b7a">IO6</text>
+<text x="766.1" y="1004.9" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#5c6b7a">IO7</text>
+<polyline points="369.6,303.2 369.6,389.2" fill="none" stroke="#ffb347" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="369.6,450.4 369.6,573.1 196.9,573.1" fill="none" stroke="#ffb347" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="456.0,303.2 456.0,373.9" fill="none" stroke="#ff7a6b" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="456.0,486.1 456.0,528.6" fill="none" stroke="#ff7a6b" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="456.0,630.6 609.0,630.6 609.0,620.4" fill="none" stroke="#ff7a6b" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="456.0,630.6 456.0,674.8 320.0,674.8 320.0,606.8" fill="none" stroke="#ff7a6b" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="320.0,606.8 320.0,538.8" fill="none" stroke="#ff7a6b" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 5" opacity="0.8"/>
+<polyline points="320.0,538.8 286.0,538.8 286.0,494.6" fill="none" stroke="#ff7a6b" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="286.0,385.8 286.0,314.1 196.9,314.1" fill="none" stroke="#ff7a6b" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="524.0,630.6 524.0,780.2 393.1,780.2 393.1,873.7" fill="none" stroke="#ff7a6b" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="360.8,824.4 393.1,824.4" fill="none" stroke="#ff7a6b" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="393.1,824.4 422.0,824.4" fill="none" stroke="#ff7a6b" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="196.9,832.2 265.6,832.2 265.6,916.2 294.5,916.2" fill="none" stroke="#6ec1ff" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="196.9,918.6 252.0,918.6 252.0,933.2 294.5,933.2" fill="none" stroke="#6ec1ff" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="196.9,1004.9 272.4,1004.9 272.4,950.2 294.5,950.2" fill="none" stroke="#6ec1ff" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="413.5,929.8 513.8,929.8 513.8,892.4" fill="none" stroke="#ececec" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="413.5,950.2 581.8,950.2 581.8,892.4" fill="none" stroke="#ececec" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="272.4,573.1 272.4,620.4" fill="none" stroke="#ffb347" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="272.4" cy="715.6" r="9.7" fill="#d8b04a"/>
+<circle cx="272.4" cy="715.6" r="3.4" fill="#1d6b36"/>
+<circle cx="292.8" cy="787.0" r="9.7" fill="#d8b04a"/>
+<circle cx="292.8" cy="787.0" r="3.4" fill="#1d6b36"/>
+<circle cx="503.6" cy="790.4" r="9.7" fill="#d8b04a"/>
+<circle cx="503.6" cy="790.4" r="3.4" fill="#1d6b36"/>
+<circle cx="609.0" cy="844.8" r="9.7" fill="#d8b04a"/>
+<circle cx="609.0" cy="844.8" r="3.4" fill="#1d6b36"/>
+<circle cx="354.0" cy="933.2" r="9.7" fill="#d8b04a"/>
+<circle cx="354.0" cy="933.2" r="3.4" fill="#1d6b36"/>
+<circle cx="646.4" cy="596.6" r="9.7" fill="#d8b04a"/>
+<circle cx="646.4" cy="596.6" r="3.4" fill="#1d6b36"/>
+<circle cx="320.0" cy="606.8" r="9.7" fill="#d8b04a"/>
+<circle cx="320.0" cy="606.8" r="3.4" fill="#1d6b36"/>
+<circle cx="320.0" cy="538.8" r="9.7" fill="#d8b04a"/>
+<circle cx="320.0" cy="538.8" r="3.4" fill="#1d6b36"/>
+<rect x="326.5" y="260.0" width="259.1" height="86.4" fill="#222" stroke="#000" stroke-width="1"/>
+<circle cx="369.6" cy="303.2" r="15.3" fill="#d8b04a"/>
+<circle cx="456.0" cy="303.2" r="15.3" fill="#d8b04a"/>
+<circle cx="542.4" cy="303.2" r="15.3" fill="#d8b04a"/>
+<text x="369.6" y="229.4" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1b2530">S</text>
+<text x="456.0" y="229.4" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1b2530">V</text>
+<text x="542.4" y="229.4" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1b2530">G</text>
+<rect x="348.4" y="385.8" width="42.5" height="68.0" fill="#2a2a2a" stroke="#000" stroke-width="0.8"/>
+<rect x="344.1" y="372.2" width="51.0" height="95.2" fill="none" stroke="#f4f4ee" stroke-width="0.8" stroke-dasharray="3 3"/>
+<text x="369.6" y="356.9" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#f4f4ee">R1</text>
+<rect x="428.8" y="375.6" width="54.4" height="108.8" fill="#e3cf5e" stroke="#000" stroke-width="0.8"/>
+<rect x="422.0" y="360.3" width="68.0" height="139.4" fill="none" stroke="#f4f4ee" stroke-width="0.8" stroke-dasharray="3 3"/>
+<text x="456.0" y="345.0" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#f4f4ee">F1</text>
+<rect x="425.4" y="511.6" width="61.2" height="136.0" fill="#1c1c1e" stroke="#000" stroke-width="0.8"/>
+<rect x="425.4" y="511.6" width="61.2" height="136.0" fill="none" stroke="#f4f4ee" stroke-width="0.8" stroke-dasharray="3 3"/>
+<rect x="425.4" y="630.6" width="61.2" height="17.0" fill="#c9ced4" stroke="none"/>
+<text x="456.0" y="496.3" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#f4f4ee">D1</text>
+<rect x="255.4" y="372.2" width="61.2" height="136.0" fill="#1c1c1e" stroke="#000" stroke-width="0.8"/>
+<rect x="255.4" y="372.2" width="61.2" height="136.0" fill="none" stroke="#f4f4ee" stroke-width="0.8" stroke-dasharray="3 3"/>
+<rect x="255.4" y="372.2" width="61.2" height="17.0" fill="#c9ced4" stroke="none"/>
+<text x="286.0" y="356.9" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#f4f4ee">D2</text>
+<rect x="251.2" y="620.4" width="42.5" height="68.0" fill="#2a2a2a" stroke="#000" stroke-width="0.8"/>
+<rect x="246.9" y="606.8" width="51.0" height="95.2" fill="none" stroke="#f4f4ee" stroke-width="0.8" stroke-dasharray="3 3"/>
+<text x="272.4" y="591.5" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#f4f4ee">R2</text>
+<rect x="554.6" y="620.4" width="108.8" height="204.0" fill="#e0a85b" stroke="#8a5a1c" stroke-width="1"/>
+<rect x="554.6" y="620.4" width="108.8" height="30.6" fill="#3a2a10" stroke="none"/>
+<rect x="551.2" y="589.8" width="115.6" height="265.2" fill="none" stroke="#f4f4ee" stroke-width="0.8" stroke-dasharray="3 3"/>
+<text x="609.0" y="574.5" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#f4f4ee">C1</text>
+<rect x="292.8" y="803.2" width="68.0" height="42.5" fill="#d6b77e" stroke="#000" stroke-width="0.8"/>
+<rect x="280.9" y="798.9" width="91.8" height="51.0" fill="none" stroke="#f4f4ee" stroke-width="0.8" stroke-dasharray="3 3"/>
+<rect x="422.0" y="803.2" width="68.0" height="42.5" fill="#d6b77e" stroke="#000" stroke-width="0.8"/>
+<rect x="410.1" y="798.9" width="91.8" height="51.0" fill="none" stroke="#f4f4ee" stroke-width="0.8" stroke-dasharray="3 3"/>
+<rect x="282.6" y="861.8" width="142.8" height="142.8" fill="none" stroke="#f4f4ee" stroke-width="1" stroke-dasharray="3 3"/>
+<rect x="303.0" y="882.2" width="102.0" height="102.0" fill="#1c1c1e" stroke="#000" stroke-width="1"/>
+<circle cx="314.9" cy="894.1" r="3" fill="#888"/>
+<rect x="464.5" y="862.7" width="200.6" height="195.5" fill="#ece6d6" stroke="#7a7466" stroke-width="1.2"/>
+<rect x="484.9" y="944.2" width="159.8" height="113.9" fill="#cfc8b4" stroke="none"/>
+<circle cx="513.8" cy="892.4" r="9.4" fill="#d8b04a"/>
+<circle cx="581.8" cy="892.4" r="9.4" fill="#d8b04a"/>
+<text x="513.8" y="870.3" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1b2530">+</text>
+<text x="581.8" y="870.3" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1b2530">-</text>
+<text x="354.0" y="1019.9" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#f4f4ee">U1</text>
+<text x="326.8" y="785.3" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#f4f4ee">C2</text>
+<text x="456.0" y="788.7" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#f4f4ee">C3</text>
+<text x="564.8" y="984.2" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1b2530">J2</text>
+<text x="456.0" y="277.0" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#fff">J1</text>
+<text x="150.0" y="1269.8" font-family="system-ui,sans-serif" font-size="13" font-weight="600" text-anchor="start" dominant-baseline="middle" fill="#1b2530">Top side (between the header strips)</text>
+<line x1="150.0" x2="197.6" y1="1305.5" y2="1305.5" stroke="#ff7a6b" stroke-width="11.9" stroke-linecap="round"/>
+<text x="214.6" y="1305.5" font-family="system-ui,sans-serif" font-size="12" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#1b2530">5 V (servo V, through F1, D1)</text>
+<line x1="150.0" x2="197.6" y1="1341.2" y2="1341.2" stroke="#ffb347" stroke-width="11.9" stroke-linecap="round"/>
+<text x="214.6" y="1341.2" font-family="system-ui,sans-serif" font-size="12" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#1b2530">throttle S to GPIO1</text>
+<line x1="150.0" x2="197.6" y1="1376.9" y2="1376.9" stroke="#6ec1ff" stroke-width="11.9" stroke-linecap="round"/>
+<text x="214.6" y="1376.9" font-family="system-ui,sans-serif" font-size="12" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#1b2530">I2S to the amplifier</text>
+<line x1="150.0" x2="197.6" y1="1412.6" y2="1412.6" stroke="#ececec" stroke-width="11.9" stroke-linecap="round"/>
+<text x="214.6" y="1412.6" font-family="system-ui,sans-serif" font-size="12" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#1b2530">speaker</text>
+<line x1="150.0" x2="197.6" y1="1448.3" y2="1448.3" stroke="#ff7a6b" stroke-width="11.9" stroke-dasharray="6 5" stroke-linecap="round"/>
+<text x="214.6" y="1448.3" font-family="system-ui,sans-serif" font-size="12" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#1b2530">hop on the bottom layer (under the S trace)</text>
+<text x="456.0" y="1269.8" font-family="system-ui,sans-serif" font-size="11" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#5c6b7a">Bottom side: GND plane, 7 test pads (5V, 3V3, GND, IO1, BCLK, LRC, DIN)</text>
 </svg>

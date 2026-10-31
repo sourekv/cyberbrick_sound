@@ -1,0 +1,395 @@
+<title>Sound Shield Model</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Drafting-bench viewer: model on the left, parts list on the right (stacked on a phone).
+   Neutral blue-grey ground, one copper-gold accent. */
+:root {
+  --bg: #e9edf1; --panel: #f6f8fa; --fg: #1b2530; --muted: #5c6b7a; --line: #c9d2db;
+  --accent: #b5801f; --grid: rgba(27, 37, 48, 0.06);
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11171d; --panel: #18212a; --fg: #e4eaf0; --muted: #93a2b1; --line: #2c3946;
+    --accent: #e0a63a; --grid: rgba(228, 234, 240, 0.06); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11171d; --panel: #18212a; --fg: #e4eaf0; --muted: #93a2b1; --line: #2c3946;
+  --accent: #e0a63a; --grid: rgba(228, 234, 240, 0.06); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 14px; line-height: 1.45;
+  padding-block: 18px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin-bottom: 14px; }
+h1 { font-size: 20px; font-weight: 600; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); font-family: var(--mono); font-size: 12px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 14px; align-items: start; }
+@media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+.stage {
+  position: relative; border: 1px solid var(--line); border-radius: 6px 6px 0 0; overflow: hidden; background-color: var(--panel);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+#view { width: 100%; height: min(72vh, 620px); min-height: 340px; display: block; touch-action: none; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 6px 6px; background: var(--panel); }
+button, .tog { font: inherit; font-size: 13px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 5px 10px; cursor: pointer; }
+button:hover, .tog:hover { border-color: var(--accent); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tog { display: inline-flex; align-items: center; gap: 6px; }
+.tog input { accent-color: var(--accent); margin: 0; }
+#tip { position: absolute; left: 0; top: 0; pointer-events: none; padding: 3px 8px; border-radius: 3px; font-family: var(--mono); font-size: 12px; background: var(--fg); color: var(--bg); opacity: 0; transition: opacity 0.12s; white-space: nowrap; }
+#hint { position: absolute; left: 10px; bottom: 10px; color: var(--muted); font-size: 12px; pointer-events: none; }
+aside { border: 1px solid var(--line); border-radius: 6px; background: var(--panel); overflow: hidden; }
+aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--line); }
+#parts { list-style: none; margin: 0; padding: 0; max-height: 440px; overflow-y: auto; }
+#parts li button { width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; padding: 8px 12px; display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 0 8px; }
+#parts li button:hover { background: var(--bg); }
+#parts li button[aria-pressed="true"] { background: var(--bg); box-shadow: inset 3px 0 0 var(--accent); }
+.ref { font-family: var(--mono); font-weight: 500; color: var(--accent); }
+.pname { font-weight: 500; }
+#info { padding: 12px; border-top: 1px solid var(--line); min-height: 88px; }
+#info strong { display: block; margin-bottom: 2px; }
+#info span { color: var(--muted); }
+.note { margin-top: 14px; color: var(--muted); font-size: 12px; max-width: 70ch; }
+</style>
+
+<header>
+  <h1>Sound Shield Model</h1>
+  <div class="sub" id="sub"></div>
+</header>
+
+<div class="layout">
+  <div>
+    <div class="stage">
+      <canvas id="view" aria-label="3D model of the shield board with the ESP32-S3-Zero plugged in"></canvas>
+      <div id="tip"></div>
+      <div id="hint">Drag to rotate, scroll or pinch to zoom, right-drag to pan</div>
+    </div>
+    <div class="toolbar" role="toolbar" aria-label="Model controls">
+      <button type="button" data-view="iso">Isometric</button>
+      <button type="button" data-view="top">Top</button>
+      <button type="button" data-view="front">Front</button>
+      <button type="button" data-view="back">Underside</button>
+      <label class="tog"><input type="checkbox" id="tZero" checked> ESP32-S3-Zero</label>
+      <label class="tog"><input type="checkbox" id="tGhost" checked> See-through</label>
+      <label class="tog"><input type="checkbox" id="tNets" checked> Traces</label>
+      <label class="tog"><input type="checkbox" id="tSilk" checked> Labels</label>
+    </div>
+  </div>
+  <aside>
+    <h2>Parts</h2>
+    <ul id="parts"></ul>
+    <div id="info"><strong>Pick a part</strong><span>Select a row or hover the model to see what it does.</span></div>
+  </aside>
+</div>
+<p class="note">The board is exactly the outline of the ESP32-S3-Zero and sits under it. Everything else fits in the gap between the two socket strips. Footprints and heights are typical values, to be replaced by the real ones when the schematic is drawn. The same layout as the 2D mock (docs/shield-mock.png).</p>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function () {
+  var D = {"board": {"w": 18.0, "h": 23.5, "t": 1.6}, "hdrX": [1.38, 16.62], "hdrH": 8.5, "pinY": [1.59, 4.13, 6.67, 9.21, 11.75, 14.29, 16.83, 19.37, 21.91], "leftPins": ["5V", "GND", "3V3", "IO1", "IO2", "IO3", "IO4", "IO5", "IO6"], "rightPins": ["TX", "RX", "IO13", "IO12", "IO11", "IO10", "IO9", "IO8", "IO7"], "j1x": [6.46, 9.0, 11.54], "j1y": 1.27, "parts": [{"ref": "J1", "kind": "hdr_ra", "x": 9.0, "y": 1.27, "w": 7.62, "h": 2.54, "z": 2.54, "name": "Input header (S, V, G)", "desc": "3-pin right-angle header at the top edge; the servo cable from PWM2 plugs in from outside. S = throttle copy, V = 5 V, G = ground."}, {"ref": "R1", "kind": "chip_r", "x": 6.46, "y": 4.7, "w": 1.5, "h": 2.8, "z": 0.5, "body": [1.25, 2.0], "name": "Resistor 1 kOhm", "desc": "Series resistor between the throttle signal and GPIO1."}, {"ref": "F1", "kind": "chip_f", "x": 9.0, "y": 5.0, "w": 2.0, "h": 4.1, "z": 1.0, "body": [1.6, 3.2], "name": "Resettable fuse (PTC)", "desc": "1206 PTC, about 0.5 A hold. Limits the current drawn from the servo port (the module takes about 0.1 A)."}, {"ref": "D1", "kind": "diode", "x": 9.0, "y": 9.4, "w": 1.8, "h": 4.0, "z": 1.1, "band": "bottom", "name": "Reverse-polarity diode", "desc": "Schottky diode (SOD-123) protecting the module if the servo cable is plugged in the wrong way round."}, {"ref": "D2", "kind": "diode", "x": 4.0, "y": 5.3, "w": 1.8, "h": 4.0, "z": 1.1, "band": "top", "name": "5 V OR-ing diode", "desc": "Keeps USB 5 V and servo-port 5 V from fighting, so both can be connected at the same time."}, {"ref": "R2", "kind": "chip_r", "x": 3.6, "y": 11.6, "w": 1.5, "h": 2.8, "z": 0.5, "body": [1.25, 2.0], "name": "Resistor 100 kOhm", "desc": "Pull-down on GPIO1, so the input has a defined level when the cable is unplugged."}, {"ref": "C1", "kind": "cap_t", "x": 13.5, "y": 13.6, "w": 3.4, "h": 7.8, "z": 2.8, "body": [3.2, 6.0], "name": "Bulk capacitor 100 uF", "desc": "Polymer/tantalum 6032 case. Absorbs the current peaks of loud passages so the 5 V rail does not sag."}, {"ref": "C2", "kind": "chip_c", "x": 5.2, "y": 16.6, "w": 2.7, "h": 1.5, "z": 0.9, "body": [2.0, 1.25], "name": "Decoupling 10 uF", "desc": "Ceramic 0805 close to the amplifier supply pin."}, {"ref": "C3", "kind": "chip_c", "x": 9.0, "y": 16.6, "w": 2.7, "h": 1.5, "z": 0.6, "body": [2.0, 1.25], "name": "Decoupling 100 nF", "desc": "Ceramic 0805 close to the amplifier supply pin."}, {"ref": "U1", "kind": "qfn", "x": 6.0, "y": 19.8, "w": 4.2, "h": 4.2, "z": 0.8, "body": [3.0, 3.0], "name": "MAX98357A amplifier", "desc": "I2S class-D amplifier, TQFN-16 3 x 3 mm. Receives BCLK, LRC and DIN from the ESP32 and drives the speaker directly."}, {"ref": "J2", "kind": "jst_side", "x": 12.2, "y": 20.6, "w": 5.9, "h": 5.75, "z": 4.4, "name": "Speaker connector", "desc": "JST-PH 2-pin side-entry connector at the bottom edge; the speaker cable plugs in from outside (or two solder pads instead)."}], "nets": [{"net": "S", "color": "#ffb347", "pts": [[6.46, 1.27], [6.46, 3.8]]}, {"net": "S", "color": "#ffb347", "pts": [[6.46, 5.6], [6.46, 9.21], [1.38, 9.21]]}, {"net": "V", "color": "#ff7a6b", "pts": [[9.0, 1.27], [9.0, 3.35]]}, {"net": "V", "color": "#ff7a6b", "pts": [[9.0, 6.65], [9.0, 7.9]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[9.0, 10.9], [13.5, 10.9], [13.5, 10.6]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[9.0, 10.9], [9.0, 12.2], [5.0, 12.2], [5.0, 10.2]]}, {"net": "5V", "color": "#ff7a6b", "layer": "bot", "pts": [[5.0, 10.2], [5.0, 8.2]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[5.0, 8.2], [4.0, 8.2], [4.0, 6.9]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[4.0, 3.7], [4.0, 1.59], [1.38, 1.59]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[11.0, 10.9], [11.0, 15.3], [7.15, 15.3], [7.15, 18.05]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[6.2, 16.6], [7.15, 16.6]]}, {"net": "5V", "color": "#ff7a6b", "pts": [[7.15, 16.6], [8.0, 16.6]]}, {"net": "DIN", "color": "#6ec1ff", "pts": [[1.38, 16.83], [3.4, 16.83], [3.4, 19.3], [4.25, 19.3]]}, {"net": "BCLK", "color": "#6ec1ff", "pts": [[1.38, 19.37], [3.0, 19.37], [3.0, 19.8], [4.25, 19.8]]}, {"net": "LRC", "color": "#6ec1ff", "pts": [[1.38, 21.91], [3.6, 21.91], [3.6, 20.3], [4.25, 20.3]]}, {"net": "SPK+", "color": "#ececec", "pts": [[7.75, 19.7], [10.7, 19.7], [10.7, 18.6]]}, {"net": "SPK-", "color": "#ececec", "pts": [[7.75, 20.3], [12.7, 20.3], [12.7, 18.6]]}, {"net": "S", "color": "#ffb347", "pts": [[3.6, 9.21], [3.6, 10.6]]}], "gndVias": [[3.6, 13.4], [4.2, 15.5], [10.4, 15.6], [13.5, 17.2], [6.0, 19.8], [14.6, 9.9]], "hopVias": [[5.0, 10.2], [5.0, 8.2]], "tp": [[3.4, 22.7], [5.4, 22.7], [7.4, 22.7], [9.4, 22.7], [11.4, 22.7], [13.4, 22.7], [15.4, 22.7]], "tpNames": ["5V", "3V3", "GND", "IO1", "BCLK", "LRC", "DIN"]};
+  var BW = D.board.w, BH = D.board.h, BT = D.board.t;
+  document.getElementById('sub').textContent = BW + ' × ' + BH + ' mm · same outline as the ESP32-S3-Zero · mock, not routed';
+
+  var canvas = document.getElementById('view');
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(30, 1, 1, 400);
+  var controls = new THREE.OrbitControls(camera, canvas);
+  controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.minDistance = 20; controls.maxDistance = 200;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a96a3, 0.85));
+  var sun = new THREE.DirectionalLight(0xffffff, 0.9);
+  sun.position.set(30, 60, 35); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.camera.left = -25; sun.shadow.camera.right = 25; sun.shadow.camera.top = 25; sun.shadow.camera.bottom = -25;
+  sun.shadow.camera.far = 160; sun.shadow.bias = -0.0004;
+  scene.add(sun);
+  var fill = new THREE.DirectionalLight(0xbcd4ff, 0.35);
+  fill.position.set(-30, -20, -30); scene.add(fill);
+
+  var root = new THREE.Group(); scene.add(root);
+  var pickables = [], partInfo = {}, partOrder = [];
+
+  function mat(color, o) {
+    o = o || {};
+    return new THREE.MeshStandardMaterial({ color: color, roughness: o.r == null ? 0.55 : o.r, metalness: o.m || 0 });
+  }
+  var M = {
+    board: mat(0x1b6b36, { r: 0.7 }), black: mat(0x1c1c1e, { r: 0.6 }), gold: mat(0xd8b04a, { r: 0.3, m: 0.85 }),
+    silver: mat(0xc9ced4, { r: 0.35, m: 0.85 }), ivory: mat(0xece6d6, { r: 0.7 }), ivoryD: mat(0xb9b29c, { r: 0.8 }),
+    beige: mat(0xd6b77e, { r: 0.6 }), ptc: mat(0xe3cf5e, { r: 0.6 }), res: mat(0x2a2a2a, { r: 0.6 }),
+    tan: mat(0xe0a85b, { r: 0.55 }), tanD: mat(0x3a2a10, { r: 0.6 })
+  };
+
+  // board coords (x right, y down from top-left) -> scene; base = bottom of the part above the board bottom face
+  function place(m, x, y, base, h) { m.position.set(x - BW / 2, base + h / 2, y - BH / 2); return m; }
+  function box(x, y, w, d, h, material, base) {
+    var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+    m.castShadow = true; m.receiveShadow = true;
+    return place(m, x, y, base == null ? BT : base, h);
+  }
+  function reg(ref, name, desc, group) {
+    var meshes = [];
+    group.traverse(function (o) { if (o.isMesh) { o.userData.ref = ref; meshes.push(o); pickables.push(o); } });
+    partInfo[ref] = { name: name, desc: desc, group: group, meshes: meshes };
+    partOrder.push(ref); root.add(group); return group;
+  }
+
+  // ---------- board ----------
+  var shape = new THREE.Shape(), rr = 1.2;
+  shape.moveTo(-BW / 2 + rr, -BH / 2);
+  shape.lineTo(BW / 2 - rr, -BH / 2); shape.quadraticCurveTo(BW / 2, -BH / 2, BW / 2, -BH / 2 + rr);
+  shape.lineTo(BW / 2, BH / 2 - rr); shape.quadraticCurveTo(BW / 2, BH / 2, BW / 2 - rr, BH / 2);
+  shape.lineTo(-BW / 2 + rr, BH / 2); shape.quadraticCurveTo(-BW / 2, BH / 2, -BW / 2, BH / 2 - rr);
+  shape.lineTo(-BW / 2, -BH / 2 + rr); shape.quadraticCurveTo(-BW / 2, -BH / 2, -BW / 2 + rr, -BH / 2);
+  var boardGeo = new THREE.ExtrudeGeometry(shape, { depth: BT, bevelEnabled: false, curveSegments: 24 });
+  boardGeo.rotateX(-Math.PI / 2);
+  var boardMesh = new THREE.Mesh(boardGeo, M.board);
+  boardMesh.receiveShadow = true; boardMesh.castShadow = true;
+  root.add(boardMesh);
+
+  // ---------- textures: top (traces + silkscreen) and bottom (GND plane + test pads) ----------
+  var PXMM = 56, showNets = true, showSilk = true;
+  function mkSurface(flipX) {
+    var c = document.createElement('canvas'); c.width = Math.round(BW * PXMM); c.height = Math.round(BH * PXMM);
+    var t = new THREE.CanvasTexture(c); t.anisotropy = 8;
+    if (flipX) { t.wrapS = THREE.RepeatWrapping; t.repeat.x = -1; t.offset.x = 1; }
+    return { c: c, x: c.getContext('2d'), t: t };
+  }
+  var top = mkSurface(false), bot = mkSurface(false);
+  function P(x, y) { return [x * PXMM, y * PXMM]; }
+  function line(cx, pts, color, w, dash) {
+    cx.beginPath();
+    pts.forEach(function (p, k) { var q = P(p[0], p[1]); if (k) cx.lineTo(q[0], q[1]); else cx.moveTo(q[0], q[1]); });
+    cx.strokeStyle = color; cx.lineWidth = w * PXMM; cx.lineJoin = 'round'; cx.lineCap = 'round';
+    cx.setLineDash(dash ? dash.map(function (d) { return d * PXMM; }) : []); cx.stroke(); cx.setLineDash([]);
+  }
+  function dot(cx, x, y, r, color) { var q = P(x, y); cx.beginPath(); cx.arc(q[0], q[1], r * PXMM, 0, Math.PI * 2); cx.fillStyle = color; cx.fill(); }
+  function txt(cx, s, x, y, size, o) {
+    o = o || {};
+    cx.font = (o.bold ? '600 ' : '500 ') + (size * PXMM) + 'px "IBM Plex Mono", monospace';
+    cx.fillStyle = o.color || '#f4f4ee'; cx.textAlign = o.align || 'left'; cx.textBaseline = 'middle';
+    var q = P(x, y); cx.fillText(s, q[0], q[1]);
+  }
+  function viaDot(cx, v) { dot(cx, v[0], v[1], 0.45, '#d8b04a'); dot(cx, v[0], v[1], 0.18, '#1b6b36'); }
+
+  function paint() {
+    var cx = top.x; cx.clearRect(0, 0, top.c.width, top.c.height);
+    D.hdrX.forEach(function (hx) { D.pinY.forEach(function (py) { dot(cx, hx, py, 0.55, '#d8b04a'); dot(cx, hx, py, 0.3, '#14452a'); }); });
+    if (showNets) {
+      D.nets.forEach(function (n) { line(cx, n.pts, n.color, 0.35, n.layer === 'bot' ? [0.45, 0.35] : null); });
+      D.gndVias.concat(D.hopVias).forEach(function (v) { viaDot(cx, v); });
+      D.parts.forEach(function (p) { if (p.kind === 'jst_side') { [10.7, 12.7].forEach(function (x) { dot(cx, x, 18.6, 0.38, '#d8b04a'); }); } });
+    }
+    if (showSilk) {
+      var s = { bold: true, align: 'center' };
+      txt(cx, 'S', D.j1x[0], 2.75, 0.6, s); txt(cx, 'V', D.j1x[1], 2.75, 0.6, s); txt(cx, 'G', D.j1x[2], 2.75, 0.6, s);
+      txt(cx, 'R1', 5.0, 3.4, 0.5, { align: 'center' }); txt(cx, 'F1', 10.9, 5.0, 0.5, { align: 'center' });
+      txt(cx, 'D1', 10.7, 9.4, 0.5, { align: 'center' }); txt(cx, 'D2', 4.0, 8.0, 0.5, { align: 'center' });
+      txt(cx, 'R2', 5.6, 11.6, 0.5, { align: 'center' }); txt(cx, 'C1', 11.2, 13.6, 0.5, { align: 'center' });
+      txt(cx, 'C2', 5.2, 15.6, 0.5, { align: 'center' }); txt(cx, 'C3', 9.0, 15.6, 0.5, { align: 'center' });
+      txt(cx, 'U1', 6.0, 22.3, 0.5, { align: 'center' }); txt(cx, 'J2', 12.2, 22.9, 0.5, { align: 'center', color: '#1b2530' });
+      txt(cx, 'SPK', 12.2, 17.2, 0.5, { align: 'center' });
+    }
+    top.t.needsUpdate = true;
+
+    cx = bot.x; cx.clearRect(0, 0, bot.c.width, bot.c.height);
+    cx.fillStyle = 'rgba(214,160,60,0.28)'; cx.fillRect(0.5 * PXMM, 0.5 * PXMM, (BW - 1) * PXMM, (BH - 1) * PXMM);
+    D.tp.forEach(function (p, k) {
+      dot(cx, p[0], p[1], 0.55, '#d8b04a');
+      txt(cx, D.tpNames[k], p[0], p[1] - 1.05, 0.5, { align: 'center', color: '#f4f4ee' });
+    });
+    txt(cx, 'GND plane', 9.0, 4.0, 0.7, { align: 'center', color: '#f4f4ee', bold: true });
+    txt(cx, 'TEST POINTS', 9.0, 20.9, 0.55, { align: 'center', color: '#f4f4ee', bold: true });
+    bot.t.needsUpdate = true;
+  }
+  var skin = new THREE.Mesh(new THREE.PlaneGeometry(BW, BH), new THREE.MeshBasicMaterial({ map: top.t, transparent: true, depthWrite: false }));
+  skin.rotation.x = -Math.PI / 2; skin.position.set(0, BT + 0.012, 0); root.add(skin);
+  var skinB = new THREE.Mesh(new THREE.PlaneGeometry(BW, BH), new THREE.MeshBasicMaterial({ map: bot.t, transparent: true, depthWrite: false }));
+  skinB.rotation.x = Math.PI / 2; skinB.position.set(0, -0.012, 0); root.add(skinB);
+
+  // ---------- parts ----------
+  var G = function () { return new THREE.Group(); };
+  function ends(g, p, endMat, len) {
+    var bw = p.body[0], bh = p.body[1], vertical = bh >= bw;
+    [-1, 1].forEach(function (s) {
+      if (vertical) g.add(box(p.x, p.y + s * (bh / 2 - len / 2), bw + 0.02, len, p.z + 0.02, endMat));
+      else g.add(box(p.x + s * (bw / 2 - len / 2), p.y, len, bh + 0.02, p.z + 0.02, endMat));
+    });
+  }
+  function build(p) {
+    var g = G(), k = p.kind;
+    if (k === 'hdr_ra') {
+      g.add(box(p.x, p.y, p.w, p.h, p.z, M.black));
+      D.j1x.forEach(function (px) {
+        g.add(box(px, D.j1y, 0.64, 0.64, 2.2, M.gold, BT + 0.4));                 // tail through the plastic
+        g.add(box(px, (D.j1y - 6.2) / 2, 0.64, D.j1y + 6.2, 0.64, M.gold, BT + 0.95)); // pin sticking out of the edge
+      });
+    } else if (k === 'chip_r') {
+      g.add(box(p.x, p.y, p.body[0], p.body[1], p.z, M.res)); ends(g, p, M.silver, 0.4);
+    } else if (k === 'chip_f') {
+      g.add(box(p.x, p.y, p.body[0], p.body[1], p.z, M.ptc)); ends(g, p, M.silver, 0.5);
+    } else if (k === 'chip_c') {
+      g.add(box(p.x, p.y, p.body[0], p.body[1], p.z, M.beige)); ends(g, p, M.silver, 0.4);
+    } else if (k === 'diode') {
+      g.add(box(p.x, p.y, 1.6, 2.7, p.z, M.black));
+      var yb = p.band === 'bottom' ? p.y + 1.35 - 0.25 : p.y - 1.35 + 0.25;
+      g.add(box(p.x, yb, 1.62, 0.45, p.z + 0.02, M.silver));
+      g.add(box(p.x, p.y - 1.5, 1.2, 0.8, 0.3, M.silver)); g.add(box(p.x, p.y + 1.5, 1.2, 0.8, 0.3, M.silver));
+    } else if (k === 'cap_t') {
+      g.add(box(p.x, p.y, p.body[0], p.body[1], p.z, M.tan));
+      g.add(box(p.x, p.y - p.body[1] / 2 + 0.45, p.body[0] + 0.02, 0.9, p.z + 0.02, M.tanD));
+      g.add(box(p.x, p.y - 3.4, 2.6, 1.2, 0.3, M.silver)); g.add(box(p.x, p.y + 3.4, 2.6, 1.2, 0.3, M.silver));
+    } else if (k === 'qfn') {
+      g.add(box(p.x, p.y, 3.0, 3.0, 0.8, M.black));
+      for (var s = 0; s < 4; s++) for (var j = 0; j < 4; j++) {
+        var off = (j - 1.5) * 0.5;
+        if (s === 0) g.add(box(p.x + off, p.y - 1.55, 0.28, 0.5, 0.12, M.gold));
+        if (s === 1) g.add(box(p.x + off, p.y + 1.55, 0.28, 0.5, 0.12, M.gold));
+        if (s === 2) g.add(box(p.x - 1.55, p.y + off, 0.5, 0.28, 0.12, M.gold));
+        if (s === 3) g.add(box(p.x + 1.55, p.y + off, 0.5, 0.28, 0.12, M.gold));
+      }
+      g.add(box(p.x - 1.0, p.y - 1.0, 0.4, 0.4, 0.82, M.silver));
+    } else if (k === 'jst_side') {
+      g.add(box(p.x, p.y, p.w, p.h, p.z, M.ivory));
+      g.add(box(p.x, p.y + p.h / 2 - 1.6, p.w - 1.4, 3.3, p.z - 1.0, M.ivoryD, BT + 0.5));   // opening towards the edge
+    }
+    return g;
+  }
+  D.parts.forEach(function (p) { reg(p.ref, p.name, p.desc, build(p)); });
+  reg('TP', 'Test points (bottom)', 'Seven 1 mm pads on the underside: 5V, 3V3, GND, IO1, BCLK, LRC, DIN. They are pads only; the model shows them on the Underside view.', (function () {
+    var g = G(); D.tp.forEach(function (p) { g.add(box(p[0], p[1], 1.1, 1.1, 0.05, M.gold, -0.05)); }); return g;
+  })());
+
+  // ---------- ESP32-S3-Zero on two female headers ----------
+  var zeroMats = [];
+  function zm(m) { var c = m.clone(); c.transparent = true; c.opacity = 0.35; c.depthWrite = false; zeroMats.push(c); return c; }
+  var zeroGroup = G();
+  (function () {
+    var hdrLen = 22.86, hy = D.pinY[4];
+    D.hdrX.forEach(function (x) {
+      var h = box(x, hy, 2.54, hdrLen, D.hdrH, M.black, BT);
+      zeroGroup.add(h);
+    });
+    var zb = BT + D.hdrH, zr = G();
+    var mZ = zm(M.res), mS = zm(M.silver), mG = zm(M.gold), mD = zm(M.black), mB = zm(mat(0x8d949c, { r: 0.5, m: 0.4 }));
+    mZ.color.set(0x15161a);
+    zr.add(box(BW / 2, BH / 2, BW, BH, 1.0, mZ, zb));
+    zr.add(box(BW / 2, 3.5, 8.94, 7.3, 3.26, mS, zb + 1.0));
+    zr.add(box(BW / 2, 3.5, 7.4, 6.0, 3.3, mD, zb + 1.0));
+    zr.add(box(BW / 2, 13.2, 12.5, 12.5, 2.3, mS, zb + 1.0));
+    zr.add(box(5.6, 21.2, 3.0, 1.8, 1.4, mB, zb + 1.0)); zr.add(box(12.4, 21.2, 3.0, 1.8, 1.4, mB, zb + 1.0));
+    var c2 = document.createElement('canvas'); c2.width = BW * 50; c2.height = BH * 50;
+    var x2 = c2.getContext('2d'); x2.textBaseline = 'middle'; x2.fillStyle = '#e7e7e0';
+    x2.font = '500 22px "IBM Plex Mono", monospace';
+    for (var i = 0; i < 9; i++) {
+      var yy = D.pinY[i] * 50;
+      x2.textAlign = 'left'; x2.fillText(D.leftPins[i], 1.05 * 50, yy);
+      x2.textAlign = 'right'; x2.fillText(D.rightPins[i], (BW - 1.05) * 50, yy);
+    }
+    x2.textAlign = 'center'; x2.font = '600 24px "IBM Plex Mono", monospace'; x2.fillText('ESP32-S3-Zero', BW * 25, 16.6 * 50);
+    var t2 = new THREE.CanvasTexture(c2); t2.anisotropy = 8;
+    var lm = new THREE.MeshBasicMaterial({ map: t2, transparent: true, depthWrite: false });
+    var lab = new THREE.Mesh(new THREE.PlaneGeometry(BW, BH), lm);
+    lab.rotation.x = -Math.PI / 2; lab.position.set(0, zb + 1.012, 0); lab.userData.noPick = true; zr.add(lab);
+    zeroGroup.add(zr);
+  })();
+  reg('U0', 'ESP32-S3-Zero', 'The controller module on two 9-pin female headers, 8.5 mm above the shield. Reads the throttle pulse on GPIO1 and plays the engine sound over I2S (GPIO4, 5, 6). USB-C and the Boot/Reset buttons stay reachable.', zeroGroup);
+
+  // ---------- parts list / selection ----------
+  var list = document.getElementById('parts'), info = document.getElementById('info'), selected = null;
+  partOrder.forEach(function (ref) {
+    var li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.setAttribute('aria-pressed', 'false'); b.dataset.ref = ref;
+    var r = document.createElement('span'); r.className = 'ref'; r.textContent = ref;
+    var n = document.createElement('span'); n.className = 'pname'; n.textContent = partInfo[ref].name;
+    b.appendChild(r); b.appendChild(n);
+    b.addEventListener('click', function () { select(selected === ref ? null : ref); });
+    li.appendChild(b); list.appendChild(li);
+  });
+  function setEmissive(ref, on) {
+    partInfo[ref].meshes.forEach(function (m) {
+      if (!m.userData.orig) m.userData.orig = m.material;
+      if (on) { var c = m.userData.orig.clone(); c.emissive = new THREE.Color(0xb5801f); c.emissiveIntensity = 0.55; m.material = c; }
+      else m.material = m.userData.orig;
+    });
+  }
+  function select(ref) {
+    if (selected) setEmissive(selected, false);
+    selected = ref; if (ref) setEmissive(ref, true);
+    Array.prototype.forEach.call(list.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String(b.dataset.ref === ref)); });
+    info.textContent = '';
+    var s = document.createElement('strong'), d = document.createElement('span');
+    if (ref) { s.textContent = ref + '  ' + partInfo[ref].name; d.textContent = partInfo[ref].desc; }
+    else { s.textContent = 'Pick a part'; d.textContent = 'Select a row or hover the model to see what it does.'; }
+    info.appendChild(s); info.appendChild(d);
+  }
+
+  // ---------- hover tooltip and click picking ----------
+  var ray = new THREE.Raycaster(), mouse = new THREE.Vector2(), tip = document.getElementById('tip');
+  function isShown(m) { var o = m; while (o) { if (!o.visible) return false; o = o.parent; } return true; }
+  function pick(e) {
+    var r = canvas.getBoundingClientRect();
+    mouse.x = ((e.clientX - r.left) / r.width) * 2 - 1; mouse.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    ray.setFromCamera(mouse, camera);
+    var vis = pickables.filter(function (m) { return isShown(m) && !(m.userData.ref === 'U0' && zeroGhost); });
+    return ray.intersectObjects(vis, false)[0];
+  }
+  canvas.addEventListener('pointermove', function (e) {
+    var hit = pick(e), r = canvas.getBoundingClientRect();
+    if (hit) {
+      var ref = hit.object.userData.ref;
+      tip.textContent = ref + '  ' + partInfo[ref].name; tip.style.opacity = 1;
+      tip.style.transform = 'translate(' + Math.max(4, Math.min(e.clientX - r.left + 12, r.width - tip.offsetWidth - 6)) + 'px,' + (e.clientY - r.top + 14) + 'px)';
+      canvas.style.cursor = 'pointer';
+    } else { tip.style.opacity = 0; canvas.style.cursor = 'grab'; }
+  });
+  canvas.addEventListener('pointerleave', function () { tip.style.opacity = 0; });
+  var downAt = null;
+  canvas.addEventListener('pointerdown', function (e) { downAt = [e.clientX, e.clientY]; });
+  canvas.addEventListener('pointerup', function (e) {
+    if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 4) return;
+    var hit = pick(e); select(hit ? hit.object.userData.ref : null);
+  });
+
+  // ---------- toggles ----------
+  var zeroGhost = true;
+  function applyGhost() {
+    zeroMats.forEach(function (m) { m.opacity = zeroGhost ? 0.3 : 1; m.transparent = zeroGhost; m.depthWrite = !zeroGhost; m.needsUpdate = true; });
+  }
+  document.getElementById('tZero').addEventListener('change', function (e) { partInfo.U0.group.visible = e.target.checked; });
+  document.getElementById('tGhost').addEventListener('change', function (e) { zeroGhost = e.target.checked; applyGhost(); });
+  document.getElementById('tNets').addEventListener('change', function (e) { showNets = e.target.checked; paint(); });
+  document.getElementById('tSilk').addEventListener('change', function (e) { showSilk = e.target.checked; paint(); });
+
+  // ---------- camera presets ----------
+  var views = { iso: [27, 31, 41], top: [0, 62, 0.01], front: [0, 14, 100], back: [14, -52, 26] };
+  var target = new THREE.Vector3(0, 4, 0);
+  function setView(name) { var v = views[name]; camera.position.set(v[0], v[1], v[2]); controls.target.copy(target); controls.update(); }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-view]'), function (b) { b.addEventListener('click', function () { setView(b.dataset.view); }); });
+
+  function resize() {
+    var w = canvas.clientWidth, h = canvas.clientHeight; if (!w || !h) return;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(canvas);
+
+  paint(); applyGhost();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(paint);
+  resize(); setView('iso'); canvas.style.cursor = 'grab';
+  window.__shield = { setView: setView, camera: camera, controls: controls };
+  (function frame() { controls.update(); renderer.render(scene, camera); requestAnimationFrame(frame); })();
+})();
+</script>

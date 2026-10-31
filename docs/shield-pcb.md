@@ -16,18 +16,21 @@ Nothing else can be connected to PWM2: a servo there would follow the throttle. 
 
 ![Shield mock](shield-mock.png)
 
-Mock of the layout (top view, illustrative placement, not routed; source `shield-mock.svg`).
+Mock of the layout (top view, illustrative placement, not routed). An interactive 3D model is `shield-3d.html`. Both are generated from the same layout data by `tools/make_shield_mock.py` (layout in `tools/shield_layout.py`).
+
+**Board size: 18 x 23.5 mm, exactly the outline of the ESP32-S3-Zero**, which sits on top of it in two 9-pin female header strips (15.24 mm apart, 8.5 mm tall). Everything fits in the 12.7 mm gap between the strips (top side) or on the bottom side (test pads, GND plane). Only the two cable plugs stick out past the board ends: the servo plug at the USB end (right-angle header J1) and the speaker plug at the opposite end (side-entry JST-PH J2). With the Zero the stack is about 14 mm high. All pins used by the firmware are on one side of the Zero (5V, GPIO1, GPIO4-6 on the left column), the right column stays free.
 
 1. **Socket or pads for the ESP32-S3-Zero**, same pin use as the prototype: GPIO1 throttle in, GPIO4 I2S DOUT, GPIO5 BCLK, GPIO6 LRC. The USB-C port and the Boot/Reset buttons must stay reachable for flashing.
 2. **Input connector** (3-pin servo type: S, V, G) to PWM2. S goes through a 1 kOhm series resistor to GPIO1, optionally with a large pull-down (for example 100 kOhm) so the input is defined when disconnected, and optionally an ESD/TVS device.
 3. **Power from the servo port**: reverse-polarity protection (Schottky diode or P-MOSFET), a resettable fuse, a bulk capacitor (about 100-470 uF) near the amplifier and small ceramic decoupling capacitors. A diode (or ideal diode) between the servo-port 5 V and the USB 5 V so both can be connected at the same time; on the breadboard only one of them may ever be connected.
 4. **MAX98357A amplifier**: gain and shutdown/channel pins configurable (resistors or jumpers), speaker output to a connector (for example JST-PH) or solder pads. The chip is hard to solder by hand; assembly by a PCB service is likely.
-5. **Service items**: test points (5 V, 3.3 V, GND, GPIO1, I2S lines), mounting holes, optionally a status LED and spare GPIOs broken out for later inputs (for example a switch to trigger an engine stop sound).
+5. **Service items**: test points (5 V, 3.3 V, GND, GPIO1, I2S lines) as pads on the bottom side. Because the board is only as large as the Zero there are no mounting holes (the sockets and the cables hold it; fix it with a stand-off or tape), and no room for a status LED or a spare GPIO header: the unused Zero pins are reachable at the socket tails on the bottom.
 
 ## Decisions still open
 
 - Amplifier as a chip on the board or as a plug-in breakout module.
-- Board size and placement in the model, and the speaker it has to carry (40 mm or a production candidate; see `sound-research.md`).
+- The speaker it has to carry (40 mm or a production candidate; see `sound-research.md`). The board size itself is settled: the outline of the Zero.
+- Whether the Zero's underside is flat (the headers leave about 7 mm of clearance under it, enough for everything on the board; check the real module).
 - ESP32-S3-Zero in a socket (replaceable) or soldered directly.
 - Hand-soldered or assembled by a PCB service.
 
@@ -52,20 +55,18 @@ Part numbers are examples to be checked when the schematic is drawn; values mark
 | | 2.54 mm female header, 9 pins | 2 | one per long edge of the Zero (5V, GND, 3V3, 1..6 and TX, RX, 13..7); omit if the Zero is soldered directly |
 | Amplifier | MAX98357AETE+ (I2S class-D amp, TQFN-16 3x3 mm) | 1 | alternative: MAX98357AEWL+ (WLP-9), smaller but harder to route; or a plug-in breakout module instead of the chip |
 | | Decoupling for the amp supply: 10 uF + 100 nF ceramic, close to VDD | 1 + 1 | |
-| | Bulk capacitor 100-470 uF, 10 V (polymer or electrolytic) | 1 | near the amplifier supply |
+| | Bulk capacitor 100 uF, 6.3-10 V, polymer or tantalum, 6032 (case C) | 1 | near the amplifier supply; flat enough to fit under the Zero (a radial electrolytic is too tall) |
 | | GAIN and SD_MODE configuration: solder-jumper pads and 100 kOhm resistors | 2-3 | default GAIN open = 9 dB; the SD_MODE resistor values that give (L+R)/2 are to be checked in the datasheet (the firmware sends the same sample on both channels) |
 | | Optional 22-33 Ohm series resistors on BCLK, LRC, DIN | 3 | EMI damping; can be 0 Ohm |
 | | Optional ferrite beads and small capacitors on the speaker outputs | 2 + 2 | only if EMI becomes a problem with longer speaker wires |
-| Speaker | JST-PH 2-pin connector (for example S2B-PH-K or B2B-PH-K) + mating cable | 1 | or two solder pads |
-| Input | 3-pin 2.54 mm pin header (S, V, G) | 1 | mates with a 3-pin female servo/Dupont cable to PWM2 (check the orientation against the receiver's header) |
+| Speaker | JST-PH 2-pin side-entry SMD connector (for example S2B-PH-SM4-TB) + mating cable | 1 | at the board end, plug enters from outside; or two solder pads |
+| Input | 3-pin 2.54 mm right-angle pin header (S, V, G) | 1 | at the USB end of the board; mates with a 3-pin female servo/Dupont cable to PWM2 (check the orientation against the receiver's header) |
 | | Resistor 1 kOhm | 1 | series resistor S to GPIO1 |
 | | Resistor 100 kOhm | 1 | pull-down on GPIO1 (defined level when the cable is unplugged) |
 | | ESD/TVS diode, low capacitance (optional) | 1 | on the S line |
-| Power | Resettable fuse (PTC), about 0.5 A hold | 1 | the module draws about 0.1 A average |
-| | Reverse-polarity protection: Schottky diode (for example SS14) or P-MOSFET | 1 | a Schottky drops about 0.3-0.4 V, which is acceptable at this current (the amplifier needs 2.5-5.5 V) |
+| Power | Resettable fuse (PTC), about 0.5 A hold, 1206 | 1 | the module draws about 0.1 A average |
+| | Reverse-polarity protection: Schottky diode in SOD-123 (rated 1 A or more) or P-MOSFET | 1 | a Schottky drops about 0.3-0.4 V, which is acceptable at this current (the amplifier needs 2.5-5.5 V) |
 | | Diode (or ideal diode) between servo 5 V and USB 5 V | 1 | so both can be connected; check first whether the Zero's 5V pin already has a diode towards USB |
 | | Ceramic capacitors 100 nF | 2-3 | general decoupling |
-| Service | Test points (5 V, 3.3 V, GND, GPIO1, BCLK, LRC, DIN) | 7 | 1 mm pads |
-| | Status LED + 1 kOhm resistor (optional) | 1 + 1 | |
-| | Spare GPIO header 1x4 (optional) | 1 | for later inputs, for example a switch for an engine-stop sound |
-| Mechanical | M2 mounting holes | 2-4 | position depends on the space in the model |
+| Service | Test points (5 V, 3.3 V, GND, GPIO1, BCLK, LRC, DIN) | 7 | 1 mm pads on the bottom side |
+| Dropped for size | Status LED, spare GPIO header, M2 mounting holes | - | no room on a board the size of the Zero; the Zero's own pins and socket tails serve for spare GPIOs |
