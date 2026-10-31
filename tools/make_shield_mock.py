@@ -127,10 +127,10 @@ def panel(vid, title, sub, tx_px=None):
             for px, py in L.J2_PADS:
                 o.append(f'<circle cx="{X(px):.1f}" cy="{Y(py):.1f}" r="{0.5 * S / 2:.1f}" fill="#d8b04a"/>')
             o.append(text(L.J2_PADS[0][0], L.J2_PADS[0][1] - 0.9, "+", 12, "middle", 700)); o.append(text(L.J2_PADS[1][0], L.J2_PADS[1][1] - 0.9, "-", 12, "middle", 700))
-        elif k == "led":
-            o.append(rect(p["x"] - 0.8, p["y"] - 0.4, p["x"] + 0.8, p["y"] + 0.4, fill="#59e06f", stroke="#1f7a33", stroke_width=1))
-            o.append(rect(p["x"] - 1.1, p["y"] - 0.45, p["x"] - 0.7, p["y"] + 0.45, fill="#c9ced4", stroke="none"))
-            o.append(rect(p["x"] + 0.7, p["y"] - 0.45, p["x"] + 1.1, p["y"] + 0.45, fill="#c9ced4", stroke="none"))
+        elif k == "led":                                 # vertical: parallel to the left board edge
+            o.append(rect(p["x"] - 0.4, p["y"] - 0.8, p["x"] + 0.4, p["y"] + 0.8, fill="#59e06f", stroke="#1f7a33", stroke_width=1))
+            o.append(rect(p["x"] - 0.45, p["y"] - 1.1, p["x"] + 0.45, p["y"] - 0.7, fill="#c9ced4", stroke="none"))
+            o.append(rect(p["x"] - 0.45, p["y"] + 0.7, p["x"] + 0.45, p["y"] + 1.1, fill="#c9ced4", stroke="none"))
             o.append(rect(x0, y0, x1, y1, fill="none", stroke="#f4f4ee", stroke_width=0.8, stroke_dasharray="3 3"))
         elif k == "hdr_v":
             o.append(rect(x0, y0, x1, y1, fill="#222", stroke="#000", stroke_width=1))
@@ -157,7 +157,9 @@ def panel(vid, title, sub, tx_px=None):
                 o.append(rect(p["x"] - bw / 2, yb, p["x"] + bw / 2, yb + 0.5, fill="#c9ced4", stroke="none"))
         # reference label
         lx = x1 + 0.25 if p["ref"] not in ("J1", "J2", "U1", "C2", "C3") else None
-        if p["ref"] in ("R1", "F1", "D1", "D2", "R2", "C1", "LED1", "R3", "J3"):
+        if p["ref"] == "LED1":
+            o.append(text(x0 - 0.2, p["y"], "LED1", 12, "end", 700, "#f4f4ee"))
+        elif p["ref"] in ("R1", "F1", "D1", "D2", "R2", "C1", "R3", "J3"):
             o.append(text(p["x"], y0 - 0.45 if p["ref"] != "C1" else y0 - 0.45, p["ref"], 12, "middle", 700, "#f4f4ee"))
     for ref, x, y in (("U1", 6.0, 17.35), ("C2", 5.2, 15.35), ("C3", 9.0, 15.35), ("J2", 12.2, 23.9)):
         pass

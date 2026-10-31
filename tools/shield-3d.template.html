@@ -274,8 +274,8 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
       }
       g.add(box(p.x - 1.0, p.y - 1.0, 0.4, 0.4, 0.82, M.silver));
     } else if (k === 'led') {
-      g.add(box(p.x, p.y, 1.6, 0.8, p.z, M.ledG));
-      g.add(box(p.x - 0.85, p.y, 0.4, 0.8, p.z + 0.02, M.silver)); g.add(box(p.x + 0.85, p.y, 0.4, 0.8, p.z + 0.02, M.silver));
+      g.add(box(p.x, p.y, 0.8, 1.6, p.z, M.ledG));
+      g.add(box(p.x, p.y - 0.85, 0.8, 0.4, p.z + 0.02, M.silver)); g.add(box(p.x, p.y + 0.85, 0.8, 0.4, p.z + 0.02, M.silver));
     } else if (k === 'hdr_v') {
       g.add(box(p.x, p.y, p.w, p.h, p.z, M.black));
       p.pins.forEach(function (q) { g.add(box(q[0], q[1], 0.64, 0.64, 8.5, M.gold, BT + 0.5)); });
