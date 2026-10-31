@@ -10,10 +10,10 @@ Steps: mono, resample to 22.05 kHz, take the steady part from --start, search th
 whose end best continues into its start, and crossfade 50 ms (the loop start blends into the real continuation
 of the recording). Normalise to 0.85 of full scale.
 
-Usage: python tools/make_diesel_loop.py input.wav output.wav [--start S] [--min SECONDS] [--max SECONDS]
-Needs numpy and scipy.
+Usage: python tools/make_diesel_loop.py input.wav|.flac output.wav [--start S] [--min SECONDS] [--max SECONDS]
+Needs numpy and scipy (and ffmpeg for non-WAV input).
 """
-import argparse
+import argparse, subprocess, tempfile
 import os, sys
 import numpy as np
 import scipy.io.wavfile as wav
@@ -34,7 +34,12 @@ PEAK = 0.85
 
 src, dst = args.src, args.dst
 
-sr, x = wav.read(src)
+try:
+    sr, x = wav.read(src)
+except ValueError:                      # not a WAV (for example FLAC): decode with ffmpeg
+    tmp = os.path.join(tempfile.mkdtemp(), "in.wav")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", src, tmp], check=True)
+    sr, x = wav.read(tmp)
 x = x.astype(float)
 if x.ndim > 1:
     x = x.mean(axis=1)
