@@ -48,7 +48,7 @@ def build_svg():
     # protruding plugs (outside the board): servo plug at the top, speaker plug at the bottom
     o.append(rect(5.3, -6.0, 12.7, 0.0, fill="none", stroke=MUTED, stroke_width=1.2, stroke_dasharray="5 4"))
     o.append(text(9.0, -3.0, "servo cable from PWM2", 12, "middle", fill=MUTED))
-    o.append(rect(9.25, L.BOARD_H, 15.15, L.BOARD_H + 5.0, fill="none", stroke=MUTED, stroke_width=1.2, stroke_dasharray="5 4"))
+    o.append(rect(10.2, L.BOARD_H, 14.2, L.BOARD_H + 5.0, fill="none", stroke=MUTED, stroke_width=1.2, stroke_dasharray="5 4"))
     o.append(text(12.2, L.BOARD_H + 2.5, "speaker plug", 12, "middle", fill=MUTED))
     # USB-C of the Zero (above, for orientation)
     o.append(rect(4.53, -0.15, 13.47, 7.15, fill="none", stroke="#8d949c", stroke_width=1.2, stroke_dasharray="2 4"))
@@ -87,10 +87,10 @@ def build_svg():
                 o.append(text(px, -0.9, nm, 13, "middle", 700))
         elif k == "jst_side":
             o.append(rect(x0, y0, x1, y1, fill="#ece6d6", stroke="#7a7466", stroke_width=1.2))
-            o.append(rect(x0 + 0.6, y0 + 2.4, x1 - 0.6, y1, fill="#cfc8b4", stroke="none"))
-            for px in (10.7, 12.7):
-                o.append(f'<circle cx="{X(px):.1f}" cy="{Y(18.6):.1f}" r="{0.55 * S / 2:.1f}" fill="#d8b04a"/>')
-            o.append(text(10.7, 17.95, "+", 12, "middle", 700)); o.append(text(12.7, 17.95, "-", 12, "middle", 700))
+            o.append(rect(x0 + 0.5, y0 + 1.7, x1 - 0.5, y1, fill="#cfc8b4", stroke="none"))
+            for px, py in L.J2_PADS:
+                o.append(f'<circle cx="{X(px):.1f}" cy="{Y(py):.1f}" r="{0.5 * S / 2:.1f}" fill="#d8b04a"/>')
+            o.append(text(L.J2_PADS[0][0], L.J2_PADS[0][1] - 0.9, "+", 12, "middle", 700)); o.append(text(L.J2_PADS[1][0], L.J2_PADS[1][1] - 0.9, "-", 12, "middle", 700))
         elif k == "qfn":
             bx0, by0, bx1, by1 = p["x"] - 1.5, p["y"] - 1.5, p["x"] + 1.5, p["y"] + 1.5
             o.append(rect(x0, y0, x1, y1, fill="none", stroke="#f4f4ee", stroke_width=1, stroke_dasharray="3 3"))
@@ -118,7 +118,7 @@ def build_svg():
     o.append(text(6.0, 22.35, "U1", 12, "middle", 700, "#f4f4ee"))
     o.append(text(5.2, 15.45, "C2", 12, "middle", 700, "#f4f4ee"))
     o.append(text(9.0, 15.55, "C3", 12, "middle", 700, "#f4f4ee"))
-    o.append(text(12.2, 21.3, "J2", 12, "middle", 700, "#1b2530"))
+    o.append(text(12.2, 22.3, "J2", 12, "middle", 700, "#1b2530"))
     o.append(text(9.0, 0.5, "J1", 12, "middle", 700, "#fff"))
 
     # legend below
@@ -143,7 +143,7 @@ def build_3d():
     data = dict(
         board=dict(w=L.BOARD_W, h=L.BOARD_H, t=L.BOARD_T), hdrX=L.HDR_X, hdrH=L.HDR_H, pinY=L.PIN_Y,
         leftPins=L.LEFT_PINS, rightPins=L.RIGHT_PINS, j1x=L.J1_X, j1y=L.J1_Y, parts=L.PARTS, nets=L.NETS,
-        gndVias=L.GND_VIAS, hopVias=L.HOP_VIAS, tp=L.TP, tpNames=L.TP_NAMES,
+        j2Pads=L.J2_PADS, gndVias=L.GND_VIAS, hopVias=L.HOP_VIAS, tp=L.TP, tpNames=L.TP_NAMES,
     )
     return tpl.replace("/*LAYOUT_JSON*/null", json.dumps(data))
 

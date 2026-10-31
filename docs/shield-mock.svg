@@ -4,7 +4,7 @@
 <text x="13.6" y="42.4" font-family="system-ui,sans-serif" font-size="13" font-weight="500" text-anchor="start" dominant-baseline="middle" fill="#5c6b7a">18 x 23.5 mm = outline of the ESP32-S3-Zero, which sits on top of it</text>
 <rect x="330.2" y="56.0" width="251.6" height="204.0" fill="none" stroke="#5c6b7a" stroke-width="1.2" stroke-dasharray="5 4"/>
 <text x="456.0" y="158.0" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="500" text-anchor="middle" dominant-baseline="middle" fill="#5c6b7a">servo cable from PWM2</text>
-<rect x="464.5" y="1059.0" width="200.6" height="170.0" fill="none" stroke="#5c6b7a" stroke-width="1.2" stroke-dasharray="5 4"/>
+<rect x="496.8" y="1059.0" width="136.0" height="170.0" fill="none" stroke="#5c6b7a" stroke-width="1.2" stroke-dasharray="5 4"/>
 <text x="564.8" y="1144.0" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="500" text-anchor="middle" dominant-baseline="middle" fill="#5c6b7a">speaker plug</text>
 <rect x="304.0" y="254.9" width="304.0" height="248.2" fill="none" stroke="#8d949c" stroke-width="1.2" stroke-dasharray="2 4"/>
 <text x="456.0" y="521.8" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" font-weight="500" text-anchor="middle" dominant-baseline="middle" fill="#8d949c">USB-C of the Zero (above)</text>
@@ -62,8 +62,8 @@
 <polyline points="196.9,832.2 265.6,832.2 265.6,916.2 294.5,916.2" fill="none" stroke="#6ec1ff" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="196.9,918.6 252.0,918.6 252.0,933.2 294.5,933.2" fill="none" stroke="#6ec1ff" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="196.9,1004.9 272.4,1004.9 272.4,950.2 294.5,950.2" fill="none" stroke="#6ec1ff" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="413.5,929.8 513.8,929.8 513.8,892.4" fill="none" stroke="#ececec" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="413.5,950.2 581.8,950.2 581.8,892.4" fill="none" stroke="#ececec" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="413.5,929.8 547.8,929.8" fill="none" stroke="#ececec" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="413.5,950.2 581.8,950.2 581.8,929.8" fill="none" stroke="#ececec" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="272.4,573.1 272.4,620.4" fill="none" stroke="#ffb347" stroke-width="11.9" stroke-linejoin="round" stroke-linecap="round"/>
 <circle cx="272.4" cy="715.6" r="9.7" fill="#d8b04a"/>
 <circle cx="272.4" cy="715.6" r="3.4" fill="#1d6b36"/>
@@ -116,16 +116,16 @@
 <rect x="282.6" y="861.8" width="142.8" height="142.8" fill="none" stroke="#f4f4ee" stroke-width="1" stroke-dasharray="3 3"/>
 <rect x="303.0" y="882.2" width="102.0" height="102.0" fill="#1c1c1e" stroke="#000" stroke-width="1"/>
 <circle cx="314.9" cy="894.1" r="3" fill="#888"/>
-<rect x="464.5" y="862.7" width="200.6" height="195.5" fill="#ece6d6" stroke="#7a7466" stroke-width="1.2"/>
-<rect x="484.9" y="944.2" width="159.8" height="113.9" fill="#cfc8b4" stroke="none"/>
-<circle cx="513.8" cy="892.4" r="9.4" fill="#d8b04a"/>
-<circle cx="581.8" cy="892.4" r="9.4" fill="#d8b04a"/>
-<text x="513.8" y="870.3" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1b2530">+</text>
-<text x="581.8" y="870.3" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1b2530">-</text>
+<rect x="496.8" y="912.8" width="136.0" height="146.2" fill="#ece6d6" stroke="#7a7466" stroke-width="1.2"/>
+<rect x="513.8" y="970.6" width="102.0" height="88.4" fill="#cfc8b4" stroke="none"/>
+<circle cx="547.8" cy="929.8" r="8.5" fill="#d8b04a"/>
+<circle cx="581.8" cy="929.8" r="8.5" fill="#d8b04a"/>
+<text x="547.8" y="899.2" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1b2530">+</text>
+<text x="581.8" y="899.2" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1b2530">-</text>
 <text x="354.0" y="1019.9" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#f4f4ee">U1</text>
 <text x="326.8" y="785.3" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#f4f4ee">C2</text>
 <text x="456.0" y="788.7" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#f4f4ee">C3</text>
-<text x="564.8" y="984.2" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1b2530">J2</text>
+<text x="564.8" y="1018.2" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1b2530">J2</text>
 <text x="456.0" y="277.0" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#fff">J1</text>
 <text x="150.0" y="1269.8" font-family="system-ui,sans-serif" font-size="13" font-weight="600" text-anchor="start" dominant-baseline="middle" fill="#1b2530">Top side (between the header strips)</text>
 <line x1="150.0" x2="197.6" y1="1305.5" y2="1305.5" stroke="#ff7a6b" stroke-width="11.9" stroke-linecap="round"/>

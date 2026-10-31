@@ -46,8 +46,8 @@ PARTS = [
          name="Decoupling 100 nF", desc="Ceramic 0805 close to the amplifier supply pin."),
     dict(ref="U1", kind="qfn", x=6.0, y=19.8, w=4.2, h=4.2, z=0.8, body=(3.0, 3.0),
          name="MAX98357A amplifier", desc="I2S class-D amplifier, TQFN-16 3 x 3 mm. Receives BCLK, LRC and DIN from the ESP32 and drives the speaker directly."),
-    dict(ref="J2", kind="jst_side", x=12.2, y=20.6, w=5.9, h=5.75, z=4.4,
-         name="Speaker connector", desc="JST-PH 2-pin side-entry connector at the bottom edge; the speaker cable plugs in from outside (or two solder pads instead)."),
+    dict(ref="J2", kind="jst_side", x=12.2, y=21.35, w=4.0, h=4.3, z=3.9,
+         name="Speaker connector (JST SH 1.0)", desc="JST SH 1.0 mm 2-pin side-entry connector at the bottom edge, the same type as the CyberBrick motor ports (M1/M2) and button ports. The speaker cable (for example the 2-pin SH cable of a button module) plugs in from outside."),
 ]
 
 # nets: pts are board coordinates; layer 'top' or 'bot'
@@ -70,14 +70,16 @@ NETS = [
     dict(net="BCLK", color="#6ec1ff", pts=[[HDR_X[0], IO5_Y], [3.0, IO5_Y], [3.0, 19.8], [4.25, 19.8]]),
     dict(net="LRC", color="#6ec1ff", pts=[[HDR_X[0], IO6_Y], [3.6, IO6_Y], [3.6, 20.3], [4.25, 20.3]]),
     # speaker
-    dict(net="SPK+", color="#ececec", pts=[[7.75, 19.7], [10.7, 19.7], [10.7, 18.6]]),
-    dict(net="SPK-", color="#ececec", pts=[[7.75, 20.3], [12.7, 20.3], [12.7, 18.6]]),
+    dict(net="SPK+", color="#ececec", pts=[[7.75, 19.7], [11.7, 19.7]]),
+    dict(net="SPK-", color="#ececec", pts=[[7.75, 20.3], [12.7, 20.3], [12.7, 19.7]]),
     # pull-down tap
     dict(net="S", color="#ffb347", pts=[[3.6, IO1_Y], [3.6, 10.6]]),
 ]
 # GND vias (GND plane on the bottom layer) and the hop vias
 GND_VIAS = [[3.6, 13.4], [4.2, 15.5], [10.4, 15.6], [13.5, 17.2], [6.0, 19.8], [14.6, 9.9]]
 HOP_VIAS = [[5.0, 10.2], [5.0, 8.2]]
+
+J2_PADS = [[11.7, 19.7], [12.7, 19.7]]       # signal pads of J2 (1.0 mm pitch), + and -
 
 # test pads on the bottom side
 TP_NAMES = ["5V", "3V3", "GND", "IO1", "BCLK", "LRC", "DIN"]

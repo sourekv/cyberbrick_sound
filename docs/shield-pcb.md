@@ -18,17 +18,22 @@ Nothing else can be connected to PWM2: a servo there would follow the throttle. 
 
 Mock of the layout (top view, illustrative placement, not routed). An interactive 3D model is `shield-3d.html`. Both are generated from the same layout data by `tools/make_shield_mock.py` (layout in `tools/shield_layout.py`).
 
-**Board size: 18 x 23.5 mm, exactly the outline of the ESP32-S3-Zero**, which sits on top of it in two 9-pin female header strips (15.24 mm apart, 8.5 mm tall). Everything fits in the 12.7 mm gap between the strips (top side) or on the bottom side (test pads, GND plane). Only the two cable plugs stick out past the board ends: the servo plug at the USB end (right-angle header J1) and the speaker plug at the opposite end (side-entry JST-PH J2). With the Zero the stack is about 14 mm high. All pins used by the firmware are on one side of the Zero (5V, GPIO1, GPIO4-6 on the left column), the right column stays free.
+**Board size: 18 x 23.5 mm, exactly the outline of the ESP32-S3-Zero**, which sits on top of it in two 9-pin female header strips (15.24 mm apart, 8.5 mm tall). Everything fits in the 12.7 mm gap between the strips (top side) or on the bottom side (test pads, GND plane). Only the two cable plugs stick out past the board ends: the servo plug at the USB end (right-angle header J1) and the speaker plug at the opposite end (side-entry JST SH 1.0 mm J2). With the Zero the stack is about 14 mm high. All pins used by the firmware are on one side of the Zero (5V, GPIO1, GPIO4-6 on the left column), the right column stays free.
 
 1. **Socket or pads for the ESP32-S3-Zero**, same pin use as the prototype: GPIO1 throttle in, GPIO4 I2S DOUT, GPIO5 BCLK, GPIO6 LRC. The USB-C port and the Boot/Reset buttons must stay reachable for flashing.
 2. **Input connector** (3-pin servo type: S, V, G) to PWM2. S goes through a 1 kOhm series resistor to GPIO1, optionally with a large pull-down (for example 100 kOhm) so the input is defined when disconnected, and optionally an ESD/TVS device.
 3. **Power from the servo port**: reverse-polarity protection (Schottky diode or P-MOSFET), a resettable fuse, a bulk capacitor (about 100-470 uF) near the amplifier and small ceramic decoupling capacitors. A diode (or ideal diode) between the servo-port 5 V and the USB 5 V so both can be connected at the same time; on the breadboard only one of them may ever be connected.
-4. **MAX98357A amplifier**: gain and shutdown/channel pins configurable (resistors or jumpers), speaker output to a connector (for example JST-PH) or solder pads. The chip is hard to solder by hand; assembly by a PCB service is likely.
+4. **MAX98357A amplifier**: gain and shutdown/channel pins configurable (resistors or jumpers), speaker output to a JST SH 1.0 mm 2-pin connector (see below) or solder pads. The chip is hard to solder by hand; assembly by a PCB service is likely.
 5. **Service items**: test points (5 V, 3.3 V, GND, GPIO1, I2S lines) as pads on the bottom side. Because the board is only as large as the Zero there are no mounting holes (the sockets and the cables hold it; fix it with a stand-off or tape), and no room for a status LED or a spare GPIO header: the unused Zero pins are reachable at the socket tails on the bottom.
+
+## Connectors used by CyberBrick
+
+From the Maker's Supply CyberBrick user's manual (the Bambu store page names only the power input): DC motor ports M1/M2 and the transmitter button ports K1-K4 are **JST SH 1.0 mm 2-pin**; joystick (ADC) and WS2812 LED ports are SH 1.0 mm 3-pin; servo ports S1-S4 are 3-pin headers (2.54 mm); power inputs and the power switch are **XH 2.54 mm 2-pin**. The kit's SH 2-pin wires (button module, N20 motor) therefore fit a speaker connector of the same type, so the speaker connector J2 is SH 1.0 mm 2-pin and users need no crimping: a 2-pin SH cable with one free end is soldered to the speaker (or supplied with it). Open: whether the kit has spare 2-pin SH cables (the manual does not list the kit's cables); cheap SH 2-pin pigtails are sold separately.
 
 ## Decided
 
 - Board size: the outline of the ESP32-S3-Zero (see above).
+- Speaker connector J2: JST SH 1.0 mm 2-pin, as used by the CyberBrick motor and button ports.
 - The amplifier is a bare MAX98357A chip on the board, **assembled by a PCB service** (the TQFN-16 package is not practical to hand-solder). No plug-in breakout module.
 
 ## Decisions still open
@@ -63,7 +68,7 @@ Part numbers are examples to be checked when the schematic is drawn; values mark
 | | GAIN and SD_MODE configuration: solder-jumper pads and 100 kOhm resistors | 2-3 | default GAIN open = 9 dB; the SD_MODE resistor values that give (L+R)/2 are to be checked in the datasheet (the firmware sends the same sample on both channels) |
 | | Optional 22-33 Ohm series resistors on BCLK, LRC, DIN | 3 | EMI damping; can be 0 Ohm |
 | | Optional ferrite beads and small capacitors on the speaker outputs | 2 + 2 | only if EMI becomes a problem with longer speaker wires |
-| Speaker | JST-PH 2-pin side-entry SMD connector (for example S2B-PH-SM4-TB) + mating cable | 1 | at the board end, plug enters from outside; or two solder pads |
+| Speaker | JST SH 1.0 mm 2-pin side-entry SMD connector (for example SM02B-SRSS-TB; footprint about 4 x 4.3 mm, check the datasheet) + mating cable | 1 | same type as the CyberBrick M1/M2 and button ports; at the board end, plug enters from outside; rated about 1 A per contact, enough here (the whole module drew 105 mA at full throttle) |
 | Input | 3-pin 2.54 mm right-angle pin header (S, V, G) | 1 | at the USB end of the board; mates with a 3-pin female servo/Dupont cable to PWM2 (check the orientation against the receiver's header) |
 | | Resistor 1 kOhm | 1 | series resistor S to GPIO1 |
 | | Resistor 100 kOhm | 1 | pull-down on GPIO1 (defined level when the cable is unplugged) |
