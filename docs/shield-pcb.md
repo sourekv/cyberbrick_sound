@@ -26,13 +26,17 @@ Mock of the layout (top view, illustrative placement, not routed). An interactiv
 4. **MAX98357A amplifier**: gain and shutdown/channel pins configurable (resistors or jumpers), speaker output to a connector (for example JST-PH) or solder pads. The chip is hard to solder by hand; assembly by a PCB service is likely.
 5. **Service items**: test points (5 V, 3.3 V, GND, GPIO1, I2S lines) as pads on the bottom side. Because the board is only as large as the Zero there are no mounting holes (the sockets and the cables hold it; fix it with a stand-off or tape), and no room for a status LED or a spare GPIO header: the unused Zero pins are reachable at the socket tails on the bottom.
 
+## Decided
+
+- Board size: the outline of the ESP32-S3-Zero (see above).
+- The amplifier is a bare MAX98357A chip on the board, **assembled by a PCB service** (the TQFN-16 package is not practical to hand-solder). No plug-in breakout module.
+
 ## Decisions still open
 
-- Amplifier as a chip on the board or as a plug-in breakout module.
 - The speaker it has to carry (40 mm or a production candidate; see `sound-research.md`). The board size itself is settled: the outline of the Zero.
 - Whether the Zero's underside is flat (the headers leave about 7 mm of clearance under it, enough for everything on the board; check the real module).
 - ESP32-S3-Zero in a socket (replaceable) or soldered directly.
-- Hand-soldered or assembled by a PCB service.
+- How much the PCB service assembles besides the amplifier: only the SMD parts (and the rest by hand) or the whole board.
 
 ## Out of scope for this iteration
 
