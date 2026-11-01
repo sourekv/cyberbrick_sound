@@ -80,6 +80,17 @@ On a classic RC model the receiver drives the ESC with a servo-type signal, so a
 
 Before such a variant, the signals of the target receiver would have to be measured, because they are more varied than the CyberBrick servo port: signal level (3.3 V or 5 V), pulse range and neutral point of the throttle channel, frame rate (50 Hz up to several hundred Hz for some receivers), behaviour at failsafe and whether the ESC's BEC powers the receiver (and so whether the module may take power from it). The firmware's pulse constants in `config.h` would then be re-derived from those measurements.
 
+## Reference: Waveshare ESP32-S3-Zero documentation
+
+Wiki: https://docs.waveshare.com/ESP32-S3-Zero (main page read on 2026-11-01; the sub-pages Resources, FAQ, Arduino could not be fetched from the build environment). What it says that matters for the shield:
+
+- 5 V pad: external supply 3.7 to 6 V. The OR-ing diode D2 (about 0.3 V drop from the 4.9 V servo supply) stays inside that range. The onboard LDO (ME6217C33M5G) gives at most 800 mA at 3.3 V.
+- The module has a ceramic antenna: keep copper, metal and plastic away from the antenna area. Wi-Fi and Bluetooth are not used by the sound module, but a future variant that uses them needs a copper-free zone under the antenna end of the Zero; the shield currently has a ground pour under the whole board.
+- GPIO33 to GPIO37 are not broken out (octal PSRAM), GPIO0 is BOOT, GPIO43/44 are UART0, GPIO21 drives the WS2812 RGB LED. The firmware pin choice (GPIO1, 4, 5, 6) avoids all of them.
+- No USB-to-UART chip (native USB): to enter download mode hold BOOT while plugging in the cable, or hold BOOT and press RESET.
+- Pin order, header pitch and the board size are only given as images (pinout and size drawings linked from the wiki page). The shield uses 18 x 23.5 mm and two 9-pin rows 15.24 mm apart; **check both against the size drawing before ordering** (not done yet).
+- The wiki describes the base module (ESP32-S3FH4R2: 4 MB flash, 2 MB PSRAM); the prototype uses the N8R8-M variant (8 MB flash, 8 MB PSRAM).
+
 ## Component list (draft, independent of how the board is assembled)
 
 Part numbers are examples to be checked when the schematic is drawn; values marked "check" depend on a datasheet detail not yet verified.
