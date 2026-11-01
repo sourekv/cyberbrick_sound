@@ -8,11 +8,19 @@ The result is also the basis for an "as heard from the speaker" preview of the e
 
 ## What the firmware plays
 
-`pio run -e speaker_sweep -t upload`: three times 3 s of silence followed by a logarithmic sweep 100 Hz to 10 kHz in 30 s,
-then 3 s of silence (about 105 s in total, serial monitor shows `sweep n / 3` and `done`). Peak level 0.25 of full scale
-(`-DSWEEP_LEVEL=...`), the same output path as the engine firmware (22.05 kHz, the same sample on both channels).
-The other parameters can be changed with `-DSWEEP_F0_HZ`, `-DSWEEP_F1_HZ`, `-DSWEEP_SECONDS` and `-DSWEEP_RUNS`
-(the analysis script has the same options, `--f0 --f1 --seconds --runs`).
+`pio run -e speaker_sweep -t upload` (or RESET after it was uploaded). Timeline, about 2 minutes:
+
+| Time | What happens | LED on the Zero |
+|---|---|---|
+| 0 to 15 s | countdown; three short beeps at 10, 11 and 12 s = the recording must be running by then | red |
+| 15 to 45 s | sweep 1, logarithmic 100 Hz to 10 kHz | green |
+| 45 to 48 s | silence | red |
+| 48 to 78 s and 81 to 111 s | sweeps 2 and 3, each followed by 3 s of silence | green / red |
+| 114 to 116 s | three longer beeps = finished, stop the recording | blue |
+
+Peak level 0.25 of full scale (`-DSWEEP_LEVEL=...`), the same output path as the engine firmware (22.05 kHz, the same sample on
+both channels). The other parameters: `-DSWEEP_F0_HZ`, `-DSWEEP_F1_HZ`, `-DSWEEP_SECONDS`, `-DSWEEP_RUNS`,
+`-DSTART_DELAY_SECONDS` (the analysis script has the same options, `--f0 --f1 --seconds --runs`).
 
 ## How to record
 
@@ -23,7 +31,8 @@ The other parameters can be changed with `-DSWEEP_F0_HZ`, `-DSWEEP_F1_HZ`, `-DSW
    all measurements. Do not hold it in the hand.
 4. Voice recorder in the best quality available (WAV or lossless if possible; m4a or mp3 also works). Turn off noise
    suppression, voice enhancement and automatic gain if the app has them.
-5. Start the recording, then press RESET on the Zero (the sweeps start after 3 s). Stop after about 110 s.
+5. Start the recording **first**, then press RESET on the Zero (or upload). The three beeps at 10 to 12 s tell that the sweeps
+   are about to start; the three long beeps at the end (and the blue LED) tell that it is over. Stop the recording after them.
 
 ## Analysis
 
@@ -41,3 +50,18 @@ with noise and clock drift) before the first real measurement.
 - A very low level (the phone far away or the volume low) shows up as "less than 15 dB above the noise"; there the numbers
   are not reliable.
 - The distortion values are for the signal level of the sweep (0.25 of full scale); the engine sound may be louder.
+
+## Results
+
+### 2026-11-01: bare speaker (the 40 mm prototype speaker), phone 5 cm in front, quiet room
+
+`docs/measurements/speaker_baseline_2026-11-01.csv` and `.png`. The recording had two sweeps (the first one started before the
+recording, so its first 1.5 s are missing; the third did not play). Relative to the median level between 1 and 3 kHz:
+
+- within -3 dB from 212 Hz to 8 kHz; the response falls steeply below that: about -20 dB at 150 Hz and below the noise at 130 Hz.
+  A cut this sharp may come partly from the phone (microphone or app high-pass filter), a speaker alone usually rolls off more
+  gently. Treat the bass limit as "at most about 200 Hz" until a second phone or a measurement in the housing confirms it.
+- up to +8 dB around 450 Hz and +3 to +5 dB at 0.5 to 1.3 kHz, a dip of about -5 dB at 2 to 3 kHz, then flat to 8 kHz.
+- strong distortion below about 300 Hz at this level (second and third harmonic only 9 to 11 dB below the fundamental, the third
+  harmonic is stronger than the fundamental around 170 Hz); clean at 1 kHz (-39 dB and below), the third harmonic is
+  -15 to -25 dB between 2 and 6 kHz.

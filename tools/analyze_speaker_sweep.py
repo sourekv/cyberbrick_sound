@@ -38,11 +38,14 @@ def reference_sweep(f0, f1, secs):
     return np.sin(2 * np.pi * f0 * secs / np.log(r) * (r ** (t / secs) - 1.0))
 
 
+PAD = 8 * FS      # zeros in front of the recording: a sweep that started before the recording can still be located
+
+
 def find_starts(rec, ref, runs, secs):
     corr = signal.fftconvolve(rec, ref[::-1], mode="valid")
     env = np.abs(corr)
     env = np.convolve(env, np.ones(int(0.005 * FS)) / int(0.005 * FS), mode="same")
-    peaks, _ = signal.find_peaks(env, height=0.3 * env.max(), distance=int(0.8 * secs * FS))
+    peaks, _ = signal.find_peaks(env, height=0.12 * env.max(), distance=int(0.8 * secs * FS))
     peaks = peaks[np.argsort(env[peaks])[::-1][:runs]]
     return np.sort(peaks), env
 
@@ -71,12 +74,14 @@ def measure(rec, start, f0, f1, secs, step=0.1, win_s=0.25):
     return np.array(rows)
 
 
-def noise_curve(rec, start, f0, f1, secs, step=0.1, win_s=0.25):
-    """Same measurement on the silence before the sweep (2.5 s .. 0.3 s before its start)."""
+def noise_curve(rec, starts, f0, f1, secs, step=0.1, win_s=0.25):
+    """Same measurement on a silent part: 2.5 s .. 0.3 s before the first sweep, else after the end of the last one."""
     L = int(win_s * FS)
     win = np.hanning(L)
-    a0, a1 = max(0, start - int(2.5 * FS)), max(0, start - int(0.3 * FS))
-    quiet = rec[a0:a1]
+    a0, a1 = starts[0] - int(2.5 * FS), starts[0] - int(0.3 * FS)
+    if a0 < PAD:
+        a0, a1 = starts[-1] + int((secs + 0.7) * FS), starts[-1] + int((secs + 2.7) * FS)
+    quiet = rec[max(a0, 0):max(min(a1, len(rec)), 0)]
     if len(quiet) < 2 * L:
         return None
     r = f1 / f0
@@ -114,32 +119,30 @@ def main():
 
     rec = load(a.recording)
     print(f"recording: {len(rec) / FS:.1f} s, peak {np.abs(rec).max():.3f} of full scale")
-    if np.abs(rec).max() > 0.98:
+    clips = np.abs(rec).max() > 0.98
+    rec = np.concatenate([np.zeros(PAD), rec])
+    if clips:
         print("WARNING: the recording clips, lower the phone input level (or move the phone away) and record again")
     ref = reference_sweep(a.f0, a.f1, a.seconds)
     starts, env = find_starts(rec, ref, a.runs, a.seconds)
     if len(starts) == 0:
         sys.exit("no sweep found in the recording (too quiet, or wrong --f0/--f1/--seconds?)")
-    print("sweeps found at", ", ".join(f"{s / FS:.1f} s" for s in starts), f"({len(starts)} of {a.runs})")
+    print("sweeps found starting at", ", ".join(f"{(s - PAD) / FS:.1f} s" for s in starts), f"({len(starts)} of {a.runs}; a negative start means the recording began during the sweep)")
 
     runs = [measure(rec, s, a.f0, a.f1, a.seconds) for s in starts]
-    n = min(len(r) for r in runs)
-    freq = runs[0][:n, 0]
-    fund = np.median([r[:n, 1] for r in runs], axis=0)
-    h2 = np.median([r[:n, 2] for r in runs], axis=0)
-    h3 = np.median([r[:n, 3] for r in runs], axis=0)
-    noise = noise_curve(rec, starts[0], a.f0, a.f1, a.seconds)
-
     grid = a.f0 * 2 ** (np.arange(0, np.log2(a.f1 / a.f0) * 12 - 1) / 12)
-    resp = smooth_log(freq, db(fund), grid)
+    # every run on the common grid first (a run may start or end outside the recording), then the median of the runs
+    resp = np.nanmedian([smooth_log(r[:, 0], db(r[:, 1]), grid) for r in runs], axis=0)
     ref_level = np.nanmedian(resp[(grid >= 1000) & (grid <= 3000)])
     rel = resp - ref_level
-    hd2 = smooth_log(freq, db(h2) - db(fund), grid)
-    hd3 = smooth_log(freq, db(h3) - db(fund), grid)
+    hd2 = np.nanmedian([smooth_log(r[:, 0], db(r[:, 2]) - db(r[:, 1]), grid) for r in runs], axis=0)
+    hd3 = np.nanmedian([smooth_log(r[:, 0], db(r[:, 3]) - db(r[:, 1]), grid) for r in runs], axis=0)
+    noise = noise_curve(rec, starts, a.f0, a.f1, a.seconds)
     if noise is not None:
-        nz = smooth_log(noise[:n, 0], db(noise[:n, 1]), grid) - ref_level
+        nz = smooth_log(noise[:, 0], db(noise[:, 1]), grid) - ref_level
     else:
         nz = np.full(len(grid), np.nan)
+        print("note: no silent part long enough in the recording, the noise floor is not shown")
     snr = rel - nz
 
     # summary
