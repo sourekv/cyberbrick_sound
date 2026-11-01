@@ -41,6 +41,7 @@ From the Maker's Supply CyberBrick user's manual (the Bambu store page names onl
 - Board size and shape: CyberBrick-sized rectangle (29 x 30 mm) with the four CyberBrick mounting holes (23.0 x 24.0 mm), Zero in the middle.
 - Power LED on the board (from the servo-port 5 V); the signal status is shown by the Zero's RGB LED in firmware.
 - No spare GPIO header in this iteration, to keep the scope small (see "Out of scope").
+- Servo input J1 stays a 3-pin right-angle pin header (male) for now; it mates with a female-to-female servo/Dupont cable to PWM2. A female socket (so that a standard servo extension cable could be used) is left as a possible later change.
 - Speaker connector J2: JST SH 1.0 mm 2-pin, as used by the CyberBrick motor and button ports.
 - The amplifier is a bare MAX98357A chip on the board, **assembled by a PCB service** (the TQFN-16 package is not practical to hand-solder). No plug-in breakout module.
 
