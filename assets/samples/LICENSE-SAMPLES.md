@@ -52,3 +52,13 @@ Six engine recordings were provided by the project owner for evaluation (mono, 8
 - `Stop` (10 s)
 
 **We do not know where these recordings come from and their license is unknown.** Treat them as not cleared for redistribution: they are not committed to this repository and must not be published or included in a public release until the origin and license are established. Findings from the analysis (spectrum, structure) are in the project notes only.
+
+## Per-gear loops (used by the `engine_gears` firmware)
+Source: Freesound pack "Vintage Trucks (Red Lib)" by craigsmith, https://freesound.org/people/craigsmith/packs/27529/ (the Red Library: 1930s-40s nitrate optical sound effects made for Hollywood studios, digitised and cleaned of splices)
+License: Creative Commons 0 (CC0 1.0); the pack's readme lists CC0 for every sound in it (checked 2026-11-01 from the readme of the pack download supplied by the project owner)
+Used sounds (48 kHz mono, originals not stored here):
+- https://freesound.org/s/487151/ "R03-29-Large Truck Constant Engine" (10.8 s) -> `gear_a_r03-29.wav` (5.00 s, 22.05 kHz mono): `python tools/make_gear_loop.py <original> assets/samples/gear_a_r03-29.wav --start 0.6 --end 6.6`
+- https://freesound.org/s/487152/ "R03-32-Old Truck Engine Working Hard" (33.1 s) -> `gear_b_r03-32.wav` (7.00 s): `python tools/make_gear_loop.py <original> assets/samples/gear_b_r03-32.wav --start 5 --end 13`
+Headers: `python tools/make_engine_diesel.py assets/samples/gear_a_r03-29.wav firmware/include/gear_a.h GEAR_A` (and `gear_b_r03-32.wav ... gear_b.h GEAR_B`).
+Content (own analysis): old noisy optical recordings of a large old truck, a visible 60 Hz line (hum) below the range of the speaker, no reliable firing rate measurable; the loops are made seamless only by a 1 s crossfade, so a repetition may be audible, and the pitch of the two loops is not matched. Gear 1 uses the first loop and gears 2..5 share the second one while the sound is being chosen (see `firmware/include/gear_bank.h`).
+

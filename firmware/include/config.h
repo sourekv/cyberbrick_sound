@@ -47,6 +47,22 @@
 #define GEAR_DECEL_S      8.0f    // virtual speed 1..0 when the throttle is released, seconds
 #endif
 
+// Per-gear samples (`engine_gears` only, see include/gear_bank.h): playback rate range inside a gear (1.0 = as recorded)
+// and the time constant of the crossfade between the samples of two gears.
+#ifndef GEAR_RATE_LO
+#define GEAR_RATE_LO      0.75f
+#endif
+#ifndef GEAR_RATE_HI
+#define GEAR_RATE_HI      1.30f
+#endif
+#ifndef GEAR_XFADE_S
+#define GEAR_XFADE_S      0.033f
+#endif
+// 1: announce the gear after every change with 1..GEAR_COUNT beeps (include/gear_beep.h), a test aid
+#ifndef GEAR_BEEP
+#define GEAR_BEEP         0
+#endif
+
 // Second loop "under load" (engine_truck only): played faster by LOADED_RATE_SCALE because its firing rate is
 // lower (about 21 Hz against about 25 Hz of the idle loop), and scaled by LOADED_GAIN because it is louder.
 #ifndef LOADED_RATE_SCALE

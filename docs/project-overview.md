@@ -57,6 +57,7 @@ Every firmware shares the pins and constants in `include/config.h`. Environments
 | `engine_pulse` | real-time synthesis: throttle sets how often a combustion grain is triggered (default sound, preset a_diesel6) |
 | `engine_diesel` | like `engine`, with a real diesel idle loop (CC0), plus the virtual gearbox |
 | `engine_truck` | real truck idle loop (CC0) with the virtual gearbox and a second "under load" loop blended in with the throttle |
+| `engine_gears` | test: a separate CC0 truck loop for each of the 5 gears (0.75x..1.3x playback), crossfade at a shift, gear number announced with 1..5 beeps |
 | `engine_real` | experiment with owner-supplied recordings (not in the repo, licence unknown) |
 
 How it works: a pin interrupt measures the pulse width; the throttle is the deflection from the centre with a dead band and a timeout (no pulse for 150 ms means idle); the RPM is smoothed (rises faster than it falls); the I2S output is written in blocks of 128 samples at 22.05 kHz.
