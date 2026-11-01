@@ -11,7 +11,7 @@ Overview of the whole project (hardware, firmware, sound, what was tested): `doc
 - `firmware/` - PlatformIO (Arduino) project
 - `docs/` - wiring, measurements, notes (sound research: `docs/sound-research.md`, shield PCB scope: `docs/shield-pcb.md`)
 - `3d/` - cases, links
-- `hardware/` - KiCad, later
+- `hardware/` - KiCad project of the shield board: schematic, routed PCB, manufacturing files (`hardware/shield/`)
 
 ## Wiring overview
 ![Wiring overview](docs/wiring-overview.png)

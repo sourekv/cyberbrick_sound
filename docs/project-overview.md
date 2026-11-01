@@ -31,9 +31,11 @@ Details and the measurement table: `bringup.md`; app mapping: `cyberbrick-config
 
 Rule on the breadboard: never connect USB and the servo-port 5 V at the same time. Wiring pictures: `wiring-overview.png`, `wiring-stage2.png`, `wiring-test-tone.png`.
 
-### Shield PCB (iteration 2, designed as a layout mock, not routed, no schematic yet)
+### Shield PCB (iteration 2: KiCad schematic and routed board exist, not yet reviewed or manufactured)
 
 A carrier board ("shield") that replaces the loose wires. Scope and component list: `shield-pcb.md`; 2D mock `shield-mock.png`; interactive 3D model `shield-3d.html`; both are generated from `tools/shield_layout.py` by `tools/make_shield_mock.py`.
+
+The real KiCad design is in `hardware/shield/` (schematic `shield.kicad_sch`, board `shield.kicad_pcb`, manufacturing files in `fab/`); details and open review points in `shield-pcb.md`. Top and bottom renders: ![top](shield-pcb-top.png) ![bottom](shield-pcb-bottom.png)
 
 - **Size and holes:** 29 x 30 mm, the size of the CyberBrick receiver shield, with the same four mounting holes (2.7 mm, spacing 23.0 x 24.0 mm, taken from the CAD model of the community test housing). The Zero (18 x 23.5 mm) sits in the middle in two 9-pin female header strips; most parts are in the gap under it.
 - **Input J1:** 3-pin right-angle male header at the USB end (S, V, G) for the servo cable to PWM2.
