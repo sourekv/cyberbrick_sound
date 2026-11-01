@@ -130,7 +130,7 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
     board: mat(0x1b6b36, { r: 0.7 }), black: mat(0x1c1c1e, { r: 0.6 }), gold: mat(0xd8b04a, { r: 0.3, m: 0.85 }),
     silver: mat(0xc9ced4, { r: 0.35, m: 0.85 }), ivory: mat(0xece6d6, { r: 0.7 }), ivoryD: mat(0xb9b29c, { r: 0.8 }),
     beige: mat(0xd6b77e, { r: 0.6 }), ptc: mat(0xe3cf5e, { r: 0.6 }), res: mat(0x2a2a2a, { r: 0.6 }),
-    tan: mat(0xe0a85b, { r: 0.55 }), tanD: mat(0x3a2a10, { r: 0.6 }), ledG: mat(0x59e06f, { r: 0.3 })
+    tan: mat(0xe0a85b, { r: 0.55 }), fb: mat(0x5b6573, { r: 0.5 }), tanD: mat(0x3a2a10, { r: 0.6 }), ledG: mat(0x59e06f, { r: 0.3 })
   };
 
   // board coords (x right, y down from top-left) -> scene; base = bottom of the part above the board bottom face
@@ -198,18 +198,21 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
     if (showNets) {
       D.nets.forEach(function (n) { line(cx, n.pts, n.color, 0.35, n.layer === 'bot' ? [0.45, 0.35] : null); });
       D.gndVias.concat(D.hopVias).forEach(function (v) { viaDot(cx, v); });
+      D.v5Vias.forEach(function (v) { dot(cx, v[0], v[1], 0.45, '#ff7a6b'); dot(cx, v[0], v[1], 0.18, '#1b6b36'); });
       D.parts.forEach(function (p) { if (p.kind === 'jst_side') { D.j2Pads.forEach(function (q) { dot(cx, q[0], q[1], 0.32, '#d8b04a'); }); } });
     }
     if (showSilk) {
       var s = { bold: true, align: 'center' };
       txt(cx, 'S', D.j1x[0], 2.75, 0.6, s); txt(cx, 'V', D.j1x[1], 2.75, 0.6, s); txt(cx, 'G', D.j1x[2], 2.75, 0.6, s);
-      txt(cx, 'R1', 5.0, 3.4, 0.5, { align: 'center' }); txt(cx, 'F1', 10.9, 5.0, 0.5, { align: 'center' });
-      txt(cx, 'D1', 10.7, 9.4, 0.5, { align: 'center' }); txt(cx, 'D2', 4.0, 8.0, 0.5, { align: 'center' });
-      txt(cx, 'R2', 5.6, 11.6, 0.5, { align: 'center' }); txt(cx, 'C1', 11.2, 13.6, 0.5, { align: 'center' });
-      txt(cx, 'C2', 5.2, 15.6, 0.5, { align: 'center' }); txt(cx, 'C3', 9.0, 15.6, 0.5, { align: 'center' });
-      txt(cx, 'U1', 6.0, 22.3, 0.5, { align: 'center' }); txt(cx, 'J2', 12.2, 22.9, 0.5, { align: 'center', color: '#1b2530' });
-      txt(cx, 'SPK', 12.2, 18.2, 0.5, { align: 'center' });
-      txt(cx, 'LED1', -4.1, 6.6, 0.5, { align: 'center' }); txt(cx, 'R3', -1.4, 6.6, 0.5, { align: 'center' });
+      D.parts.forEach(function (p) {
+        if (p.ref === 'J1' || p.ref === 'J2') return;             // plugs are labelled by their own bodies
+        var x0 = p.x - p.w / 2, x1 = p.x + p.w / 2, y0 = p.y - p.h / 2, y1 = p.y + p.h / 2, l = p.lab || 'above';
+        if (Array.isArray(l)) txt(cx, p.ref, l[0], l[1], 0.5, { align: l[2] === 'middle' ? 'center' : l[2] });
+        else if (l === 'left') txt(cx, p.ref, x0 - 0.2, p.y, 0.5, { align: 'right' });
+        else if (l === 'right') txt(cx, p.ref, x1 + 0.2, p.y, 0.5, { align: 'left' });
+        else if (l === 'below') txt(cx, p.ref, p.x, y1 + 0.5, 0.5, { align: 'center' });
+        else txt(cx, p.ref, p.x, y0 - 0.45, 0.5, { align: 'center' });
+      });
     }
     top.t.needsUpdate = true;
 
@@ -221,7 +224,7 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
       txt(cx, D.tpNames[k], p[0], p[1] - 1.05, 0.5, { align: 'center', color: '#f4f4ee' });
     });
     txt(cx, 'GND plane', 9.0, -1.0, 0.7, { align: 'center', color: '#f4f4ee', bold: true });
-    txt(cx, 'TEST POINTS', 9.0, 20.9, 0.55, { align: 'center', color: '#f4f4ee', bold: true });
+    txt(cx, 'TEST POINTS', 9.0, 23.3, 0.55, { align: 'center', color: '#f4f4ee', bold: true });
     bot.t.needsUpdate = true;
   }
   var skin = new THREE.Mesh(new THREE.PlaneGeometry(BW, BH), new THREE.MeshBasicMaterial({ map: top.t, transparent: true, depthWrite: false }));
@@ -233,6 +236,7 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
   var G = function () { return new THREE.Group(); };
   function ends(g, p, endMat, len) {
     var bw = p.body[0], bh = p.body[1], vertical = bh >= bw;
+    if (Math.max(bw, bh) < 1.3) len = Math.min(len, 0.25);
     [-1, 1].forEach(function (s) {
       if (vertical) g.add(box(p.x, p.y + s * (bh / 2 - len / 2), bw + 0.02, len, p.z + 0.02, endMat));
       else g.add(box(p.x + s * (bw / 2 - len / 2), p.y, len, bh + 0.02, p.z + 0.02, endMat));
@@ -250,13 +254,19 @@ aside h2 { margin: 0; padding: 10px 12px; font-size: 13px; font-weight: 600; let
       g.add(box(p.x, p.y, p.body[0], p.body[1], p.z, M.res)); ends(g, p, M.silver, 0.4);
     } else if (k === 'chip_f') {
       g.add(box(p.x, p.y, p.body[0], p.body[1], p.z, M.ptc)); ends(g, p, M.silver, 0.5);
+    } else if (k === 'chip_fb') {
+      g.add(box(p.x, p.y, p.body[0], p.body[1], p.z, M.fb)); ends(g, p, M.silver, 0.25);
+    } else if (k === 'jumper') {
+      [-0.5, 0.5].forEach(function (dx) { g.add(box(p.x + dx, p.y, 0.6, 0.9, 0.05, M.gold)); });
+      if (p.closed) g.add(box(p.x, p.y, 1.1, 0.4, 0.12, M.silver));
     } else if (k === 'chip_c') {
       g.add(box(p.x, p.y, p.body[0], p.body[1], p.z, M.beige)); ends(g, p, M.silver, 0.4);
     } else if (k === 'diode') {
-      g.add(box(p.x, p.y, 1.6, 2.7, p.z, M.black));
-      var yb = p.band === 'bottom' ? p.y + 1.35 - 0.25 : p.y - 1.35 + 0.25;
-      g.add(box(p.x, yb, 1.62, 0.45, p.z + 0.02, M.silver));
-      g.add(box(p.x, p.y - 1.5, 1.2, 0.8, 0.3, M.silver)); g.add(box(p.x, p.y + 1.5, 1.2, 0.8, 0.3, M.silver));
+      var dw = p.body ? p.body[0] : 1.6, dh = p.body ? p.body[1] : 2.7, pl = dh > 2 ? 0.8 : 0.5, po = dh / 2 + 0.15;
+      g.add(box(p.x, p.y, dw, dh, p.z, M.black));
+      var yb = p.band === 'bottom' ? p.y + dh / 2 - 0.25 : p.y - dh / 2 + 0.25;
+      g.add(box(p.x, yb, dw + 0.02, 0.45, p.z + 0.02, M.silver));
+      g.add(box(p.x, p.y - po, dw * 0.75, pl, 0.3, M.silver)); g.add(box(p.x, p.y + po, dw * 0.75, pl, 0.3, M.silver));
     } else if (k === 'cap_t') {
       g.add(box(p.x, p.y, p.body[0], p.body[1], p.z, M.tan));
       g.add(box(p.x, p.y - p.body[1] / 2 + 0.45, p.body[0] + 0.02, 0.9, p.z + 0.02, M.tanD));

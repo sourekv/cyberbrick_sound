@@ -86,8 +86,9 @@ def panel(vid, title, sub, tx_px=None):
     # protruding plugs (outside the board): servo plug at the top, speaker plug at the bottom
     o.append(rect(5.3, -6.0, 12.7, 0.0, fill="none", stroke=MUTED, stroke_width=1.2, stroke_dasharray="5 4"))
     o.append(text(9.0, -3.0, "servo cable from PWM2", 12, "middle", fill=MUTED))
-    o.append(rect(10.2, L.BOARD_H, 14.2, L.BOARD_H + 5.0, fill="none", stroke=MUTED, stroke_width=1.2, stroke_dasharray="5 4"))
-    o.append(text(12.2, L.BOARD_H + 2.5, "speaker plug", 12, "middle", fill=MUTED))
+    j2 = next(q for q in L.PARTS if q["ref"] == "J2")
+    o.append(rect(j2["x"] - 2.0, L.BOARD_H, j2["x"] + 2.0, L.BOARD_H + 5.0, fill="none", stroke=MUTED, stroke_width=1.2, stroke_dasharray="5 4"))
+    o.append(text(j2["x"], L.BOARD_H + 2.5, "speaker plug", 12, "middle", fill=MUTED))
     # USB-C of the Zero (above, for orientation)
     o.append(rect(4.53, -0.15, 13.47, 7.15, fill="none", stroke="#8d949c", stroke_width=1.2, stroke_dasharray="2 4"))
     o.append(text(9.0, 7.7, "USB-C of the Zero (above)", 11, "middle", fill="#8d949c"))
@@ -109,6 +110,9 @@ def panel(vid, title, sub, tx_px=None):
                  f'stroke-linejoin="round" stroke-linecap="round"' + (' stroke-dasharray="6 5" opacity="0.8"' if bot else "") + "/>")
     for vx, vy in L.GND_VIAS + L.HOP_VIAS:
         o.append(f'<circle cx="{X(vx):.1f}" cy="{Y(vy):.1f}" r="{0.45 * S / 2 + 2:.1f}" fill="#d8b04a"/>')
+        o.append(f'<circle cx="{X(vx):.1f}" cy="{Y(vy):.1f}" r="{0.2 * S / 2:.1f}" fill="{GREEN_D}"/>')
+    for vx, vy in L.V5_VIAS:                             # via to the 5 V rail (red ring)
+        o.append(f'<circle cx="{X(vx):.1f}" cy="{Y(vy):.1f}" r="{0.45 * S / 2 + 2:.1f}" fill="#ff7a6b"/>')
         o.append(f'<circle cx="{X(vx):.1f}" cy="{Y(vy):.1f}" r="{0.2 * S / 2:.1f}" fill="{GREEN_D}"/>')
 
     # parts
@@ -142,28 +146,36 @@ def panel(vid, title, sub, tx_px=None):
             o.append(rect(p["x"] - bw / 2, p["y"] - bh / 2, p["x"] + bw / 2, p["y"] + bh / 2, fill="#e0a85b", stroke="#8a5a1c", stroke_width=1))
             o.append(rect(p["x"] - bw / 2, p["y"] - bh / 2, p["x"] + bw / 2, p["y"] - bh / 2 + 0.9, fill="#3a2a10", stroke="none"))
             o.append(rect(x0, y0, x1, y1, fill="none", stroke="#f4f4ee", stroke_width=0.8, stroke_dasharray="3 3"))
+        elif k == "jumper":                      # solder jumper: two pads, bridged when closed
+            for sx in (-0.5, 0.5):
+                o.append(rect(p["x"] + sx - 0.3, p["y"] - 0.45, p["x"] + sx + 0.3, p["y"] + 0.45, fill="#d8b04a", stroke="none"))
+            if p.get("closed"):
+                o.append(rect(p["x"] - 0.5, p["y"] - 0.2, p["x"] + 0.5, p["y"] + 0.2, fill="#c9ced4", stroke="none"))
+            o.append(rect(x0, y0, x1, y1, fill="none", stroke="#f4f4ee", stroke_width=0.8, stroke_dasharray="3 3"))
         else:                                    # chip parts and diodes
             bw, bh = p.get("body", (p["w"], p["h"]))
-            col = {"chip_r": "#2a2a2a", "chip_c": "#d6b77e", "chip_f": "#e3cf5e", "diode": "#1c1c1e"}[k]
+            col = {"chip_r": "#2a2a2a", "chip_c": "#d6b77e", "chip_f": "#e3cf5e", "chip_fb": "#5b6573", "diode": "#1c1c1e"}[k]
             o.append(rect(p["x"] - bw / 2, p["y"] - bh / 2, p["x"] + bw / 2, p["y"] + bh / 2, fill=col, stroke="#000", stroke_width=0.8))
             o.append(rect(x0, y0, x1, y1, fill="none", stroke="#f4f4ee", stroke_width=0.8, stroke_dasharray="3 3"))
             if k == "diode":
                 yb = p["y"] + bh / 2 - 0.5 if p["band"] == "bottom" else p["y"] - bh / 2
                 o.append(rect(p["x"] - bw / 2, yb, p["x"] + bw / 2, yb + 0.5, fill="#c9ced4", stroke="none"))
-        # reference label
-        lx = x1 + 0.25 if p["ref"] not in ("J1", "J2", "U1", "C2", "C3") else None
-        if p["ref"] == "LED1":
-            o.append(text(x0 - 0.2, p["y"], "LED1", 12, "end", 700, "#f4f4ee"))
-        elif p["ref"] in ("R1", "F1", "D1", "D2", "R2", "C1", "R3"):
-            o.append(text(p["x"], y0 - 0.45 if p["ref"] != "C1" else y0 - 0.45, p["ref"], 12, "middle", 700, "#f4f4ee"))
-    for ref, x, y in (("U1", 6.0, 17.35), ("C2", 5.2, 15.35), ("C3", 9.0, 15.35), ("J2", 12.2, 23.9)):
-        pass
-    o.append(text(6.0, 22.35, "U1", 12, "middle", 700, "#f4f4ee"))
-    o.append(text(5.2, 15.45, "C2", 12, "middle", 700, "#f4f4ee"))
-    o.append(text(9.0, 15.55, "C3", 12, "middle", 700, "#f4f4ee"))
-    o.append(text(12.2, 22.3, "J2", 12, "middle", 700, "#1b2530"))
-    o.append(text(9.0, 0.5, "J1", 12, "middle", 700, "#fff"))
-
+        # reference label (U1, J1 and J2 are labelled by the explicit rules below)
+        lab = p.get("lab", "above")
+        if p["ref"] == "J1":
+            o.append(text(9.0, 0.5, "J1", 12, "middle", 700, "#fff"))
+        elif p["ref"] == "J2":
+            o.append(text(p["x"], y1 - 0.9, "J2", 12, "middle", 700, "#1b2530"))
+        elif isinstance(lab, tuple):
+            o.append(text(lab[0], lab[1], p["ref"], 12, lab[2], 700, "#f4f4ee"))
+        elif lab == "left":
+            o.append(text(x0 - 0.2, p["y"], p["ref"], 12, "end", 700, "#f4f4ee"))
+        elif lab == "right":
+            o.append(text(x1 + 0.2, p["y"], p["ref"], 12, "start", 700, "#f4f4ee"))
+        elif lab == "below":
+            o.append(text(p["x"], y1 + 0.5, p["ref"], 12, "middle", 700, "#f4f4ee"))
+        else:
+            o.append(text(p["x"], y0 - 0.45, p["ref"], 12, "middle", 700, "#f4f4ee"))
     return o
 
 
@@ -172,16 +184,20 @@ def legend():
     ly = L.BOARD_H + 6.2
     o.append(text(0, ly, "Top side (between the header strips)", 13, weight=600, mono=False))
     items = [("#ff7a6b", "5 V (servo V, through F1, D1)"), ("#ffb347", "throttle S to GPIO1"),
-             ("#6ec1ff", "I2S to the amplifier"), ("#ececec", "speaker"),
-             ("#9aa7b4", "ground (to the bottom plane)")]
+             ("#6ec1ff", "I2S to the amplifier (through 33 Ohm resistors)"), ("#ececec", "speaker (through ferrite beads)"),
+             ("#b6e38a", "amplifier configuration: GAIN, SD_MODE"), ("#9aa7b4", "ground (to the bottom plane)")]
     for i, (c, t) in enumerate(items):
         yy = ly + 1.05 * (i + 1)
         o.append(f'<line x1="{X(0):.1f}" x2="{X(1.4):.1f}" y1="{Y(yy):.1f}" y2="{Y(yy):.1f}" stroke="{c}" stroke-width="{0.35 * S:.1f}" stroke-linecap="round"/>')
         o.append(text(1.9, yy, t, 12, fill=FG, mono=False))
-    yy = ly + 1.05 * 6
+    yy = ly + 1.05 * 7
     o.append(f'<line x1="{X(0):.1f}" x2="{X(1.4):.1f}" y1="{Y(yy):.1f}" y2="{Y(yy):.1f}" stroke="#ff7a6b" stroke-width="{0.35 * S:.1f}" stroke-dasharray="6 5" stroke-linecap="round"/>')
     o.append(text(1.9, yy, "hop on the bottom layer (under the S trace)", 12, fill=FG, mono=False))
-    o.append(text(9.0, ly, "Bottom side: GND plane, 7 test pads (5V, 3V3, GND, IO1, BCLK, LRC, DIN)", 11, "start", fill=MUTED, mono=False))
+    yy = ly + 1.05 * 8
+    o.append(f'<circle cx="{X(0.7):.1f}" cy="{Y(yy):.1f}" r="{0.45 * S / 2 + 2:.1f}" fill="#ff7a6b"/>')
+    o.append(f'<circle cx="{X(0.7):.1f}" cy="{Y(yy):.1f}" r="{0.2 * S / 2:.1f}" fill="{GREEN_D}"/>')
+    o.append(text(1.9, yy, "via to the 5 V rail (R5 pull-up); the other vias go to the ground plane", 12, fill=FG, mono=False))
+    o.append(text(9.0, ly, "Bottom side: GND plane, 7 test pads in the lower margin (5V, 3V3, GND, IO1, BCLK, LRC, DIN)", 11, "start", fill=MUTED, mono=False))
     return o
 
 
@@ -205,7 +221,7 @@ def build_svg():
     body += dim_line(25.3, hy0, 25.3, hy1, f"{L.CB_DY:.1f}", off=(0.9, 0), rot=-90)
     body.append(text(hx0 - 0.2, hy0 - 3.9, f"hole {L.CB_HOLE_D:g} mm", 12, "middle", 600, "#c0392b"))
     body += legend()
-    ny = L.BOARD_H + 6.2 + 1.05 * 9
+    ny = L.BOARD_H + 6.2 + 1.05 * 10
     body.append(text(0.0, ny, "Hole spacing 23.0 x 24.0 mm from the CAD model of a CyberBrick receiver test housing (matches the manufacturer's image).",
                      12, "start", fill=MUTED, mono=False))
     body.append(text(0.0, ny + 0.9, "Hole diameter 2.7 mm from the manufacturer's image. Verify both with calipers on the real receiver.",
@@ -224,7 +240,7 @@ def build_3d():
         board=dict(x0=L.ZERO_CX - L.CB_W / 2, y0=L.ZERO_CY - L.CB_H / 2, w=L.CB_W, h=L.CB_H, t=L.BOARD_T),
         zero=dict(w=L.BOARD_W, l=L.BOARD_H), holes=L.CB_HOLES, ringD=L.CB_RING_D, hdrX=L.HDR_X, hdrH=L.HDR_H, pinY=L.PIN_Y,
         leftPins=L.LEFT_PINS, rightPins=L.RIGHT_PINS, j1x=L.J1_X, j1y=L.J1_Y, parts=L.PARTS, nets=L.NETS,
-        j2Pads=L.J2_PADS, gndVias=L.GND_VIAS, hopVias=L.HOP_VIAS, tp=L.TP, tpNames=L.TP_NAMES,
+        j2Pads=L.J2_PADS, gndVias=L.GND_VIAS, hopVias=L.HOP_VIAS, v5Vias=L.V5_VIAS, tp=L.TP, tpNames=L.TP_NAMES,
     )
     return tpl.replace("/*LAYOUT_JSON*/null", json.dumps(data))
 

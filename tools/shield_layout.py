@@ -38,21 +38,51 @@ PARTS = [
          name="5 V OR-ing diode", desc="Keeps USB 5 V and servo-port 5 V from fighting, so both can be connected at the same time."),
     dict(ref="R2", kind="chip_r", x=3.6, y=11.6, w=1.5, h=2.8, z=0.5, body=(1.25, 2.0),
          name="Resistor 100 kOhm", desc="Pull-down on GPIO1, so the input has a defined level when the cable is unplugged."),
-    dict(ref="C1", kind="cap_t", x=13.5, y=13.6, w=3.4, h=7.8, z=2.8, body=(3.2, 6.0),
+    dict(ref="C1", kind="cap_t", x=21.0, y=12.5, w=3.4, h=7.8, z=2.8, body=(3.2, 6.0), margin=True,
          name="Bulk capacitor 100 uF", desc="Polymer/tantalum 6032 case. Absorbs the current peaks of loud passages so the 5 V rail does not sag."),
-    dict(ref="C2", kind="chip_c", x=5.2, y=16.6, w=2.7, h=1.5, z=0.9, body=(2.0, 1.25),
+    dict(ref="C2", kind="chip_c", x=5.6, y=16.6, w=2.7, h=1.5, z=0.9, body=(2.0, 1.25),
          name="Decoupling 10 uF", desc="Ceramic 0805 close to the amplifier supply pin."),
     dict(ref="C3", kind="chip_c", x=9.0, y=16.6, w=2.7, h=1.5, z=0.6, body=(2.0, 1.25),
          name="Decoupling 100 nF", desc="Ceramic 0805 close to the amplifier supply pin."),
-    dict(ref="U1", kind="qfn", x=6.0, y=19.8, w=4.2, h=4.2, z=0.8, body=(3.0, 3.0),
-         name="MAX98357A amplifier", desc="I2S class-D amplifier, TQFN-16 3 x 3 mm. Receives BCLK, LRC and DIN from the ESP32 and drives the speaker directly."),
-    dict(ref="J2", kind="jst_side", x=12.2, y=21.35, w=4.0, h=4.3, z=3.9,
+    dict(ref="U1", kind="qfn", x=7.0, y=19.95, w=4.2, h=4.2, z=0.8, body=(3.0, 3.0),
+         lab=(9.0, 18.0, "middle"), name="MAX98357A amplifier", desc="I2S class-D amplifier, TQFN-16 3 x 3 mm. Receives BCLK, LRC and DIN from the ESP32 and drives the speaker directly."),
+    dict(ref="J2", kind="jst_side", x=13.3, y=21.35, w=4.0, h=4.3, z=3.9,
          name="Speaker connector (JST SH 1.0)", desc="JST SH 1.0 mm 2-pin side-entry connector at the bottom edge, the same type as the CyberBrick motor ports (M1/M2) and button ports. The speaker cable (for example the 2-pin SH cable of a button module) plugs in from outside."),
     # parts in the margin around the Zero (the board is larger than the Zero), so they stay visible from above
-    dict(ref="LED1", kind="led", x=-2.75, y=11.8, w=1.2, h=2.2, z=0.6, margin=True,
+    dict(ref="LED1", kind="led", x=-2.75, y=11.8, w=1.2, h=2.2, z=0.6, margin=True, lab="left",
          name="Power LED", desc="Lights when the servo-port 5 V is present (taken after the reverse-polarity diode D1), so you can see that the cable and the receiver are fine. Hardware only, no firmware needed. Placed beside the Zero because the Zero would hide it."),
     dict(ref="R3", kind="chip_r", x=-2.75, y=8.84, w=1.5, h=2.8, z=0.5, body=(1.25, 2.0), margin=True,
          name="LED resistor 1 kOhm", desc="Series resistor of the power LED (about 3 mA)."),
+    # ---- optional and configuration parts of the amplifier, input and speaker circuit ----
+    dict(ref="TVS1", kind="diode", x=6.2, y=10.75, w=1.4, h=2.4, z=0.7, band="top", body=(1.0, 1.4), lab="right",
+         name="ESD/TVS diode",
+         desc="Low-capacitance ESD protection from the throttle signal to ground, on the signal line before the 1 kOhm resistor path to the Zero. Optional."),
+    dict(ref="C6", kind="chip_c", x=12.0, y=12.6, w=1.5, h=2.8, z=0.6, body=(1.25, 2.0), lab=(12.0, 15.05, "middle"),
+         name="Decoupling 100 nF", desc="General ceramic decoupling on the 5 V rail after the protection parts."),
+    dict(ref="C7", kind="chip_c", x=13.8, y=12.6, w=1.5, h=2.8, z=0.6, body=(1.25, 2.0), lab=(13.8, 15.05, "middle"),
+         name="Decoupling 100 nF", desc="General ceramic decoupling on the 5 V rail after the protection parts."),
+    dict(ref="R6", kind="chip_r", x=3.5, y=17.9, w=1.7, h=0.8, z=0.4, body=(1.0, 0.5),
+         name="Series resistor 33 Ohm (DIN)", desc="Damps ringing and EMI on the I2S data line between the Zero and the amplifier. Can be 0 Ohm. Optional."),
+    dict(ref="R7", kind="chip_r", x=3.5, y=19.37, w=1.7, h=0.8, z=0.4, body=(1.0, 0.5),
+         name="Series resistor 33 Ohm (BCLK)", desc="Damps ringing and EMI on the I2S bit clock between the Zero and the amplifier. Can be 0 Ohm. Optional."),
+    dict(ref="R8", kind="chip_r", x=3.5, y=21.91, w=1.7, h=0.8, z=0.4, body=(1.0, 0.5),
+         name="Series resistor 33 Ohm (LRC)", desc="Damps ringing and EMI on the I2S word clock between the Zero and the amplifier. Can be 0 Ohm. Optional."),
+    dict(ref="R4", kind="chip_r", x=3.9, y=22.9, w=1.7, h=0.8, z=0.4, body=(1.0, 0.5), lab="below",
+         name="GAIN resistor 100 kOhm (check)", desc="With the solder jumper JP1 it ties the GAIN pin to ground through 100 kOhm (15 dB). With JP1 open the pin floats (9 dB). The steps are to be checked in the MAX98357A datasheet."),
+    dict(ref="JP1", kind="jumper", x=5.75, y=22.9, w=1.6, h=0.9, z=0.05, lab="below",
+         name="Solder jumper JP1 (GAIN)", desc="Open by default (GAIN pin floating, 9 dB). Bridge it with solder to connect R4 and raise the gain to 15 dB."),
+    dict(ref="JP2", kind="jumper", x=8.25, y=22.9, w=1.6, h=0.9, z=0.05, lab="below", closed=True,
+         name="Solder jumper JP2 (SD_MODE)", desc="Closed (bridged) by default, so R5 sets the (L+R)/2 mix. Cut it open to hold the amplifier in shutdown (mute)."),
+    dict(ref="R5", kind="chip_r", x=9.9, y=22.9, w=1.5, h=0.8, z=0.4, body=(1.0, 0.5), lab="below",
+         name="SD_MODE resistor 1 MOhm (check)", desc="Pulls SD_MODE up from the 5 V rail against the internal pull-down of the amplifier, which selects the (L+R)/2 mix the firmware needs (it sends the same sample on both channels). The value is to be checked in the MAX98357A datasheet."),
+    dict(ref="FB1", kind="chip_fb", x=10.3, y=19.7, w=1.7, h=0.8, z=0.5, body=(1.0, 0.5),
+         name="Ferrite bead (SPK+)", desc="Filters radio-frequency noise on the speaker output towards the speaker cable. Optional; can be a 0 Ohm link."),
+    dict(ref="FB2", kind="chip_fb", x=10.3, y=20.7, w=1.7, h=0.8, z=0.5, body=(1.0, 0.5), lab="below",
+         name="Ferrite bead (SPK-)", desc="Filters radio-frequency noise on the speaker output towards the speaker cable. Optional; can be a 0 Ohm link."),
+    dict(ref="C4", kind="chip_c", x=12.8, y=18.35, w=0.9, h=1.7, z=0.5, body=(0.5, 1.0), lab="left",
+         name="Capacitor 100 pF (SPK+)", desc="Small capacitor from the speaker output to ground, right at the connector, with the ferrite bead forming an EMI filter. Optional."),
+    dict(ref="C5", kind="chip_c", x=13.8, y=18.35, w=0.9, h=1.7, z=0.5, body=(0.5, 1.0), lab="right",
+         name="Capacitor 100 pF (SPK-)", desc="Small capacitor from the speaker output to ground, right at the connector, with the ferrite bead forming an EMI filter. Optional."),
 ]
 
 # nets: pts are board coordinates; layer 'top' or 'bot'
@@ -61,38 +91,68 @@ NETS = [
     dict(net="S", color="#ffb347", pts=[[6.46, 5.6], [6.46, IO1_Y], [HDR_X[0], IO1_Y]]),
     dict(net="V", color="#ff7a6b", pts=[[9.0, 1.27], [9.0, 3.35]]),
     dict(net="V", color="#ff7a6b", pts=[[9.0, 6.65], [9.0, 7.9]]),
-    # 5 V rail after D1: to the Zero via D2 (hop under the S trace), to the bulk cap and to the amplifier
-    dict(net="5V", color="#ff7a6b", pts=[[9.0, 10.9], [13.5, 10.9], [13.5, 10.6]]),
-    dict(net="5V", color="#ff7a6b", pts=[[9.0, 10.9], [9.0, 12.2], [5.0, 12.2], [5.0, 10.2]]),
+    # 5 V rail after D1: to the Zero via D2 (hop under the S trace), to the amplifier, the decoupling caps and
+    # (through the right header, between two pins) to the bulk cap C1 in the right margin
+    dict(net="5V", color="#ff7a6b", pts=[[9.0, 10.9], [14.3, 10.9], [14.3, 10.48], [21.0, 10.48], [21.0, 9.5]]),
+    dict(net="5V", color="#ff7a6b", pts=[[9.0, 10.9], [9.0, 12.5], [5.0, 12.5], [5.0, 10.2]]),
     dict(net="5V", color="#ff7a6b", layer="bot", pts=[[5.0, 10.2], [5.0, 8.2]]),
     dict(net="5V", color="#ff7a6b", pts=[[5.0, 8.2], [4.0, 8.2], [4.0, 6.9]]),
     dict(net="5V", color="#ff7a6b", pts=[[4.0, 3.7], [4.0, PIN_Y[0]], [HDR_X[0], PIN_Y[0]]]),
-    dict(net="5V", color="#ff7a6b", pts=[[11.0, 10.9], [11.0, 15.3], [7.15, 15.3], [7.15, 18.05]]),
-    dict(net="5V", color="#ff7a6b", pts=[[6.2, 16.6], [7.15, 16.6]]),
-    dict(net="5V", color="#ff7a6b", pts=[[7.15, 16.6], [8.0, 16.6]]),
-    # I2S
-    dict(net="DIN", color="#6ec1ff", pts=[[HDR_X[0], IO4_Y], [3.4, IO4_Y], [3.4, 19.3], [4.25, 19.3]]),
-    dict(net="BCLK", color="#6ec1ff", pts=[[HDR_X[0], IO5_Y], [3.0, IO5_Y], [3.0, 19.8], [4.25, 19.8]]),
-    dict(net="LRC", color="#6ec1ff", pts=[[HDR_X[0], IO6_Y], [3.6, IO6_Y], [3.6, 20.3], [4.25, 20.3]]),
-    # speaker
-    dict(net="SPK+", color="#ececec", pts=[[7.75, 19.7], [11.7, 19.7]]),
-    dict(net="SPK-", color="#ececec", pts=[[7.75, 20.3], [12.7, 20.3], [12.7, 19.7]]),
-    # pull-down tap
+    dict(net="5V", color="#ff7a6b", pts=[[10.8, 10.9], [10.8, 15.0], [7.25, 15.0], [7.25, 18.15]]),
+    dict(net="5V", color="#ff7a6b", pts=[[6.6, 16.6], [7.25, 16.6]]),
+    dict(net="5V", color="#ff7a6b", pts=[[7.25, 16.6], [8.0, 16.6]]),
+    # decoupling caps C6, C7 on the 5 V rail (top pads on the rail, bottom pads to ground)
+    dict(net="5V", color="#ff7a6b", pts=[[12.0, 10.9], [12.0, 11.7]]),
+    dict(net="5V", color="#ff7a6b", pts=[[13.8, 10.9], [13.8, 11.7]]),
+    dict(net="GND", color="#9aa7b4", pts=[[12.0, 13.5], [12.0, 14.3]]),
+    dict(net="GND", color="#9aa7b4", pts=[[13.8, 13.5], [13.8, 14.3]]),
+    # bulk cap C1: ground return to a via
+    dict(net="GND", color="#9aa7b4", pts=[[21.0, 15.5], [21.0, 16.8]]),
+    # C2 ground
+    dict(net="GND", color="#9aa7b4", pts=[[4.6, 16.6], [4.6, 15.5]]),
+    # I2S: header pin -> 33 Ohm series resistor (R6 DIN, R7 BCLK, R8 LRC) -> amplifier pad
+    dict(net="DIN", color="#6ec1ff", pts=[[HDR_X[0], IO4_Y], [2.3, IO4_Y], [2.3, 17.9], [3.05, 17.9]]),
+    dict(net="DIN", color="#6ec1ff", pts=[[3.95, 17.9], [4.75, 17.9], [4.75, 19.2], [5.25, 19.2]]),
+    dict(net="BCLK", color="#6ec1ff", pts=[[HDR_X[0], IO5_Y], [3.05, IO5_Y]]),
+    dict(net="BCLK", color="#6ec1ff", pts=[[3.95, IO5_Y], [4.4, IO5_Y], [4.4, 19.7], [5.25, 19.7]]),
+    dict(net="LRC", color="#6ec1ff", pts=[[HDR_X[0], IO6_Y], [3.05, IO6_Y]]),
+    dict(net="LRC", color="#6ec1ff", pts=[[3.95, IO6_Y], [4.5, IO6_Y], [4.5, 20.7], [5.25, 20.7]]),
+    # speaker: amplifier -> ferrite bead -> connector pad, small caps to ground at the connector
+    dict(net="SPK+", color="#ececec", pts=[[8.75, 19.7], [9.8, 19.7]]),
+    dict(net="SPK+", color="#ececec", pts=[[10.8, 19.7], [12.8, 19.7]]),
+    dict(net="SPK-", color="#ececec", pts=[[8.75, 20.7], [9.8, 20.7]]),
+    dict(net="SPK-", color="#ececec", pts=[[10.8, 20.7], [13.8, 20.7], [13.8, 19.7]]),
+    dict(net="SPK+", color="#ececec", pts=[[12.8, 18.85], [12.8, 19.7]]),
+    dict(net="SPK-", color="#ececec", pts=[[13.8, 18.85], [13.8, 19.7]]),
+    dict(net="GND", color="#9aa7b4", pts=[[12.8, 17.85], [12.8, 17.0]]),
+    dict(net="GND", color="#9aa7b4", pts=[[13.8, 17.85], [13.8, 17.0]]),
+    # pull-down tap and ESD diode tap on the throttle signal
     dict(net="S", color="#ffb347", pts=[[3.6, IO1_Y], [3.6, 10.6]]),
+    dict(net="S", color="#ffb347", pts=[[6.2, IO1_Y], [6.2, 9.9]]),
+    dict(net="GND", color="#9aa7b4", pts=[[6.2, 11.6], [6.2, 11.3], [7.2, 11.3]]),
+    # amplifier configuration: GAIN (R4 + JP1 to ground) and SD_MODE (JP2 + R5 to 5 V)
+    dict(net="GND", color="#9aa7b4", pts=[[3.4, 22.9], [2.9, 22.9]]),
+    dict(net="GAIN", color="#b6e38a", pts=[[4.4, 22.9], [5.25, 22.9]]),
+    dict(net="GAIN", color="#b6e38a", pts=[[6.25, 22.9], [6.25, 21.75]]),
+    dict(net="SD_MODE", color="#b6e38a", pts=[[7.75, 22.9], [7.75, 21.75]]),
+    dict(net="SD_MODE", color="#b6e38a", pts=[[8.75, 22.9], [9.4, 22.9]]),
+    dict(net="5V", color="#ff7a6b", pts=[[10.4, 22.9], [10.4, 22.15]]),
     # power LED, from the 5 V rail between D2 and the hop
     dict(net="5V", color="#ff7a6b", pts=[[4.0, 7.94], [-2.75, 7.94]]),
     dict(net="5V", color="#ff7a6b", pts=[[-2.75, 9.74], [-2.75, 10.9]]),
     dict(net="GND", color="#9aa7b4", pts=[[-2.75, 12.7], [-2.75, 13.6]]),
 ]
-# GND vias (GND plane on the bottom layer) and the hop vias
-GND_VIAS = [[3.6, 13.4], [4.2, 15.5], [10.4, 15.6], [13.5, 17.2], [6.0, 19.8], [14.6, 9.9], [-2.75, 13.6]]
+# GND vias (GND plane on the bottom layer), the hop vias and the 5 V via (R5 pull-up, drawn red)
+GND_VIAS = [[3.6, 13.4], [4.6, 15.5], [10.4, 15.6], [7.0, 19.95], [-2.75, 13.6], [7.2, 11.3], [12.0, 14.3], [13.8, 14.3],
+            [12.8, 17.0], [13.8, 17.0], [21.0, 16.8], [2.9, 22.9]]
 HOP_VIAS = [[5.0, 10.2], [5.0, 8.2]]
+V5_VIAS = [[10.4, 22.15]]
 
-J2_PADS = [[11.7, 19.7], [12.7, 19.7]]       # signal pads of J2 (1.0 mm pitch), + and -
+J2_PADS = [[12.8, 19.7], [13.8, 19.7]]       # signal pads of J2 (1.0 mm pitch), + and -
 
 # test pads on the bottom side
 TP_NAMES = ["5V", "3V3", "GND", "IO1", "BCLK", "LRC", "DIN"]
-TP = [[round(3.4 + 2.0 * k, 2), 22.7] for k in range(7)]
+TP = [[round(3.4 + 2.0 * k, 2), 25.2] for k in range(7)]
 
 LABELS = [
     dict(text="J1", x=9.0, y=-0.0, kind="ref"),
