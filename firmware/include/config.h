@@ -6,8 +6,6 @@
 // GPIO21 (onboard RGB LED), GPIO33-37 (octal PSRAM), GPIO43/44 (UART0).
 
 #define PIN_THROTTLE_IN 1   // from receiver servo port signal, via ~1k series resistor
-#define PIN_AUX_IN      2   // second servo-type input (GP2, left header pin 5), planned for a CyberBrick button (engine start/stop);
-                            // same wiring as PIN_THROTTLE_IN (signal via ~1k, common GND); only used by pulse_measure_aux so far
 #define PIN_I2S_DOUT    4   // -> MAX98357A DIN
 #define PIN_I2S_BCLK    5   // -> MAX98357A BCLK
 #define PIN_I2S_LRC     6   // -> MAX98357A LRC

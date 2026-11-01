@@ -56,7 +56,7 @@ From the Maker's Supply CyberBrick user's manual (the Bambu store page names onl
 
 - Board size and shape: CyberBrick-sized rectangle (29 x 30 mm) with the four CyberBrick mounting holes (23.0 x 24.0 mm), Zero in the middle.
 - Power LED on the board (from the servo-port 5 V); the signal status is shown by the Zero's RGB LED in firmware.
-- No spare GPIO header in this iteration, to keep the scope small (see "Out of scope"); a single second servo-type input is now planned, see "Planned: second servo-type input" below.
+- No spare GPIO header in this iteration, to keep the scope small (see "Out of scope").
 - Servo input J1 stays a 3-pin right-angle pin header (male) for now; it mates with a female-to-female servo/Dupont cable to PWM2. A female socket (so that a standard servo extension cable could be used) is left as a possible later change.
 - Speaker connector J2: JST SH 1.0 mm 2-pin, as used by the CyberBrick motor and button ports.
 - The amplifier is a bare MAX98357A chip on the board, **assembled by a PCB service** (the TQFN-16 package is not practical to hand-solder). No plug-in breakout module.
@@ -72,8 +72,7 @@ From the Maker's Supply CyberBrick user's manual (the Bambu store page names onl
 
 - ESP32 module directly on the board without the Zero (iteration 3, only if size or cost demands it).
 - Further sound features beyond the current firmware.
-- **Planned: second servo-type input** (decision 2026-11-01, see `bringup.md`): a second input like J1 for a button bound to an angle servo on another CyberBrick servo port (engine start / stop sounds). Plan: S through 1 kOhm and a pull-down to GPIO2 (left row, beside the GPIO1 of J1), GND shared, V not connected; the board is not changed yet.
-- **Earlier note on spare inputs (superseded by the above for one input).** A connector for the unused GPIOs (IO12, IO11, IO10 and GND) for later inputs, for example a switch for an engine-stop sound. It has to be a cable connector, because a plain vertical pin header beside the Zero is hard to plug into from above; for example a JST SH 1.0 mm or a right-angle header at a board edge. Added only if a use turns up; the right-hand column of the Zero is left free for it.
+- **Future option: spare inputs.** A connector for the unused GPIOs (IO12, IO11, IO10 and GND) for later inputs, for example a switch for an engine-stop sound. It has to be a cable connector, because a plain vertical pin header beside the Zero is hard to plug into from above; for example a JST SH 1.0 mm or a right-angle header at a board edge. Added only if a use turns up; the right-hand column of the Zero is left free for it.
 
 ## Possible future variant: classic RC receiver
 
