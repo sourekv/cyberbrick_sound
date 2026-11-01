@@ -1,6 +1,13 @@
 // Prints the width of the incoming servo pulse (microseconds) to serial.
+// Measures PIN_THROTTLE_IN; with -DMEASURE_AUX (env pulse_measure_aux) it measures PIN_AUX_IN instead, to check a
+// second servo port, for example a CyberBrick button bound to an angle servo (docs/bringup.md).
 #include <Arduino.h>
 #include "config.h"
+#ifdef MEASURE_AUX
+#define MEASURE_PIN PIN_AUX_IN
+#else
+#define MEASURE_PIN PIN_THROTTLE_IN
+#endif
 
 static volatile uint32_t riseUs = 0;
 static volatile uint32_t widthUs = 0;
@@ -9,7 +16,7 @@ static volatile uint32_t pulseCount = 0;
 
 void IRAM_ATTR onEdge() {
   uint32_t now = micros();
-  if (digitalRead(PIN_THROTTLE_IN)) {
+  if (digitalRead(MEASURE_PIN)) {
     riseUs = now;
   } else if (riseUs) {
     widthUs = now - riseUs;
@@ -20,9 +27,9 @@ void IRAM_ATTR onEdge() {
 
 void setup() {
   Serial.begin(115200);
-  pinMode(PIN_THROTTLE_IN, INPUT);
-  attachInterrupt(digitalPinToInterrupt(PIN_THROTTLE_IN), onEdge, CHANGE);
-  Serial.println("pulse_measure: waiting for pulses");
+  pinMode(MEASURE_PIN, INPUT);
+  attachInterrupt(digitalPinToInterrupt(MEASURE_PIN), onEdge, CHANGE);
+  Serial.printf("pulse_measure: waiting for pulses on GPIO%d\n", MEASURE_PIN);
 }
 
 void loop() {

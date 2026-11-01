@@ -68,3 +68,12 @@ Tune `config.h`: `PULSE_CENTER_US`, `PULSE_RANGE_US`, `MASTER_VOLUME`.
 | Pulse range (us) | 977 .. 1973 with L Stick Y bound to PWM2 (45..135 deg); at rest 1445..1465 (duty steps of about 20 us) |
 | Pulse rate (Hz) | 50.0, measured on GPIO1 via 1 kOhm with `pulse_measure` |
 | Current draw of module at volume X | MASTER_VOLUME 0.6, ESP32-S3-Zero + MAX98357A + 40 mm speaker powered from the PWM2 V pin: about 57 mA idle, about 105 mA at full throttle in either direction (multimeter average, 1 A range). Receiver stayed stable, motor kept responding |
+
+## Second input: button as a servo on another port (engine start / stop)
+Decision 2026-11-01: engine start and stall sounds will be controlled through a second servo-type input, because it is more general than sniffing the radio link (any button, switch or stick of the transmitter can be bound to an output in the CyberBrick app). The transmitter has four digital button ports K1-K4 (momentary button module: short press, long press, press and release; several values can be added and they cycle with each press) and the receiver has four servo ports.
+Test before any firmware depends on it:
+1. In the CyberBrick app add a second angle servo (a free port, for example **PWM3**, servo port 3) and bind a button (K1) to it with two values, for example 135 deg and 45 deg, cycling with each press.
+2. Connect the signal pin (S) of that servo port through a 1 kOhm resistor to **GPIO2** of the Zero (left header, pin 5; `PIN_AUX_IN` in `config.h`). Ground is common with the PWM2 cable; no power is needed from this port.
+3. Flash `pio run -e pulse_measure_aux -t upload` and watch the serial monitor: the width should change with every press and stay there (about 1.0 ms / 2.0 ms, see the PWM2 measurements above). Note the values and whether the pulse keeps running after the press, and whether the throttle copy on PWM2 is unaffected.
+Open: whether the app accepts a button bound to an angle servo with fixed angles, and whether the receiver keeps the pulse running without a servo plugged in (it does for PWM2).
+
