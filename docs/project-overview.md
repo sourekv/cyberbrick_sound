@@ -72,7 +72,7 @@ Research and measurements are in `sound-research.md`. The constraints that decid
 
 **On the real hardware (receiver, Zero, amplifier, speaker):**
 
-- `engine_truck` (real truck loop, virtual gearbox, "under load" layer) compiled, uploaded and ran on the owner's hardware (reported 2026-11-01). The owner's verdict on the sound, the gear feel and the loaded layer is still to be recorded here.
+- `engine_truck` (real truck loop, virtual gearbox, "under load" layer) compiled, uploaded and ran on the owner's hardware (reported 2026-11-01). Sound quality is a subjective judgement that can be revisited at any time, so no verdict is recorded; the sound stays unchanged for now.
 
 - Throttle copy on PWM2: 50.0 Hz, about 3.3 V, 977 to 1973 us, rest 1445 to 1465 us, V pin 4.94 V (`bringup.md`, measurements table). Pin order of the servo port confirmed.
 - Breadboard prototype end to end: the engine sound follows the real stick in both directions. Powered from the PWM2 V pin the module drew about 57 mA idle and 105 mA at full throttle (`MASTER_VOLUME` 0.6, 40 mm speaker); the receiver stayed stable and the motor kept responding.
