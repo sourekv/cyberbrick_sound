@@ -72,6 +72,8 @@ Research and measurements are in `sound-research.md`. The constraints that decid
 
 **On the real hardware (receiver, Zero, amplifier, speaker):**
 
+- `engine_truck` (real truck loop, virtual gearbox, "under load" layer) compiled, uploaded and ran on the owner's hardware (reported 2026-11-01). The owner's verdict on the sound, the gear feel and the loaded layer is still to be recorded here.
+
 - Throttle copy on PWM2: 50.0 Hz, about 3.3 V, 977 to 1973 us, rest 1445 to 1465 us, V pin 4.94 V (`bringup.md`, measurements table). Pin order of the servo port confirmed.
 - Breadboard prototype end to end: the engine sound follows the real stick in both directions. Powered from the PWM2 V pin the module drew about 57 mA idle and 105 mA at full throttle (`MASTER_VOLUME` 0.6, 40 mm speaker); the receiver stayed stable and the motor kept responding.
 - Sound, judged by listening on the real speaker: the first CC0 car loops were nearly inaudible and hissy; a synthesised pulse loop was audible ("less pretty but better heard") but turned into a siren when sped up; the grain engine `engine_pulse` (a_diesel6) sounded deeper and was chosen as the default; the owner's own recordings pulsated when looped and were parked.
@@ -85,7 +87,7 @@ Research and measurements are in `sound-research.md`. The constraints that decid
 
 **Not yet checked on hardware:**
 
-- `engine_diesel` and `engine_truck` (real loops, gearbox, "under load" layer). The assistant's build environment cannot download PlatformIO packages, so these changes passed only a syntax check with stand-in Arduino headers; the first real compile is on the owner's machine.
+- `engine_diesel` (real loop, gearbox). The assistant's build environment cannot download PlatformIO packages, so it passed only a syntax check with stand-in Arduino headers.
 - The shield PCB itself: only a layout mock and a 3D model exist, no schematic, nothing manufactured.
 - The loaded layer's level and pitch match (`LOADED_GAIN`, `LOADED_RATE_SCALE`) were set from measured values, not by ear.
 
