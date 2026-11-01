@@ -19,6 +19,10 @@ Details and the measurement table: `bringup.md`; app mapping: `cyberbrick-config
 
 ### Prototype (works, on a breadboard)
 
+![The working breadboard prototype: ESP32-S3-Zero, MAX98357A breakout with speaker, servo cable from the receiver, slide switch and battery](prototype.jpg)
+
+*The breadboard prototype that the shield PCB reproduces (photo from the project owner, 2026-11-01).*
+
 | Part | Role |
 |---|---|
 | Waveshare ESP32-S3-Zero-N8R8-M | controller; reads the pulse on GPIO1 through a 1 kOhm resistor; I2S on GPIO4 (DIN), GPIO5 (BCLK), GPIO6 (LRC); onboard RGB LED (GPIO21) for status |
