@@ -5,6 +5,7 @@
 #include "driver/i2s.h"
 #include "config.h"
 #include "status_led.h"
+#include "gearbox.h"
 #if defined(ENGINE_TRUCK)
 #include "engine_truck.h"           // real truck idle loop (CC0), see assets/samples/LICENSE-SAMPLES.md
 static const float RATE_IDLE = 1.0f;  // playback rate at rest
@@ -83,6 +84,8 @@ void setup() {
 void loop() {
   static float pos = 0.0f;      // position in the sample
   static float rpm = 0.0f;      // smoothed 0..1
+  static float prevGain = 1.0f; // volume factor of the previous block (gearbox cut), ramped inside a block
+  static Gearbox gearbox;
   static uint32_t lastPrint = 0;
 
   const int N = 128;
@@ -91,9 +94,17 @@ void loop() {
   // Update the smoothed RPM once per block (128 samples ~ 5.8 ms).
   float target = readThrottle();
   statusLed.update(signalPresent(), target);
+  float gain = 1.0f;
+#if GEARBOX_ENABLED
+  // Virtual gearbox: rpm and volume cut come from the shift logic (see include/gearbox.h).
+  gearbox.update(target, (float)N / AUDIO_RATE);
+  rpm = gearbox.rpm;
+  gain = gearbox.gain;
+#else
   // Rise faster than fall, like a real engine spooling up / coasting down.
   float k = target > rpm ? 0.02f : 0.008f;
   rpm += (target - rpm) * k;
+#endif
 
   // Playback rate: RATE_IDLE at rest .. RATE_FULL at full throttle
   float rate = RATE_IDLE + (RATE_FULL - RATE_IDLE) * rpm;
@@ -106,18 +117,25 @@ void loop() {
     int next = idx + 1;
     if (next >= ENGINE_SAMPLE_LEN) next = 0;
     float s = ENGINE_SAMPLE[idx] + (ENGINE_SAMPLE[next] - ENGINE_SAMPLE[idx]) * frac;
-    int16_t v = (int16_t)(s * vol);
+    float g = prevGain + (gain - prevGain) * ((float)(i + 1) / N);
+    int16_t v = (int16_t)(s * vol * g);
     buf[2 * i] = v;      // left
     buf[2 * i + 1] = v;  // right (the amp mixes (L+R)/2, so both must carry the signal)
     pos += rate;
     if (pos >= ENGINE_SAMPLE_LEN) pos -= ENGINE_SAMPLE_LEN;
   }
+  prevGain = gain;
   size_t written;
   i2s_write(I2S_NUM_0, buf, sizeof(buf), &written, portMAX_DELAY);
 
   if (millis() - lastPrint > 500) {
     lastPrint = millis();
-    Serial.printf("pulse %lu us  throttle %.2f  rpm %.2f\n",
-                  (unsigned long)widthUs, target, rpm);
+    Serial.printf("pulse %lu us  throttle %.2f  rpm %.2f  gear %d\n",
+                  (unsigned long)widthUs, target, rpm,
+#if GEARBOX_ENABLED
+                  gearbox.gear + 1);
+#else
+                  0);
+#endif
   }
 }

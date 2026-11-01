@@ -23,6 +23,29 @@
 #define PULSE_DEADBAND_US 35   // rest value jitters 1445..1465 us
 #define PULSE_TIMEOUT_MS 150   // no pulse for this long -> treat as idle
 
+// Virtual gearbox (see include/gearbox.h); used by the `engine` firmware family. Override with -D in platformio.ini.
+#ifndef GEARBOX_ENABLED
+#define GEARBOX_ENABLED   1
+#endif
+#ifndef GEAR_COUNT
+#define GEAR_COUNT        5
+#endif
+#ifndef GEAR_SHIFT_DROP
+#define GEAR_SHIFT_DROP   0.55f   // rpm (0..1) right after an upshift
+#endif
+#ifndef SHIFT_CUT_S
+#define SHIFT_CUT_S       0.25f   // torque cut while shifting up, seconds
+#endif
+#ifndef SHIFT_CUT_GAIN
+#define SHIFT_CUT_GAIN    0.15f   // volume factor during the cut
+#endif
+#ifndef GEAR_ACCEL_S
+#define GEAR_ACCEL_S      6.0f    // virtual speed 0..1 at full throttle, seconds (without shifts)
+#endif
+#ifndef GEAR_DECEL_S
+#define GEAR_DECEL_S      8.0f    // virtual speed 1..0 when the throttle is released, seconds
+#endif
+
 // Audio
 #define AUDIO_RATE        22050
 #define MASTER_VOLUME     0.6f    // 0..1; speaker is rated 2 W, amp can do ~3 W. Raise gradually.
