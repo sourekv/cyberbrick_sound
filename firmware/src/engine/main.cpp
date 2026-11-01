@@ -2,12 +2,15 @@
 // Reads the pulse on PIN_THROTTLE_IN, smooths an "RPM" value, and plays the
 // looped engine sample at a variable rate (linear interpolation) over I2S.
 #include <Arduino.h>
+#include <math.h>
 #include "driver/i2s.h"
 #include "config.h"
 #include "status_led.h"
 #include "gearbox.h"
 #if defined(ENGINE_TRUCK)
 #include "engine_truck.h"           // real truck idle loop (CC0), see assets/samples/LICENSE-SAMPLES.md
+#include "engine_truck_loaded.h"    // second loop "under load" (CC0), blended in with the throttle
+#define LOADED_LAYER 1
 static const float RATE_IDLE = 1.0f;  // playback rate at rest
 static const float RATE_FULL = 3.0f;  // playback rate at full throttle
 #elif defined(ENGINE_DIESEL)
@@ -18,6 +21,9 @@ static const float RATE_FULL = 3.0f;
 #include "engine_sample.h"          // synthesised loop
 static const float RATE_IDLE = 0.7f;
 static const float RATE_FULL = 2.0f;
+#endif
+#ifndef LOADED_LAYER
+#define LOADED_LAYER 0
 #endif
 
 static volatile uint32_t riseUs = 0;
@@ -54,6 +60,20 @@ static bool signalPresent() {
 
 static StatusLed statusLed;
 
+#if LOADED_LAYER
+// Plays a loop at a variable rate with linear interpolation; pos is kept inside the loop.
+static inline float playLoop(const int16_t* data, int len, float& pos, float rate) {
+  int idx = (int)pos;
+  float frac = pos - idx;
+  int next = idx + 1;
+  if (next >= len) next = 0;
+  float s = data[idx] + (data[next] - data[idx]) * frac;
+  pos += rate;
+  if (pos >= len) pos -= len;
+  return s;
+}
+#endif
+
 void setup() {
   Serial.begin(115200);
   statusLed.begin();
@@ -83,6 +103,10 @@ void setup() {
 
 void loop() {
   static float pos = 0.0f;      // position in the sample
+#if LOADED_LAYER
+  static float posLoaded = 0.0f;  // position in the "under load" loop
+  static float load = 0.0f;       // smoothed throttle 0..1: share of the "under load" loop
+#endif
   static float rpm = 0.0f;      // smoothed 0..1
   static float prevGain = 1.0f; // volume factor of the previous block (gearbox cut), ramped inside a block
   static Gearbox gearbox;
@@ -111,6 +135,21 @@ void loop() {
   // Volume rises a bit with throttle.
   float vol = MASTER_VOLUME * (0.55f + 0.45f * rpm);
 
+#if LOADED_LAYER
+  // Blend idle loop and "under load" loop by the throttle (equal power). The loaded loop has a slightly lower
+  // firing rate and a different level, so it is played faster / quieter to match (see config.h).
+  load += (target - load) * 0.04f;
+  const float wIdle = cosf(load * 1.5707963f);
+  const float wLoaded = sinf(load * 1.5707963f);
+  for (int i = 0; i < N; i++) {
+    float s = wIdle * playLoop(ENGINE_SAMPLE, ENGINE_SAMPLE_LEN, pos, rate)
+            + wLoaded * LOADED_GAIN * playLoop(ENGINE_LOADED, ENGINE_LOADED_LEN, posLoaded, rate * LOADED_RATE_SCALE);
+    float g = prevGain + (gain - prevGain) * ((float)(i + 1) / N);
+    int16_t v = (int16_t)(s * vol * g);
+    buf[2 * i] = v;      // left
+    buf[2 * i + 1] = v;  // right (the amp mixes (L+R)/2, so both must carry the signal)
+  }
+#else
   for (int i = 0; i < N; i++) {
     int idx = (int)pos;
     float frac = pos - idx;
@@ -124,6 +163,7 @@ void loop() {
     pos += rate;
     if (pos >= ENGINE_SAMPLE_LEN) pos -= ENGINE_SAMPLE_LEN;
   }
+#endif
   prevGain = gain;
   size_t written;
   i2s_write(I2S_NUM_0, buf, sizeof(buf), &written, portMAX_DELAY);

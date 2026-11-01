@@ -46,6 +46,15 @@
 #define GEAR_DECEL_S      8.0f    // virtual speed 1..0 when the throttle is released, seconds
 #endif
 
+// Second loop "under load" (engine_truck only): played faster by LOADED_RATE_SCALE because its firing rate is
+// lower (about 21 Hz against about 25 Hz of the idle loop), and scaled by LOADED_GAIN because it is louder.
+#ifndef LOADED_RATE_SCALE
+#define LOADED_RATE_SCALE 1.18f
+#endif
+#ifndef LOADED_GAIN
+#define LOADED_GAIN       0.8f
+#endif
+
 // Audio
 #define AUDIO_RATE        22050
 #define MASTER_VOLUME     0.6f    // 0..1; speaker is rated 2 W, amp can do ~3 W. Raise gradually.

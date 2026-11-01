@@ -33,6 +33,8 @@ The CC0 loops in `assets/samples/` (see `LICENSE-SAMPLES.md`) are almost pure lo
 ## Virtual gearbox
 The `engine_diesel` and `engine_truck` firmware shift gears like a truck: the module only sees the throttle, so it keeps a virtual speed that follows the throttle with some inertia, derives the gear from it (5 gears) and plays the loop at a rate that rises within each gear. On an upshift the pitch drops and the sound is dimmed for a quarter of a second (torque cut); on a downshift the pitch jumps up. This is an effect, not a simulation: the sound does not follow the real speed of the model. Tune it in `firmware/include/config.h` (`GEAR_COUNT`, `GEAR_SHIFT_DROP`, `SHIFT_CUT_S`, `SHIFT_CUT_GAIN`, `GEAR_ACCEL_S`, `GEAR_DECEL_S`) or switch it off with `GEARBOX_ENABLED 0`. The logic is in `firmware/include/gearbox.h` and can be tested on a PC with `tools/test_gearbox.cpp`. Not tested on hardware yet.
 
+`engine_truck` also blends in a second loop "under load" (brighter and louder, from a recording of a truck climbing a hill) as the throttle rises, on top of the idle loop. Level and pitch matching are in `firmware/include/config.h` (`LOADED_GAIN`, `LOADED_RATE_SCALE`). Not tested on hardware yet.
+
 ## Building
 Open the `firmware/` folder in VS Code with the PlatformIO extension, or run `pio run -e <env> -t upload` with `<env>` one of `test_tone`, `pulse_measure`, `engine`, `engine_pulse` (default engine sound), `engine_diesel` and `engine_truck` (real diesel and truck idle loops, pitch-shifted; also show the status colours), `engine_real` (experiment, needs a locally generated header). See `docs/bringup.md`.
 
