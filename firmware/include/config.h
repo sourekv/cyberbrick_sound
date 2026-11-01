@@ -1,7 +1,7 @@
 #pragma once
 // Pin assignment for Waveshare ESP32-S3-Zero.
-// PROPOSED from the header labels on the board photo - VERIFY against the
-// silkscreen on the real board before wiring.
+// Checked against the official Waveshare pinout (https://docs.waveshare.com/ESP32-S3-Zero) and proven on the
+// prototype: GP1 is the left header pin 4 (after 5V, GND, 3V3), GP4 / GP5 / GP6 are pins 7 / 8 / 9.
 // Deliberately avoided: GPIO0 (BOOT), GPIO3/45/46 (strapping), GPIO19/20 (USB),
 // GPIO21 (onboard RGB LED), GPIO33-37 (octal PSRAM), GPIO43/44 (UART0).
 
