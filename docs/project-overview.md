@@ -88,7 +88,7 @@ Research and measurements are in `sound-research.md`. The constraints that decid
 **Not yet checked on hardware:**
 
 - `engine_diesel` (real loop, gearbox). The assistant's build environment cannot download PlatformIO packages, so it passed only a syntax check with stand-in Arduino headers.
-- The shield PCB itself: only a layout mock and a 3D model exist, no schematic, nothing manufactured.
+- The shield PCB itself: a KiCad schematic and a routed board with manufacturing files exist (`hardware/shield/`, see `shield-pcb.md`), but they have not been reviewed by a human in KiCad and nothing has been manufactured.
 - The loaded layer's level and pitch match (`LOADED_GAIN`, `LOADED_RATE_SCALE`) were set from measured values, not by ear.
 
 ## Open decisions

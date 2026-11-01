@@ -2,3 +2,7 @@
 .vscode/
 *.pyc
 firmware/include/user_sounds.h
+hardware/shield/shield.dsn
+hardware/shield/shield.ses
+hardware/shield/shield.kicad_prl
+logs/
