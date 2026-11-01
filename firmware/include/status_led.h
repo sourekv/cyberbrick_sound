@@ -44,7 +44,11 @@ class StatusLed {
   void write(uint8_t r, uint8_t g, uint8_t b) {
     if (r == cr && g == cg && b == cb) return;
     cr = r; cg = g; cb = b;
+#if STATUS_LED_SWAP_RG
+    neopixelWrite(PIN_STATUS_RGB, g, r, b);   // red and green are swapped on the Zero we tested
+#else
     neopixelWrite(PIN_STATUS_RGB, r, g, b);   // arduino-esp32: RGB order, handled for the WS2812
+#endif
   }
 };
 

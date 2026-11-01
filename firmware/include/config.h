@@ -14,6 +14,7 @@
 #define STATUS_LED_ENABLED 1
 #define PIN_STATUS_RGB    21
 #define STATUS_LED_MAX    40  // 0..255 brightness limit; the LED is very bright
+#define STATUS_LED_SWAP_RG 1  // 1: red and green are swapped on this board (seen on the real Zero), 0: normal order
 
 // Throttle pulse (microseconds)
 #define PULSE_MIN_US     800
