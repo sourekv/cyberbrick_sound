@@ -29,6 +29,7 @@ The CyberBrick receiver has no inputs, only outputs, so the button is passed thr
 - A press during the start sample with the throttle moving: skip the rest of the start, follow the throttle.
 - Throttle moved while the stop sample plays: **interrupt the stop** (fade ~30–50 ms) and go straight to the engine sound for the current throttle position (same ramp note as above).
 - Missing or out-of-range PWM3 pulse: state unchanged. PWM2 signal lost: idle, as today.
+- Idea (2026-11-03, not decided): after the throttle has been at rest for a longer time, the engine could stall by itself (stop sample, then silence), as if left idling. The timeout is open.
 - The sound never goes silent while the truck moves; the button cannot stop the real motor (the app has no way to make M1 depend on the button), so this is a sound effect only.
 
 ## Samples chosen for a first try
