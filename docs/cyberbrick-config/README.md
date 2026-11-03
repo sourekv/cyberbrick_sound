@@ -11,3 +11,11 @@ Use: import the file in the CyberBrick app, then **Send to Device** to the trans
 
 ## Truck_stock.json (baseline without sound)
 The original CyberBrick Truck configuration exactly as exported from the app, without any of our additions: PWM2 is empty and the L Stick Y channel drives only Throttle. Use it to restore the stock behaviour.
+
+## Truck_with_Engine_Sound_Button.json (start/stop/horn button)
+`Truck_with_Engine_Sound.json` plus one button for the planned start/stop/horn feature (see `docs/start-stop-horn.md`), exported from the app by the project owner on 1 Nov 2026:
+
+- **PWM3 (Angular)**: min 45 deg, max 135 deg, speed 100 %, initial 90 deg, centre offset 0
+- **Button channel "StartStopHorn"**, event **Short Hold** (`short`) sets PWM3 to **45 and 135 deg, alternating on each press**
+
+After power-up PWM3 sits at the centre (about 1.5 ms); each press then flips it between about 1.0 and 2.0 ms, and the module treats every change as one press. Not yet tested on hardware, and the firmware does not read PWM3 yet.
