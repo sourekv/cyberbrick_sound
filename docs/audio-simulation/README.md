@@ -33,14 +33,16 @@ Plays the start-up part of a user-supplied recording once, then repeats a seamle
 Files in `lab/`, rendered by `python tools/engine_lab.py <out_dir>` with the same 20 s throttle profile and virtual
 gearbox as the `engine_demo` firmware. The number is the sound's number in the firmware (BOOT switches them):
 
-| File prefix | Sound (`tools/engine_lab.py` name) |
-|---|---|
-| `1_truck` | truck loops (`truck`) |
-| `2_truck_with_eq` | truck loops through the speaker EQ (`truck_eq`) |
-| `3_old_pulse_synth` | the old `engine_pulse` synth (`pulse_old`) |
-| `4_diesel` | new grain synth, diesel (`diesel`) |
-| `5_petrol_4_cylinder` | new grain synth, four-cylinder petrol (`petrol4`) |
-| `6_v8` | new grain synth, V8 (`v8`) |
+| File prefix | Sound (`tools/engine_lab.py` name) | Made from |
+|---|---|---|
+| `1_truck` | truck loops (`truck`) | CC0 recordings: truck idle (wesleywestmusic) and truck under load (kyles) |
+| `2_truck_with_eq` | truck loops through the speaker EQ (`truck_eq`) | the same CC0 recordings |
+| `3_old_pulse_synth` | the old `engine_pulse` synth (`pulse_old`) | synthesised, no recorded audio |
+| `4_diesel` | new grain synth, diesel (`diesel`) | synthesised, no recorded audio |
+| `5_petrol_4_cylinder` | new grain synth, four-cylinder petrol (`petrol4`) | synthesised, no recorded audio |
+| `6_v8` | new grain synth, V8 (`v8`) | synthesised, no recorded audio |
+
+Sources and licences of the recordings: `assets/samples/LICENSE-SAMPLES.md`.
 
 `*_raw.wav` is what the firmware sends to the amplifier. `*_as_heard.wav` goes through `tools/speaker_model.py` (the
 measured response of the 40 mm speaker plus a rough model of its bass distortion) and all of them are normalised to

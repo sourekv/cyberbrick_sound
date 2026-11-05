@@ -62,3 +62,11 @@ Used sounds (48 kHz mono, originals not stored here):
 Headers: `python tools/make_engine_diesel.py assets/samples/gear_a_r03-29.wav firmware/include/gear_a.h GEAR_A` (and `gear_b_r03-32.wav ... gear_b.h GEAR_B`).
 Content (own analysis): old noisy optical recordings of a large old truck, a visible 60 Hz line (hum) below the range of the speaker, no reliable firing rate measurable; the loops are made seamless only by a 1 s crossfade, so a repetition may be audible, and the pitch of the two loops is not matched. Gear 1 uses the first loop and gears 2..5 share the second one while the sound is being chosen (see `firmware/include/gear_bank.h`).
 
+
+## Synthesised sounds (no third-party audio)
+The `engine_pulse` grain synth (`tools/make_engine_grains.py`, `firmware/include/engine_synth.h`), the earlier synthesised loop (`tools/make_engine_synth.py`) and the speaker-tuned grain synth with the presets `diesel`, `petrol4` and `v8` (`tools/engine_lab.py`, `firmware/include/engine_synth2.h`, data in `firmware/include/engine_lab_data.h`) are generated entirely by this project's code from formulas. They contain no recorded audio, so no third-party licence applies.
+
+## Voice prompts (used by the `engine_lab` / `engine_demo` firmware)
+Text-to-speech: Piper (https://github.com/rhasspy/piper, MIT licence), voice `en_US-ljspeech-medium` (https://huggingface.co/rhasspy/piper-voices, en/en_US/ljspeech/medium), trained on the LJ Speech dataset, which its model card lists as public domain.
+Generated file: `firmware/include/voice_prompts.h` (six short English prompts "One. Truck." .. "Six. V eight."), made with `pwsh tools/make_voice_prompts.ps1` and `tools/make_voice_header.py` (resampled to 22.05 kHz, trimmed, high-passed at 250 Hz, normalised). Neither Piper nor the voice model is stored here.
+Replaced the earlier Windows text-to-speech prompts (2026-11-05), because the licence of the Windows voices for redistribution was unclear.
