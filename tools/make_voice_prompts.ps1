@@ -12,7 +12,7 @@ param(
 )
 $ErrorActionPreference = "Stop"
 # Keep in step with SOUND_NAMES in firmware/src/engine_lab/main.cpp
-$texts = @("One. Truck.", "Two. Truck with E Q.", "Three. Old synth.", "Four. Diesel.", "Five. Petrol, four cylinder.", "Six. V eight.")
+$texts = @("One. Truck.", "Two. Truck with E Q.", "Three. Old synth.", "Four. Diesel.", "Five. Petrol, four cylinder.", "Six. V eight.", "Seven. V twelve.")
 $exe = Join-Path $Piper "piper.exe"
 $dir = Join-Path ([System.IO.Path]::GetTempPath()) "cyberbrick_voice"
 New-Item -ItemType Directory -Force $dir | Out-Null

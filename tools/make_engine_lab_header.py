@@ -12,7 +12,7 @@ import math, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import engine_lab as L  # noqa: E402
 
-ORDER = ["diesel", "petrol4", "v8"]
+ORDER = ["diesel", "petrol4", "v8", "v12"]
 MAXPAT = 8
 
 

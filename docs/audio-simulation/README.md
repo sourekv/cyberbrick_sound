@@ -41,6 +41,7 @@ gearbox as the `engine_demo` firmware. The number is the sound's number in the f
 | `4_diesel` | new grain synth, diesel (`diesel`) | synthesised, no recorded audio |
 | `5_petrol_4_cylinder` | new grain synth, four-cylinder petrol (`petrol4`) | synthesised, no recorded audio |
 | `6_v8` | new grain synth, V8 (`v8`) | synthesised, no recorded audio |
+| `7_v12` | new grain synth, V12 (`v12`) | synthesised, no recorded audio |
 
 Sources and licences of the recordings: `assets/samples/LICENSE-SAMPLES.md`.
 

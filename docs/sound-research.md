@@ -53,13 +53,14 @@ Based on the speaker measurement (`docs/speaker-measurement.md`: plays about 210
   exhaust-like resonances placed between 300 Hz and 4 kHz, band-pass combustion noise synchronous with the firing,
   then soft clip and the speaker EQ. The low engine pitch comes from the firing rhythm (the ear infers it), not from
   bass the speaker cannot play. Presets: `diesel` (28-105 firings/s), `petrol4` (26-190), `v8` (36-150, uneven
-  cross-plane firing). RPM from the virtual gearbox.
+  cross-plane firing), `v12` (60-270, six even firings per revolution, short bright grains: a smooth howl). RPM from the virtual gearbox.
 - Found on the way: the soft clipper at the end of the old `engine_pulse` synth creates difference tones at the
   firing rate (below 250 Hz), which the speaker only distorts. In the new synth the EQ comes after the clipper.
 - `python tools/engine_lab.py OUT_DIR` renders all candidates (raw and as heard, same loudness);
   `python tools/make_engine_lab_header.py` writes `firmware/include/engine_lab_data.h` from the same source.
-- Firmware `engine_lab`: all six candidates in one build, the **BOOT button** on the Zero switches 1..6 and the module
-  announces it: 1 truck, 2 truck with EQ, 3 old pulse synth, 4 diesel, 5 petrol4, 6 v8. The announcement is spoken
+- Firmware `engine_lab`: all seven candidates in one build, the **BOOT button** on the Zero switches 1..7 and the module
+  announces it: 1 truck, 2 truck with EQ, 3 old pulse synth, 4 diesel, 5 petrol4, 6 v8, 7 v12
+  (added 2026-11-05 after the owner liked the V8 best). The announcement is spoken
   (English, Piper text-to-speech with the voice `en_US-ljspeech`, trained on the public-domain LJ Speech dataset)
   when `firmware/include/voice_prompts.h` exists; it is generated locally with `pwsh tools/make_voice_prompts.ps1
   -Piper <piper folder> -Model <en_US-ljspeech-medium.onnx>` and kept in git (the voice is licence-clean); without the header the module beeps the number.

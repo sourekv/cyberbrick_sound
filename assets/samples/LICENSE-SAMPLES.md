@@ -64,9 +64,9 @@ Content (own analysis): old noisy optical recordings of a large old truck, a vis
 
 
 ## Synthesised sounds (no third-party audio)
-The `engine_pulse` grain synth (`tools/make_engine_grains.py`, `firmware/include/engine_synth.h`), the earlier synthesised loop (`tools/make_engine_synth.py`) and the speaker-tuned grain synth with the presets `diesel`, `petrol4` and `v8` (`tools/engine_lab.py`, `firmware/include/engine_synth2.h`, data in `firmware/include/engine_lab_data.h`) are generated entirely by this project's code from formulas. They contain no recorded audio, so no third-party licence applies.
+The `engine_pulse` grain synth (`tools/make_engine_grains.py`, `firmware/include/engine_synth.h`), the earlier synthesised loop (`tools/make_engine_synth.py`) and the speaker-tuned grain synth with the presets `diesel`, `petrol4`, `v8` and `v12` (`tools/engine_lab.py`, `firmware/include/engine_synth2.h`, data in `firmware/include/engine_lab_data.h`) are generated entirely by this project's code from formulas. They contain no recorded audio, so no third-party licence applies.
 
 ## Voice prompts (used by the `engine_lab` / `engine_demo` firmware)
 Text-to-speech: Piper (https://github.com/rhasspy/piper, MIT licence), voice `en_US-ljspeech-medium` (https://huggingface.co/rhasspy/piper-voices, en/en_US/ljspeech/medium), trained on the LJ Speech dataset, which its model card lists as public domain.
-Generated file: `firmware/include/voice_prompts.h` (six short English prompts "One. Truck." .. "Six. V eight."), made with `pwsh tools/make_voice_prompts.ps1` and `tools/make_voice_header.py` (resampled to 22.05 kHz, trimmed, high-passed at 250 Hz, normalised). Neither Piper nor the voice model is stored here.
+Generated file: `firmware/include/voice_prompts.h` (six short English prompts "One. Truck." .. "Six. V eight."; "Seven. V twelve." is in the script but the committed header still has six prompts until it is regenerated), made with `pwsh tools/make_voice_prompts.ps1` and `tools/make_voice_header.py` (resampled to 22.05 kHz, trimmed, high-passed at 250 Hz, normalised). Neither Piper nor the voice model is stored here.
 Replaced the earlier Windows text-to-speech prompts (2026-11-05), because the licence of the Windows voices for redistribution was unclear.

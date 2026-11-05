@@ -282,6 +282,13 @@ PRESETS = {
                bright=[(800, 220, 0.5), (1400, 280, 0.9), (2300, 420, 0.8), (3300, 600, 0.5)],
                amp_pattern=(1.0, 0.65, 0.9, 0.6, 1.0, 0.7, 0.85, 0.62), time_pattern=(0.10, -0.08, 0.06, -0.10, 0.08, -0.06, 0.10, -0.10),
                noise_level=(0.08, 0.40), noise_bp=(1500, 0.7), noise_tau_ms=3.5, out_gain=3.6),
+    # V12: six even firings per revolution (60 deg), so the pulses blend into a smooth, higher howl; short, bright
+    # grains so they do not smear at up to 270 firings/s (about 2700 rpm); almost no unevenness
+    "v12": dict(fire=(60.0, 270.0), length=260, pulse_ms=0.8, noise=0.22, decay=1.0,
+                base=[(420, 130, 0.7), (780, 160, 1.0), (1250, 220, 0.9), (1900, 320, 0.6), (2900, 480, 0.35)],
+                bright=[(1500, 300, 0.6), (2600, 380, 0.9), (3700, 520, 0.8), (5000, 700, 0.4)],
+                amp_pattern=(1.0, 0.95, 0.98, 0.94, 1.0, 0.96), time_pattern=(0, 0, 0, 0, 0, 0),
+                noise_level=(0.05, 0.30), noise_bp=(2800, 0.8), noise_tau_ms=1.5, out_gain=2.8),
 }
 
 
@@ -348,6 +355,7 @@ CANDIDATES = {
     "diesel": lambda: Synth2(PRESETS["diesel"]),
     "petrol4": lambda: Synth2(PRESETS["petrol4"]),
     "v8": lambda: Synth2(PRESETS["v8"]),
+    "v12": lambda: Synth2(PRESETS["v12"]),
 }
 
 TARGET_RMS = 0.10  # loudness of the "as heard" previews (all the same)

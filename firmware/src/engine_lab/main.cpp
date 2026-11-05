@@ -6,7 +6,8 @@
 //   4 diesel      new speaker-tuned synth (include/engine_synth2.h)
 //   5 petrol4     new, petrol 4-cylinder
 //   6 v8          new, cross-plane V8
-// After every switch the module beeps the number (1..6) of the sound now playing. All sounds share the throttle
+//   7 v12         new, V12 (six even firings per revolution)
+// After every switch the module beeps the number (1..7) of the sound now playing. All sounds share the throttle
 // input and the virtual gearbox (except 3, which smooths the RPM itself, as in its own firmware).
 // The BOOT button (GPIO0) only matters at power-up/reset; read later it is an ordinary button.
 //
@@ -35,8 +36,8 @@
 #endif
 
 #define PIN_BOOT_BUTTON 0
-static const int SOUNDS = 6;
-static const char* const SOUND_NAMES[SOUNDS] = {"truck", "truck_eq", "pulse_old", "diesel", "petrol4", "v8"};
+static const int SOUNDS = 7;
+static const char* const SOUND_NAMES[SOUNDS] = {"truck", "truck_eq", "pulse_old", "diesel", "petrol4", "v8", "v12"};
 
 static volatile uint32_t riseUs = 0;
 static volatile uint32_t widthUs = 0;
@@ -156,7 +157,8 @@ static void selectSound(int s) {
   demoSamples = 0;
 #endif
 #if HAVE_VOICE
-  voice.say(sound);
+  if (sound < VOICE_PROMPTS) voice.say(sound);
+  else beeper.announce(sound + 1);   // no spoken prompt for this sound yet (regenerate voice_prompts.h)
 #else
   beeper.announce(sound + 1);
 #endif
@@ -205,7 +207,7 @@ void setup() {
 #if ENGINE_LAB_DEMO
   Serial.println("engine_demo: plays all sounds in turn, BOOT skips to the next");
 #else
-  Serial.println("engine_lab: BOOT switches the sound (1..6)");
+  Serial.println("engine_lab: BOOT switches the sound (1..7)");
 #endif
   selectSound(0);
 }
