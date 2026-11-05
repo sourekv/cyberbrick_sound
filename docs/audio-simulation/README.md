@@ -27,3 +27,22 @@ speaker response. Regenerate with `python tools/simulate_engine.py` after changi
 ## Real-recording engine (`engine_real` firmware)
 
 Plays the start-up part of a user-supplied recording once, then repeats a seamless idle loop; RPM raises the playback rate by up to 40 % and the volume. The recording's origin and license are unknown, so it is **not** in the repository: generate the header locally with `python tools/make_user_sounds.py "<path to warm start.wav>"` (writes the git-ignored `firmware/include/user_sounds.h`), then `pio run -e engine_real -t upload`. Host preview: `g++ -O2 -std=c++17 -I firmware/include tools/render_engine_real.cpp -o render_engine_real && ./render_engine_real <prefix>`.
+
+## Speaker-tuned candidates (`engine_lab` / `engine_demo` firmware)
+
+Files in `lab/`, rendered by `python tools/engine_lab.py <out_dir>` with the same 20 s throttle profile and virtual
+gearbox as the `engine_demo` firmware. The number is the sound's number in the firmware (BOOT switches them):
+
+| File prefix | Sound (`tools/engine_lab.py` name) |
+|---|---|
+| `1_truck` | truck loops (`truck`) |
+| `2_truck_with_eq` | truck loops through the speaker EQ (`truck_eq`) |
+| `3_old_pulse_synth` | the old `engine_pulse` synth (`pulse_old`) |
+| `4_diesel` | new grain synth, diesel (`diesel`) |
+| `5_petrol_4_cylinder` | new grain synth, four-cylinder petrol (`petrol4`) |
+| `6_v8` | new grain synth, V8 (`v8`) |
+
+`*_raw.wav` is what the firmware sends to the amplifier. `*_as_heard.wav` goes through `tools/speaker_model.py` (the
+measured response of the 40 mm speaker plus a rough model of its bass distortion) and all of them are normalised to
+the same loudness, so they can be compared directly. The tool writes its short names (`truck_raw.wav`, ...); the
+files here were renamed to the numbered names above. See `docs/sound-research.md` for the background.
