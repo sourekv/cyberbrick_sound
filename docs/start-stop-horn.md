@@ -57,3 +57,28 @@ Also considered: phenoxy "Diesel_start_idle2.wav" (https://freesound.org/people/
 The transmitter talks to the receiver over ESP-NOW (from forum posts and a community transmitter project; the official packet format is undocumented). The Zero could in principle listen to it and the servo input would not be needed.
 
 Decided: **side research only, never a dependency of the main design.** The format may change with any CyberBrick firmware update, packets may be encrypted, receiving costs an estimated 80–100 mA more, and the Zero's antenna would need a copper keep-out on the shield. A first experiment would be a small sniffer firmware that prints frames from the transmitter while moving the sticks.
+
+### Result of the first experiment (2026-11-05): the payload is encrypted
+
+Firmware `espnow_sniff` (listens only, never transmits; promiscuous mode, channels 1..13, also 802.11 LR) on the
+prototype Zero, transmitter and receiver switched on and bound:
+
+- ESP-NOW frames were found on **Wi-Fi channel 2** from two senders, `80:F1:B2:34:1A:B8` (about 10-20 frames/s,
+  59 bytes, RSSI about -45 dBm; sends to the other one, so most likely the **transmitter**) and `80:F1:B2:19:48:74`
+  (about 1 frame/s, 44 bytes, RSSI about -25 dBm next to the breadboard; most likely the **receiver** answering).
+  The 802.11 "protected" bit is not set.
+- Frame layout: byte 0 = `2A`, byte 1 = length of the rest after byte 19 (`27` = 39, `18` = 24), bytes 2-3 change
+  in every frame (nonce or checksum), bytes 4-7 = `41 40 00 00`, bytes 8-13 = destination MAC, bytes 14-19 = source
+  MAC, then the data.
+- 40 s test with timestamps: 10 s at rest, 10 s moving the throttle stick end to end, 10 s pressing the button, 10 s
+  at rest. **Nothing in the frames followed the stick or the button**: the same length (59, sometimes 60) and the
+  same frame rate in all four phases, and every data byte after byte 19 takes a different value in practically
+  every frame even at rest (126-134 distinct values per byte position in 190 frames).
+- That is what encrypted data with a per-frame nonce looks like (application-level encryption, not the ESP-NOW
+  built-in one). Without the key it cannot be read, and the CyberBrick cores use flash encryption and secure boot,
+  so the key is not reachable.
+
+**Conclusion: investigated, no result. The data cannot be read, the servo-port input stays.** The side research
+is closed. Breaking or bypassing the CyberBrick encryption is not an option for this project. The sniffer firmware
+was not kept in the repository; it was a short promiscuous-mode program and can be rewritten if Bambu ever
+publishes the protocol or stops encrypting it.
