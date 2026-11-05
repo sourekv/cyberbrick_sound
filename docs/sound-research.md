@@ -40,6 +40,33 @@ Analysis:
 
 Implementation: `tools/make_user_sounds.py <warm start.wav>` trims the silence, searches a seamless loop (found: 4.6-7.4 s, seam correlation 0.41) and writes the git-ignored `firmware/include/user_sounds.h`; `include/engine_real.h` plays the start-up once, then loops with an equal-power crossfade and raises the playback rate by up to 40 % with RPM. Preview renderer: `tools/render_engine_real.cpp`.
 
+## Speaker-tuned candidates (2026-11-05)
+
+Based on the speaker measurement (`docs/speaker-measurement.md`: plays about 210 Hz to 8 kHz, +8 dB resonance at
+450 Hz, a dip at 2-3 kHz, strong distortion below 300 Hz):
+
+- `tools/speaker_model.py` turns any WAV into an approximate "as heard from the speaker" version: the measured
+  response plus a rough model of the bass distortion. A listening aid, not a calibrated model.
+- **Speaker EQ**: 4th-order high-pass at 260 Hz, -7 dB at 450 Hz, +4 dB at 2.5 kHz. Removes the energy the speaker
+  cannot play and would only distort.
+- **New grain synth** (`Synth2` in `tools/engine_lab.py`, `firmware/include/engine_synth2.h`): a firing pulse through
+  exhaust-like resonances placed between 300 Hz and 4 kHz, band-pass combustion noise synchronous with the firing,
+  then soft clip and the speaker EQ. The low engine pitch comes from the firing rhythm (the ear infers it), not from
+  bass the speaker cannot play. Presets: `diesel` (28-105 firings/s), `petrol4` (26-190), `v8` (36-150, uneven
+  cross-plane firing). RPM from the virtual gearbox.
+- Found on the way: the soft clipper at the end of the old `engine_pulse` synth creates difference tones at the
+  firing rate (below 250 Hz), which the speaker only distorts. In the new synth the EQ comes after the clipper.
+- `python tools/engine_lab.py OUT_DIR` renders all candidates (raw and as heard, same loudness);
+  `python tools/make_engine_lab_header.py` writes `firmware/include/engine_lab_data.h` from the same source.
+- Firmware `engine_lab`: all six candidates in one build, the **BOOT button** on the Zero switches 1..6 and the module
+  announces it: 1 truck, 2 truck with EQ, 3 old pulse synth, 4 diesel, 5 petrol4, 6 v8. The announcement is spoken
+  (English, Piper text-to-speech with the voice `en_US-ljspeech`, trained on the public-domain LJ Speech dataset)
+  when `firmware/include/voice_prompts.h` exists; it is generated locally with `pwsh tools/make_voice_prompts.ps1
+  -Piper <piper folder> -Model <en_US-ljspeech-medium.onnx>` and kept in git (the voice is licence-clean); without the header the module beeps the number.
+- Firmware `engine_demo` (same source, `-DENGINE_LAB_DEMO=1`): needs no receiver; announces each sound in turn and
+  plays it through the whole RPM range with the same 20 s throttle profile as the previews, then the next one, in a
+  loop. BOOT skips to the next sound.
+
 ## Lessons
 
 - Do not pitch-shift a recording to follow RPM: it moves the timbre as well. Trigger fixed-timbre grains at a rate set by RPM instead.
