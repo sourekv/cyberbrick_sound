@@ -82,3 +82,38 @@ prototype Zero, transmitter and receiver switched on and bound:
 is closed. Breaking or bypassing the CyberBrick encryption is not an option for this project. The sniffer firmware
 was not kept in the repository; it was a short promiscuous-mode program and can be rewritten if Bambu ever
 publishes the protocol or stops encrypting it.
+
+## Option found later: the receiver's own, documented data API (2026-11-06, not tried)
+
+Bambu publishes the MicroPython application of the CyberBrick cores at
+https://github.com/CyberBrick-Official/CyberBrick_Controller_Core (read 2026-11-06; the code was not copied into
+this repository):
+
+- The receiver and the transmitter run the same ESP32-C3 core board with MicroPython; `src/app_rc/app/rc_main.py`
+  picks the role from GPIO10 at start-up. The receiver application (`control.py`, `parser.py`, `bbl/servos.py`,
+  ...) is source code; the radio itself, its encryption and the pin numbers of the servo outputs live in the
+  closed, built-in module `rc_module`.
+- `docs/cyberbrick_core/lib/rc_module.rst` documents `rc_module.rc_slave_data()`: on the receiver it returns the
+  transmitter's channels **already decoded**, as `[L1, L2, L3, R1, R2, R3, K1, K2, K3, K4]` (six stick channels as
+  ADC values 0..4095, four buttons as 0/1), or `None` when not paired. The receiver's main loop calls it every
+  20 ms. `rc_index()` gives which of the two receivers this is.
+- The servo outputs are ordinary 50 Hz PWM (`bbl/servos.py`), which is what the module reads on GPIO1 today.
+- Pins used by the receiver application: 0..5 outputs (also the wake-up pins for deep sleep), 8 the RGB LED, 9 the
+  board key, 10 the role pin. Which other pins of the core board are brought out is not documented there.
+
+So the decoded data is available on the receiver through an official interface; nothing has to be broken. A small
+piece of code on the receiver could send all ten channels over a wire (for example UART) to the sound module:
+throttle, the start/stop/horn button and the other sticks at once, without using a servo output for each.
+
+Open points before trying it:
+
+- **Licence.** The "CyberBrick Codebase License" allows use only through MakerWorld's services and products (or with
+  written permission) and requires the licence notice in all copies. Modified receiver code therefore does not go
+  into this repository as it is; check whether a snippet through the official "Code" option of the CyberBrick app
+  is enough, or keep the change local.
+- **A free pin** on the receiver core for the data wire (GPIO 20/21 are the ESP32-C3 UART0 pins, but whether they are
+  brought out and unused is not known).
+- **Getting back** to the original receiver application before changing anything (the app can re-send the
+  configuration; whether it restores the application files was not checked).
+- Shared ground and a 3.3 V signal level between the receiver core and the Zero; the [USB power
+  rule](bringup.md) still applies.
