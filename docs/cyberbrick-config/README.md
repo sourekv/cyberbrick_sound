@@ -19,3 +19,19 @@ The original CyberBrick Truck configuration exactly as exported from the app, wi
 - **Button channel "StartStopHorn"**, event **Short Hold** (`short`) sets PWM3 to **45 and 135 deg, alternating on each press**
 
 After power-up PWM3 sits at the centre (about 1.5 ms); each press then flips it between about 1.0 and 2.0 ms, and the module treats every change as one press. Not yet tested on hardware, and the firmware does not read PWM3 yet.
+
+## Truck_Code_Test.json (receiver "Code" experiment)
+`Truck_stock.json` changed for the Code snippets in `docs/cyberbrick-code/` (written by hand on 2026-11-06, not an
+app export, **not tried yet**):
+
+- **LED2 is switched off** (no lights; it was first meant for the data wire, now PWM4 is used). The lights events on
+  the R Stick and the L Shoulder Button are removed. **PWM4** stays unconfigured: the UART snippet sends on it.
+- **CODE** holds two snippets: effect 1 = `blink_test.py`, effect 2 = `uart_forward.py` (comments removed).
+- **L Shoulder Button** (K1, the only button the stock truck transmitter is sure to have): short press runs
+  snippet 1 (the core LED blinks blue), long press runs snippet 2 (forward the channels over UART). Starting one
+  snippet stops the other.
+- Throttle and steering as in the stock truck; no PWM2 / PWM3 for the sound module.
+
+The CODE entries follow what the receiver parser reads (`effect`, `code`); whether the app accepts them as they are
+is not known. If the app does not show the two snippets after the import, add them in the app by hand instead.
+Restore the truck afterwards with `Truck_stock.json` or `Truck_with_Engine_Sound_Button.json`.
