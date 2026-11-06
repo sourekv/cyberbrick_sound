@@ -28,6 +28,7 @@
 #include "engine_synth.h"          // old grain synth (engine_pulse)
 #include "engine_synth2.h"         // new speaker-tuned synth
 #include "rc_link.h"               // channel data over a wire from the receiver Code snippet
+#include "engine_events.h"         // start, stop and horn (from the channel data)
 
 // Spoken announcement of the sound number and name, if the locally generated header exists
 // (tools/make_voice_prompts.ps1, Piper text-to-speech, English voice en_US-ljspeech); otherwise beeps.
@@ -112,6 +113,11 @@ static EngineSynth oldSynth;
 static EngineSynth2 synth2;
 static SpeakerEq truckEq;
 static int sound = 0;
+static StarterSound starter;
+static HornSound horn;
+static EngineState engineState;
+static float engGain = 1.0f, engGainPrev = 1.0f;   // engine level from engineState, ramped over each block
+
 
 #ifndef ENGINE_LAB_DEMO
 #define ENGINE_LAB_DEMO 0
@@ -172,6 +178,12 @@ static inline int16_t mixOut(float s) {
   return (int16_t)v;
 }
 
+// Engine sample s with the engine level and the start/stop/horn sounds, then voice and beeps.
+static inline int16_t outSample(float s, int i, int n) {
+  float g = engGainPrev + (engGain - engGainPrev) * ((float)(i + 1) / n);
+  return mixOut(s * g + starter.sample() + horn.sample());
+}
+
 static void selectSound(int s) {
   sound = s;
   if (sound >= 3) synth2.setPreset(sound - 3);
@@ -213,6 +225,8 @@ void setup() {
   rcLink.begin(PIN_THROTTLE_IN);
 #endif
   attachInterrupt(digitalPinToInterrupt(PIN_THROTTLE_IN), onEdge, CHANGE);
+  starter.begin();
+  horn.begin();
 
   i2s_config_t cfg = {};
   cfg.mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX);
@@ -263,7 +277,26 @@ void loop() {
   float target = readThrottle();
   statusLed.update(signalPresent(), target);
 #endif
-  gearbox.update(target, (float)N / AUDIO_RATE);
+  const float dt = (float)N / AUDIO_RATE;
+#if RC_LINK_ENABLED && !ENGINE_LAB_DEMO
+  {
+    bool data = dataActive();
+    int ignDev = (int)rcLink.get(RcLink::L1) - RC_IGNITION_MID;
+    bool ignNow = ignDev > RC_IGNITION_BAND || ignDev < -RC_IGNITION_BAND;   // end positions = ON, middle = OFF
+    static bool ignition = false, ignCand = false;
+    static uint32_t ignSinceMs = 0;
+    if (ignNow != ignCand) { ignCand = ignNow; ignSinceMs = millis(); }
+    if (ignCand != ignition && millis() - ignSinceMs >= RC_IGNITION_SETTLE_MS) ignition = ignCand;
+    int hornDev = (int)rcLink.get(RcLink::R1) - RC_HORN_REST;
+    horn.set(data && (hornDev > RC_HORN_THRESHOLD || hornDev < -RC_HORN_THRESHOLD));
+    target = engineState.block(rcLink.alive(RC_STATE_HOLD_MS), ignition, target > 0.05f, target, dt, gearbox.rpm,
+                               starter);
+  }
+#endif
+  gearbox.update(target, dt);
+  engineState.apply(gearbox.rpm, gearbox.gain);
+  engGainPrev = engGain;
+  engGain = engineState.gain;
   const float rpm = gearbox.rpm, gain = gearbox.gain;
 
   if (sound <= 1) {
@@ -277,14 +310,14 @@ void loop() {
       float g = prevGain + (gain - prevGain) * ((float)(i + 1) / N);
       s = s * vol * g * (1.0f / 32768.0f);
       if (sound == 1) s = truckEq.run(s) * 1.6f;   // EQ removes energy; 1.6 brings the level back
-      buf[2 * i] = buf[2 * i + 1] = mixOut(s);
+      buf[2 * i] = buf[2 * i + 1] = outSample(s, i, N);
     }
   } else if (sound == 2) {
     oldSynth.block(target);
-    for (int i = 0; i < N; i++) buf[2 * i] = buf[2 * i + 1] = mixOut(oldSynth.sample());
+    for (int i = 0; i < N; i++) buf[2 * i] = buf[2 * i + 1] = outSample(oldSynth.sample(), i, N);
   } else {
     synth2.block(target, gearbox);
-    for (int i = 0; i < N; i++) buf[2 * i] = buf[2 * i + 1] = mixOut(synth2.sample());
+    for (int i = 0; i < N; i++) buf[2 * i] = buf[2 * i + 1] = outSample(synth2.sample(), i, N);
   }
   prevGain = gain;
   size_t written;
@@ -292,6 +325,8 @@ void loop() {
 
   if (millis() - lastPrint > 500) {
     lastPrint = millis();
+    static const char* const ST[] = {"OFF", "CRANK", "RUN", "STOP"};
+    Serial.printf("%s L1 %u R1 %u  ", ST[engineState.state], rcLink.get(RcLink::L1), rcLink.get(RcLink::R1));
     Serial.printf("sound %d %s  %s  L3 %u  pulse %lu us  throttle %.2f  rpm %.2f  gear %d  frames %lu, %lu bad\n",
                   sound + 1, SOUND_NAMES[sound], dataActive() ? "DATA " : "PULSE", rcLink.get(RcLink::L3),
                   (unsigned long)widthUs, target, rpm, gearbox.gear + 1, (unsigned long)rcLink.good,

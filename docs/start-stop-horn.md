@@ -1,6 +1,35 @@
-# Engine start, stop and horn (design notes, not implemented)
+# Engine start, stop and horn
 
-Status: **thinking, not a task.** Nothing here is in the firmware, the shield or the CyberBrick config files yet. These notes record what was discussed and decided on 2026-11-01 and 2026-11-02 so the work can resume later.
+## Implemented with the channel data (2026-11-06, first version, to be tried)
+
+With the receiver's channel data on a wire (`docs/cyberbrick-code/`, `Truck_with_Engine_Sound_Data.json`) the
+module sees every control of the transmitter, so the one-button design below is no longer needed. `engine_lab`
+(`include/engine_events.h`) now does:
+
+| Control | Action |
+|---|---|
+| **Left shoulder 3-position switch** (L1) = ignition: **middle = OFF, left or right = ON** | moved from the middle to either side: **starter** cranks for 1.1 s, the engine catches with a short rev and settles to idle; moved back to the middle: the engine **winds down** below idle (1.4 s) and goes silent |
+| **Throttle** while the engine is off | the engine runs at once, without the starter (the sound is never silent while the truck moves); it stays on until the switch goes ON and back to OFF |
+| **Right shoulder stick** (R1), pushed either way | **horn** (two-tone, 415 + 523 Hz), as long as it is held; works with the engine off too |
+| L Shoulder Button | unchanged: short = lights, long = start the data |
+
+- Switch values: left about 4089, middle about 1760, right about 0 (`RC_IGNITION_MID`, `RC_IGNITION_BAND` in
+  `config.h`). A new position must hold for 250 ms, so flipping from left to right through the middle does not stop
+  the engine. (First version had OFF on the right end; changed on the owner's request.)
+- When the data starts (long press) with the switch in OFF and the throttle at rest, the engine goes quiet (short
+  fade), so after the long press the engine is started with the switch.
+- Without channel data (servo pulse only, or before the long press) the engine just runs, as before; no start, stop
+  or horn.
+- The frames sometimes pause for about 0.4 s; the engine state holds over gaps up to 2 s (`RC_STATE_HOLD_MS`), so a
+  stopped engine does not blip on. Only after a longer loss does the module go back to the plain running engine.
+- The starter, the stall and the horn are synthesised in the firmware (no recordings, no licences). The samples
+  chosen below are not used.
+- Not done yet: stalling by itself after a long idle, reverse beeper.
+
+## Earlier design notes (one button through PWM3)
+
+
+Status of this part: superseded by the section above. When written: **thinking, not a task.** Nothing here was in the firmware, the shield or the CyberBrick config files yet. These notes record what was discussed and decided on 2026-11-01 and 2026-11-02 so the work can resume later.
 
 ## Idea
 

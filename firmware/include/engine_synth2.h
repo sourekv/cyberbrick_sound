@@ -56,6 +56,7 @@ class EngineSynth2 {
     load = 0.3f * throttle + 2.5f * push;
     if (load > 1.0f) load = 1.0f;
     fire = p.fireIdle + (p.fireMax - p.fireIdle) * rpm;
+    if (fire < 6.0f) fire = 6.0f;   // rpm goes below 0 while the engine stops (include/engine_events.h)
     vol = (0.55f + 0.45f * rpm) * gb.gain * p.outGain;
   }
 

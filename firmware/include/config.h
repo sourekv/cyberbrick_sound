@@ -32,6 +32,13 @@
 #define RC_THROTTLE_MID   2020   // mid_value of the L Stick Y channel in the CyberBrick config (measured rest ~1830)
 #define RC_THROTTLE_DEADZONE 250 // counts; the app uses 200, the measured rest is 190 from the mid
 #define RC_LINK_TIMEOUT_MS 300   // no frame for this long -> back to the servo pulse
+#define RC_STATE_HOLD_MS  2000   // engine on/off state survives a data gap this long (frames sometimes pause ~0.4 s)
+// Start / stop / horn from the channel data (include/engine_events.h, docs/start-stop-horn.md)
+#define RC_IGNITION_MID   1760   // left shoulder 3-position switch (L1): the middle position = ignition OFF
+#define RC_IGNITION_BAND   800   // within this of the middle = OFF; both end positions (about 0 and 4089) = ON
+#define RC_IGNITION_SETTLE_MS 250 // a new switch position must hold this long (passing the middle does not stop)
+#define RC_HORN_REST      2260   // right shoulder stick (R1) at rest, measured
+#define RC_HORN_THRESHOLD  800   // counts away from rest (either way) = horn
 
 // Virtual gearbox (see include/gearbox.h); used by the `engine` firmware family. Override with -D in platformio.ini.
 #ifndef GEARBOX_ENABLED
