@@ -6,9 +6,10 @@
 //   ignition switch (left shoulder 3-position switch, L1) moved out of OFF  -> starter cranks, engine catches
 //   ignition switch moved back to OFF                                         -> engine winds down and stops
 //   throttle moved while the engine is off                                    -> engine runs at once (no starter)
+//   after power-up                                                            -> silent until one of the above
 //   right shoulder stick (R1) pushed either way                               -> horn, as long as it is held
 //
-// Without channel data (servo pulse only) the engine just runs, as before.
+// Without channel data (servo pulse only) the engine starts with the throttle and then keeps running.
 #include <math.h>
 #include <stdint.h>
 #include "engine_synth2.h"   // SpeakerEq
@@ -102,24 +103,25 @@ class HornSound {
 class EngineState {
  public:
   enum State { OFF, CRANKING, RUNNING, STOPPING };
-  State state = RUNNING;      // without channel data the engine simply runs
-  float gain = 1.0f;          // engine sound level 0..1 (multiply the engine samples)
+  State state = OFF;          // silent after power-up until the ignition or the throttle starts the engine
+  float gain = 0.0f;          // engine sound level 0..1 (multiply the engine samples)
 
   // dataAlive: channel data present; ignitionOn: switch out of OFF; moving: throttle off rest; rpmNow: the
   // gearbox rpm of the previous block. Returns the throttle to feed to the gearbox.
   float block(bool dataAlive, bool ignitionOn, bool moving, float throttle, float dt, float rpmNow,
               StarterSound& starter) {
     override = false;
-    if (!dataAlive) {                       // servo pulse only: run as before
-      if (state != RUNNING) { state = RUNNING; flare = false; starter.stop(); }
+    if (!dataAlive) {                       // no channel data (servo pulse only): no ignition, the throttle starts it
       wasAlive = false;
-      gain = approach(gain, 1.0f, dt / 0.3f);
-      return throttle;
-    }
-    if (!wasAlive) {                        // first frames: follow the switch, quietly
+      if (state == CRANKING) { state = RUNNING; t = 0.0f; flare = false; starter.stop(); }
+      if (moving && (state == OFF || state == STOPPING)) { state = RUNNING; flare = false; }
+      if (state == RUNNING) { gain = approach(gain, 1.0f, dt / 0.3f); return throttle; }
+      ignitionOn = lastIgnition;            // keep OFF / STOPPING going below
+    } else if (!wasAlive) {                 // first frames: follow the switch
       wasAlive = true;
-      lastIgnition = ignitionOn;
+      if (ignitionOn && state == OFF) { state = CRANKING; t = 0.0f; starter.start(); }
       if (!ignitionOn && !moving && state == RUNNING) { state = STOPPING; t = 0.0f; rpm0 = rpmNow; quietStop = true; }
+      lastIgnition = ignitionOn;
     }
     if (ignitionOn && !lastIgnition && (state == OFF || state == STOPPING)) {
       state = CRANKING; t = 0.0f; starter.start();

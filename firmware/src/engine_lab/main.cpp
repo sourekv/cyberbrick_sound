@@ -292,6 +292,8 @@ void loop() {
     target = engineState.block(rcLink.alive(RC_STATE_HOLD_MS), ignition, target > 0.05f, target, dt, gearbox.rpm,
                                starter);
   }
+#else
+  target = engineState.block(false, false, true, target, dt, gearbox.rpm, starter);   // demo: always running
 #endif
   gearbox.update(target, dt);
   engineState.apply(gearbox.rpm, gearbox.gain);

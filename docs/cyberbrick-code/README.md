@@ -14,7 +14,7 @@ containing `exit`, `quit`, `open`, `eval`, `exec`, `__import__`, `subprocess`, `
 | File | Test | What you should see |
 |---|---|---|
 | `blink_test.py` | does a snippet run at all | the RGB LED on the receiver core blinks blue about 3 times a second |
-| `uart_forward.py` | forward all ten channels over a wire | the core LED flashes green once a second; `uart_probe` on the Zero prints the channels |
+| `uart_forward.py` | forward all ten channels over a wire | `uart_probe` on the Zero prints the channels (the green flash of the first version was removed on 2026-11-06) |
 
 ## Test 2 wiring (`uart_forward.py` + `uart_probe`)
 

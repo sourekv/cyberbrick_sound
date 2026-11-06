@@ -16,10 +16,10 @@ module sees every control of the transmitter, so the one-button design below is 
 - Switch values: left about 4089, middle about 1760, right about 0 (`RC_IGNITION_MID`, `RC_IGNITION_BAND` in
   `config.h`). A new position must hold for 250 ms, so flipping from left to right through the middle does not stop
   the engine. (First version had OFF on the right end; changed on the owner's request.)
-- When the data starts (long press) with the switch in OFF and the throttle at rest, the engine goes quiet (short
-  fade), so after the long press the engine is started with the switch.
-- Without channel data (servo pulse only, or before the long press) the engine just runs, as before; no start, stop
-  or horn.
+- After power-up the engine is **silent**. The data starts by itself (`Truck_with_Engine_Sound_Data.json`); if the
+  switch is already on a side when the data arrives, the starter runs at once.
+- Without channel data (servo pulse only, older configs) the engine starts with the throttle, without a starter,
+  and then keeps running; no ignition or horn.
 - The frames sometimes pause for about 0.4 s; the engine state holds over gaps up to 2 s (`RC_STATE_HOLD_MS`), so a
   stopped engine does not blip on. Only after a longer loss does the module go back to the plain running engine.
 - The starter, the stall and the horn are synthesised in the firmware (no recordings, no licences). The samples

@@ -36,17 +36,18 @@ The CODE entries follow what the receiver parser reads (`effect`, `code`); wheth
 is not known. If the app does not show the two snippets after the import, add them in the app by hand instead.
 Restore the truck afterwards with `Truck_stock.json` or `Truck_with_Engine_Sound_Button.json`.
 
-## Truck_with_Engine_Sound_Data.json (sound module on channel data)
-`Truck_stock.json` plus the data link to the sound module (made on 2026-11-06, not yet tried as a whole):
+## Truck_with_Engine_Sound_Data.json (sound module on channel data, tested 2026-11-06)
+`Truck_stock.json` plus the data link to the sound module (2026-11-06):
 
-- **L Shoulder Button**: short press = lights as in the stock truck; **long press = start sending the channel data**
-  (`docs/cyberbrick-code/uart_forward.py`, the only snippet, so nothing else can stop it).
-- **PWM4 "Sound"** (Angular 45..135 deg like PWM2 before) follows the L Stick Y channel, so the PWM4 servo port
-  carries the throttle as a servo pulse right after power-up. The long press switches the same pin to the data
-  frames. The sound module (`engine_lab`) reads both on GPIO1 and uses the data while frames arrive, the pulse
-  otherwise, so the sound works before and after the long press.
-- The servo cable for the module goes to **S4** (lower row of the right header group): S orange, G brown; V stays
-  disconnected while the Zero is on USB.
-
-Not known yet: whether the receiver's servo code takes the pin back from the UART when it updates the PWM4 output
-(then the data would stop after a while and the module would fall back to the pulse).
+- **The data starts by itself after power-up.** The L Stick X channel (unused in the truck) has its mid value moved
+  to 600 (dead zone 100), so the stick at rest (about 2130) counts as "above mid" and the receiver fires its
+  `gt_mid` event (above mid) on the first data after power-up; the event runs the Code snippet "Sound data"
+  (`docs/cyberbrick-code/uart_forward.py`). The receiver's stick events fire only on a change, and every stick
+  starts as "at mid", which is why the mid is moved instead of using an event at mid. Pushing the left stick
+  fully left and back restarts the snippet (a short gap in the data).
+- **L Shoulder Button**: short press = lights as in the stock truck; long press = start the snippet again (backup).
+- The data goes out on the **PWM4** servo port (S4): S orange, G brown to the module; V stays disconnected while the
+  Zero is on USB. PWM4 has no servo in this config (the earlier "Sound" servo there, which carried the throttle
+  pulse until the long press, was removed).
+- Sound module: `engine_lab` is silent after power-up; the ignition switch or the throttle starts the engine
+  (`docs/start-stop-horn.md`).
