@@ -117,3 +117,46 @@ Open points before trying it:
   configuration; whether it restores the application files was not checked).
 - Shared ground and a 3.3 V signal level between the receiver core and the Zero; the [USB power
   rule](bringup.md) still applies.
+
+### The "Code" option of the CyberBrick app (read from the receiver source, 2026-11-06, not tried)
+
+How a code snippet runs on the receiver (`src/app_rc/app/control.py`, `src/app_rc/bbl/executor.py` in the Bambu
+repository):
+
+- A snippet is stored in the configuration JSON (`CODE` section) and started as the action of an **event**: short or
+  long press, press or release of a button, or a stick above, at or below its centre. One snippet runs at a time;
+  starting another stops the running one.
+- It runs as full MicroPython, as an asyncio task next to the normal control loop. The executor rejects lines that
+  contain `exit`, `quit`, `sys.exit`, `os.system`, `__import__`, `open`, `eval`, `exec`, `subprocess`, `os.remove`
+  or `os.rmdir`. Importing `machine` (UART, Pin) or `rc_module` is not blocked.
+- It rewrites `time.sleep(x)` into `await asyncio.sleep(x)` and `while True:` into a loop that ends when the snippet
+  is stopped, so an endless loop is allowed and does not block the receiver.
+
+Receiver pins (constants in `src/app_rc/bbl/*.py`):
+
+| Receiver output | Core GPIO |
+|---|---|
+| PWM1, PWM2, PWM3, PWM4 (servo ports) | 3, 2, 1, 0 |
+| LED1 / buzzer 1 | 21 |
+| LED2 / buzzer 2 | 20 |
+| RGB LED on the core | 8 |
+| Board key | 9 |
+| Role pin (transmitter / receiver) | 10 |
+
+Idea: a snippet started by a button that reads `rc_module.rc_slave_data()` every 20 ms and sends the ten channels as
+a short UART frame from the **LED2 port (GPIO20)**, so all servo ports stay free. One data wire plus GND to the sound
+module, 3.3 V logic on both sides. The snippet is our own code sent through Bambu's official app, nothing in the
+receiver's files changes, and no Bambu code is copied.
+
+To find out by testing:
+
+- Whether the snippet can start by itself after power-up, or a button has to be pressed once every time.
+- Whether the LED port stays ours while the configuration does not use it for lights (the receiver resets the LED
+  ports when it reloads the configuration).
+- The UART RX pin must be set explicitly to a pin that is not used, otherwise the default may collide with the board
+  key.
+- Frame rate, frame format and checksum, and what the sound module does when frames stop (fall back to the servo
+  input).
+
+First test, without risk: receiver on the model battery, Zero on USB, only GND and the data wire between them (the
+V wire disconnected, [USB power rule](bringup.md)); a small firmware on the Zero only prints what arrives over UART.
