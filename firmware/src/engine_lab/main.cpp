@@ -10,6 +10,8 @@
 // After every switch the module beeps the number (1..7) of the sound now playing. All sounds share the throttle
 // input and the virtual gearbox (except 3, which smooths the RPM itself, as in its own firmware).
 // The BOOT button (GPIO0) only matters at power-up/reset; read later it is an ordinary button.
+// Throttle: from the receiver's channel data on GPIO1 while frames arrive (include/rc_link.h, the app Code snippet
+// docs/cyberbrick-code/uart_forward.py), otherwise from the servo pulse on the same pin.
 //
 // With -DENGINE_LAB_DEMO=1 (env engine_demo) no receiver is needed: the firmware announces each sound in turn and
 // drives it with the same 20 s throttle profile as the previews (idle, full throttle through the gears, release,
@@ -25,6 +27,7 @@
 #include "engine_truck_loaded.h"   // CC0
 #include "engine_synth.h"          // old grain synth (engine_pulse)
 #include "engine_synth2.h"         // new speaker-tuned synth
+#include "rc_link.h"               // channel data over a wire from the receiver Code snippet
 
 // Spoken announcement of the sound number and name, if the locally generated header exists
 // (tools/make_voice_prompts.ps1, Piper text-to-speech, English voice en_US-ljspeech); otherwise beeps.
@@ -56,7 +59,9 @@ void IRAM_ATTR onEdge() {
   }
 }
 
-static float readThrottle() {
+static RcLink rcLink;
+
+static float readPulseThrottle() {
   if (millis() - lastEdgeMs > PULSE_TIMEOUT_MS) return 0.0f;
   int d = (int)widthUs - PULSE_CENTER_US;
   if (d < 0) d = -d;
@@ -65,9 +70,29 @@ static float readThrottle() {
   return t > 1.0f ? 1.0f : t;
 }
 
-static bool signalPresent() {
+static bool pulsePresent() {
   return lastEdgeMs != 0 && millis() - lastEdgeMs <= PULSE_TIMEOUT_MS;
 }
+
+// Throttle 0..1 (absolute deflection, both directions): from the receiver's channel data while frames arrive,
+// otherwise from the servo pulse. Both come in on the same pin (include/rc_link.h).
+static bool dataActive() {
+#if RC_LINK_ENABLED
+  return rcLink.alive(RC_LINK_TIMEOUT_MS);
+#else
+  return false;
+#endif
+}
+
+static float readThrottle() {
+  if (dataActive()) {
+    float v = rcLink.stick(RcLink::L3, RC_THROTTLE_MID, RC_THROTTLE_DEADZONE);
+    return v < 0 ? -v : v;
+  }
+  return readPulseThrottle();
+}
+
+static bool signalPresent() { return dataActive() || pulsePresent(); }
 
 static inline float playLoop(const int16_t* data, int len, float& pos, float rate) {
   int idx = (int)pos;
@@ -184,6 +209,9 @@ void setup() {
   statusLed.begin();
   pinMode(PIN_THROTTLE_IN, INPUT);
   pinMode(PIN_BOOT_BUTTON, INPUT_PULLUP);
+#if RC_LINK_ENABLED
+  rcLink.begin(PIN_THROTTLE_IN);
+#endif
   attachInterrupt(digitalPinToInterrupt(PIN_THROTTLE_IN), onEdge, CHANGE);
 
   i2s_config_t cfg = {};
@@ -219,6 +247,9 @@ void loop() {
   int16_t buf[N * 2];  // interleaved L,R
 
   if (bootPressed()) selectSound((sound + 1) % SOUNDS);
+#if RC_LINK_ENABLED
+  rcLink.poll();
+#endif
 
 #if ENGINE_LAB_DEMO
   float target = 0.0f;
@@ -261,7 +292,9 @@ void loop() {
 
   if (millis() - lastPrint > 500) {
     lastPrint = millis();
-    Serial.printf("sound %d %s  pulse %lu us  throttle %.2f  rpm %.2f  gear %d\n", sound + 1, SOUND_NAMES[sound],
-                  (unsigned long)widthUs, target, rpm, gearbox.gear + 1);
+    Serial.printf("sound %d %s  %s  L3 %u  pulse %lu us  throttle %.2f  rpm %.2f  gear %d  frames %lu, %lu bad\n",
+                  sound + 1, SOUND_NAMES[sound], dataActive() ? "DATA " : "PULSE", rcLink.get(RcLink::L3),
+                  (unsigned long)widthUs, target, rpm, gearbox.gear + 1, (unsigned long)rcLink.good,
+                  (unsigned long)rcLink.bad);
   }
 }

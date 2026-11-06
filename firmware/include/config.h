@@ -24,6 +24,15 @@
 #define PULSE_DEADBAND_US 35   // rest value jitters 1445..1465 us
 #define PULSE_TIMEOUT_MS 150   // no pulse for this long -> treat as idle
 
+// Channel data from the receiver over a wire (include/rc_link.h, docs/cyberbrick-code/), on PIN_THROTTLE_IN as well.
+// Used instead of the servo pulse while frames arrive; raw stick values 0..4095.
+#ifndef RC_LINK_ENABLED
+#define RC_LINK_ENABLED   1
+#endif
+#define RC_THROTTLE_MID   2020   // mid_value of the L Stick Y channel in the CyberBrick config (measured rest ~1830)
+#define RC_THROTTLE_DEADZONE 250 // counts; the app uses 200, the measured rest is 190 from the mid
+#define RC_LINK_TIMEOUT_MS 300   // no frame for this long -> back to the servo pulse
+
 // Virtual gearbox (see include/gearbox.h); used by the `engine` firmware family. Override with -D in platformio.ini.
 #ifndef GEARBOX_ENABLED
 #define GEARBOX_ENABLED   1

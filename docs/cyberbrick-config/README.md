@@ -35,3 +35,18 @@ app export, **not tried yet**):
 The CODE entries follow what the receiver parser reads (`effect`, `code`); whether the app accepts them as they are
 is not known. If the app does not show the two snippets after the import, add them in the app by hand instead.
 Restore the truck afterwards with `Truck_stock.json` or `Truck_with_Engine_Sound_Button.json`.
+
+## Truck_with_Engine_Sound_Data.json (sound module on channel data)
+`Truck_stock.json` plus the data link to the sound module (made on 2026-11-06, not yet tried as a whole):
+
+- **L Shoulder Button**: short press = lights as in the stock truck; **long press = start sending the channel data**
+  (`docs/cyberbrick-code/uart_forward.py`, the only snippet, so nothing else can stop it).
+- **PWM4 "Sound"** (Angular 45..135 deg like PWM2 before) follows the L Stick Y channel, so the PWM4 servo port
+  carries the throttle as a servo pulse right after power-up. The long press switches the same pin to the data
+  frames. The sound module (`engine_lab`) reads both on GPIO1 and uses the data while frames arrive, the pulse
+  otherwise, so the sound works before and after the long press.
+- The servo cable for the module goes to **S4** (lower row of the right header group): S orange, G brown; V stays
+  disconnected while the Zero is on USB.
+
+Not known yet: whether the receiver's servo code takes the pin back from the UART when it updates the PWM4 output
+(then the data would stop after a while and the module would fall back to the pulse).
