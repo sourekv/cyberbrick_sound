@@ -1,5 +1,17 @@
 # CyberBrick configuration: Truck with Engine Sound
 
+**Current configuration (use this one): `Truck_with_Engine_Sound_Data.json`** (tested on the truck on 2026-11-06)
+together with the `engine_lab` firmware. Send it to both the transmitter and the receiver; the module's servo cable
+goes to the receiver's **S4** port. The other files are kept for reference:
+
+| File | Status |
+|---|---|
+| `Truck_with_Engine_Sound_Data.json` | **current**: channel data to the module, starts by itself; ignition, horn, lights |
+| `Truck_with_Engine_Sound.json` | older: throttle copied to PWM2 as a servo pulse |
+| `Truck_with_Engine_Sound_Button.json` | older: PWM2 plus the planned PWM3 button (superseded by the data) |
+| `Truck_Code_Test.json` | test only: the two Code snippets on one button |
+| `Truck_stock.json` | the original truck, no sound module |
+
 `Truck_with_Engine_Sound.json` is the official CyberBrick Truck configuration plus one extra servo output for the sound module:
 
 - **PWM2 (Angular)**: min 45 deg, max 135 deg, speed 100 %, initial 90 deg (about 1.0-2.0 ms pulse, 1.5 ms at the centre)
