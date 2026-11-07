@@ -40,7 +40,7 @@ PARAMS = [
     ('cap_top', 2.0, 'thickness of the cap top plate'),
     ('cap_wall', 2.5, 'cap wall outside the thread'),
     ('cap_opening_d', 37.0, 'opening in the cap for the membrane'),
-    ('cable_hole_d', 3.0, 'cable hole (TODO: must let the cable connector through)'),
+    ('cable_hole_d', 3.0, 'cable hole: set it for your cable and connector before printing (3 mm was just enough)'),
     ('cable_hole_drop', 10.5, 'cable hole centre below the start of the thread'),
 ]
 THREAD_TYPE = 'ISO Metric profile'
