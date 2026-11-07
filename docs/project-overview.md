@@ -105,4 +105,4 @@ Research and measurements are in `sound-research.md`. The constraints that decid
 - Shield: Zero in sockets or soldered; how much the PCB service assembles besides the amplifier; schematic and routing; an exact quote.
 - A long power test with the motor running, to see whether the servo-port 5 V supply holds.
 - Later, optional: spare inputs (for example a switch for an engine-stop sound), a variant for a classic RC receiver (see `shield-pcb.md`).
-- Engine start, stop and horn on one transmitter button through PWM3: rules and samples are worked out but not implemented, see `start-stop-horn.md`.
+- ~~Engine start, stop and horn on one transmitter button through PWM3~~: done differently on 2026-11-06, through the receiver's channel data on a single servo cable (S4); see `start-stop-horn.md`. More servo cables are not planned.
