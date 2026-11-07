@@ -36,8 +36,9 @@ box_volume_ml = 30;   // air volume behind the speaker (try 15 and 30 and compar
 bottom        = 3.0;
 fit           = 0.4;  // clearance around the rim and the tabs
 rim_proud     = 0.3;  // the rim stands this much above the box, so the cap presses the rim and not the box
-cable_hole_d  = 3.0;  // NOTE: set this for your cable before printing: the wires (and the connector, if it has to
-                      // go through) must pass. 3 mm was just enough for the first box, nearly needed drilling out.
+cable_hole_d  = 5.0;  // NOTE: set this for your cable before printing: the wires (and the connector, if it has to
+                      // go through) must pass. 3 mm was just enough for the bare wires of the first box; 5 mm is
+                      // for a connector of about 4.87 mm (printed holes come out a little smaller).
 cable_hole_drop = 10.5; // cable hole centre below the start of the thread (was 3 mm: the wires came out right at
                       // the edge of the cap; moved 7.5 mm lower on 2026-11-07)
 
