@@ -40,7 +40,8 @@ PARAMS = [
     ('cap_top', 2.0, 'thickness of the cap top plate'),
     ('cap_wall', 2.5, 'cap wall outside the thread'),
     ('cap_opening_d', 37.0, 'opening in the cap for the membrane'),
-    ('cable_hole_d', 3.0, 'cable hole'),
+    ('cable_hole_d', 3.0, 'cable hole (TODO: must let the cable connector through)'),
+    ('cable_hole_drop', 10.5, 'cable hole centre below the start of the thread'),
 ]
 THREAD_TYPE = 'ISO Metric profile'
 THREAD_PITCH = 2.0
@@ -191,7 +192,7 @@ def run(context):
 
         # cable hole through the wall at the notch, below the thread
         sk = box.sketches.add(box.yZConstructionPlane)
-        z = mm(total_h - p['thread_len'] - 3)
+        z = mm(total_h - p['thread_len'] - p['cable_hole_drop'])
         hole_c = sk.modelToSketchSpace(P3(0, 0, z))
         sk.sketchCurves.sketchCircles.addByCenterRadius(hole_c, mm(p['cable_hole_d'] / 2))
         for direction in (adsk.fusion.ExtentDirections.PositiveExtentDirection,

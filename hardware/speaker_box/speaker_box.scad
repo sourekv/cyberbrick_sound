@@ -6,7 +6,7 @@
 // box is airtight (a leaking box loses most of its bass). Where to put the plasticine:
 //   1. a thin roll on the ledge under the rim, all round;
 //   2. in the notch for the solder tabs, around the tabs up to the underside of the rim;
-//   3. around the wires in the cable hole, inside and outside.
+//   3. around the wires in the cable hole, inside and outside (hot glue works too: used on the first box).
 // The tabs sit in the notch, so the speaker does not turn while the cap is screwed on.
 // Print: PETG or PLA, 100 % infill or at least 4 walls, so the box itself does not resonate. The box stands on its
 // bottom, the cap on its top face. A tuft of cotton wool or foam inside is optional (acts like a larger box).
@@ -36,7 +36,10 @@ box_volume_ml = 30;   // air volume behind the speaker (try 15 and 30 and compar
 bottom        = 3.0;
 fit           = 0.4;  // clearance around the rim and the tabs
 rim_proud     = 0.3;  // the rim stands this much above the box, so the cap presses the rim and not the box
-cable_hole_d  = 3.0;
+cable_hole_d  = 3.0;  // TODO: too small for the speaker cable with its connector on; size it (or make a slot) so
+                      // the connector passes, then seal around the wires. Connector size not measured yet.
+cable_hole_drop = 10.5; // cable hole centre below the start of the thread (was 3 mm: the wires came out right at
+                      // the edge of the cap; moved 7.5 mm lower on 2026-11-07)
 
 // thread: a rounded single-start thread made by twisting an off-centre circle; prints without supports
 thread_len    = 8.0;  // length of the thread on the box
@@ -86,7 +89,7 @@ module box() {
       translate([0, -tab_w / 2 - fit, 0]) cube([tabs_d, tab_w + 2 * fit, speaker_h + 2]);
     }
     translate([0, 0, total_h - cb_h]) cylinder(d = seat_d, h = cb_h + 1);            // counterbore for the rim
-    translate([0, 0, total_h - thread_len - 3]) rotate([0, 90, 0])                    // cable hole below the thread
+    translate([0, 0, total_h - thread_len - cable_hole_drop]) rotate([0, 90, 0])      // cable hole below the thread
       cylinder(d = cable_hole_d, h = outer_d);
   }
 }
