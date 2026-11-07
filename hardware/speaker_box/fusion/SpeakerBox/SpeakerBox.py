@@ -8,7 +8,10 @@
 # updates. The air volume (VOLUME_ML below) is turned into inner_h when the script runs; to change it, edit
 # inner_h or run the script again.
 #
-# Written 2026-11-07; the project owner ran it in Fusion 360 the same day and it worked. A printed thread from the ISO table has almost no
+# Written 2026-11-07 and run in Fusion 360 the same day: the box had no wall under the thread, because the cap's
+# thread hole (cut with the cap in place on the box) also cut the box. Fixed by limiting every cut to its own part;
+# re-run the same day, and the cross-sections of box.stl and cap.stl are solid.
+# Not printed yet. A printed thread from the ISO table has almost no
 # play; if the cap is too tight, scale the cap 101 % in X and Y in the slicer (or use the slicer's hole compensation).
 
 import math
@@ -78,7 +81,14 @@ class Builder:
         prof = profile or sk.profiles.item(0)
         ei = self.comp.features.extrudeFeatures.createInput(prof, op)
         ei.setDistanceExtent(False, V(dist_expr))
+        self.own_bodies(ei, op)
         return self.comp.features.extrudeFeatures.add(ei)
+
+    def own_bodies(self, ei, op):
+        # A cut in Fusion hits every body it passes through, also in other components: the cap's thread hole, cut
+        # with the cap on the box, removed the box wall under the thread. Limit cuts to this component's bodies.
+        if op == adsk.fusion.FeatureOperations.CutFeatureOperation and self.comp.bRepBodies.count:
+            ei.participantBodies = [self.comp.bRepBodies.item(i) for i in range(self.comp.bRepBodies.count)]
 
     def cylinder_face(self, r_mm):
         for body in self.comp.bRepBodies:
@@ -87,6 +97,20 @@ class Builder:
                 if g.surfaceType == adsk.core.SurfaceTypes.CylinderSurfaceType and abs(g.radius - mm(r_mm)) < 1e-4:
                     return f
         raise RuntimeError('no cylindrical face with radius %.3f mm' % r_mm)
+
+    def merge(self):
+        # One solid per part: join any extra bodies. The first run exported only body 1, and at the thread the box STL
+        # held the thread ridge alone, without the wall under it. Returns the body count before merging.
+        bodies = self.comp.bRepBodies
+        n = bodies.count
+        if n > 1:
+            tools = adsk.core.ObjectCollection.create()
+            for i in range(1, n):
+                tools.add(bodies.item(i))
+            ci = self.comp.features.combineFeatures.createInput(bodies.item(0), tools)
+            ci.operation = adsk.fusion.FeatureOperations.JoinFeatureOperation
+            self.comp.features.combineFeatures.add(ci)
+        return n
 
     def thread(self, face, internal):
         tf = self.comp.features.threadFeatures
@@ -174,6 +198,7 @@ def run(context):
                           adsk.fusion.ExtentDirections.NegativeExtentDirection):
             ei = box.features.extrudeFeatures.createInput(sk.profiles.item(0), cut)
             ei.setOneSideExtent(adsk.fusion.DistanceExtentDefinition.create(V('30 mm')), direction)
+            b.own_bodies(ei, cut)
             feat = box.features.extrudeFeatures.add(ei)
             inside = box.bRepBodies.item(0).pointContainment(P3(mm(THREAD_D / 2 - 1), 0, z))
             if inside == adsk.fusion.PointContainment.PointOutsidePointContainment:
@@ -181,6 +206,7 @@ def run(context):
             feat.deleteMe()                             # wrong side: try the other direction
 
         box_thread = b.thread(b.cylinder_face(THREAD_D / 2), False)
+        box_bodies = b.merge()
 
         # ---- Cap (assembled on the box; print it upside down, top plate on the bed) ----
         occ = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
@@ -193,18 +219,22 @@ def run(context):
         c.extrude(c.circle(c.plane('cap_z'), 'thread_minor', minor), 'thread_len', cut)
         c.extrude(c.circle(c.plane('cap_z'), 'cap_opening_d', p['cap_opening_d']), 'thread_len + cap_top', cut)
         cap_thread = c.thread(c.cylinder_face(minor / 2), True)
+        cap_bodies = c.merge()
 
         # ---- STL export next to this script ----
         here = os.path.dirname(os.path.realpath(__file__))
         em = design.exportManager
         for comp, fname in ((box, 'box.stl'), (cap, 'cap.stl')):
-            opts = em.createSTLExportOptions(comp.bRepBodies.item(0), os.path.join(here, fname))
+            opts = em.createSTLExportOptions(comp, os.path.join(here, fname))   # all bodies of the part
             opts.meshRefinement = adsk.fusion.MeshRefinementSettings.MeshRefinementHigh
             em.execute(opts)
 
         app.activeViewport.fit()
         ui.messageBox('Speaker box done.\nBox thread: %s %s\nCap thread: %s %s\nAir volume %d ml, box height %.1f mm.\n'
-                      'STL files saved to:\n%s' % (box_thread + cap_thread + (VOLUME_ML, total_h, here)))
+                      'Bodies before merging: box %d, cap %d.\n'
+                      'STL files saved to:\n%s\n'
+                      '(cap.stl is in the assembled position: flip it in the slicer, top plate on the bed)'
+                      % (box_thread + cap_thread + (VOLUME_ML, total_h, box_bodies, cap_bodies, here)))
     except Exception:
         if ui:
             ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
