@@ -1,0 +1,10 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"script",
+	"author":	"cyberbrick_sound",
+	"description":	{
+		"":	"Sealed speaker box with a screw cap for the 40 mm speaker (see ../../speaker_box.scad)"
+	},
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true
+}
