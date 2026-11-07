@@ -8,7 +8,7 @@
 # updates. The air volume (VOLUME_ML below) is turned into inner_h when the script runs; to change it, edit
 # inner_h or run the script again.
 #
-# Written 2026-11-07 without Fusion at hand, so not tried yet. A printed thread from the ISO table has almost no
+# Written 2026-11-07; the project owner ran it in Fusion 360 the same day and it worked. A printed thread from the ISO table has almost no
 # play; if the cap is too tight, scale the cap 101 % in X and Y in the slicer (or use the slicer's hole compensation).
 
 import math
