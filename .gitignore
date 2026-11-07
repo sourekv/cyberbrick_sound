@@ -7,3 +7,5 @@ hardware/shield/shield.ses
 hardware/shield/shield.kicad_prl
 logs/
 hardware/shield/.history/
+# generated meshes: export them from speaker_box.scad or the Fusion script (speaker_box.3mf keeps a copy)
+*.stl
