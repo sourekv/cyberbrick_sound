@@ -28,7 +28,7 @@ The first real design step: the KiCad 7 schematic `hardware/shield/shield.kicad_
 - 2 layers, 29 x 30 mm, tracks 0.25 mm, clearance 0.2 mm, vias 0.6/0.3 mm, copper-to-edge 0.3 mm. J1 (right-angle header) sticks out of the top edge, the J2 speaker connector opens toward the bottom edge, test pads are on the bottom side.
 - DRC (run through pcbnew, KiCad 7 has no command-line DRC): 0 unconnected, 0 clearance / short / courtyard / edge errors. Remaining messages are warnings only: silkscreen overlaps and silkscreen clipped at the edge (J1 outline hangs outside the board), and a library-path warning from the generated footprints.
 - Manufacturing outputs in `hardware/shield/fab/`: `shield_gerbers.zip` (Gerber + drill), `shield_positions.csv`, `shield_bom.csv` (made by `tools/make_shield_outputs.py`). The BOM has values and footprints but no distributor part numbers.
-- **Not ready to order as it is.** Needs a human review in KiCad (DRC and 3D view again, silkscreen tidy-up, track widths of the 5 V path, GND stitching), the part values and exact parts (TVS, Schottky, ferrite, speaker connector) checked, the hole spacing checked with calipers, and the open decisions below answered. The routing is autorouter quality, not hand-optimised; it has not been through any signal-integrity or EMC check.
+- **Not ready to order as it is.** Needs a human review in KiCad (DRC and 3D view again, silkscreen tidy-up, track widths of the 5 V path, GND stitching), the part values and exact parts (TVS, Schottky, ferrite, speaker connector) checked, and the open decisions below answered. The routing is autorouter quality, not hand-optimised; it has not been through any signal-integrity or EMC check.
 
 ## On the board
 
@@ -48,7 +48,12 @@ Mock of the layout (top view, illustrative placement, not routed). An interactiv
 
 The receiver shield (XA004) is 29 x 30 mm with four corner holes: 2.7 mm in diameter with a copper ring of about 5.7 mm (from the manufacturer's product image, reference only, not stored here), centred 3.0 mm from the board edges. The spacing is **23.0 x 24.0 mm** according to the CAD model of the community "CyberBrick Remote Control Receiver Test Housing" (its four heat-set insert holes of 3.1 mm are at +-11.5 / +-12.0 mm from the centre; the pocket for the board is 30 x 31 mm); the product image gives the same within its reading error. The test housing is only a size reference: our board needs the servo input and the speaker output and does not go into that housing. Our board is therefore a plain rectangle of the same size as the receiver shield (29 x 30 mm) with the same four holes, and the Zero (18 x 23.5 mm) sits in the middle, as drawn above.
 
-To check before ordering: measure the hole spacing and diameter with calipers on the real receiver, and find out which way the receiver sits in its housing (the J1 and J2 plugs must stay accessible). A screw head of 4.5 mm leaves only about 0.25 mm to the corner of the Zero, so use a low or countersunk head or shift the Zero. The screw size is not known (the housing's 3.1 mm holes are for heat-set inserts, probably M2, and the 2.7 mm board holes would also take M2.5).
+**Confirmed 2026-11-07 from the official CAD model** of the receiver ("Remote Control Receiver-XA003-XA004", STEP from
+Bambu Lab, assembly `PCBA-V2000_ASM`, board `PCB-V2000`; not stored here): board 29.0 x 30.0 mm, four holes of 2.7 mm at
++-11.5 / +-12.0 mm from the centre, so **23.0 x 24.0 mm** apart and 3.0 mm from the edges, with a 6.0 mm copper ring. Our
+board (`hardware/shield/shield.kicad_pcb`) has the same outline and holes. No caliper measurement needed for the holes.
+
+To check before ordering: find out which way the receiver sits in its housing (the J1 and J2 plugs must stay accessible). A screw head of 4.5 mm leaves only about 0.25 mm to the corner of the Zero, so use a low or countersunk head or shift the Zero. The screw size is not known (the housing's 3.1 mm holes are for heat-set inserts, probably M2, and the 2.7 mm board holes would also take M2.5).
 
 ## Connectors used by CyberBrick
 
