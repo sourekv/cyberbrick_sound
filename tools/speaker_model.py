@@ -1,29 +1,36 @@
 #!/usr/bin/env python3
 """Approximate "as heard from the speaker" preview, built from the measured speaker response.
 
-Uses docs/measurements/speaker_baseline_2026-11-01.csv (40 mm prototype speaker, phone 5 cm in front):
+Two measured setups of the 40 mm prototype speaker (phone 5 cm in front), chosen with SPEAKER (default "box30"):
+- "box30": in the 30 ml sealed box, docs/measurements/speaker_box30_2026-11-07.csv (the current hardware);
+- "bare":  the bare speaker on a table, docs/measurements/speaker_baseline_2026-11-01.csv.
 - the frequency response (relative dB) is applied as a zero-phase filter; below the measured range it is
   held at FLOOR_DB, so bass that the speaker cannot play disappears;
-- the strong distortion below about 300 Hz is imitated by adding 2nd and 3rd harmonics of the low band.
-  The amounts are set so that a 200 Hz sine at 0.25 of full scale gets about -9 dB 2nd and -15 dB 3rd
-  harmonic, as measured; louder bass distorts more, like a real speaker cone at its excursion limit.
+- the distortion below about 300 Hz is imitated by adding 2nd and 3rd harmonics of the low band. The amounts
+  are set so that a 200 Hz sine at 0.25 of full scale gets the measured harmonics (bare: about -9 dB 2nd and
+  -15 dB 3rd; box: about -25 dB and -39 dB); louder bass distorts more, like a cone at its excursion limit.
 
 This is a listening aid, not a calibrated model: the phone microphone is part of the measurement, and the
 distortion model is a rough fit. Compare candidates with it, then confirm on the real speaker.
 
 Library use:  from speaker_model import as_heard;  y = as_heard(x, rate)   (x: numpy float array, -1..1)
-Command line: python tools/speaker_model.py in.wav out.wav
+Command line: python tools/speaker_model.py in.wav out.wav      (SPEAKER=bare for the bare-speaker measurement)
 Needs numpy.
 """
 import csv, os, sys, wave
 import numpy as np
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-CSV = os.path.join(ROOT, "docs", "measurements", "speaker_baseline_2026-11-01.csv")
+SETUPS = {
+    # csv, 2nd-harmonic coefficient a (a*A/2 at amplitude A), 3rd-harmonic coefficient b (b*A^2/4)
+    "bare": ("speaker_baseline_2026-11-01.csv", 2.84, 11.4),   # -9 dB / -15 dB at A = 0.25
+    "box30": ("speaker_box30_2026-11-07.csv", 0.45, 0.72),     # -25 dB / -39 dB at A = 0.25
+}
+SPEAKER = os.environ.get("SPEAKER", "box30")
+_csv, HD2_COEF, HD3_COEF = SETUPS[SPEAKER]
+CSV = os.path.join(ROOT, "docs", "measurements", _csv)
 FLOOR_DB = -45.0      # level for frequencies the speaker does not play at all
 LOW_SPLIT_HZ = 300.0  # band that distorts
-HD2_COEF = 2.84       # 2nd-harmonic term: a*A/2 = 0.355 (-9 dB) at A = 0.25
-HD3_COEF = 11.4       # 3rd-harmonic term: b*A^2/4 = 0.178 (-15 dB) at A = 0.25
 
 
 def _response():

@@ -65,3 +65,30 @@ recording, so its first 1.5 s are missing; the third did not play). Relative to 
 - strong distortion below about 300 Hz at this level (second and third harmonic only 9 to 11 dB below the fundamental, the third
   harmonic is stronger than the fundamental around 170 Hz); clean at 1 kHz (-39 dB and below), the third harmonic is
   -15 to -25 dB between 2 and 6 kHz.
+
+### 2026-11-07: the same speaker in the 30 ml sealed box
+
+`docs/measurements/speaker_box30_2026-11-07.csv` and `.png`, comparison with the bare speaker in
+`speaker_box30_vs_bare_2026-11-07.png`. Box from `hardware/speaker_box` (OpenSCAD version, screw cap; the rim held only by the
+cap, no plasticine under it; cable hole sealed with hot glue). Phone 5 cm in front, all three sweeps recorded.
+
+| | bare speaker | 30 ml box |
+|---|---|---|
+| within -3 dB | 212 Hz to 8 kHz | 159 Hz to 4.3 kHz |
+| within -6 dB | | 119 Hz to 7.2 kHz |
+| 150 Hz | -22 dB | -6 dB |
+| 200 / 300 / 450 Hz | -5 / -5 / +8 dB | +8 / +12 / +18 dB (peak +19 dB at 424 Hz) |
+| 2nd / 3rd harmonic at 200 Hz | -9 / -16 dB | -25 / -39 dB |
+| 2nd / 3rd harmonic at 300 Hz | -11 / -9 dB | -33 / -46 dB |
+
+- The box removes the acoustic short circuit of the open back: the speaker now plays down to about 120 Hz instead of stopping
+  at about 200 Hz. So the steep cut of the bare measurement was the speaker, not a high-pass in the phone.
+- The air in the box also holds the cone back: distortion below 500 Hz falls by 15 to 35 dB.
+- The price is a strong resonance hump, +12 to +19 dB from 300 to 500 Hz relative to 1 to 3 kHz (boomy), and a little less
+  top (-5 to -7 dB around 5 kHz). The speaker EQ in the firmware (`SPEAKER_EQ` in `tools/engine_lab.py`: high-pass at 260 Hz,
+  -7 dB at 450 Hz) was made for the bare speaker and needs a new version for the box.
+- New speaker EQ for the box (`SPEAKER_EQ_BOX` in `tools/engine_lab.py`, now the default and in the firmware): high-pass
+  at 140 Hz, -15 dB at 420 Hz, -6 dB at 315 Hz, +5 dB at 5.3 kHz, gain 1.15 for the same peak level as before. Fitted to
+  this measurement (flat within about +-2 dB from 200 Hz to 5 kHz); listened to with `engine_demo` in the box on 2026-11-07:
+  "dojem je dobrý" (a good impression). `tools/speaker_model.py` now previews the box by default (`SPEAKER=bare` for the old one).
+- Not yet measured: the box with plasticine under the rim. The 15 ml box is not planned (the 30 ml one works well).

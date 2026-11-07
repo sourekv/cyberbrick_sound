@@ -87,11 +87,20 @@ def biquad(kind, f0, q, gain_db=0.0, fs=RATE):
     return [b[0] / a[0], b[1] / a[0], b[2] / a[0], a[1] / a[0], a[2] / a[0]]
 
 
-# Speaker EQ, from the measurement (docs/speaker-measurement.md): 4th-order high-pass at 260 Hz (keeps the
-# energy away from where the cone distorts and plays nothing), -7 dB at the 450 Hz resonance, +4 dB in the
-# 2-3 kHz dip.
-SPEAKER_EQ = [biquad("hp", 260, 0.5412), biquad("hp", 260, 1.3066),
-              biquad("peak", 450, 1.2, -7.0), biquad("peak", 2500, 0.9, 4.0)]
+# Speaker EQ, from the measurements (docs/speaker-measurement.md).
+# Bare speaker (2026-11-01): 4th-order high-pass at 260 Hz (keeps the energy away from where the cone distorts and
+# plays nothing), -7 dB at the 450 Hz resonance, +4 dB in the 2-3 kHz dip.
+SPEAKER_EQ_BARE = [biquad("hp", 260, 0.5412), biquad("hp", 260, 1.3066),
+                   biquad("peak", 450, 1.2, -7.0), biquad("peak", 2500, 0.9, 4.0)]
+# Speaker in the 30 ml sealed box (2026-11-07), fitted to the measurement (flat within about +-2 dB from 200 Hz to
+# 5 kHz): 4th-order high-pass at 140 Hz (the box lets the speaker play down to about 120 Hz), -15 dB at the 420 Hz
+# box resonance plus -6 dB at 315 Hz for its lower flank, +5 dB at 5.3 kHz where the box lost some top.
+# BOX_EQ_GAIN brings the level back after the cuts (same peak level as with the bare-speaker EQ).
+BOX_EQ_GAIN = 1.15
+SPEAKER_EQ_BOX = [biquad("hp", 140, 0.5412), biquad("hp", 140, 1.3066),
+                  biquad("peak", 420, 1.6, -15.0), biquad("peak", 315, 1.3, -6.0), biquad("peak", 5300, 2.4, 5.0)]
+SPEAKER_EQ_BOX[0] = [c * BOX_EQ_GAIN for c in SPEAKER_EQ_BOX[0][:3]] + SPEAKER_EQ_BOX[0][3:]
+SPEAKER_EQ = SPEAKER_EQ_BOX
 
 
 class Chain:
