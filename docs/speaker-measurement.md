@@ -91,4 +91,29 @@ cap, no plasticine under it; cable hole sealed with hot glue). Phone 5 cm in fro
   at 140 Hz, -15 dB at 420 Hz, -6 dB at 315 Hz, +5 dB at 5.3 kHz, gain 1.15 for the same peak level as before. Fitted to
   this measurement (flat within about +-2 dB from 200 Hz to 5 kHz); listened to with `engine_demo` in the box on 2026-11-07:
   "dojem je dobrý" (a good impression). `tools/speaker_model.py` now previews the box by default (`SPEAKER=bare` for the old one).
-- Not yet measured: the box with plasticine under the rim. The 15 ml box is not planned (the 30 ml one works well).
+- Not yet measured: the box with plasticine under the rim.
+
+### 2026-11-08: the 15 ml sealed box
+
+`docs/measurements/speaker_box15_2026-11-08.csv` and `.png`; comparison with the bare speaker and the 30 ml box in
+`speaker_box15_vs_box30_2026-11-08.png`. Same speaker, same cap, phone 5 cm in front. The first recording was made before
+the cable hole was sealed (`speaker_box15_unsealed_2026-11-08.csv` / `.png`); the second after sealing it with hot glue.
+
+| | 30 ml box | 15 ml, cable hole open | 15 ml box (sealed) |
+|---|---|---|---|
+| within -3 dB | 159 Hz to 4.3 kHz | 178 Hz to 7.2 kHz | 178 Hz to 4.8 kHz |
+| 150 Hz | -5 dB | -7 dB | -10 dB |
+| 200 / 300 / 450 Hz | +8 / +12 / +18 dB | +3 / +6 / +15 dB | +4 / +8 / +18 dB |
+| resonance peak | +19 dB at 424 Hz | +15 dB at 534 Hz | +18 dB at 449 Hz |
+| 2nd / 3rd harmonic at 200 Hz | -25 / -39 dB | -18 / -4 dB | -32 / -37 dB |
+| 2nd / 3rd harmonic at 300 Hz | -33 / -46 dB | -16 / -13 dB | -34 / -43 dB |
+
+- **An open cable hole ruins the box**: with the hole open the distortion below 300 Hz was as bad as with the bare speaker
+  (the 3rd harmonic even above the fundamental at 150 to 180 Hz) and the resonance moved up. Air pushed through the small
+  hole is noisy and the box no longer holds the cone back. Sealing the hole fixed it. (The first guess, rattling solder
+  tabs in the tight notch, was wrong; the notch was widened anyway, see `hardware/speaker_box`.)
+- **Sealed, 15 ml is only a little worse than 30 ml**: above about 450 Hz the two boxes are nearly the same; below it the
+  15 ml box gives 4 to 5 dB less (at 150 Hz -10 instead of -5 dB), the resonance is a little higher (449 instead of
+  424 Hz). Distortion is about as low as in the 30 ml box.
+- So the smaller box costs some low bass but works; the 30 ml box stays the better one where it fits. `SPEAKER_EQ_BOX` was
+  fitted to the 30 ml box; with the 15 ml box it is close, with slightly less bass. A separate EQ was not made.

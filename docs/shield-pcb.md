@@ -62,6 +62,7 @@ From the Maker's Supply CyberBrick user's manual (the Bambu store page names onl
 ## Decided
 
 - Board size and shape: CyberBrick-sized rectangle (29 x 30 mm) with the four CyberBrick mounting holes (23.0 x 24.0 mm), Zero in the middle.
+- **Flashing with the servo cable plugged in must be safe** (requirement from the project owner, 2026-11-08): the module hangs on one cable and the V wire cannot be unplugged on its own. The OR-ing diode D2 stops the USB 5 V from flowing into the receiver, and the servo 5 V reaches the Zero's 5V pad (= USB VBUS) only through D2, about 0.3 V lower than USB, so normally nothing flows back into the computer either. The breadboard rule (never USB and V together) applies only to the prototype without D2. To check on the first boards: voltages and currents with USB and the receiver connected at the same time.
 - Power LED on the board (from the servo-port 5 V); the signal status is shown by the Zero's RGB LED in firmware.
 - No spare GPIO header in this iteration, to keep the scope small (see "Out of scope").
 - Servo input J1 stays a 3-pin right-angle pin header (male) for now; it mates with a female-to-female servo/Dupont cable to PWM4 (S4, data configuration) or PWM2 (pulse configuration). It is the only servo input. A female socket (so that a standard servo extension cable could be used) is left as a possible later change.

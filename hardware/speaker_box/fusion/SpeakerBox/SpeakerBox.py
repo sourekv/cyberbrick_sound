@@ -32,7 +32,9 @@ PARAMS = [
     ('magnet_d', 34.45, 'magnet diameter'),
     ('basket_d', 35.5, 'basket without the tabs'),
     ('tab_w', 23.26, 'width of the solder tab strip'),
-    ('fit', 0.4, 'clearance around the rim and the tabs'),
+    ('fit', 0.4, 'clearance around the rim'),
+    ('notch_side', 1.0, 'clearance on each side of the solder tab strip (was 0.4: too tight)'),
+    ('notch_radial', 0.8, 'clearance beyond the solder tabs towards the wall (was 0.4: too tight)'),
     ('bottom', 3.0, 'bottom thickness'),
     ('rim_proud', 0.3, 'the rim stands this much above the box, so the cap presses the rim'),
     ('thread_d', 48.0, 'nominal thread diameter (ISO metric M48)'),
@@ -42,6 +44,7 @@ PARAMS = [
     ('cap_opening_d', 37.0, 'opening in the cap for the membrane'),
     ('cable_hole_d', 5.0, 'cable hole: set it for your cable and connector before printing (connector about 4.87 mm)'),
     ('cable_hole_drop', 10.5, 'cable hole centre below the start of the thread'),
+    ('chamfer', 0.6, '45 deg chamfer on the edges that lie on the bed: box bottom, cap top'),
 ]
 THREAD_TYPE = 'ISO Metric profile'
 THREAD_PITCH = 2.0
@@ -98,6 +101,21 @@ class Builder:
                 if g.surfaceType == adsk.core.SurfaceTypes.CylinderSurfaceType and abs(g.radius - mm(r_mm)) < 1e-4:
                     return f
         raise RuntimeError('no cylindrical face with radius %.3f mm' % r_mm)
+
+    def chamfer_circle(self, r_mm, z_mm, dist_expr):
+        # 45 deg chamfer on the circular outer edge with radius r_mm at height z_mm (model space)
+        for body in self.comp.bRepBodies:
+            for e in body.edges:
+                g = e.geometry
+                if (g.curveType == adsk.core.Curve3DTypes.Circle3DCurveType and abs(g.radius - mm(r_mm)) < 1e-4
+                        and abs(g.center.z - mm(z_mm)) < 1e-4):
+                    edges = adsk.core.ObjectCollection.create()
+                    edges.add(e)
+                    cf = self.comp.features.chamferFeatures
+                    ci = cf.createInput2()
+                    ci.chamferEdgeSets.addEqualDistanceChamferEdgeSet(edges, V(dist_expr), False)
+                    return cf.add(ci)
+        raise RuntimeError('no circular edge with radius %.3f mm at z %.3f mm' % (r_mm, z_mm))
 
     def merge(self):
         # One solid per part: join any extra bodies. The first run exported only body 1, and at the thread the box STL
@@ -178,10 +196,11 @@ def run(context):
         b.extrude(b.circle(b.plane('bottom'), 'inner_d', inner_d), 'inner_h + 1 mm', cut)
         b.extrude(b.circle(b.plane('total_h - cb_h'), 'rim_d + fit', p['rim_d'] + p['fit']), 'cb_h + 1 mm', cut)
 
-        # notch for the solder tabs: the part of a circle (tabs_d + 2 fit) between y = +-(tab_w / 2 + fit), x > 0
+        # notch for the solder tabs: the part of a circle (tabs_d + 2 notch_radial) between
+        # y = +-(tab_w / 2 + notch_side), x > 0
         sk = box.sketches.add(b.plane('total_h - cb_h - speaker_h - 1 mm'))
-        r = mm((p['tabs_d'] + 2 * p['fit']) / 2)
-        w = mm(p['tab_w'] / 2 + p['fit'])
+        r = mm((p['tabs_d'] + 2 * p['notch_radial']) / 2)
+        w = mm(p['tab_w'] / 2 + p['notch_side'])
         xc = math.sqrt(r * r - w * w)
         lines = sk.sketchCurves.sketchLines
         lines.addByTwoPoints(P3(0, -w), P3(xc, -w))
@@ -208,6 +227,7 @@ def run(context):
 
         box_thread = b.thread(b.cylinder_face(THREAD_D / 2), False)
         box_bodies = b.merge()
+        b.chamfer_circle((THREAD_D - 1) / 2, 0.0, 'chamfer')            # bottom edge, on the bed
 
         # ---- Cap (assembled on the box; print it upside down, top plate on the bed) ----
         occ = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
@@ -221,6 +241,8 @@ def run(context):
         c.extrude(c.circle(c.plane('cap_z'), 'cap_opening_d', p['cap_opening_d']), 'thread_len + cap_top', cut)
         cap_thread = c.thread(c.cylinder_face(minor / 2), True)
         cap_bodies = c.merge()
+        cap_top_z = total_h + p['rim_proud'] + p['cap_top']           # cap_z + thread_len + cap_top
+        c.chamfer_circle(cap_d / 2, cap_top_z, 'chamfer')               # top edge, on the bed when printed
 
         # ---- STL export next to this script ----
         here = os.path.dirname(os.path.realpath(__file__))

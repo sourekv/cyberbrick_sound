@@ -34,7 +34,9 @@ tab_w        = 23.26; // width of the solder tab strip with the wires, along the
 
 box_volume_ml = 30;   // air volume behind the speaker (try 15 and 30 and compare)
 bottom        = 3.0;
-fit           = 0.4;  // clearance around the rim and the tabs
+fit           = 0.4;  // clearance around the rim
+notch_side    = 1.0;  // clearance on each side of the solder tab strip, along the rim (was 0.4: too tight, 2026-11-08)
+notch_radial  = 0.8;  // clearance beyond the tabs towards the wall (was 0.4: too tight; leaves a 1.4 mm wall)
 rim_proud     = 0.3;  // the rim stands this much above the box, so the cap presses the rim and not the box
 cable_hole_d  = 5.0;  // NOTE: set this for your cable before printing: the wires (and the connector, if it has to
                       // go through) must pass. 3 mm was just enough for the bare wires of the first box; 5 mm is
@@ -51,6 +53,7 @@ thread_r      = 23.4; // outer radius of the box thread
 cap_top       = 2.0;  // thickness of the cap's top plate
 cap_wall      = 2.0;
 cap_opening_d = 37.0; // the cap covers (rim_d - cap_opening_d) / 2 = 1.35 mm of the rim
+chamfer       = 0.6;  // 45 deg chamfer on the edges that lie on the bed: box bottom, cap top (no elephant foot)
 
 $fn = 96;
 
@@ -77,7 +80,8 @@ module thread(r, h) {
 module box() {
   difference() {
     union() {
-      cylinder(d = outer_d, h = total_h - thread_len);
+      cylinder(d1 = outer_d - 2 * chamfer, d2 = outer_d, h = chamfer);               // chamfered bottom edge
+      translate([0, 0, chamfer]) cylinder(d = outer_d, h = total_h - thread_len - chamfer);
       translate([0, 0, total_h - thread_len]) intersection() {
         thread(thread_r, thread_len);
         cylinder(r1 = thread_r, r2 = thread_r - 0.6, h = thread_len);   // chamfer at the top for an easy start
@@ -86,8 +90,8 @@ module box() {
     }
     translate([0, 0, bottom]) cylinder(d = inner_d, h = inner_h + 1);                 // cavity
     translate([0, 0, total_h - cb_h - speaker_h - 1]) intersection() {               // notch for the solder tabs
-      cylinder(d = tabs_d + 2 * fit, h = speaker_h + 2);
-      translate([0, -tab_w / 2 - fit, 0]) cube([tabs_d, tab_w + 2 * fit, speaker_h + 2]);
+      cylinder(d = tabs_d + 2 * notch_radial, h = speaker_h + 2);
+      translate([0, -tab_w / 2 - notch_side, 0]) cube([tabs_d, tab_w + 2 * notch_side, speaker_h + 2]);
     }
     translate([0, 0, total_h - cb_h]) cylinder(d = seat_d, h = cb_h + 1);            // counterbore for the rim
     translate([0, 0, total_h - thread_len - cable_hole_drop]) rotate([0, 90, 0])      // cable hole below the thread
@@ -98,7 +102,10 @@ module box() {
 // The cap as printed: top plate on the bed (z = 0), thread upwards.
 module cap() {
   difference() {
-    cylinder(d = cap_d, h = cap_h);
+    union() {
+      cylinder(d1 = cap_d - 2 * chamfer, d2 = cap_d, h = chamfer);                    // chamfered top edge (on the bed)
+      translate([0, 0, chamfer]) cylinder(d = cap_d, h = cap_h - chamfer);
+    }
     translate([0, 0, -1]) cylinder(d = cap_opening_d, h = cap_top + 2);
     translate([0, 0, cap_top]) thread(thread_r + thread_gap, thread_len + 1);
     translate([0, 0, cap_h - 0.6]) cylinder(r1 = thread_r - thread_depth + thread_gap, r2 = thread_r + thread_gap + 0.6, h = 0.61);
