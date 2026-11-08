@@ -48,4 +48,5 @@ the reason no longer holds.
 | Sealing the speaker rim with plasticine only | 2026-11-07 | the owner found plasticine impractical (no TPU at hand for a printed seal either) | a screw cap that presses the rim | `hardware/speaker_box/speaker_box.scad` |
 | A barrel-shaped box | 2026-11-08 | at these frequencies only the air volume matters, not the shape | the plain cylinder | `speaker-measurement.md` |
 | Foam on the bottom of the box | 2026-11-08 | measured: no change | empty box | `speaker-measurement.md` |
+| A flat or a polygon outside on the test box, so it does not roll when laid on its side | 2026-11-08 | the box is only a test fixture and does not go into the model; a reprint brings nothing (put it on its bottom or under a bit of plasticine) | the enclosure for the model will be designed from scratch around the chosen speaker; it can have a flat or a mounting foot then | `hardware/speaker_box/speaker_box.scad` |
 | Further box experiments | 2026-11-08 | the 30 ml (and 15 ml) box already works well | if the sound must improve: a larger or different speaker, or a different amplifier / converter | `speaker-measurement.md` |
