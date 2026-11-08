@@ -13,7 +13,7 @@ containing `exit`, `quit`, `open`, `eval`, `exec`, `__import__`, `subprocess`, `
 
 | File | Test | What you should see |
 |---|---|---|
-| `blink_test.py` | does a snippet run at all | the RGB LED on the receiver core blinks blue about 3 times a second |
+| `blink_test.py` | does a snippet run at all | the RGB LED on the receiver (Remote Control Receiver Shield - XA003 XA004) blinks blue about 3 times a second |
 | `uart_forward.py` | forward all ten channels over a wire | `uart_probe` on the Zero prints the channels (the green flash of the first version was removed on 2026-11-06) |
 
 ## Test 2 wiring (`uart_forward.py` + `uart_probe`)
@@ -33,7 +33,7 @@ data bytes.
 
 ## Results (2026-11-06)
 
-- **Test 1 passed**: a short press of the L Shoulder Button made the RGB LED on the receiver core blink blue. The app
+- **Test 1 passed**: a short press of the L Shoulder Button made the RGB LED on the receiver (Remote Control Receiver Shield - XA003 XA004) blink blue. The app
   accepted the hand-written `Truck_Code_Test.json` and showed both snippets.
 - **Test 2 passed**: the UART snippet on the PWM4 servo header (GPIO0) delivered frames to `uart_probe` on Zero
   GPIO1, **about 27 frames/s with zero checksum errors** over several thousand frames (the snippet asks every 20 ms;

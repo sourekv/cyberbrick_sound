@@ -6,17 +6,17 @@ The Bambu Lab CyberBrick is an RC kit without sound. This project adds an **engi
 
 ## How the module gets the throttle
 
-The CyberBrick receiver has four servo ports (S, V, G: signal, 5 V, ground). In the CyberBrick app the throttle stick is mapped twice: to the motor port M1 (the real throttle) and also to an angular servo on **PWM2**, a copy of the same stick. The module reads only that copy and takes its power from the same port.
+The CyberBrick receiver has four servo headers (S, V, G: signal, 5 V, ground). The module hangs on **one servo cable to the S4 header**, which carries both its power and **all transmitter channels as serial data** (since 2026-11-06):
 
-- Signal on PWM2: 50 Hz, about 3.3 V, pulse 977 to 1973 us, rest at about 1455 us (measured on the real receiver).
+- A small program of ours on the receiver in the model (CyberBrick Remote Control Receiver Shield - XA003 XA004; "Sound data", `cyberbrick-code/uart_forward.py`, stored in the config as a Code module) reads all ten channels every 20 ms and sends them from S4 (GPIO0) at 115200 baud 8N1: a 23-byte frame `A5 5A`, ten 16-bit values little endian `[L1 L2 L3 R1 R2 R3 K1 K2 K3 K4]`, XOR. Measured: about 27 frames per second, no checksum errors.
+- The program is started by the transmitter (CyberBrick Remote Control Transmitter Shield - XA003 XA005): a moved stick centre in the transmitter's part of the config (L2) fires its event right after power-up; a long press of the left shoulder button starts it again. Bambu's firmware is unchanged on both boards, only the configuration was changed. What we added where: `controls.md`.
+- The module reads the frames on GPIO1 through a 1 kOhm resistor. The throttle is the left stick (L3) as the deflection from its centre with a dead band (`RC_THROTTLE_*` in `config.h`), so forward and reverse both raise the sound. The other channels give the ignition (L1 switch) and the horn (R1).
 - Supply on the V pin: about 4.94 V. The module draws about 57 mA idle and 105 mA at full throttle (`MASTER_VOLUME` 0.6, 40 mm speaker).
-- Because the original path to the motor is untouched, **no pass-through connector is needed**. PWM2 is dedicated to the sound module; nothing else may be connected there (a servo would follow the throttle).
-- The stick self-centres and the firmware uses the deflection from the centre, so forward and reverse both raise the sound.
+- Because the original path to the motor (M1) is untouched, **no pass-through connector is needed**. S4 is dedicated to the sound module.
 
-Details and the measurement table: `bringup.md`; app mapping: `cyberbrick-config/`.
+Older variant, still accepted by the firmware on the same input: the throttle stick mapped a second time to an angular servo on **PWM2** (`Truck_with_Engine_Sound.json`), read as a servo pulse: 50 Hz, about 3.3 V, 977 to 1973 us, rest at about 1455 us (measured on the real receiver). It gives only the throttle, no ignition or horn.
 
-Since 2026-11-06 the current configuration sends **all transmitter channels as serial data** from the S4 header instead
-of the PWM2 copy (the firmware still accepts the pulse). Controls, the receiver program and its auto-start: `controls.md`.
+Controls, the receiver program and its auto-start: `controls.md`; measurements: `bringup.md`; configurations: `cyberbrick-config/`.
 
 ## Hardware
 
@@ -28,7 +28,7 @@ of the PWM2 copy (the firmware still accepts the pulse). Controls, the receiver 
 
 | Part | Role |
 |---|---|
-| Waveshare ESP32-S3-Zero-N8R8-M | controller; reads the pulse on GPIO1 through a 1 kOhm resistor; I2S on GPIO4 (DIN), GPIO5 (BCLK), GPIO6 (LRC); onboard RGB LED (GPIO21) for status |
+| Waveshare ESP32-S3-Zero-N8R8-M | controller; reads the receiver's channel data (or the older servo pulse) on GPIO1 through a 1 kOhm resistor; I2S on GPIO4 (DIN), GPIO5 (BCLK), GPIO6 (LRC); onboard RGB LED (GPIO21) for status |
 | MAX98357A breadboard module | I2S class-D amplifier; the firmware sends the same sample on both channels because the amplifier outputs (L+R)/2 |
 | 40 mm speaker (4 Ohm) | prototype speaker |
 
@@ -40,8 +40,8 @@ A carrier board ("shield") that replaces the loose wires. Scope and component li
 
 The real KiCad design is in `hardware/shield/` (schematic `shield.kicad_sch`, board `shield.kicad_pcb`, manufacturing files in `fab/`); details and open review points in `shield-pcb.md`. Top and bottom renders: ![top](shield-pcb-top.png) ![bottom](shield-pcb-bottom.png)
 
-- **Size and holes:** 29 x 30 mm, the size of the CyberBrick receiver shield, with the same four mounting holes (2.7 mm, spacing 23.0 x 24.0 mm, taken from the CAD model of the community test housing). The Zero (18 x 23.5 mm) sits in the middle in two 9-pin female header strips; most parts are in the gap under it.
-- **Input J1:** 3-pin right-angle male header at the USB end (S, V, G) for the servo cable to PWM2.
+- **Size and holes:** 29 x 30 mm, the size of the CyberBrick receiver shield, with the same four mounting holes (2.7 mm, spacing 23.0 x 24.0 mm, confirmed on 2026-11-07 from the official CAD model of the receiver). The Zero (18 x 23.5 mm) sits in the middle in two 9-pin female header strips; most parts are in the gap under it.
+- **Input J1:** 3-pin right-angle male header at the USB end (S, V, G) for the servo cable to the receiver's S4 header (channel data and power).
 - **Protection and power:** 1 kOhm series resistor and 100 kOhm pull-down on the signal, resettable fuse, Schottky reverse-polarity diode, an OR-ing diode so USB and servo-port 5 V can be connected together, 100 uF bulk and ceramic decoupling capacitors.
 - **Amplifier:** bare MAX98357A chip (TQFN-16), to be **assembled by a PCB service** because it cannot be hand-soldered in practice. No plug-in breakout module.
 - **Speaker J2:** JST SH 1.0 mm 2-pin side-entry connector, the same type as the CyberBrick motor and button ports. The CyberBrick kit contains a suitable 10 cm cable (bag B-IC004), and SH 1.0 pigtails are cheap, so users need no crimping.
@@ -62,8 +62,9 @@ Every firmware shares the pins and constants in `include/config.h`. Environments
 | `engine_truck` | real truck idle loop (CC0) with the virtual gearbox and a second "under load" loop blended in with the throttle |
 | `engine_gears` | test: a separate CC0 truck loop for each of the 5 gears (0.75x..1.3x playback), crossfade at a shift, gear number announced with 1..5 beeps |
 | `engine_real` | experiment with owner-supplied recordings (not in the repo, licence unknown) |
+| `engine_lab` | the current firmware: all engine-sound candidates (the BOOT button switches 1..6 and beeps the number), ignition, starter, stop and horn from the channel data, speaker EQ for the 30 ml box |
 
-How it works: a pin interrupt measures the pulse width; the throttle is the deflection from the centre with a dead band and a timeout (no pulse for 150 ms means idle); the RPM is smoothed (rises faster than it falls); the I2S output is written in blocks of 128 samples at 22.05 kHz.
+How it works: the module reads the channel frames from the receiver (`include/rc_link.h`) or, with an older configuration, measures the servo pulse width with a pin interrupt; the throttle is the deflection from the centre with a dead band and a timeout (no data or pulse for 150 ms means idle); the RPM is smoothed (rises faster than it falls); the I2S output is written in blocks of 128 samples at 22.05 kHz.
 
 Extras in the `engine*` firmware:
 
@@ -86,6 +87,7 @@ Research and measurements are in `sound-research.md`. The constraints that decid
 
 - Throttle copy on PWM2: 50.0 Hz, about 3.3 V, 977 to 1973 us, rest 1445 to 1465 us, V pin 4.94 V (`bringup.md`, measurements table). Pin order of the servo port confirmed.
 - Breadboard prototype end to end: the engine sound follows the real stick in both directions. Powered from the PWM2 V pin the module drew about 57 mA idle and 105 mA at full throttle (`MASTER_VOLUME` 0.6, 40 mm speaker); the receiver stayed stable and the motor kept responding.
+- Channel data on S4 (2026-11-06): about 27 frames per second without checksum errors; ignition, starter, stop and horn work from the transmitter; the program starts by itself after power-up (`controls.md`).
 - Sound, judged by listening on the real speaker: the first CC0 car loops were nearly inaudible and hissy; a synthesised pulse loop was audible ("less pretty but better heard") but turned into a siren when sped up; the grain engine `engine_pulse` (a_diesel6) sounded deeper and was chosen as the default; the owner's own recordings pulsated when looped and were parked.
 - Status LED on the Zero: it showed that red and green are swapped on this board (no signal showed as green, signal present as red); after `STATUS_LED_SWAP_RG` the colours match: red at start until the first pulse, green with the stick at rest, blue-cyan with throttle.
 
@@ -93,7 +95,7 @@ Research and measurements are in `sound-research.md`. The constraints that decid
 
 - Spectrum, level and loop seams of all sound candidates; rendered throttle sweeps of the Citroen and the truck loops. For the truck, a playback rate of 1.0x to 3.0x sounded better than 1.0x to 4.0x (at 4x the timbre shifts too far and more of the sound aliases at 22.05 kHz).
 - Gearbox logic: simulated with `tools/test_gearbox.cpp` (it shifts as designed).
-- Dimensions of the shield: hole spacing 23.0 x 24.0 mm comes from the CAD model of the community test housing, not yet from calipers on a real receiver.
+- Dimensions of the shield: hole spacing 23.0 x 24.0 mm, confirmed from the official CAD model of the receiver (`shield-pcb.md`).
 
 **Not yet checked on hardware:**
 

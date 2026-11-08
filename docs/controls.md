@@ -4,6 +4,21 @@ What every control of the CyberBrick transmitter does in the truck with the soun
 the receiver does. Valid for the current configuration `docs/cyberbrick-config/Truck_with_Engine_Sound_Data.json`
 with the `engine_lab` firmware (state of 2026-11-08). The module's servo cable goes to the receiver's **S4** header.
 
+## What we added where
+
+```
+transmitter --radio--> receiver in the model --S4 servo header (S, V, G)--> sound module
+```
+
+| Where | What we added | Where in the config |
+|---|---|---|
+| Transmitter (CyberBrick Remote Control Transmitter Shield - XA003 XA005) | the trigger for the snippet: the moved centre of L2 (`mid_value` 600, `deadzone` 100) with a `gt_mid` event to CODE | `sender/channels[1]` |
+| Transmitter | a long press of the L Shoulder Button to CODE (manual restart) | `sender/channels[6]/event[1]` |
+| Receiver in the model (CyberBrick Remote Control Receiver Shield - XA003 XA004) | our Python snippet `uart_forward.py` (module CODE, "Sound data"): every 20 ms it takes all channels received over the radio and **sends them as serial data from servo header 4 (S4, pin S) to our module**; the module also takes its power from the same header (V, G) | `receiver_1/CODE` |
+| Our module (ESP32-S3-Zero) | our firmware: reads the data from the receiver's S4 and makes the sound from it | - |
+
+Bambu's original firmware is unchanged on both boards; only the configuration was changed.
+
 ## Transmitter controls
 
 Channel names as in the receiver's data (`rc_module.rc_slave_data()`): sticks 0..4095, buttons 1 = released,
@@ -42,11 +57,12 @@ Details and the reasoning in `start-stop-horn.md`; the code is `firmware/include
 
 ## The program on the receiver ("Sound data")
 
-The receiver core (ESP32-C3, MicroPython) runs our snippet `docs/cyberbrick-code/uart_forward.py`, stored in the
+The program runs on the receiver in the model (CyberBrick Remote Control Receiver Shield - XA003 XA004; an ESP32-C3
+with MicroPython). It is our snippet `docs/cyberbrick-code/uart_forward.py`, stored in the receiver's part of the
 config as the **Code** module with the effect name "Sound data". It is our own code and uses only the documented
 `rc_module` and MicroPython; nothing of Bambu's firmware is changed.
 
-- Every 20 ms it reads all ten channels of the transmitter.
+- Every 20 ms it reads all ten channels that the receiver got from the transmitter over the radio.
 - It sends them as serial data from the **S4** servo header (GPIO0), 115200 baud 8N1, in a frame of 23 bytes:
   `A5 5A`, ten 16-bit values little endian `[L1 L2 L3 R1 R2 R3 K1 K2 K3 K4]`, XOR of the 20 data bytes.
   Measured: about 27 frames per second, no checksum errors.

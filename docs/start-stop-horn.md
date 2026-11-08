@@ -140,11 +140,11 @@ Open points before trying it:
   written permission) and requires the licence notice in all copies. Modified receiver code therefore does not go
   into this repository as it is; check whether a snippet through the official "Code" option of the CyberBrick app
   is enough, or keep the change local.
-- **A free pin** on the receiver core for the data wire (GPIO 20/21 are the ESP32-C3 UART0 pins, but whether they are
+- **A free pin** on the receiver (Remote Control Receiver Shield - XA003 XA004) for the data wire (GPIO 20/21 are the ESP32-C3 UART0 pins, but whether they are
   brought out and unused is not known).
 - **Getting back** to the original receiver application before changing anything (the app can re-send the
   configuration; whether it restores the application files was not checked).
-- Shared ground and a 3.3 V signal level between the receiver core and the Zero; the [USB power
+- Shared ground and a 3.3 V signal level between the receiver (Remote Control Receiver Shield - XA003 XA004) and the Zero; the [USB power
   rule](bringup.md) still applies.
 
 ### The "Code" option of the CyberBrick app (read from the receiver source, 2026-11-06, not tried)
