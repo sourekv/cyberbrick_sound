@@ -110,7 +110,7 @@ Ideas already considered and dropped, with the reasons: `rejected-ideas.md`.
 - Which sound wins: synthesised grains, Citroen, or truck with gearbox (to be judged by listening on the real speaker).
 - Speaker: 40 mm or a production candidate (for example a 21 mm one). The sealed box is done (30 ml best, 15 ml close; `speaker-measurement.md`); further improvement, if needed, would come from a larger or different speaker or a different amplifier / converter, not from the box. The printed box is a test fixture only; the enclosure for the model will be designed from scratch
   around the chosen speaker.
-- Shield: how much the PCB service assembles besides the amplifier; a human review of the board in KiCad; part numbers for the service; an exact quote. Decided on 2026-11-08: the Zero sits in sockets, the speaker connector is JST SH like the CyberBrick motor port; a strain-relief slot for a soldered servo cable was considered and rejected (`shield-pcb.md`).
+- Shield: a human review of the board in KiCad; an exact quote. Prepared on 2026-11-08: the service fits all SMD parts (LCSC numbers and JLCPCB files in `hardware/shield/fab/`, steps in `shield-pcb.md` "Ordering at JLCPCB"), J1/J3/J4 are soldered by hand. Decided on 2026-11-08: the Zero sits in sockets, the speaker connector is JST SH like the CyberBrick motor port; a strain-relief slot for a soldered servo cable was considered and rejected (`shield-pcb.md`).
 - A long power test with the motor running, to see whether the servo-port 5 V supply holds.
 - Development outlook (2026-11-08), not started:
   - a USB-audio test firmware (the Zero as a speaker for the PC): tried on 2026-11-08, does not work with the current

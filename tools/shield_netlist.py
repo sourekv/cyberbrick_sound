@@ -16,8 +16,8 @@ FP_C = "Capacitor_SMD:C_0603_1608Metric"
 PARTS = {
     # ---- input and protection ----
     "J1": ("Connector_Generic:Conn_01x03", "Servo input S-V-G", "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Horizontal",
-           {"1": "S_IN", "2": "VIN", "3": "GND"}, "Right-angle male header, throttle copy from PWM2"),
-    "TVS1": ("Device:D_TVS", "ESD diode 5 V", "Diode_SMD:D_SOD-323", {"1": "S_IN", "2": "GND"}, "Optional ESD protection of the throttle signal"),
+           {"1": "S_IN", "2": "VIN", "3": "GND"}, "Right-angle male header, servo cable to the receiver's S4 header (channel data and 5 V)"),
+    "TVS1": ("Device:D_TVS", "ESD diode 5 V", "Diode_SMD:D_SOD-323", {"1": "S_IN", "2": "GND"}, "ESD protection of the data input"),
     "R1": ("Device:R", "1k", FP_R, {"1": "S_IN", "2": "IO1_THR"}, "Series resistor to GPIO1"),
     "R2": ("Device:R", "100k", FP_R, {"1": "IO1_THR", "2": "GND"}, "Pull-down on GPIO1"),
     # ---- power ----

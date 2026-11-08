@@ -27,8 +27,8 @@ The first real design step: the KiCad 7 schematic `hardware/shield/shield.kicad_
 
 - 2 layers, 29 x 30 mm, tracks 0.25 mm, clearance 0.2 mm, vias 0.6/0.3 mm, copper-to-edge 0.3 mm. J1 (right-angle header) sticks out of the top edge, the J2 speaker connector opens toward the bottom edge, test pads are on the bottom side.
 - DRC (run through pcbnew, KiCad 7 has no command-line DRC): 0 unconnected, 0 clearance / short / courtyard / edge errors. Remaining messages are warnings only: silkscreen overlaps and silkscreen clipped at the edge (J1 outline hangs outside the board), and a library-path warning from the generated footprints.
-- Manufacturing outputs in `hardware/shield/fab/`: `shield_gerbers.zip` (Gerber + drill), `shield_positions.csv`, `shield_bom.csv` (made by `tools/make_shield_outputs.py`). The BOM has values and footprints but no distributor part numbers.
-- **Not ready to order as it is.** Needs a human review in KiCad (DRC and 3D view again, silkscreen tidy-up, track widths of the 5 V path, GND stitching), the part values and exact parts (TVS, Schottky, ferrite, speaker connector) checked, and the open decisions below answered. The routing is autorouter quality, not hand-optimised; it has not been through any signal-integrity or EMC check.
+- Manufacturing outputs in `hardware/shield/fab/`: `shield_gerbers.zip` (Gerber + drill), `shield_positions.csv`, `shield_bom.csv` (values, footprints from the board, LCSC part numbers) and the JLCPCB assembly files in `fab/jlcpcb/` (made by `tools/make_shield_outputs.py`; `--bom-only` rebuilds only the BOMs). How to order: "Ordering at JLCPCB" below.
+- **Not ready to order as it is.** Needs a human review in KiCad (DRC and 3D view again, silkscreen tidy-up, track widths of the 5 V path, GND stitching), the chosen parts ("Ordering at JLCPCB") looked over, and the open decisions below answered. The routing is autorouter quality, not hand-optimised; it has not been through any signal-integrity or EMC check.
 
 ## On the board
 
@@ -59,6 +59,46 @@ To check before ordering: find out which way the receiver sits in its housing (t
 
 From the Maker's Supply CyberBrick user's manual (the Bambu store page names only the power input): DC motor ports M1/M2 and the transmitter button ports K1-K4 are **JST SH 1.0 mm 2-pin**; joystick (ADC) and WS2812 LED ports are SH 1.0 mm 3-pin; servo ports S1-S4 are 3-pin headers (2.54 mm); power inputs and the power switch are **XH 2.54 mm 2-pin**. The kit's SH 2-pin wires (button module, N20 motor) therefore fit a speaker connector of the same type, so the speaker connector J2 is SH 1.0 mm 2-pin and users need no crimping: a 2-pin SH cable with one free end is soldered to the speaker (or supplied with it). The CyberBrick kit contains a suitable cable: bag **B-IC004**, "100 mm Wire Pair with SH1.0", SH1.0 2-pin, 10 cm, with a plug on both ends (photo from the project owner). Cut off one plug and solder the wires to the speaker, so the speaker sits within about 10 cm of the board; for a longer run, buy an SH 1.0 mm 2-pin pigtail (plug with one free end) instead. The speaker is not polarised in any way that matters here, so the wire order does not need to be tracked.
 
+## Ordering at JLCPCB
+
+Prepared on 2026-11-08; not ordered yet. Before ordering: the human review in KiCad (see "Routed board") and a stock
+check of the parts.
+
+Parts (LCSC numbers, all in stock on 2026-11-08; the list is in `tools/make_shield_outputs.py`):
+
+| Ref | Part | LCSC |
+|---|---|---|
+| U1 | MAX98357AETE+T, I2S class-D amplifier, TQFN-16 3x3 | C910544 |
+| J2 | JST SM02B-SRSS-TB, SH 1.0 mm 2-pin right angle | C160402 |
+| C1 | tantalum 100 uF 10 V, case C 6032 (Kyocera AVX TAJC107K010RNJ) | C8649 |
+| C2 | 10 uF 25 V X5R 0805 | C15850 |
+| C3, C6, C7 | 100 nF 50 V X7R 0603 | C1591 |
+| C4, C5 | 100 pF 50 V C0G 0603 | C14858 |
+| D1, D2 | B5819W, Schottky 40 V 1 A, SOD-123 | C8598 |
+| F1 | PTC 500 mA hold, 13.2 V, 1206 (Ruilon SMD1206P050TF/13.2) | C43379 |
+| FB1, FB2 | ferrite 600 R @ 100 MHz, 1.3 A, 0603 (Murata BLM18KG601SN1D) | C85833 |
+| LED1 | green LED 0603 (Kento KT-0603G) | C12624 |
+| R1, R3 | 1 k 0603 | C21190 |
+| R2, R4 | 100 k 0603 | C25803 |
+| R5 | 1 M 0603 | C22935 |
+| R6, R7, R8 | 33 R 0402 | C25105 |
+| TVS1 | PESD5V0S1BA, ESD diode 5 V, SOD-323 | C19224 |
+| J1, J3, J4 | right-angle 1x3 pin header 2.54 mm; two 1x9 female socket strips 2.54 mm | by hand |
+
+Several of them are "extended" parts at JLCPCB (U1, J2, C1, F1, FB1/FB2, TVS1, ...), each with a small loading fee.
+
+Steps:
+
+1. PCB: upload `hardware/shield/fab/shield_gerbers.zip`. 2 layers, 1.6 mm, the size is read from the outline
+   (29 x 30 mm).
+2. Assembly: top side only. Upload `fab/jlcpcb/shield_bom_jlcpcb.csv` (BOM) and `fab/jlcpcb/shield_cpl_jlcpcb.csv`
+   (positions). J1, J3, J4, the solder jumpers JP1/JP2, the test points and the holes are not in these files.
+3. **Check every part in the placement preview.** The rotations are KiCad's and JLCPCB's footprints can be turned
+   differently; fix the rotation in the preview where a part is off. Watch the polarised parts: U1 (pin 1 dot),
+   D1 and D2 (cathode bar), C1 (plus side), LED1 (cathode), and J2 (the plug opening towards the board edge).
+4. After delivery: solder J3/J4 (the Zero's sockets) and J1 by hand.
+5. First power-up: the checks listed under "Decided" (USB and receiver connected together).
+
 ## Decided
 
 - Board size and shape: CyberBrick-sized rectangle (29 x 30 mm) with the four CyberBrick mounting holes (23.0 x 24.0 mm), Zero in the middle.
@@ -69,6 +109,7 @@ From the Maker's Supply CyberBrick user's manual (the Bambu store page names onl
 - Servo input J1 stays a 3-pin right-angle pin header (male) for now; it mates with a female-to-female servo/Dupont cable to PWM4 (S4, data configuration) or PWM2 (pulse configuration). It is the only servo input. A female socket (so that a standard servo extension cable could be used) is left as a possible later change.
 - Speaker connector J2: JST SH 1.0 mm 2-pin, as used by the CyberBrick motor and button ports (confirmed by the project owner on 2026-11-08: the same connector as the CyberBrick motor port; no screw terminal, no dual footprint).
 - The amplifier is a bare MAX98357A chip on the board, **assembled by a PCB service** (the TQFN-16 package is not practical to hand-solder). No plug-in breakout module.
+- **Assembly (2026-11-08): the PCB service fits every SMD part** (all on the top side); the Zero's socket strips J3/J4 and the right-angle servo header J1 are soldered by hand. J1 could also be fitted by the service as a through-hole part, for an extra fee.
 
 - **Rejected 2026-11-08 (all rejected ideas: `rejected-ideas.md`): a strain-relief slot next to J1.** Idea: an unplated slot (about 4.4 x 1.6 mm) between the board edge and J1, so that a servo cable soldered into the J1 holes would come up through the slot and a pull would end there instead of at the joints (a cable tie through two small holes was judged too weak). It was drawn and put into the board, then dropped by the project owner: it complicates the prototype, and only 1 mm of board would be left between the slot and the edge. The prototype keeps the right-angle header J1. Could come back with a soldered-cable variant of a later board.
 
@@ -76,7 +117,6 @@ From the Maker's Supply CyberBrick user's manual (the Bambu store page names onl
 
 - The speaker it has to carry (40 mm or a production candidate; see `sound-research.md`). The board size itself is settled: the outline of the Zero.
 - Whether the Zero's underside is flat (the headers leave about 7 mm of clearance under it, enough for everything on the board; check the real module).
-- How much the PCB service assembles besides the amplifier: only the SMD parts (and the rest by hand) or the whole board.
 
 ## Out of scope for this iteration
 

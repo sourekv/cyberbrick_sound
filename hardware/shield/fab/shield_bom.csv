@@ -1,27 +1,27 @@
-Designators,Qty,Value,Footprint,Note
-C1,1,100u,CP_EIA-6032-28_Kemet-C,Bulk capacitor
-C2,1,10u,C_0805_2012Metric,Amplifier supply decoupling
-C3,1,100n,C_0603_1608Metric,Amplifier supply decoupling
-"C4,C5",2,100p,C_0603_1608Metric,EMI capacitor at the speaker connector
-"C6,C7",2,100n,C_0603_1608Metric,General decoupling
-D1,1,Schottky 1A,D_SOD-123,Reverse-polarity protection
-D2,1,Schottky 1A,D_SOD-123,OR-ing: servo 5 V and USB 5 V can both be connected
-F1,1,0.5A PTC,Fuse_1206_3216Metric,Resettable fuse
-"FB1,FB2",2,ferrite 600R@100MHz,L_0603_1608Metric,Speaker output filter (can be 0R)
-J1,1,Servo input S-V-G,PinHeader_1x03_P2.54mm_Horizontal,"Right-angle male header, throttle copy from PWM2"
-J2,1,Speaker JST SH 1.0,JST_SH_SM02B-SRSS-TB_1x02-1MP_P1.00mm_Horizontal,"Speaker connector, same type as the CyberBrick motor ports"
-J3,1,Zero left: 5V GND 3V3 IO1 IO2 IO3 IO4 IO5 IO6,PinSocket_1x09_P2.54mm_Vertical,Socket for the left pin row of the ESP32-S3-Zero
-J4,1,Zero right: TX RX IO13..IO7 (unused),PinSocket_1x09_P2.54mm_Vertical,Socket for the right pin row of the ESP32-S3-Zero (no signals used)
-JP1,1,GAIN 15 dB,SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm,Open: GAIN floating = 9 dB. Bridged: 100k to ground = 15 dB
-JP2,1,SD_MODE (L+R)/2,SolderJumper-2_P1.3mm_Bridged_Pad1.0x1.5mm,Bridged by default; cut open = amplifier in shutdown
-LED1,1,green,LED_0603_1608Metric,Power LED
-R1,1,1k,R_0603_1608Metric,Series resistor to GPIO1
-R2,1,100k,R_0603_1608Metric,Pull-down on GPIO1
-R3,1,1k,R_0603_1608Metric,Power LED resistor (about 3 mA)
-R4,1,100k,R_0603_1608Metric,GAIN resistor
-R5,1,1M,R_0603_1608Metric,SD_MODE pull-up: with the internal 100k pull-down gives (L+R)/2
-R6,1,33R,R_0603_1608Metric,Series resistor DIN (can be 0R)
-R7,1,33R,R_0603_1608Metric,Series resistor BCLK (can be 0R)
-R8,1,33R,R_0603_1608Metric,Series resistor LRC (can be 0R)
-TVS1,1,ESD diode 5 V,D_SOD-323,Optional ESD protection of the throttle signal
-U1,1,MAX98357AETE+,TQFN-16-1EP_3x3mm_P0.5mm_EP1.23x1.23mm,I2S class-D amplifier
+Designators,Qty,Value,Footprint,LCSC,Note
+C1,1,100u,CP_EIA-6032-28_Kemet-C,C8649,Bulk capacitor
+C2,1,10u,C_0805_2012Metric,C15850,Amplifier supply decoupling
+C3,1,100n,C_0603_1608Metric,C1591,Amplifier supply decoupling
+"C4,C5",2,100p,C_0603_1608Metric,C14858,EMI capacitor at the speaker connector
+"C6,C7",2,100n,C_0603_1608Metric,C1591,General decoupling
+D1,1,Schottky 1A,D_SOD-123,C8598,Reverse-polarity protection
+D2,1,Schottky 1A,D_SOD-123,C8598,OR-ing: servo 5 V and USB 5 V can both be connected
+F1,1,0.5A PTC,Fuse_1206_3216Metric,C43379,Resettable fuse
+"FB1,FB2",2,ferrite 600R@100MHz,L_0603_1608Metric,C85833,Speaker output filter (can be 0R)
+J1,1,Servo input S-V-G,PinHeader_1x03_P2.54mm_Horizontal,hand-soldered,"Right-angle male header, servo cable to the receiver's S4 header (channel data and 5 V)"
+J2,1,Speaker JST SH 1.0,JST_SH_SM02B-SRSS-TB_1x02-1MP_P1.00mm_Horizontal,C160402,"Speaker connector, same type as the CyberBrick motor ports"
+J3,1,Zero left: 5V GND 3V3 IO1 IO2 IO3 IO4 IO5 IO6,PinSocket_1x09_P2.54mm_Vertical,hand-soldered,Socket for the left pin row of the ESP32-S3-Zero
+J4,1,Zero right: TX RX IO13..IO7 (unused),PinSocket_1x09_P2.54mm_Vertical,hand-soldered,Socket for the right pin row of the ESP32-S3-Zero (no signals used)
+JP1,1,GAIN 15 dB,SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm,,Open: GAIN floating = 9 dB. Bridged: 100k to ground = 15 dB
+JP2,1,SD_MODE (L+R)/2,SolderJumper-2_P1.3mm_Bridged_Pad1.0x1.5mm,,Bridged by default; cut open = amplifier in shutdown
+LED1,1,green,LED_0603_1608Metric,C12624,Power LED
+R1,1,1k,R_0603_1608Metric,C21190,Series resistor to GPIO1
+R2,1,100k,R_0603_1608Metric,C25803,Pull-down on GPIO1
+R3,1,1k,R_0603_1608Metric,C21190,Power LED resistor (about 3 mA)
+R4,1,100k,R_0603_1608Metric,C25803,GAIN resistor
+R5,1,1M,R_0603_1608Metric,C22935,SD_MODE pull-up: with the internal 100k pull-down gives (L+R)/2
+R6,1,33R,R_0402_1005Metric,C25105,Series resistor DIN (can be 0R)
+R7,1,33R,R_0402_1005Metric,C25105,Series resistor BCLK (can be 0R)
+R8,1,33R,R_0402_1005Metric,C25105,Series resistor LRC (can be 0R)
+TVS1,1,ESD diode 5 V,D_SOD-323,C19224,ESD protection of the data input
+U1,1,MAX98357AETE+,TQFN-16-1EP_3x3mm_P0.5mm_EP1.23x1.23mm,C910544,I2S class-D amplifier
