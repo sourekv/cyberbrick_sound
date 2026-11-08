@@ -15,6 +15,9 @@ The CyberBrick receiver has four servo ports (S, V, G: signal, 5 V, ground). In 
 
 Details and the measurement table: `bringup.md`; app mapping: `cyberbrick-config/`.
 
+Since 2026-11-06 the current configuration sends **all transmitter channels as serial data** from the S4 header instead
+of the PWM2 copy (the firmware still accepts the pulse). Controls, the receiver program and its auto-start: `controls.md`.
+
 ## Hardware
 
 ### Prototype (works, on a breadboard)

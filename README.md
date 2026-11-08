@@ -6,6 +6,7 @@ Engine sound module for Bambu Lab CyberBrick RC. The module taps the throttle PW
 Phase 1: prototype on a dev board (Waveshare ESP32-S3-Zero-N8R8-M + MAX98357A + 4 Ω speaker). A custom PCB comes only after the prototype works.
 
 Overview of the whole project (hardware, firmware, sound, what was tested): `docs/project-overview.md`.
+What every transmitter control does, the program on the receiver and how it starts by itself: `docs/controls.md`.
 
 ## Structure
 - `firmware/` - PlatformIO (Arduino) project
