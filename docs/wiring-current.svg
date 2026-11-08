@@ -30,6 +30,8 @@
 
   <!-- wires from S4 -->
   <path d="M110 413 L110 540 L395 540 L395 520" fill="none" stroke="#e0a020" stroke-width="3"/>
+  <path d="M395 498 L395 486 L362 486 L362 285 L380 285" fill="none" stroke="#e0a020" stroke-width="3"/>
+  <circle cx="380" cy="285" r="4" fill="#e0a020" stroke="#8a5a00"/>
   <path d="M180 413 L180 575 L470 575 L470 470" fill="none" stroke="#d22" stroke-width="3"/>
   <path d="M250 413 L250 610 L540 610 L540 470" fill="none" stroke="#333" stroke-width="3"/>
   <text x="262" y="534" font-size="12" fill="#8a5a00">S: data</text>
