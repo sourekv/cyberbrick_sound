@@ -31,7 +31,11 @@
 #endif
 #define RC_THROTTLE_MID   2020   // mid_value of the L Stick Y channel in the CyberBrick config (measured rest ~1830)
 #define RC_THROTTLE_DEADZONE 250 // counts; the app uses 200, the measured rest is 190 from the mid
-#define RC_LINK_TIMEOUT_MS 300   // no frame for this long -> back to the servo pulse
+#ifndef RC_REVERSE_SIGN
+#define RC_REVERSE_SIGN   +1     // +1 / -1: which stick direction is forward (raw value above the mid = +); +1 tried on the truck 2026-11-08
+#endif
+#define RC_REVERSE_THRESHOLD 0.05f // throttle (0..1) the other way that switches between forward and reverse
+#define RC_LINK_TIMEOUT_MS 300  // no frame for this long -> back to the servo pulse
 #define RC_STATE_HOLD_MS  2000   // engine on/off state survives a data gap this long (frames sometimes pause ~0.4 s)
 // Start / stop / horn from the channel data (include/engine_events.h, docs/start-stop-horn.md)
 #define RC_IGNITION_MID   1760   // left shoulder 3-position switch (L1): the middle position = ignition OFF
@@ -55,6 +59,9 @@
 #endif
 #ifndef SHIFT_CUT_GAIN
 #define SHIFT_CUT_GAIN    0.15f   // volume factor during the cut
+#endif
+#ifndef SHIFT_SOUND_LEVEL
+#define SHIFT_SOUND_LEVEL 0.35f   // level of the gear-shift sound (engine_lab, all sounds), full scale = 1, after MASTER_VOLUME
 #endif
 #ifndef GEAR_ACCEL_S
 #define GEAR_ACCEL_S      6.0f    // virtual speed 0..1 at full throttle, seconds (without shifts)

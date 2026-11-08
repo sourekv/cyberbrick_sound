@@ -24,6 +24,7 @@ module sees every control of the transmitter, so the one-button design below is 
   stopped engine does not blip on. Only after a longer loss does the module go back to the plain running engine.
 - The starter, the stall and the horn are synthesised in the firmware (no recordings, no licences). The samples
   chosen below are not used.
+- Reverse (engine_lab): detected from the direction of L3; no upshift while reversing (see `RC_REVERSE_SIGN` in `config.h`).
 - Not done yet: stalling by itself after a long idle, reverse beeper.
 
 ## Earlier design notes (one button through PWM3)

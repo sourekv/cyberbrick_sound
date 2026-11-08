@@ -70,3 +70,10 @@ The `engine_pulse` grain synth (`tools/make_engine_grains.py`, `firmware/include
 Text-to-speech: Piper (https://github.com/rhasspy/piper, MIT licence), voice `en_US-ljspeech-medium` (https://huggingface.co/rhasspy/piper-voices, en/en_US/ljspeech/medium), trained on the LJ Speech dataset, which its model card lists as public domain.
 Generated file: `firmware/include/voice_prompts.h` (six short English prompts "One. Truck." .. "Six. V eight."; "Seven. V twelve." is in the script but the committed header still has six prompts until it is regenerated), made with `pwsh tools/make_voice_prompts.ps1` and `tools/make_voice_header.py` (resampled to 22.05 kHz, trimmed, high-passed at 250 Hz, normalised). Neither Piper nor the voice model is stored here.
 Replaced the earlier Windows text-to-speech prompts (2026-11-05), because the licence of the Windows voices for redistribution was unclear.
+
+## Gear-shift sound (used by `engine_lab`, all engine sounds)
+Source: https://freesound.org/s/438031/ ("G13.1-04-Old Car Gearshift Grind.wav")
+Author: craigsmith (uploaded 2018-08-26; a digitised copy of Hollywood optical and magnetic sound effects from the 1930s to the 1960s, transferred by USC Cinema)
+License: CC0 1.0 (public domain dedication), checked on the Freesound page on 2026-11-08; the file was downloaded by the project owner.
+Original: 72.3 s, 48 kHz 24 bit mono: an old car sputtering, many starts and stops, grinding and clanking, a voice in the background, some noise and hum. The original is not stored here.
+Derived file: `shift_grind.wav` (0.35 s, 22.05 kHz mono), one grinding event without voice (event 21 of the 24 loud events, at 62.79 s, picked by ear by the project owner), high-passed at 200 Hz, faded and normalised, with `python tools/make_shift_sound.py <original>`; the same tool writes `firmware/include/shift_sound.h`.

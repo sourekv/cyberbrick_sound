@@ -29,6 +29,7 @@
 #include "engine_synth2.h"         // new speaker-tuned synth
 #include "rc_link.h"               // channel data over a wire from the receiver Code snippet
 #include "engine_events.h"         // start, stop and horn (from the channel data)
+#include "shift_sound.h"           // CC0 gear-shift sound (tools/make_shift_sound.py)
 
 // Spoken announcement of the sound number and name, if the locally generated header exists
 // (tools/make_voice_prompts.ps1, Piper text-to-speech, English voice en_US-ljspeech); otherwise beeps.
@@ -62,13 +63,15 @@ void IRAM_ATTR onEdge() {
 
 static RcLink rcLink;
 
+// Signed -1..1: the sign is the stick direction (see RC_REVERSE_SIGN).
 static float readPulseThrottle() {
   if (millis() - lastEdgeMs > PULSE_TIMEOUT_MS) return 0.0f;
   int d = (int)widthUs - PULSE_CENTER_US;
-  if (d < 0) d = -d;
-  if (d < PULSE_DEADBAND_US) return 0.0f;
-  float t = (float)(d - PULSE_DEADBAND_US) / (float)(PULSE_RANGE_US - PULSE_DEADBAND_US);
-  return t > 1.0f ? 1.0f : t;
+  int a = d < 0 ? -d : d;
+  if (a < PULSE_DEADBAND_US) return 0.0f;
+  float t = (float)(a - PULSE_DEADBAND_US) / (float)(PULSE_RANGE_US - PULSE_DEADBAND_US);
+  if (t > 1.0f) t = 1.0f;
+  return d < 0 ? -t : t;
 }
 
 static bool pulsePresent() {
@@ -85,12 +88,20 @@ static bool dataActive() {
 #endif
 }
 
-static float readThrottle() {
-  if (dataActive()) {
-    float v = rcLink.stick(RcLink::L3, RC_THROTTLE_MID, RC_THROTTLE_DEADZONE);
-    return v < 0 ? -v : v;
-  }
+static float readThrottleSigned() {
+  if (dataActive()) return rcLink.stick(RcLink::L3, RC_THROTTLE_MID, RC_THROTTLE_DEADZONE);
   return readPulseThrottle();
+}
+
+// Reverse: the stick pushed the reverse way. The direction is kept while the stick is at rest (the truck may still
+// roll) and changes only when the stick is pushed past RC_REVERSE_THRESHOLD the other way.
+static bool reversing = false;
+
+static float readThrottle() {
+  float s = readThrottleSigned() * RC_REVERSE_SIGN;
+  if (s < -RC_REVERSE_THRESHOLD) reversing = true;
+  else if (s > RC_REVERSE_THRESHOLD) reversing = false;
+  return s < 0 ? -s : s;
 }
 
 static bool signalPresent() { return dataActive() || pulsePresent(); }
@@ -171,6 +182,23 @@ class VoicePlayer {
 };
 static VoicePlayer voice;
 
+// Gear-shift sound: a short CC0 recording (include/shift_sound.h), started on every upshift, during the torque cut of
+// the virtual gearbox. With every engine sound (owner's choice, 2026-11-08; first tried on the V8 only).
+class ShiftPlayer {
+ public:
+  void trigger() { pos = 0; }
+  float next() {
+    if (pos < 0) return 0.0f;
+    float s = SHIFT_SOUND[pos] * (1.0f / 32768.0f);
+    if (++pos >= SHIFT_SOUND_LEN) pos = -1;
+    return s;
+  }
+ private:
+  int pos = -1;
+};
+static ShiftPlayer shift;
+static bool shiftSoundFor(int) { return true; }   // all sounds
+
 // Voice (or beeps) mixed over the engine sample s (both in -1..1 before MASTER_VOLUME is applied to s).
 static inline int16_t mixOut(float s) {
   float v = s * voice.duck() * MASTER_VOLUME + voice.next() * 0.9f + beeper.next();
@@ -181,7 +209,7 @@ static inline int16_t mixOut(float s) {
 // Engine sample s with the engine level and the start/stop/horn sounds, then voice and beeps.
 static inline int16_t outSample(float s, int i, int n) {
   float g = engGainPrev + (engGain - engGainPrev) * ((float)(i + 1) / n);
-  return mixOut(s * g + starter.sample() + horn.sample());
+  return mixOut(s * g + starter.sample() + horn.sample() + shift.next() * (SHIFT_SOUND_LEVEL / MASTER_VOLUME));
 }
 
 static void selectSound(int s) {
@@ -295,7 +323,13 @@ void loop() {
 #else
   target = engineState.block(false, false, true, target, dt, gearbox.rpm, starter);   // demo: always running
 #endif
-  gearbox.update(target, dt);
+  {
+    static int lastGear = 0;
+    // reversing: one gear only, so no upshift (and no shift sound); the rpm still spans the whole range of gear 1
+    gearbox.update(reversing ? target * (0.98f / GEAR_COUNT) : target, dt);
+    if (gearbox.gear > lastGear && shiftSoundFor(sound)) shift.trigger();
+    lastGear = gearbox.gear;
+  }
   engineState.apply(gearbox.rpm, gearbox.gain);
   engGainPrev = engGain;
   engGain = engineState.gain;
@@ -329,9 +363,10 @@ void loop() {
     lastPrint = millis();
     static const char* const ST[] = {"OFF", "CRANK", "RUN", "STOP"};
     Serial.printf("%s L1 %u R1 %u  ", ST[engineState.state], rcLink.get(RcLink::L1), rcLink.get(RcLink::R1));
-    Serial.printf("sound %d %s  %s  L3 %u  pulse %lu us  throttle %.2f  rpm %.2f  gear %d  frames %lu, %lu bad\n",
+    Serial.printf("sound %d %s  %s  L3 %u  pulse %lu us  throttle %.2f %s  rpm %.2f  gear %d  frames %lu, %lu bad\n",
                   sound + 1, SOUND_NAMES[sound], dataActive() ? "DATA " : "PULSE", rcLink.get(RcLink::L3),
-                  (unsigned long)widthUs, target, rpm, gearbox.gear + 1, (unsigned long)rcLink.good,
+                  (unsigned long)widthUs, target, reversing ? "REV" : "FWD", rpm, gearbox.gear + 1,
+                  (unsigned long)rcLink.good,
                   (unsigned long)rcLink.bad);
   }
 }
