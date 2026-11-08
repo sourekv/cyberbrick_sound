@@ -1,5 +1,8 @@
 # Measuring the speaker
 
+Status: 2026-11-08. The 40 mm prototype speaker was measured bare and in 30 ml and 15 ml sealed boxes; the speaker EQ
+for the 30 ml box is in `engine_lab`. Choosing the speaker for the model is open (`roadmap.md`).
+
 Generic speakers come without a datasheet, so the response is measured on the real hardware: the firmware
 `speaker_sweep` plays a slow sine sweep through the MAX98357A and the speaker, a phone records it, and
 `tools/analyze_speaker_sweep.py` turns the recording into a frequency response, a noise floor and the harmonic distortion.

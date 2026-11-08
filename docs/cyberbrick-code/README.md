@@ -1,9 +1,10 @@
-# Code snippets for the CyberBrick receiver (experiment)
+# Code snippets for the CyberBrick receiver
 
 Small MicroPython snippets for the "Code" module of the CyberBrick app, which the receiver runs when an event fires
 (see `docs/start-stop-horn.md`, section on the receiver's documented data API). Our own code; it uses only the
 documented `rc_module` and standard MicroPython modules, nothing from Bambu is copied or changed on the receiver.
-Status: written 2026-11-06, **not tried yet**.
+Status: both work on the truck (2026-11-06); `uart_forward.py` is part of the current configuration
+(`docs/cyberbrick-config/Truck_with_Engine_Sound_Data.json`).
 
 How to use: in the CyberBrick app, add an event to the receiver (for example a short press of a free button on the
 transmitter), set its module to **Code**, paste the snippet as the value, send the configuration and fire the event.

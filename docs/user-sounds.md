@@ -1,7 +1,7 @@
 # User sounds: what a sample must meet
 
 Plan for the future (2026-11-08), not implemented. The firmware would load sound sets from files in the flash data
-partition, uploaded over USB by a PC tool (see the development outlook in `project-overview.md`). This page says what a
+partition, uploaded over USB by a PC tool (see "Later" in `roadmap.md`). This page says what a
 sample has to meet so it sounds right on the module. The numbers come from the current firmware (`engine_lab`) and the
 speaker measurement (`speaker-measurement.md`).
 

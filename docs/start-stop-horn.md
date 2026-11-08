@@ -1,6 +1,9 @@
 # Engine start, stop and horn
 
-## Implemented with the channel data (2026-11-06, first version, to be tried)
+Status: implemented in `engine_lab` and working on the truck (2026-11-08). The first section is the current design;
+the sections after it are earlier notes kept as history. What is still open: `roadmap.md`.
+
+## Implemented with the channel data (2026-11-06)
 
 With the receiver's channel data on a wire (`docs/cyberbrick-code/`, `Truck_with_Engine_Sound_Data.json`) the
 module sees every control of the transmitter, so the one-button design below is no longer needed. `engine_lab`
@@ -25,9 +28,9 @@ module sees every control of the transmitter, so the one-button design below is 
 - The starter, the stall and the horn are synthesised in the firmware (no recordings, no licences). The samples
   chosen below are not used.
 - Reverse (engine_lab): detected from the direction of L3; no upshift while reversing (see `RC_REVERSE_SIGN` in `config.h`).
-- Not done yet: stalling by itself after a long idle, reverse beeper.
+- Not done yet (`roadmap.md`): stalling by itself after a long idle, reverse beeper.
 
-## Earlier design notes (one button through PWM3)
+## History: earlier design notes (one button through PWM3)
 
 
 Status of this part: superseded by the section above. When written: **thinking, not a task.** Nothing here was in the firmware, the shield or the CyberBrick config files yet. These notes record what was discussed and decided on 2026-11-01 and 2026-11-02 so the work can resume later.

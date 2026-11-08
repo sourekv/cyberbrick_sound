@@ -1,5 +1,8 @@
 # Bring-up plan
 
+Status: done for the breadboard prototype (2026-11-01..06). The checklists below are kept as the record; the results
+are in the measurements table at the bottom. The current wiring is a single servo cable to S4 (`wiring-current.png`).
+
 > **Safety rule for every test: the ESP32-S3-Zero must never be powered from the model and connected to USB at the same time.** The Zero's 5V pad is the USB VBUS net (no diode), so the receiver's 5 V would be tied straight to the computer's USB 5 V. Whenever USB is plugged in, the servo cable's V (red) wire must be disconnected; signal and GND may stay. Unplug USB before connecting V. Only the shield, with its OR-ing diode, may have both.
 > **GND stays connected** in USB tests: the signal needs the common ground as its reference, and without it the return current would flow through the signal pin and the ESP's protection diodes. A common ground ties no supplies together (the receiver runs from a floating battery). Connect GND first and disconnect it last.
 

@@ -115,7 +115,9 @@ Steps:
 
 ## Decisions still open
 
-- The speaker it has to carry (40 mm or a production candidate; see `sound-research.md`). The board size itself is settled: the outline of the Zero.
+Also collected with all other open points in `roadmap.md`.
+
+- The speaker it has to carry (40 mm or a production candidate; see `sound-research.md`). The board size itself is settled: 29 x 30 mm, the size of the CyberBrick receiver shield.
 - Whether the Zero's underside is flat (the headers leave about 7 mm of clearance under it, enough for everything on the board; check the real module).
 
 ## Out of scope for this iteration

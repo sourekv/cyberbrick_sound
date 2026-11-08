@@ -1,12 +1,12 @@
 # Engine sound research
 
-Status: parked. The default sound is the synthesised "a_diesel6" preset (`engine_pulse` firmware). This page records what was tried, what was measured and what is still open, so the work can be resumed later.
+Status: 2026-11-08. The current firmware is `engine_lab` with seven candidates (section "Speaker-tuned candidates"); the winner is still being judged by ear, aiming at a Detroit Diesel Series 60 (inline-6) for the truck. Until 2026-11-05 the default was the synthesised "a_diesel6" preset (`engine_pulse`). This page records what was tried and measured; what is open is in `roadmap.md`.
 
 ## Constraints that shape everything
 
 - The speaker is small (40 mm prototype speaker, production candidates 21 mm). It reproduces almost nothing below about 300 Hz, and the bass of the 21 mm candidates starts around 800 Hz. Sound that lives below 150 Hz is nearly inaudible on it and mostly sounds like hiss.
 - Playback is 22.05 kHz mono over I2S into a MAX98357A (the same sample is sent to both channels, because the amplifier outputs (L+R)/2).
-- Throttle is the only live input (servo pulse 977..1973 us, 50 Hz, centre about 1455 us; the sound follows the absolute deflection from centre in both directions). There is no key/ignition signal, so "engine stop" cannot be triggered from the stick alone.
+- At the time of the first approaches the throttle was the only live input (servo pulse 977..1973 us, 50 Hz, centre about 1455 us; the sound follows the absolute deflection from centre in both directions). Since 2026-11-06 the module gets all transmitter channels (ignition, horn, the stick direction), see `controls.md`.
 - RPM is smoothed in firmware (rises faster than it falls), so the sound follows the stick with some inertia.
 - I could only measure the sounds offline (level, spectrum, loop seams). How they sound was judged by the project owner listening on the real speaker.
 
@@ -76,9 +76,5 @@ Based on the speaker measurement (`docs/speaker-measurement.md`: plays about 210
 
 ## Open questions and ideas
 
-- Find recordings with a known free license (CC0), ideally steady loops at several RPM with mid-frequency content; or record one and extract grains from it, so the real timbre drives the grain engine instead of a synthesised one.
-- A start-up sound at power-on, then handing over to the grain engine (the start part is short, so the pulsation does not matter).
-- A stop sound needs another input (button or switch channel on the transmitter).
-- Speaker comparison (40 mm prototype speaker vs. the production candidates) will change which frequencies matter; re-tune the grains afterwards.
-- Possible tunable parameters: firing range, idle unevenness and jitter, load behaviour, RPM smoothing speeds, output gain and `MASTER_VOLUME`.
-- Measure the current at the final volume and speaker (57 mA idle and 105 mA at full throttle were measured with `MASTER_VOLUME` 0.6 and the 40 mm speaker).
+Moved to `roadmap.md` ("Sound features not done yet" and "To check on hardware"). The start-up and stop sounds
+once listed here exist now (synthesised, `start-stop-horn.md`).

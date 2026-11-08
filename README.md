@@ -7,12 +7,18 @@ engine stop and horn. It never touches the original signal path: if the module f
 
 ## Status
 
+State of 2026-11-08; what is still open: `docs/roadmap.md`.
+
 - **Prototype works** on a breadboard in the truck: Waveshare ESP32-S3-Zero-N8R8-M, MAX98357A, 40 mm 4 Ohm speaker
   in a printed 30 ml sealed box, with a speaker EQ tuned for the box (2026-11-07).
 - **Channel data link works** (2026-11-06): about 27 frames per second, no checksum errors; ignition, starter,
   stop and horn from the transmitter.
-- **Shield PCB**: KiCad schematic and a routed board exist (`hardware/shield/`), not yet reviewed or manufactured.
-- Which engine sound wins is still being judged by ear (`engine_lab` holds all candidates).
+- **Gearbox effects** (2026-11-08): a shift sound on every upshift; reverse is detected from the stick and does not
+  shift.
+- **Shield PCB**: KiCad schematic, routed board and JLCPCB assembly files exist (`hardware/shield/`); not yet reviewed
+  by a human or manufactured.
+- Which engine sound wins is still being judged by ear (`engine_lab` holds all candidates); the target is a Detroit
+  Diesel Series 60.
 
 ## How it works
 
@@ -35,23 +41,43 @@ flashing and USB tests; connect GND first and disconnect it last (`docs/bringup.
 
 ## Documentation
 
+Start with `docs/project-overview.md` (the whole project on one page) and `docs/roadmap.md` (everything still open).
+
+**Using it: controls, wiring, configuration**
+
 | File | What it covers |
 |---|---|
-| `docs/project-overview.md` | the whole project in one page: goal, how the module gets the data, hardware, firmware, sound, what was tested, open decisions |
 | `docs/controls.md` | what we added where (transmitter, receiver, module), every transmitter control, ignition / starter / stop / horn, the receiver program and its auto-start, power-up order |
-| `docs/bringup.md` | bring-up plan: measurements on the receiver, breadboard wiring, test order, measurements table, the USB power rule |
-| `docs/start-stop-horn.md` | design of engine start, stop and horn: the channel-data version, earlier one-button notes, engine state rules |
-| `docs/cyberbrick-config/README.md` | the CyberBrick app configurations (`*.json`): stock truck, button variant, Code test, the current channel-data config |
-| `docs/cyberbrick-code/README.md` | the MicroPython snippets for the receiver (`blink_test.py`, `uart_forward.py`), test wiring and results |
-| `docs/sound-research.md` | engine sound research: constraints of a small speaker, approaches tried, speaker-tuned candidates, lessons |
-| `docs/audio-simulation/README.md` | rendered previews of the engine sounds (`engine_pulse`, `engine_real`, `engine_lab` candidates) |
-| `docs/rejected-ideas.md` | ideas that were considered and dropped (shield, receiver link, sound, speaker box), why, and what is used instead |
-| `docs/speaker-measurement.md` | how the speaker response is measured (`speaker_sweep`), results bare and in the 30 ml box, the speaker EQ |
-| `docs/shield-pcb.md` | the shield PCB: scope, schematic, routed board, mounting holes, connectors, decided and open points |
-| `assets/samples/LICENSE-SAMPLES.md` | origin and licence of every sound (CC0 recordings, synthesised sounds, voice prompts) |
+| `docs/cyberbrick-config/README.md` | the CyberBrick app configurations (`*.json`): the current channel-data config and older ones |
+| `docs/cyberbrick-code/README.md` | the MicroPython snippets for the receiver (`uart_forward.py`, `blink_test.py`), test wiring and results |
+| `docs/bringup.md` | bring-up of the prototype: measurements on the receiver, breadboard wiring, test order, the USB power rule |
+| `docs/start-stop-horn.md` | engine start, stop and horn: the current design and the earlier notes |
+
+**Hardware**
+
+| File | What it covers |
+|---|---|
+| `docs/shield-pcb.md` | the shield PCB: scope, schematic, routed board, mounting holes, connectors, ordering at JLCPCB, decided and open points |
+| `docs/speaker-measurement.md` | how the speaker response is measured (`speaker_sweep`), results bare and in the boxes, the speaker EQ |
 
 The speaker box (OpenSCAD, Fusion 360 script, Bambu Studio project) is in `hardware/speaker_box/`; its notes are in
 the header of `speaker_box.scad`.
+
+**Sound**
+
+| File | What it covers |
+|---|---|
+| `docs/sound-research.md` | engine sound research: constraints of a small speaker, approaches tried, speaker-tuned candidates, lessons |
+| `docs/audio-simulation/README.md` | rendered previews of the engine sounds (`engine_lab` candidates and earlier firmware) |
+| `docs/user-sounds.md` | plan: user-changeable sound sets, what a sample must meet, the PC tool |
+| `assets/samples/LICENSE-SAMPLES.md` | origin and licence of every sound (CC0 recordings, synthesised sounds, voice prompts) |
+
+**Plans and decisions**
+
+| File | What it covers |
+|---|---|
+| `docs/roadmap.md` | everything open: next steps, checks on hardware, missing sound features, the development outlook |
+| `docs/rejected-ideas.md` | ideas that were considered and dropped (shield, receiver link, sound, speaker box, USB audio), why, and what is used instead |
 
 ## Structure
 
@@ -70,7 +96,7 @@ Open `firmware/` in VS Code with the PlatformIO extension, or run `pio run -e <e
 
 | Env | What it does |
 |---|---|
-| `engine_lab` | **the current firmware**: all engine-sound candidates (the BOOT button switches 1..6 and beeps the number), ignition, starter, stop and horn from the channel data, speaker EQ for the 30 ml box |
+| `engine_lab` | **the current firmware**: all seven engine-sound candidates (the BOOT button switches 1..7 and announces the name), ignition, starter, stop and horn from the channel data, shift sound, no upshift while reversing, speaker EQ for the 30 ml box |
 | `engine_demo` | the same, plays every sound through the whole rpm range by itself with a spoken announcement (no receiver needed) |
 | `engine_pulse` | real-time grain synthesis (preset a_diesel6) |
 | `engine`, `engine_diesel`, `engine_truck`, `engine_gears` | earlier variants: synthesised loop, CC0 diesel and truck loops with the virtual gearbox, one loop per gear |

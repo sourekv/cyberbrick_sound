@@ -1,5 +1,8 @@
 # Project overview: what we built and why
 
+Status: 2026-11-08. The prototype works in the truck with the `engine_lab` firmware; the shield PCB is designed and
+prepared for ordering, not made yet. This page describes the current state; what is open is in `roadmap.md`.
+
 ## Goal
 
 The Bambu Lab CyberBrick is an RC kit without sound. This project adds an **engine sound module** for CyberBrick models (first target: a truck): a small board that listens to the throttle, plays a matching engine sound through a speaker, and **never touches the original signal path**. The module is an add-on, not part of the control chain: if it fails, the model still drives.
@@ -54,15 +57,14 @@ Every firmware shares the pins and constants in `include/config.h`. Environments
 
 | Env | What it does |
 |---|---|
+| `engine_lab` | **the current firmware**: all seven engine-sound candidates (the BOOT button switches 1..7 and announces the name), ignition, starter, stop and horn from the channel data, the virtual gearbox with a shift sound on every upshift, no upshift while reversing, speaker EQ for the 30 ml box |
+| `engine_demo` | the same, plays every sound through the whole rpm range by itself with a spoken announcement (no receiver needed) |
 | `test_tone` | 440 Hz sine over I2S; checks amplifier and speaker |
-| `pulse_measure` | prints the throttle pulse width to serial |
-| `engine` | synthesised firing-pulse loop played back at a throttle-dependent rate |
-| `engine_pulse` | real-time synthesis: throttle sets how often a combustion grain is triggered (default sound, preset a_diesel6) |
-| `engine_diesel` | like `engine`, with a real diesel idle loop (CC0), plus the virtual gearbox |
-| `engine_truck` | real truck idle loop (CC0) with the virtual gearbox and a second "under load" loop blended in with the throttle |
-| `engine_gears` | test: a separate CC0 truck loop for each of the 5 gears (0.75x..1.3x playback), crossfade at a shift, gear number announced with 1..5 beeps |
-| `engine_real` | experiment with owner-supplied recordings (not in the repo, licence unknown) |
-| `engine_lab` | the current firmware: all engine-sound candidates (the BOOT button switches 1..6 and beeps the number), ignition, starter, stop and horn from the channel data, speaker EQ for the 30 ml box |
+| `speaker_sweep` | slow sine sweep for measuring the speaker (`speaker-measurement.md`) |
+| `pulse_measure`, `uart_probe` | print the servo pulse width or the receiver's channel frames to serial |
+| `engine_pulse` | earlier: real-time synthesis, the throttle sets how often a combustion grain is triggered (preset a_diesel6; the default sound until `engine_lab`) |
+| `engine`, `engine_diesel`, `engine_truck`, `engine_gears` | earlier: synthesised firing-pulse loop; CC0 diesel and truck loops with the virtual gearbox (the truck with a second "under load" loop); one CC0 loop per gear |
+| `engine_real` | earlier experiment with owner-supplied recordings (not in the repo, licence unknown) |
 
 How it works: the module reads the channel frames from the receiver (`include/rc_link.h`) or, with an older configuration, measures the servo pulse width with a pin interrupt; the throttle is the deflection from the centre with a dead band and a timeout (no data or pulse for 150 ms means idle); the RPM is smoothed (rises faster than it falls); the I2S output is written in blocks of 128 samples at 22.05 kHz.
 
@@ -73,7 +75,9 @@ Extras in the `engine*` firmware:
 
 ## Sound: why it is built this way
 
-Research and measurements are in `sound-research.md`. The constraints that decided everything:
+Research and measurements are in `sound-research.md`. Current state: `engine_lab` holds seven candidates (CC0 truck
+loops, the old grain synth and four presets of a newer synth tuned to the speaker); which one wins is judged by ear.
+The target for the truck is a Detroit Diesel Series 60 (inline-6). The constraints that decided everything:
 
 - The speaker is small (40 mm prototype, 21 mm production candidates) and reproduces almost nothing below about 300 Hz. Sound that lives below 150 Hz is nearly inaudible and turns into hiss. The first CC0 car loops were almost pure 40 to 80 Hz tones and failed for exactly this reason.
 - Playing a loop faster shifts the whole timbre, not just the firing rate, so a single loop turns into a siren at high rates. That is why the synthesised grain engine (`engine_pulse`) keeps the grain timbre fixed and changes only the rate, and why the real-loop firmware limits the rate range and adds a second layer.
@@ -97,35 +101,10 @@ Research and measurements are in `sound-research.md`. The constraints that decid
 - Gearbox logic: simulated with `tools/test_gearbox.cpp` (it shifts as designed).
 - Dimensions of the shield: hole spacing 23.0 x 24.0 mm, confirmed from the official CAD model of the receiver (`shield-pcb.md`).
 
-**Not yet checked on hardware:**
+**Not yet checked on hardware:** the shield boards (none made yet) and a few details of the sound; the list is in
+`roadmap.md` "To check on hardware".
 
-- `engine_diesel` (real loop, gearbox). The assistant's build environment cannot download PlatformIO packages, so it passed only a syntax check with stand-in Arduino headers.
-- The shield PCB itself: a KiCad schematic and a routed board with manufacturing files exist (`hardware/shield/`, see `shield-pcb.md`), but they have not been reviewed by a human in KiCad and nothing has been manufactured.
-- The loaded layer's level and pitch match (`LOADED_GAIN`, `LOADED_RATE_SCALE`) were set from measured values, not by ear.
+## What is open
 
-## Open decisions
-
+Everything still open (decisions, checks, sound features, the development outlook) is collected in `roadmap.md`.
 Ideas already considered and dropped, with the reasons: `rejected-ideas.md`.
-
-- Which sound wins: synthesised grains, Citroen, or truck with gearbox (to be judged by listening on the real speaker).
-- Speaker: 40 mm or a production candidate (for example a 21 mm one). The sealed box is done (30 ml best, 15 ml close; `speaker-measurement.md`); further improvement, if needed, would come from a larger or different speaker or a different amplifier / converter, not from the box. The printed box is a test fixture only; the enclosure for the model will be designed from scratch
-  around the chosen speaker.
-- Shield: a human review of the board in KiCad; an exact quote. Prepared on 2026-11-08: the service fits all SMD parts (LCSC numbers and JLCPCB files in `hardware/shield/fab/`, steps in `shield-pcb.md` "Ordering at JLCPCB"), J1/J3/J4 are soldered by hand. Decided on 2026-11-08: the Zero sits in sockets, the speaker connector is JST SH like the CyberBrick motor port; a strain-relief slot for a soldered servo cable was considered and rejected (`shield-pcb.md`).
-- A long power test with the motor running, to see whether the servo-port 5 V supply holds.
-- Development outlook (2026-11-08), not started:
-  - a USB-audio test firmware (the Zero as a speaker for the PC): tried on 2026-11-08, does not work with the current
-    Arduino core; parked until a move to core 3.x (`rejected-ideas.md`);
-  - firmware updates over Wi-Fi (OTA), with Wi-Fi switched on only in an update mode (for example BOOT held at
-    power-up). The 8 MB partition table already has two 3.3 MB app slots; the current firmware is about 1.15 MB.
-  - The sounds are compiled into the firmware as headers (`firmware/include/*.h`), so an OTA update also brings new
-    sounds. A separate filesystem partition for the sounds would allow loading them without a rebuild, including own
-    recordings that cannot go into the repo.
-  - User-changeable sounds (decided 2026-11-08 as a plan, not started): sound sets as files in the 1.5 MB data
-    partition, loaded over **USB** by a PC tool (first a Python script for us, then a web page with Web Serial for users) that converts a WAV (22050 Hz mono 16 bit) and writes it together with
-    its parameters (playback rate at idle and full throttle, level, optional loaded loop); Wi-Fi upload later, together
-    with OTA. Requirements: the BOOT button keeps switching between sets, now through the built-in sets and the loaded
-    ones; the built-in sets stay as a fallback when no file is there. A clean loop point is up to the user (or a tool
-    that helps find one); the licence of own recordings is the user's. What a sample must meet (format, size, loop,
-    parameters): `user-sounds.md`.
-- Later, optional: spare inputs (for example a switch for an engine-stop sound), a variant for a classic RC receiver (see `shield-pcb.md`).
-- ~~Engine start, stop and horn on one transmitter button through PWM3~~: done differently on 2026-11-06, through the receiver's channel data on a single servo cable (S4); see `start-stop-horn.md`. More servo cables are not planned.
