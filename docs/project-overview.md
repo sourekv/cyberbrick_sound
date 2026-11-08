@@ -46,7 +46,7 @@ The real KiCad design is in `hardware/shield/` (schematic `shield.kicad_sch`, bo
 - **Amplifier:** bare MAX98357A chip (TQFN-16), to be **assembled by a PCB service** because it cannot be hand-soldered in practice. No plug-in breakout module.
 - **Speaker J2:** JST SH 1.0 mm 2-pin side-entry connector, the same type as the CyberBrick motor and button ports. The CyberBrick kit contains a suitable 10 cm cable (bag B-IC004), and SH 1.0 pigtails are cheap, so users need no crimping.
 - **Service items:** a green power LED (from the servo-port 5 V) beside the Zero, bottom test pads, four mounting holes.
-- **Rejected on the way:** a Zero-sized board without holes (no room for anything), a variant with fragile "ears" for the holes, a spare GPIO header (recorded as a future option).
+- **Rejected on the way:** a Zero-sized board without holes (no room for anything), a variant with fragile "ears" for the holes, a spare GPIO header (recorded as a future option); the full list is in `rejected-ideas.md`.
 
 ## Firmware (`firmware/`, PlatformIO, Arduino framework)
 
@@ -105,9 +105,19 @@ Research and measurements are in `sound-research.md`. The constraints that decid
 
 ## Open decisions
 
+Ideas already considered and dropped, with the reasons: `rejected-ideas.md`.
+
 - Which sound wins: synthesised grains, Citroen, or truck with gearbox (to be judged by listening on the real speaker).
 - Speaker: 40 mm or a production candidate (for example a 21 mm one). The sealed box is done (30 ml best, 15 ml close; `speaker-measurement.md`); further improvement, if needed, would come from a larger or different speaker or a different amplifier / converter, not from the box.
-- Shield: Zero in sockets or soldered; how much the PCB service assembles besides the amplifier; schematic and routing; an exact quote.
+- Shield: how much the PCB service assembles besides the amplifier; a human review of the board in KiCad; part numbers for the service; an exact quote. Decided on 2026-11-08: the Zero sits in sockets, the speaker connector is JST SH like the CyberBrick motor port; a strain-relief slot for a soldered servo cable was considered and rejected (`shield-pcb.md`).
 - A long power test with the motor running, to see whether the servo-port 5 V supply holds.
+- Development outlook (2026-11-08), not started:
+  - a USB-audio test firmware (the Zero as a speaker for the PC): tried on 2026-11-08, does not work with the current
+    Arduino core; parked until a move to core 3.x (`rejected-ideas.md`);
+  - firmware updates over Wi-Fi (OTA), with Wi-Fi switched on only in an update mode (for example BOOT held at
+    power-up). The 8 MB partition table already has two 3.3 MB app slots; the current firmware is about 1.15 MB.
+  - The sounds are compiled into the firmware as headers (`firmware/include/*.h`), so an OTA update also brings new
+    sounds. A separate filesystem partition for the sounds would allow loading them without a rebuild, including own
+    recordings that cannot go into the repo.
 - Later, optional: spare inputs (for example a switch for an engine-stop sound), a variant for a classic RC receiver (see `shield-pcb.md`).
 - ~~Engine start, stop and horn on one transmitter button through PWM3~~: done differently on 2026-11-06, through the receiver's channel data on a single servo cable (S4); see `start-stop-horn.md`. More servo cables are not planned.

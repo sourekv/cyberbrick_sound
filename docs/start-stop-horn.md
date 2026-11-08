@@ -50,7 +50,7 @@ The CyberBrick receiver has no inputs, only outputs, so the button is passed thr
 - The initial value cannot be set in the app's servo dialog; after power-up PWM3 is expected to sit near the centre (~1.5 ms) until the first press.
 - Long Hold stays free for later. A double press could be detected in the module by timing, but it is not needed.
 - The horn has a fixed length because the module cannot tell how long the button is held.
-- Code snippets (MicroPython in the CyberBrick app) were looked at and rejected: isolated, no state, 2048-character limit. Built-in rules are enough.
+- Code snippets (MicroPython in the CyberBrick app) were looked at and rejected: isolated, no state, 2048-character limit. Built-in rules are enough. (A one-line note carried over from the claude.ai chat, not a real test; the work then went into listening to the radio link, see below. On 2026-11-06 a Code snippet turned out to be the way: it now forwards all channels to the module and is the current design, see the top of this file and `controls.md`.)
 
 ## Engine state rules
 

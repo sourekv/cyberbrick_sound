@@ -65,15 +65,17 @@ From the Maker's Supply CyberBrick user's manual (the Bambu store page names onl
 - **Flashing with the servo cable plugged in must be safe** (requirement from the project owner, 2026-11-08): the module hangs on one cable and the V wire cannot be unplugged on its own. The OR-ing diode D2 stops the USB 5 V from flowing into the receiver, and the servo 5 V reaches the Zero's 5V pad (= USB VBUS) only through D2, about 0.3 V lower than USB, so normally nothing flows back into the computer either. The breadboard rule (never USB and V together) applies only to the prototype without D2. To check on the first boards: voltages and currents with USB and the receiver connected at the same time.
 - Power LED on the board (from the servo-port 5 V); the signal status is shown by the Zero's RGB LED in firmware.
 - No spare GPIO header in this iteration, to keep the scope small (see "Out of scope").
+- **The ESP32-S3-Zero sits in two 9-pin female socket strips (J3, J4), decided 2026-11-08.** It stays replaceable and can go back to the breadboard. Soldering it in only makes sense together with a single board that carries the ESP32-S3 itself (iteration 3, see "Out of scope").
 - Servo input J1 stays a 3-pin right-angle pin header (male) for now; it mates with a female-to-female servo/Dupont cable to PWM4 (S4, data configuration) or PWM2 (pulse configuration). It is the only servo input. A female socket (so that a standard servo extension cable could be used) is left as a possible later change.
-- Speaker connector J2: JST SH 1.0 mm 2-pin, as used by the CyberBrick motor and button ports.
+- Speaker connector J2: JST SH 1.0 mm 2-pin, as used by the CyberBrick motor and button ports (confirmed by the project owner on 2026-11-08: the same connector as the CyberBrick motor port; no screw terminal, no dual footprint).
 - The amplifier is a bare MAX98357A chip on the board, **assembled by a PCB service** (the TQFN-16 package is not practical to hand-solder). No plug-in breakout module.
+
+- **Rejected 2026-11-08 (all rejected ideas: `rejected-ideas.md`): a strain-relief slot next to J1.** Idea: an unplated slot (about 4.4 x 1.6 mm) between the board edge and J1, so that a servo cable soldered into the J1 holes would come up through the slot and a pull would end there instead of at the joints (a cable tie through two small holes was judged too weak). It was drawn and put into the board, then dropped by the project owner: it complicates the prototype, and only 1 mm of board would be left between the slot and the edge. The prototype keeps the right-angle header J1. Could come back with a soldered-cable variant of a later board.
 
 ## Decisions still open
 
 - The speaker it has to carry (40 mm or a production candidate; see `sound-research.md`). The board size itself is settled: the outline of the Zero.
 - Whether the Zero's underside is flat (the headers leave about 7 mm of clearance under it, enough for everything on the board; check the real module).
-- ESP32-S3-Zero in a socket (replaceable) or soldered directly.
 - How much the PCB service assembles besides the amplifier: only the SMD parts (and the rest by hand) or the whole board.
 
 ## Out of scope for this iteration

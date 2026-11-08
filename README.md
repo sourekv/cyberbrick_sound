@@ -45,6 +45,7 @@ flashing and USB tests; connect GND first and disconnect it last (`docs/bringup.
 | `docs/cyberbrick-code/README.md` | the MicroPython snippets for the receiver (`blink_test.py`, `uart_forward.py`), test wiring and results |
 | `docs/sound-research.md` | engine sound research: constraints of a small speaker, approaches tried, speaker-tuned candidates, lessons |
 | `docs/audio-simulation/README.md` | rendered previews of the engine sounds (`engine_pulse`, `engine_real`, `engine_lab` candidates) |
+| `docs/rejected-ideas.md` | ideas that were considered and dropped (shield, receiver link, sound, speaker box), why, and what is used instead |
 | `docs/speaker-measurement.md` | how the speaker response is measured (`speaker_sweep`), results bare and in the 30 ml box, the speaker EQ |
 | `docs/shield-pcb.md` | the shield PCB: scope, schematic, routed board, mounting holes, connectors, decided and open points |
 | `assets/samples/LICENSE-SAMPLES.md` | origin and licence of every sound (CC0 recordings, synthesised sounds, voice prompts) |
