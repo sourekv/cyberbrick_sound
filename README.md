@@ -17,8 +17,7 @@ State of 2026-11-08; what is still open: `docs/roadmap.md`.
   shift.
 - **Shield PCB**: KiCad schematic, routed board and JLCPCB assembly files exist (`hardware/shield/`); not yet reviewed
   by a human or manufactured.
-- Which engine sound wins is still being judged by ear (`engine_lab` holds all candidates); the target is a Detroit
-  Diesel Series 60.
+- Which engine sound wins is still being judged by ear (`engine_lab` holds all candidates).
 
 ## How it works
 
@@ -36,8 +35,9 @@ Bambu's firmware is unchanged on both boards. The configuration to send from the
 `docs/cyberbrick-config/Truck_with_Engine_Sound_Data.json`. The firmware also still accepts the older variant, a
 throttle-only servo pulse on PWM2. Details: `docs/controls.md`.
 
-**Power rule:** never connect the module to USB and to the receiver's 5 V at the same time. Disconnect the V wire for
-flashing and USB tests; connect GND first and disconnect it last (`docs/bringup.md`).
+**Power rule (breadboard prototype):** never connect the module to USB and to the receiver's 5 V at the same time.
+Disconnect the V wire for flashing and USB tests; connect GND first and disconnect it last (`docs/bringup.md`). The
+shield PCB has an OR-ing diode, so there both may be connected (`docs/shield-pcb.md`).
 
 ## Documentation
 

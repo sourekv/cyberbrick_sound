@@ -77,7 +77,7 @@ Extras in the `engine*` firmware:
 
 Research and measurements are in `sound-research.md`. Current state: `engine_lab` holds seven candidates (CC0 truck
 loops, the old grain synth and four presets of a newer synth tuned to the speaker); which one wins is judged by ear.
-The target for the truck is a Detroit Diesel Series 60 (inline-6). The constraints that decided everything:
+The constraints that decided everything:
 
 - The speaker is small (40 mm prototype, 21 mm production candidates) and reproduces almost nothing below about 300 Hz. Sound that lives below 150 Hz is nearly inaudible and turns into hiss. The first CC0 car loops were almost pure 40 to 80 Hz tones and failed for exactly this reason.
 - Playing a loop faster shifts the whole timbre, not just the firing rate, so a single loop turns into a siren at high rates. That is why the synthesised grain engine (`engine_pulse`) keeps the grain timbre fixed and changes only the rate, and why the real-loop firmware limits the rate range and adds a second layer.

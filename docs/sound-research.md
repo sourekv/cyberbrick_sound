@@ -1,6 +1,6 @@
 # Engine sound research
 
-Status: 2026-11-08. The current firmware is `engine_lab` with seven candidates (section "Speaker-tuned candidates"); the winner is still being judged by ear, aiming at a Detroit Diesel Series 60 (inline-6) for the truck. Until 2026-11-05 the default was the synthesised "a_diesel6" preset (`engine_pulse`). This page records what was tried and measured; what is open is in `roadmap.md`.
+Status: 2026-11-08. The current firmware is `engine_lab` with seven candidates (section "Speaker-tuned candidates"); the winner is still being judged by ear. Until 2026-11-05 the default was the synthesised "a_diesel6" preset (`engine_pulse`). This page records what was tried and measured; what is open is in `roadmap.md`.
 
 ## Constraints that shape everything
 

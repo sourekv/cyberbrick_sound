@@ -8,7 +8,7 @@ reasons, are in `rejected-ideas.md`.
 
 | Item | Where | Notes |
 |---|---|---|
-| Choose the engine sound | `engine_lab`, `sound-research.md` | the truck is to sound like a **Detroit Diesel Series 60** (inline-6 truck diesel, 3 firings per crank revolution); candidates are judged by ear on the real speaker. The Synth2 `diesel` preset or a new inline-6 preset is the natural start |
+| Choose the engine sound | `engine_lab`, `sound-research.md` | candidates are judged by ear on the real speaker |
 | Shield: review by a human in KiCad | `shield-pcb.md` "Board" | DRC and 3D view again, silkscreen tidy-up, track widths of the 5 V path, GND stitching; the routing is autorouter quality |
 | Shield: order | `shield-pcb.md` "Ordering at JLCPCB" | stock check again, rotation check of U1, D1/D2, C1, LED1, J2 in the placement preview, exact quote |
 | Speaker for the model | `speaker-measurement.md` | 40 mm or a production candidate (for example 21 mm). The box is done (30 ml best, 15 ml close); more would come from another speaker or amplifier, not from the box |
