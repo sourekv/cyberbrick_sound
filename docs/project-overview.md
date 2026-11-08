@@ -106,7 +106,7 @@ Research and measurements are in `sound-research.md`. The constraints that decid
 ## Open decisions
 
 - Which sound wins: synthesised grains, Citroen, or truck with gearbox (to be judged by listening on the real speaker).
-- Speaker: 40 mm or a production candidate (for example a 21 mm one).
+- Speaker: 40 mm or a production candidate (for example a 21 mm one). The sealed box is done (30 ml best, 15 ml close; `speaker-measurement.md`); further improvement, if needed, would come from a larger or different speaker or a different amplifier / converter, not from the box.
 - Shield: Zero in sockets or soldered; how much the PCB service assembles besides the amplifier; schematic and routing; an exact quote.
 - A long power test with the motor running, to see whether the servo-port 5 V supply holds.
 - Later, optional: spare inputs (for example a switch for an engine-stop sound), a variant for a classic RC receiver (see `shield-pcb.md`).

@@ -117,3 +117,9 @@ the cable hole was sealed (`speaker_box15_unsealed_2026-11-08.csv` / `.png`); th
   424 Hz). Distortion is about as low as in the 30 ml box.
 - So the smaller box costs some low bass but works; the 30 ml box stays the better one where it fits. `SPEAKER_EQ_BOX` was
   fitted to the 30 ml box; with the 15 ml box it is close, with slightly less bass. A separate EQ was not made.
+- **A foam disc (6 to 8 mm) on the bottom of the 15 ml box changes nothing**: the response stayed within the spread of two
+  recordings (band means within 1 dB, single points within 2 to 4 dB), so there is no standing wave between the cone and
+  the bottom worth damping. (The distortion below 300 Hz rose again in that recording, most likely a small leak after the
+  box was opened; not followed up.) Recording not stored.
+- **End of the box experiments (2026-11-08).** The box shape and filling are not worth more work. If the sound needs to
+  get better later, the next step is a larger or different speaker, or a different amplifier / converter.
