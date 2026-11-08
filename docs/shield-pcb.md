@@ -27,7 +27,7 @@ The first real design step: the KiCad 7 schematic `hardware/shield/shield.kicad_
 
 - 2 layers, 29 x 30 mm, tracks 0.25 mm, clearance 0.2 mm, vias 0.6/0.3 mm, copper-to-edge 0.3 mm. J1 (right-angle header) sticks out of the top edge, the J2 speaker connector opens toward the bottom edge, test pads are on the bottom side.
 - DRC (run through pcbnew, KiCad 7 has no command-line DRC): 0 unconnected, 0 clearance / short / courtyard / edge errors. Remaining messages are warnings only: silkscreen overlaps and silkscreen clipped at the edge (J1 outline hangs outside the board), and a library-path warning from the generated footprints.
-- Manufacturing outputs in `hardware/shield/fab/`: `shield_gerbers.zip` (Gerber + drill), `shield_positions.csv`, `shield_bom.csv` (values, footprints from the board, LCSC part numbers) and the JLCPCB assembly files in `fab/jlcpcb/` (made by `tools/make_shield_outputs.py`; `--bom-only` rebuilds only the BOMs). How to order: "Ordering at JLCPCB" below.
+- Manufacturing outputs in `hardware/shield/fab/`: `shield_gerbers.zip` (Gerber + drill), `shield_positions.csv`, `shield_bom.csv` (values, footprints from the board, LCSC part numbers) and the assembly files for JLCPCB in `fab/jlcpcb/` and for PCBWay in `fab/pcbway/` (made by `tools/make_shield_outputs.py`; `--bom-only` rebuilds only the BOMs and assembly files). How to order: "Ordering at JLCPCB" and "Ordering at PCBWay" below.
 - **Not ready to order as it is.** Needs a human review in KiCad (DRC and 3D view again, silkscreen tidy-up, track widths of the 5 V path, GND stitching), the chosen parts ("Ordering at JLCPCB") looked over, and the open decisions below answered. The routing is autorouter quality, not hand-optimised; it has not been through any signal-integrity or EMC check.
 
 ## On the board
@@ -98,6 +98,41 @@ Steps:
    D1 and D2 (cathode bar), C1 (plus side), LED1 (cathode), and J2 (the plug opening towards the board edge).
 4. After delivery: solder J3/J4 (the Zero's sockets) and J1 by hand.
 5. First power-up: the checks listed under "Decided" (USB and receiver connected together).
+
+## Ordering at PCBWay
+
+Prepared on 2026-11-08 as the second option, so both services can be quoted for the same board; not ordered yet.
+
+How it differs from JLCPCB:
+
+- **Turnkey:** PCBWay buys the parts itself from any distributor, by manufacturer and part number, so it does not
+  depend on one stock. The BOM gives the LCSC number as an alternative source.
+- **It fits every part, the through-hole ones too:** J1 (right-angle servo header) and the Zero's socket strips J3/J4.
+  The board arrives complete, nothing is soldered by hand.
+- **The files are checked by a person** before production (including the part rotations); the price is confirmed
+  after that review, usually within a day or two, not instantly.
+- For a small series the assembly is usually more expensive than at JLCPCB; compare the real quotes.
+
+Files:
+
+- PCB: `hardware/shield/fab/shield_gerbers.zip` (the same as for JLCPCB; it holds the silkscreen layers PCBWay asks
+  for).
+- BOM: `fab/pcbway/shield_bom_pcbway.csv`: every fitted part with manufacturer, part number, description, package,
+  SMD or THT, and the LCSC number. If PCBWay wants its own template, copy the columns over.
+- Positions: `fab/pcbway/shield_centroid_pcbway.csv` (designator, X, Y in mm, layer, rotation), all parts including
+  J1, J3, J4.
+
+Parts that only PCBWay fits (checked on digikey.com on 2026-11-08):
+
+| Ref | Part |
+|---|---|
+| J1 | Sullins PRPC003SBAN-M71RC, pin header 1x3 2.54 mm, right angle |
+| J3, J4 | Sullins PPTC091LFBN-RC, female socket strip 1x9 2.54 mm, straight, 8.5 mm high |
+
+Steps: upload the Gerbers, choose assembly ("Turnkey", top side, SMD and through hole), upload the BOM and the
+centroid file, and in the comments ask them to check the polarised parts as for JLCPCB (U1 pin 1, D1/D2 cathode, C1
+plus side, LED1 cathode, J2 opening towards the board edge) and the orientation of J1 (pins out over the top edge).
+Before ordering, check that the 8.5 mm socket height suits the parts under the Zero (`roadmap.md`).
 
 ## Decided
 

@@ -1,0 +1,19 @@
+Item #,Designator,Qty,Manufacturer,Mfg Part #,Description,Value,Package,Type,LCSC Part # (alternative source)
+1,C1,1,Kyocera AVX,TAJC107K010RNJ,"Tantalum capacitor 100 uF 10 V, case C 6032",100u,CP_EIA-6032-28_Kemet-C,SMD,C8649
+2,C2,1,Samsung Electro-Mechanics,CL21A106KAYNNNE,Ceramic capacitor 10 uF 25 V X5R 0805,10u,C_0805_2012Metric,SMD,C15850
+3,"C3,C6,C7",3,Samsung Electro-Mechanics,CL10B104KB8NNNC,Ceramic capacitor 100 nF 50 V X7R 0603,100n,C_0603_1608Metric,SMD,C1591
+4,"C4,C5",2,Samsung Electro-Mechanics,CL10C101JB8NNNC,Ceramic capacitor 100 pF 50 V C0G 0603,100p,C_0603_1608Metric,SMD,C14858
+5,"D1,D2",2,JSCJ,B5819W SL,"Schottky diode 40 V 1 A, SOD-123",Schottky 1A,D_SOD-123,SMD,C8598
+6,F1,1,Ruilon,SMD1206P050TF/13.2,"PTC resettable fuse 500 mA hold 13.2 V, 1206",0.5A PTC,Fuse_1206_3216Metric,SMD,C43379
+7,"FB1,FB2",2,Murata,BLM18KG601SN1D,"Ferrite bead 600 R @ 100 MHz 1.3 A, 0603",ferrite 600R@100MHz,L_0603_1608Metric,SMD,C85833
+8,J1,1,Sullins Connector Solutions,PRPC003SBAN-M71RC,"Pin header 1x3 2.54 mm, right angle, through hole",Servo input S-V-G,PinHeader_1x03_P2.54mm_Horizontal,THT,
+9,J2,1,JST,SM02B-SRSS-TB(LF)(SN),"Connector JST SH 1.0 mm 2-pin, right angle, SMD",Speaker JST SH 1.0,JST_SH_SM02B-SRSS-TB_1x02-1MP_P1.00mm_Horizontal,SMD,C160402
+10,J3,1,Sullins Connector Solutions,PPTC091LFBN-RC,"Female socket strip 1x9 2.54 mm, straight, through hole, 8.5 mm high",Zero left: 5V GND 3V3 IO1 IO2 IO3 IO4 IO5 IO6,PinSocket_1x09_P2.54mm_Vertical,THT,
+11,J4,1,Sullins Connector Solutions,PPTC091LFBN-RC,"Female socket strip 1x9 2.54 mm, straight, through hole, 8.5 mm high",Zero right: TX RX IO13..IO7 (unused),PinSocket_1x09_P2.54mm_Vertical,THT,
+12,LED1,1,Kento,KT-0603G,LED green 0603,green,LED_0603_1608Metric,SMD,C12624
+13,"R1,R3",2,Uni-Royal,0603WAF1001T5E,Resistor 1 k 1 % 0603,1k,R_0603_1608Metric,SMD,C21190
+14,"R2,R4",2,Uni-Royal,0603WAF1003T5E,Resistor 100 k 1 % 0603,100k,R_0603_1608Metric,SMD,C25803
+15,R5,1,Uni-Royal,0603WAF1004T5E,Resistor 1 M 1 % 0603,1M,R_0603_1608Metric,SMD,C22935
+16,"R6,R7,R8",3,Uni-Royal,0402WGF330JTCE,Resistor 33 R 5 % 0402,33R,R_0402_1005Metric,SMD,C25105
+17,TVS1,1,Nexperia,PESD5V0S1BA,"ESD protection diode 5 V, SOD-323",ESD diode 5 V,D_SOD-323,SMD,C19224
+18,U1,1,Analog Devices / Maxim,MAX98357AETE+T,"I2S class-D amplifier, TQFN-16 3x3",MAX98357AETE+,TQFN-16-1EP_3x3mm_P0.5mm_EP1.23x1.23mm,SMD,C910544

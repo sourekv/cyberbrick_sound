@@ -1,8 +1,9 @@
-"""Manufacturing outputs of the shield board: Gerbers + drill (zip), component positions, BOM, JLCPCB assembly files.
+"""Manufacturing outputs of the shield board: Gerbers + drill (zip), component positions, BOM, assembly files for
+JLCPCB (SMD only, LCSC part numbers) and for PCBWay (every part incl. the through-hole ones, manufacturer part numbers).
 Run after tools/make_shield_pcb.py route.
 
     python3 tools/make_shield_outputs.py             everything (needs kicad-cli on the PATH)
-    python3 tools/make_shield_outputs.py --bom-only  only the BOMs and the JLCPCB files, from the existing
+    python3 tools/make_shield_outputs.py --bom-only  only the BOMs and the assembly files, from the existing
                                                      fab/shield_positions.csv (no kicad-cli needed)
 
 Output: hardware/shield/fab/ (committed so the files can be inspected; regenerate after any board change).
@@ -24,6 +25,7 @@ PCB = ROOT / "hardware" / "shield" / "shield.kicad_pcb"
 FAB = ROOT / "hardware" / "shield" / "fab"
 POS = FAB / "shield_positions.csv"
 JLC = FAB / "jlcpcb"
+PCBWAY = FAB / "pcbway"
 
 # LCSC part numbers for assembly at JLCPCB, checked on lcsc.com on 2026-11-08 (in stock that day). Check the stock
 # again before ordering; a part that ran out needs a replacement with the same value and package.
@@ -53,8 +55,35 @@ LCSC = {
     "TVS1": "C19224",   # Nexperia PESD5V0S1BA, ESD diode 5 V, SOD-323
     "U1": "C910544",    # Maxim MAX98357AETE+T, TQFN-16 3x3
 }
-# soldered by hand, not by the assembly service: the Zero's two socket strips and the right-angle servo header
+# soldered by hand at JLCPCB (not in its files): the Zero's two socket strips and the right-angle servo header.
+# PCBWay fits them too (see MPN below).
 HAND_SOLDERED = {"J1", "J3", "J4"}
+
+# Manufacturer and part number of every fitted part, for PCBWay (it buys the parts itself, from any distributor).
+# The SMD parts are the same as the LCSC ones above. J1/J3/J4 checked on digikey.com on 2026-11-08.
+MPN = {
+    "C1": ("Kyocera AVX", "TAJC107K010RNJ", "Tantalum capacitor 100 uF 10 V, case C 6032"),
+    "C2": ("Samsung Electro-Mechanics", "CL21A106KAYNNNE", "Ceramic capacitor 10 uF 25 V X5R 0805"),
+    "C3": ("Samsung Electro-Mechanics", "CL10B104KB8NNNC", "Ceramic capacitor 100 nF 50 V X7R 0603"),
+    "C4": ("Samsung Electro-Mechanics", "CL10C101JB8NNNC", "Ceramic capacitor 100 pF 50 V C0G 0603"),
+    "D1": ("JSCJ", "B5819W SL", "Schottky diode 40 V 1 A, SOD-123"),
+    "F1": ("Ruilon", "SMD1206P050TF/13.2", "PTC resettable fuse 500 mA hold 13.2 V, 1206"),
+    "FB1": ("Murata", "BLM18KG601SN1D", "Ferrite bead 600 R @ 100 MHz 1.3 A, 0603"),
+    "J1": ("Sullins Connector Solutions", "PRPC003SBAN-M71RC", "Pin header 1x3 2.54 mm, right angle, through hole"),
+    "J2": ("JST", "SM02B-SRSS-TB(LF)(SN)", "Connector JST SH 1.0 mm 2-pin, right angle, SMD"),
+    "J3": ("Sullins Connector Solutions", "PPTC091LFBN-RC", "Female socket strip 1x9 2.54 mm, straight, through hole, 8.5 mm high"),
+    "LED1": ("Kento", "KT-0603G", "LED green 0603"),
+    "R1": ("Uni-Royal", "0603WAF1001T5E", "Resistor 1 k 1 % 0603"),
+    "R2": ("Uni-Royal", "0603WAF1003T5E", "Resistor 100 k 1 % 0603"),
+    "R5": ("Uni-Royal", "0603WAF1004T5E", "Resistor 1 M 1 % 0603"),
+    "R6": ("Uni-Royal", "0402WGF330JTCE", "Resistor 33 R 5 % 0402"),
+    "TVS1": ("Nexperia", "PESD5V0S1BA", "ESD protection diode 5 V, SOD-323"),
+    "U1": ("Analog Devices / Maxim", "MAX98357AETE+T", "I2S class-D amplifier, TQFN-16 3x3"),
+}
+for _ref, _same in {"C5": "C4", "C6": "C3", "C7": "C3", "D2": "D1", "FB2": "FB1", "J4": "J3", "R3": "R1", "R4": "R2",
+                    "R7": "R6", "R8": "R6"}.items():
+    MPN[_ref] = MPN[_same]
+THROUGH_HOLE = {"J1", "J3", "J4"}
 
 
 def run(*a):
@@ -75,6 +104,10 @@ def write_boms():
     missing = [r for r in parts if r not in LCSC and r not in HAND_SOLDERED and not r.startswith(("MH", "TP", "JP"))]
     if missing:
         sys.exit(f"no LCSC part number for {missing}: add them to LCSC in {Path(__file__).name}")
+    fitted = sorted(r for r in parts if not r.startswith(("MH", "TP", "JP")))
+    missing = [r for r in fitted if r not in MPN]
+    if missing:
+        sys.exit(f"no manufacturer part number for {missing}: add them to MPN in {Path(__file__).name}")
 
     # full BOM, grouped by value + footprint + part number
     groups = {}
@@ -108,6 +141,27 @@ def write_boms():
         for ref in assembled:
             _v, _fp, x, y, rot, side = parts[ref]
             w.writerow([ref, f"{float(x):.4f}mm", f"{float(y):.4f}mm", "Top" if side == "top" else "Bottom",
+                        f"{float(rot):g}"])
+
+    # PCBWay turnkey assembly: every fitted part, SMD and through hole, with manufacturer part numbers
+    PCBWAY.mkdir(exist_ok=True)
+    groups = {}
+    for ref in fitted:
+        val, fp = parts[ref][0], parts[ref][1]
+        groups.setdefault((MPN[ref], val, fp, LCSC.get(ref, ""), ref in THROUGH_HOLE), []).append(ref)
+    with open(PCBWAY / "shield_bom_pcbway.csv", "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["Item #", "Designator", "Qty", "Manufacturer", "Mfg Part #", "Description", "Value", "Package",
+                    "Type", "LCSC Part # (alternative source)"])
+        rows = sorted(groups.items(), key=lambda kv: kv[1][0])
+        for i, ((mpn, val, fp, lcsc, tht), refs) in enumerate(rows, 1):
+            w.writerow([i, ",".join(refs), len(refs), mpn[0], mpn[1], mpn[2], val, fp, "THT" if tht else "SMD", lcsc])
+    with open(PCBWAY / "shield_centroid_pcbway.csv", "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["Designator", "Mid X (mm)", "Mid Y (mm)", "Layer", "Rotation"])
+        for ref in fitted:
+            _v, _fp, x, y, rot, side = parts[ref]
+            w.writerow([ref, f"{float(x):.4f}", f"{float(y):.4f}", "Top" if side == "top" else "Bottom",
                         f"{float(rot):g}"])
 
 
