@@ -70,14 +70,14 @@ Parts (LCSC numbers, all in stock on 2026-11-08; the list is in `tools/make_shie
 |---|---|---|
 | U1 | MAX98357AETE+T, I2S class-D amplifier, TQFN-16 3x3 | C910544 |
 | J2 | JST SM02B-SRSS-TB, SH 1.0 mm 2-pin right angle | C160402 |
-| C1 | tantalum 100 uF 10 V, case C 6032 (Kyocera AVX TAJC107K010RNJ) | C8649 |
+| C1 | tantalum 100 uF 10 V, case C 6032 (Kyocera AVX TAJC107K010RNJ; the 6.3 V TAJB107K006RNJ, C16133, was rejected: no headroom at 5 V, and it is case B) | C8649 |
 | C2 | 10 uF 25 V X5R 0805 | C15850 |
-| C3, C6, C7 | 100 nF 50 V X7R 0603 | C1591 |
+| C3, C6, C7 | 100 nF 50 V X7R 0603 (Samsung CL10B104KB8NNNC; first choice YAGEO CC0603KRX7R9BB104, C14663, out of stock on 2026-11-08) | C1591 |
 | C4, C5 | 100 pF 50 V C0G 0603 | C14858 |
 | D1, D2 | B5819W, Schottky 40 V 1 A, SOD-123 | C8598 |
 | F1 | PTC 500 mA hold, 13.2 V, 1206 (Ruilon SMD1206P050TF/13.2) | C43379 |
 | FB1, FB2 | ferrite 600 R @ 100 MHz, 1.3 A, 0603 (Murata BLM18KG601SN1D) | C85833 |
-| LED1 | green LED 0603 (Kento KT-0603G) | C12624 |
+| LED1 | green LED 0603 (Kento KT-0603G; first choice Everlight 19-217/GHC-YR1S2/3T, C72043, out of stock on 2026-11-08) | C12624 |
 | R1, R3 | 1 k 0603 | C21190 |
 | R2, R4 | 100 k 0603 | C25803 |
 | R5 | 1 M 0603 | C22935 |

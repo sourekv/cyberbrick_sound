@@ -28,9 +28,9 @@ JLC = FAB / "jlcpcb"
 # LCSC part numbers for assembly at JLCPCB, checked on lcsc.com on 2026-11-08 (in stock that day). Check the stock
 # again before ordering; a part that ran out needs a replacement with the same value and package.
 LCSC = {
-    "C1": "C8649",      # Kyocera AVX TAJC107K010RNJ, tantalum 100 uF 10 V, case C (6032)
+    "C1": "C8649",      # Kyocera AVX TAJC107K010RNJ, tantalum 100 uF 10 V, case C (6032) (not the 6.3 V TAJB107K006RNJ C16133: no headroom at 5 V, case B)
     "C2": "C15850",     # Samsung CL21A106KAYNNNE, 10 uF 25 V X5R 0805
-    "C3": "C1591",      # Samsung CL10B104KB8NNNC, 100 nF 50 V X7R 0603
+    "C3": "C1591",      # Samsung CL10B104KB8NNNC, 100 nF 50 V X7R 0603 (first choice YAGEO CC0603KRX7R9BB104 C14663, out of stock 2026-11-08)
     "C4": "C14858",     # Samsung CL10C101JB8NNNC, 100 pF 50 V C0G 0603
     "C5": "C14858",
     "C6": "C1591",
@@ -41,7 +41,7 @@ LCSC = {
     "FB1": "C85833",    # Murata BLM18KG601SN1D, 600 R @ 100 MHz, 1.3 A, 0603
     "FB2": "C85833",
     "J2": "C160402",    # JST SM02B-SRSS-TB(LF)(SN), SH 1.0 mm 2-pin, right angle
-    "LED1": "C12624",   # Kento KT-0603G, green 0603
+    "LED1": "C12624",   # Kento KT-0603G, green 0603 (first choice Everlight 19-217/GHC-YR1S2/3T C72043, out of stock 2026-11-08)
     "R1": "C21190",     # Uni-Royal 0603WAF1001T5E, 1 k 0603
     "R2": "C25803",     # Uni-Royal 0603WAF1003T5E, 100 k 0603
     "R3": "C21190",
