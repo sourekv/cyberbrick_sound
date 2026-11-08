@@ -1,18 +1,18 @@
 # Shield PCB (iteration 2): scope
 
-Status: requirements only, no schematic yet. The prototype (iteration 1) is a breadboard with an ESP32-S3-Zero-N8R8-M and a MAX98357A, powered and verified as described in `bringup.md`.
+Status: KiCad schematic and a first routed board with manufacturing files exist (`hardware/shield/`), not yet reviewed by a human or manufactured. The prototype (iteration 1) is a breadboard with an ESP32-S3-Zero-N8R8-M and a MAX98357A, powered and verified as described in `bringup.md`.
 
-## Rule: PWM2 is dedicated to the sound module
+## Input: one servo cable to the receiver's S4 header
 
-The throttle is copied to the servo port **PWM2** in the CyberBrick app (L Stick Y drives both Throttle on M1 and PWM2). The module only listens to that copy and takes its power from the same port:
+The module hangs on a single servo cable to the receiver's **PWM4** header (S4). With the current configuration (`docs/cyberbrick-config/Truck_with_Engine_Sound_Data.json`) our snippet on the receiver sends all transmitter channels there as serial data (what we added where: `controls.md`):
 
-- S: throttle copy, 50 Hz, about 3.3 V, 977..1973 us (45..135 deg), centre about 1455 us
+- S: serial data, 115200 baud 8N1, 3.3 V, read on GPIO1 through 1 kOhm
 - V: about 4.94 V without load; the module draws about 57 mA idle and 105 mA at full throttle (`MASTER_VOLUME` 0.6, 40 mm speaker)
 - G: ground
 
-Nothing else can be connected to PWM2: a servo there would follow the throttle. The original path to the motor (port M1) is untouched, so **the board needs no pass-through connector**. PWM1 (steering), PWM3 and PWM4 stay free.
+S4 is dedicated to the sound module. The original path to the motor (port M1) is untouched, so **the board needs no pass-through connector**. A second servo input for start, stop or horn is not planned (decided 2026-11-07).
 
-**Update 2026-11-07: one servo cable only.** With the current configuration (`docs/cyberbrick-config/Truck_with_Engine_Sound_Data.json`) the receiver sends all transmitter channels as serial data from the **PWM4** header (S4), and the firmware reads both the data and the old pulse on the same input. The shield therefore keeps a single servo input J1, plugged into S4 (or into PWM2 with the older pulse-only configuration). A second servo input for start, stop or horn is no longer planned.
+Older variant, still accepted by the firmware on the same input: the throttle copied to **PWM2** in the app (`Truck_with_Engine_Sound.json`), 50 Hz, about 3.3 V, 977..1973 us (45..135 deg), centre about 1455 us. Then J1 goes to PWM2 and nothing else may be connected there (a servo would follow the throttle).
 
 ## Schematic
 
@@ -39,7 +39,7 @@ Mock of the layout (top view, illustrative placement, not routed). An interactiv
 **Board: 29 x 30 mm, the size of the CyberBrick receiver shield, with its four mounting holes** (see below). The ESP32-S3-Zero (18 x 23.5 mm) sits in the middle in two 9-pin female header strips (15.24 mm apart, 8.5 mm tall). Most parts are in the 12.7 mm gap under the Zero (everything under it stays below about 4.4 mm); the power LED is beside the Zero, where it stays visible. Only the two cable plugs stick out: the servo plug at the USB end (right-angle header J1) and the speaker plug at the opposite end (side-entry JST SH 1.0 mm J2). With the Zero the stack is about 14 mm high. All pins used by the firmware are on the left column of the Zero (5V, GPIO1, GPIO4-6); the right column is unused and stays free at the socket.
 
 1. **Socket or pads for the ESP32-S3-Zero**, same pin use as the prototype: GPIO1 throttle in, GPIO4 I2S DOUT, GPIO5 BCLK, GPIO6 LRC. The USB-C port and the Boot/Reset buttons must stay reachable for flashing.
-2. **Input connector** (3-pin servo type: S, V, G) to PWM2. S goes through a 1 kOhm series resistor to GPIO1, optionally with a large pull-down (for example 100 kOhm) so the input is defined when disconnected, and optionally an ESD/TVS device.
+2. **Input connector** (3-pin servo type: S, V, G) to PWM4 (S4; PWM2 with the older pulse configuration). S goes through a 1 kOhm series resistor to GPIO1, optionally with a large pull-down (for example 100 kOhm) so the input is defined when disconnected, and optionally an ESD/TVS device.
 3. **Power from the servo port**: reverse-polarity protection (Schottky diode or P-MOSFET), a resettable fuse, a bulk capacitor (about 100-470 uF) near the amplifier and small ceramic decoupling capacitors. A diode (or ideal diode) between the servo-port 5 V and the USB 5 V so both can be connected at the same time; on the breadboard only one of them may ever be connected.
 4. **MAX98357A amplifier**: gain and shutdown/channel pins configurable (resistors or jumpers), speaker output to a JST SH 1.0 mm 2-pin connector (see below) or solder pads. The chip is hard to solder by hand; assembly by a PCB service is likely.
 5. **Service items**: test points (5 V, 3.3 V, GND, GPIO1, I2S lines) as pads on the bottom side, four M2/M2.5 mounting holes in the CyberBrick pattern, a **power LED** (taken from the servo-port 5 V after the reverse-polarity diode, so it shows that cable and receiver are fine; the Zero has no power LED of its own, only a programmable RGB LED). The status of the signal is shown by the Zero's own RGB LED from firmware (see the README).
@@ -117,7 +117,7 @@ Part numbers are examples to be checked when the schematic is drawn; values mark
 | | Optional 22-33 Ohm series resistors on BCLK, LRC, DIN | 3 | EMI damping; can be 0 Ohm |
 | | Optional ferrite beads and small capacitors on the speaker outputs | 2 + 2 | only if EMI becomes a problem with longer speaker wires |
 | Speaker | JST SH 1.0 mm 2-pin side-entry SMD connector (for example SM02B-SRSS-TB; footprint about 4 x 4.3 mm, check the datasheet) + mating cable | 1 | same type as the CyberBrick M1/M2 and button ports; at the board end, plug enters from outside; rated about 1 A per contact, enough here (the whole module drew 105 mA at full throttle) |
-| Input | 3-pin 2.54 mm right-angle pin header (S, V, G) | 1 | at the USB end of the board; mates with a 3-pin female servo/Dupont cable to PWM2 (check the orientation against the receiver's header) |
+| Input | 3-pin 2.54 mm right-angle pin header (S, V, G) | 1 | at the USB end of the board; mates with a 3-pin female servo/Dupont cable to PWM4 (S4) (check the orientation against the receiver's header) |
 | | Resistor 1 kOhm | 1 | series resistor S to GPIO1 |
 | | Resistor 100 kOhm | 1 | pull-down on GPIO1 (defined level when the cable is unplugged) |
 | | ESD/TVS diode, low capacitance (optional) | 1 | on the S line |

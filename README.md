@@ -1,47 +1,93 @@
 # cyberbrick_sound
 
-Engine sound module for Bambu Lab CyberBrick RC. The module taps the throttle PWM signal from the receiver's servo port, plays a throttle-dependent engine sound through an I2S amplifier, and never interferes with the original signal.
+Engine sound module for Bambu Lab CyberBrick RC models (first target: the truck). A small board hangs on one servo
+cable from the CyberBrick receiver, gets all transmitter channels from it as serial data, and plays an engine sound
+through an I2S amplifier and a speaker: idle, rpm following the throttle, a virtual gearbox, ignition with starter,
+engine stop and horn. It never touches the original signal path: if the module fails, the model still drives.
 
 ## Status
-Phase 1: prototype on a dev board (Waveshare ESP32-S3-Zero-N8R8-M + MAX98357A + 4 Ω speaker). A custom PCB comes only after the prototype works.
 
-Overview of the whole project (hardware, firmware, sound, what was tested): `docs/project-overview.md`.
-What every transmitter control does, the program on the receiver and how it starts by itself: `docs/controls.md`.
+- **Prototype works** on a breadboard in the truck: Waveshare ESP32-S3-Zero-N8R8-M, MAX98357A, 40 mm 4 Ohm speaker
+  in a printed 30 ml sealed box, with a speaker EQ tuned for the box (2026-11-07).
+- **Channel data link works** (2026-11-06): about 27 frames per second, no checksum errors; ignition, starter,
+  stop and horn from the transmitter.
+- **Shield PCB**: KiCad schematic and a routed board exist (`hardware/shield/`), not yet reviewed or manufactured.
+- Which engine sound wins is still being judged by ear (`engine_lab` holds all candidates).
+
+## How it works
+
+```
+transmitter --radio--> receiver in the model --S4 servo header (S, V, G)--> sound module
+```
+
+| Where | What we added |
+|---|---|
+| Transmitter (CyberBrick Remote Control Transmitter Shield - XA003 XA005) | in the configuration only: the event that starts the receiver snippet by itself after power-up (moved centre of L2), and a long press of the L Shoulder Button to restart it |
+| Receiver in the model (CyberBrick Remote Control Receiver Shield - XA003 XA004) | in the configuration only: our MicroPython snippet `uart_forward.py`, which sends all channels as serial data from servo header 4 (S4) to the module; the module also takes its power there |
+| Sound module (ESP32-S3-Zero) | our firmware: reads the data on GPIO1 (through 1 kOhm) and makes the sound |
+
+Bambu's firmware is unchanged on both boards. The configuration to send from the app:
+`docs/cyberbrick-config/Truck_with_Engine_Sound_Data.json`. The firmware also still accepts the older variant, a
+throttle-only servo pulse on PWM2. Details: `docs/controls.md`.
+
+**Power rule:** never connect the module to USB and to the receiver's 5 V at the same time. Disconnect the V wire for
+flashing and USB tests; connect GND first and disconnect it last (`docs/bringup.md`).
+
+## Documentation
+
+| File | What it covers |
+|---|---|
+| `docs/project-overview.md` | the whole project in one page: goal, how the module gets the data, hardware, firmware, sound, what was tested, open decisions |
+| `docs/controls.md` | what we added where (transmitter, receiver, module), every transmitter control, ignition / starter / stop / horn, the receiver program and its auto-start, power-up order |
+| `docs/bringup.md` | bring-up plan: measurements on the receiver, breadboard wiring, test order, measurements table, the USB power rule |
+| `docs/start-stop-horn.md` | design of engine start, stop and horn: the channel-data version, earlier one-button notes, engine state rules |
+| `docs/cyberbrick-config/README.md` | the CyberBrick app configurations (`*.json`): stock truck, button variant, Code test, the current channel-data config |
+| `docs/cyberbrick-code/README.md` | the MicroPython snippets for the receiver (`blink_test.py`, `uart_forward.py`), test wiring and results |
+| `docs/sound-research.md` | engine sound research: constraints of a small speaker, approaches tried, speaker-tuned candidates, lessons |
+| `docs/audio-simulation/README.md` | rendered previews of the engine sounds (`engine_pulse`, `engine_real`, `engine_lab` candidates) |
+| `docs/speaker-measurement.md` | how the speaker response is measured (`speaker_sweep`), results bare and in the 30 ml box, the speaker EQ |
+| `docs/shield-pcb.md` | the shield PCB: scope, schematic, routed board, mounting holes, connectors, decided and open points |
+| `assets/samples/LICENSE-SAMPLES.md` | origin and licence of every sound (CC0 recordings, synthesised sounds, voice prompts) |
+
+The speaker box (OpenSCAD, Fusion 360 script, Bambu Studio project) is in `hardware/speaker_box/`; its notes are in
+the header of `speaker_box.scad`.
 
 ## Structure
-- `firmware/` - PlatformIO (Arduino) project
-- `docs/` - wiring, measurements, notes (sound research: `docs/sound-research.md`, shield PCB scope: `docs/shield-pcb.md`)
-- `3d/` - cases, links
-- `hardware/` - KiCad project of the shield board: schematic, routed PCB, manufacturing files (`hardware/shield/`)
 
-## Wiring overview
+- `firmware/` - PlatformIO (Arduino) project; pins and all tunable constants in `firmware/include/config.h`
+- `tools/` - Python and C++ helpers: sound generation and rendering (`engine_lab.py`, `speaker_model.py`), header
+  generators, the speaker-measurement analysis, the shield PCB generators and checks, host tests
+- `assets/samples/` - the CC0 recordings and derived loops (`LICENSE-SAMPLES.md`)
+- `docs/` - documentation (see above), wiring pictures, measurements (`docs/measurements/`)
+- `hardware/shield/` - KiCad project of the shield board: schematic, routed PCB, manufacturing files
+- `hardware/speaker_box/` - the sealed speaker box: OpenSCAD source, Fusion 360 script, Bambu Studio project
+- `3d/` - cases, links
+
+## Firmware
+
+Open `firmware/` in VS Code with the PlatformIO extension, or run `pio run -e <env> -t upload`:
+
+| Env | What it does |
+|---|---|
+| `engine_lab` | **the current firmware**: all engine-sound candidates (the BOOT button switches 1..6 and beeps the number), ignition, starter, stop and horn from the channel data, speaker EQ for the 30 ml box |
+| `engine_demo` | the same, plays every sound through the whole rpm range by itself with a spoken announcement (no receiver needed) |
+| `engine_pulse` | real-time grain synthesis (preset a_diesel6) |
+| `engine`, `engine_diesel`, `engine_truck`, `engine_gears` | earlier variants: synthesised loop, CC0 diesel and truck loops with the virtual gearbox, one loop per gear |
+| `engine_real` | experiment with the owner's recordings (needs a locally generated header, not in the repo) |
+| `test_tone` | 440 Hz sine; checks amplifier and speaker |
+| `speaker_sweep` | slow sine sweep for measuring the speaker (`docs/speaker-measurement.md`) |
+| `pulse_measure`, `uart_probe` | print the servo pulse width or the receiver's channel frames to serial |
+
+- **Virtual gearbox** (`firmware/include/gearbox.h`): the module keeps a virtual speed that follows the throttle with
+  inertia and shifts through 5 gears; an effect, not a simulation. Tunable in `config.h`.
+- **Status LED** on the Zero's onboard RGB LED (GPIO21): blue flash at start, red without valid data, dim green at
+  rest, brightening cyan with the throttle (`STATUS_LED_*` in `config.h`).
+- **Sounds**: recordings must be CC0; everything else is synthesised. Why the sound is built this way:
+  `docs/sound-research.md`.
+
+## Wiring
+
 ![Wiring overview](docs/wiring-overview.png)
 
-Stage 2 (powered from the CyberBrick servo port): `docs/wiring-stage2.png`.
-
-Source: `docs/wiring-overview.svg`. Details and measurements: `docs/bringup.md`.
-
-## Firmware plan
-1. Test tone over I2S
-2. Measure pulse width (50 Hz servo PWM) and print it to serial
-3. Engine loop with smooth playback-rate change driven by throttle
-
-## Sound samples
-The firmware embeds `firmware/include/engine_sample.h`, a synthesised engine loop generated with:
-
-    python tools/make_engine_synth.py
-
-The CC0 loops in `assets/samples/` (see `LICENSE-SAMPLES.md`) are almost pure low tones that a small speaker cannot play, so they are kept only for reference (`tools/make_sample.py` converts them).
-
-## Virtual gearbox
-The `engine_diesel` and `engine_truck` firmware shift gears like a truck: the module only sees the throttle, so it keeps a virtual speed that follows the throttle with some inertia, derives the gear from it (5 gears) and plays the loop at a rate that rises within each gear. On an upshift the pitch drops and the sound is dimmed for a quarter of a second (torque cut); on a downshift the pitch jumps up. This is an effect, not a simulation: the sound does not follow the real speed of the model. Tune it in `firmware/include/config.h` (`GEAR_COUNT`, `GEAR_SHIFT_DROP`, `SHIFT_CUT_S`, `SHIFT_CUT_GAIN`, `GEAR_ACCEL_S`, `GEAR_DECEL_S`) or switch it off with `GEARBOX_ENABLED 0`. The logic is in `firmware/include/gearbox.h` and can be tested on a PC with `tools/test_gearbox.cpp`. Not tested on hardware yet.
-
-`engine_gears` is the experiment with a separate sample for every gear: each gear plays its own loop (`firmware/include/gear_bank.h`, CC0 truck recordings) at only 0.75x..1.3x, so the timbre stays close to the recording, and the loops are crossfaded at a shift. For testing it announces every gear change with 1..5 beeps (`GEAR_BEEP`, `firmware/include/gear_beep.h`, host test `tools/test_gear_beep.cpp`). Gear 1 uses R03-29, gears 2..5 share R03-32 until more recordings are chosen. Not tested on hardware yet.
-
-`engine_truck` also blends in a second loop "under load" (brighter and louder, from a recording of a truck climbing a hill) as the throttle rises, on top of the idle loop. Level and pitch matching are in `firmware/include/config.h` (`LOADED_GAIN`, `LOADED_RATE_SCALE`). Not tested on hardware yet.
-
-## Building
-Open the `firmware/` folder in VS Code with the PlatformIO extension, or run `pio run -e <env> -t upload` with `<env>` one of `test_tone`, `pulse_measure`, `engine`, `engine_pulse` (default engine sound), `engine_diesel` and `engine_truck` (real diesel and truck idle loops, pitch-shifted; also show the status colours), `engine_gears` (one sample per gear, gear beeps), `engine_real` (experiment, needs a locally generated header). See `docs/bringup.md`.
-
-## Status LED
-The `engine` and `engine_pulse` families show their state on the Zero's onboard RGB LED (GPIO21): a blue flash at start-up, **red** when no valid throttle pulse arrives (cable, port or receiver problem), **dim green** with the stick at rest and **cyan**, brightening with the throttle. Switch it off with `STATUS_LED_ENABLED` in `firmware/include/config.h`. On the tested Zero the red and green channels turned out to be swapped, which `STATUS_LED_SWAP_RG` (default 1) corrects; if your board shows the colours as described, set it to 0.
+Source: `docs/wiring-overview.svg`; earlier stages: `docs/wiring-stage2.png`, `docs/wiring-test-tone.png`.
+Pins, test order and measurements: `docs/bringup.md`.
