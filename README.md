@@ -87,7 +87,8 @@ Open `firmware/` in VS Code with the PlatformIO extension, or run `pio run -e <e
 
 ## Wiring
 
-![Wiring overview](docs/wiring-overview.png)
+![Current wiring: one servo cable from the receiver's S4 header carries the data and the 5 V supply](docs/wiring-current.png)
 
-Source: `docs/wiring-overview.svg`; earlier stages: `docs/wiring-stage2.png`, `docs/wiring-test-tone.png`.
+Source: `docs/wiring-current.svg`. Earlier development stages (module on USB, only signal and GND from the receiver;
+then power from the servo port): `docs/wiring-overview.png`, `docs/wiring-stage2.png`, `docs/wiring-test-tone.png`.
 Pins, test order and measurements: `docs/bringup.md`.

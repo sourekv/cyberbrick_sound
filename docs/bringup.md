@@ -53,6 +53,9 @@ Only after stage 1 works. See `docs/wiring-stage2.png` (source `.svg`): unplug U
 
 Test-tone wiring only (no CyberBrick yet): `docs/wiring-test-tone.png`.
 
+Current wiring (2026-11-08: one servo cable to the receiver's S4 header, data and power): `docs/wiring-current.png`
+(source `.svg`).
+
 ## 3. Test order
 1. `pio run -e test_tone -t upload` - expect a steady 440 Hz tone. Checks amplifier and speaker.
 2. `pio run -e pulse_measure -t upload` - move the stick, expect about 1000-2000 us at about 50 Hz.

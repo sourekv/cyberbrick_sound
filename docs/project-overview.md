@@ -32,7 +32,7 @@ Controls, the receiver program and its auto-start: `controls.md`; measurements: 
 | MAX98357A breadboard module | I2S class-D amplifier; the firmware sends the same sample on both channels because the amplifier outputs (L+R)/2 |
 | 40 mm speaker (4 Ohm) | prototype speaker |
 
-Rule on the breadboard: never connect USB and the servo-port 5 V at the same time. Wiring pictures: `wiring-overview.png`, `wiring-stage2.png`, `wiring-test-tone.png`.
+Rule on the breadboard: never connect USB and the servo-port 5 V at the same time. Current wiring: `wiring-current.png` (one servo cable to S4, data and power); earlier stages: `wiring-overview.png`, `wiring-stage2.png`, `wiring-test-tone.png`.
 
 ### Shield PCB (iteration 2: KiCad schematic and routed board exist, not yet reviewed or manufactured)
 
