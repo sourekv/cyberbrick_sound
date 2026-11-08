@@ -120,5 +120,11 @@ Ideas already considered and dropped, with the reasons: `rejected-ideas.md`.
   - The sounds are compiled into the firmware as headers (`firmware/include/*.h`), so an OTA update also brings new
     sounds. A separate filesystem partition for the sounds would allow loading them without a rebuild, including own
     recordings that cannot go into the repo.
+  - User-changeable sounds (decided 2026-11-08 as a plan, not started): sound sets as files in the 1.5 MB data
+    partition, loaded over **USB** by a PC tool that converts a WAV (22050 Hz mono 16 bit) and writes it together with
+    its parameters (playback rate at idle and full throttle, level, optional loaded loop); Wi-Fi upload later, together
+    with OTA. Requirements: the BOOT button keeps switching between sets, now through the built-in sets and the loaded
+    ones; the built-in sets stay as a fallback when no file is there. A clean loop point is up to the user (or a tool
+    that helps find one); the licence of own recordings is the user's.
 - Later, optional: spare inputs (for example a switch for an engine-stop sound), a variant for a classic RC receiver (see `shield-pcb.md`).
 - ~~Engine start, stop and horn on one transmitter button through PWM3~~: done differently on 2026-11-06, through the receiver's channel data on a single servo cable (S4); see `start-stop-horn.md`. More servo cables are not planned.
