@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 660" font-family="Helvetica, Arial, sans-serif">
   <rect width="1100" height="660" fill="#ffffff"/>
   <text x="30" y="40" font-size="22" font-weight="bold" fill="#1a1a1a">cyberbrick_sound: current wiring (one servo cable to S4, data and power)</text>
-  <text x="30" y="64" font-size="13" fill="#555">State of 2026-11-08: configuration Truck_with_Engine_Sound_Data.json, firmware engine_lab. Normal operation: USB unplugged.</text>
+  <text x="30" y="64" font-size="13" fill="#555">State of 2026-11-12: configuration Truck_with_Engine_Sound_Data.json, firmware engine_lab, 1N5819 OR-ing diode in V.</text>
 
   <!-- battery and switch -->
   <rect x="30" y="100" width="120" height="44" rx="8" fill="#dbe9ff" stroke="#2b5fb4"/>
@@ -32,7 +32,12 @@
   <path d="M110 413 L110 540 L395 540 L395 520" fill="none" stroke="#e0a020" stroke-width="3"/>
   <path d="M395 498 L395 486 L362 486 L362 285 L380 285" fill="none" stroke="#e0a020" stroke-width="3"/>
   <circle cx="380" cy="285" r="4" fill="#e0a020" stroke="#8a5a00"/>
-  <path d="M180 413 L180 575 L470 575 L470 470" fill="none" stroke="#d22" stroke-width="3"/>
+  <path d="M180 413 L180 575 L418 575" fill="none" stroke="#d22" stroke-width="3"/>
+  <path d="M442 575 L470 575 L470 470" fill="none" stroke="#d22" stroke-width="3"/>
+  <!-- OR-ing diode 1N5819: anode from the receiver, cathode (bar) to the Zero 5V -->
+  <path d="M418 563 L418 587 L440 575 Z" fill="#333" stroke="#333" stroke-width="1"/>
+  <path d="M441 562 L441 588" stroke="#333" stroke-width="3"/>
+  <text x="430" y="597" font-size="10" text-anchor="middle" fill="#333">1N5819</text>
   <path d="M250 413 L250 610 L540 610 L540 470" fill="none" stroke="#333" stroke-width="3"/>
   <text x="262" y="534" font-size="12" fill="#8a5a00">S: data</text>
   <text x="262" y="569" font-size="12" fill="#b11">V: 5 V supply</text>
@@ -55,8 +60,8 @@
 
   <!-- USB -->
   <rect x="620" y="110" width="210" height="58" rx="8" fill="#f3f3f3" stroke="#bbb" stroke-dasharray="5 4"/>
-  <text x="725" y="133" font-size="13" text-anchor="middle">USB: only for flashing</text>
-  <text x="725" y="152" font-size="10" text-anchor="middle" fill="#a33">and then the V wire must be disconnected</text>
+  <text x="725" y="133" font-size="13" text-anchor="middle">USB: flashing and serial</text>
+  <text x="725" y="152" font-size="10" text-anchor="middle" fill="#1d5e33">may stay with the receiver on (1N5819 in V)</text>
   <path d="M620 140 L525 225" fill="none" stroke="#bbb" stroke-width="3" stroke-dasharray="6 6"/>
 
   <!-- I2S and power wires to the amplifier -->
@@ -88,5 +93,5 @@
   <!-- notes -->
   <text x="620" y="215" font-size="11" fill="#333">Measured: 57 mA idle, 105 mA at full throttle</text>
   <text x="620" y="231" font-size="11" fill="#333">(MASTER_VOLUME 0.6, 40 mm speaker)</text>
-  <text x="30" y="650" font-size="12" fill="#777">Never connect USB and the receiver's V at the same time (GND first on, last off). Never put the battery's 7.4 V on any board pin.</text>
+  <text x="30" y="650" font-size="12" fill="#777">Without the 1N5819, never connect USB and the receiver's V at the same time. GND first on, last off. Never put 7.4 V on any board pin.</text>
 </svg>

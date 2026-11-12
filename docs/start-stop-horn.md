@@ -80,7 +80,7 @@ Also considered: phenoxy "Diesel_start_idle2.wav" (https://freesound.org/people/
 
 ## Still to check on hardware
 
-0. Safety: the measurement runs over USB, so the servo cable's V (red) wire must be disconnected first; only signal (through 1 kΩ) and GND go to the Zero (see the rule at the top of `bringup.md`).
+0. Safety: the measurement runs over USB. With the 1N5819 in the V wire (breadboard since 2026-11-12) the receiver may stay connected; without it the servo cable's V (red) wire must be disconnected first and only signal (through 1 kΩ) and GND go to the Zero (see the rule at the top of `bringup.md`).
 1. Send the config to both cores (Bluetooth, "Send to Device") and measure the PWM3 pulse with `pulse_measure` on a second pin: does it change on every Short Hold press and hold its value?
 2. Does the receiver keep sending pulses when the transmitter is off or out of range?
 3. ~~The shield then needs a second servo input (signal through 1 kΩ to a free GPIO, for example GPIO2, with a pull-down; GND shared, V not connected).~~ Dropped on 2026-11-07: the channel data on one cable replaces it, see the top of this file. A draft of this was committed and reverted on 2026-11-01 (`91d2b26`, revert `54d28b3`) because it was only thinking aloud.

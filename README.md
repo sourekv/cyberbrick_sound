@@ -35,9 +35,10 @@ Bambu's firmware is unchanged on both boards. The configuration to send from the
 `docs/cyberbrick-config/Truck_with_Engine_Sound_Data.json`. The firmware also still accepts the older variant, a
 throttle-only servo pulse on PWM2. Details: `docs/controls.md`.
 
-**Power rule (breadboard prototype):** never connect the module to USB and to the receiver's 5 V at the same time.
-Disconnect the V wire for flashing and USB tests; connect GND first and disconnect it last (`docs/bringup.md`). The
-shield PCB has an OR-ing diode, so there both may be connected (`docs/shield-pcb.md`).
+**Power rule:** USB and the receiver's 5 V may be connected together only through a diode in the V wire. The
+breadboard prototype has a 1N5819 there since 2026-11-12 (measured: the receiver stays isolated from USB), and the
+shield PCB has the OR-ing diode D2 (`docs/shield-pcb.md`). Without that diode, disconnect the V wire for flashing and
+USB tests. Connect GND first and disconnect it last (`docs/bringup.md`).
 
 ## Documentation
 

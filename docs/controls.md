@@ -98,8 +98,9 @@ Side effects:
 2. The data start by themselves within about a second; the engine stays silent.
 3. Turn the ignition on (switch to either side), or just drive off.
 
-The sound module is powered from the receiver's servo header. When the module is on USB (flashing, tests), the V
-wire must be disconnected (`bringup.md`).
+The sound module is powered from the receiver's servo header. USB (flashing, tests) may stay connected with the
+receiver on, thanks to the 1N5819 in the breadboard's V wire; without that diode the V wire must be disconnected
+first (`bringup.md`).
 
 ## Files
 

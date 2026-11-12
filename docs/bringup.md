@@ -3,7 +3,7 @@
 Status: done for the breadboard prototype (2026-11-01..06). The checklists below are kept as the record; the results
 are in the measurements table at the bottom. The current wiring is a single servo cable to S4 (`wiring-current.png`).
 
-> **Safety rule for every test: the ESP32-S3-Zero must never be powered from the model and connected to USB at the same time.** The Zero's 5V pad is the USB VBUS net (no diode), so the receiver's 5 V would be tied straight to the computer's USB 5 V. Whenever USB is plugged in, the servo cable's V (red) wire must be disconnected; signal and GND may stay. Unplug USB before connecting V. Only the shield, with its OR-ing diode, may have both.
+> **Safety rule for every test: the ESP32-S3-Zero may be powered from the model and from USB at the same time only through a diode in the V wire.** The Zero's 5V pad is the USB VBUS net with no diode (measured 5.135 V on it with USB only), so without a diode the receiver's 5 V would be tied straight to the computer's USB 5 V. Since 2026-11-12 the breadboard has a 1N5819 Schottky in the V wire (anode to the receiver, cathode to the Zero's 5V), like D2 on the shield; see "OR-ing diode on the breadboard" below for the check. Without that diode: whenever USB is plugged in, the servo cable's V (red) wire must be disconnected (signal and GND may stay), and USB is unplugged before V is connected.
 > **GND stays connected** in USB tests: the signal needs the common ground as its reference, and without it the return current would flow through the signal pin and the ESP's protection diodes. A common ground ties no supplies together (the receiver runs from a floating battery). Connect GND first and disconnect it last.
 
 Status: PWM2 throttle copy verified on the real receiver (see the measurements table). The engine firmware with the real throttle is the next test.
@@ -56,8 +56,27 @@ Only after stage 1 works. See `docs/wiring-stage2.png` (source `.svg`): unplug U
 
 Test-tone wiring only (no CyberBrick yet): `docs/wiring-test-tone.png`.
 
-Current wiring (2026-11-08: one servo cable to the receiver's S4 header, data and power): `docs/wiring-current.png`
-(source `.svg`).
+Current wiring (2026-11-08: one servo cable to the receiver's S4 header, data and power; 1N5819 in the V wire since
+2026-11-12): `docs/wiring-current.png` (source `.svg`).
+
+### OR-ing diode on the breadboard (2026-11-12)
+
+A 1N5819 Schottky sits in the V wire on the breadboard: the receiver's red wire in a row of its own, the diode's anode
+in that row, its cathode (the stripe) in the row of the red wire to the Zero's 5V pin. Both legs on the same side of
+the breadboard's centre groove as the wires; rows on the other side are not connected. The diode lets the receiver
+feed the module and blocks the USB 5 V from flowing back into the receiver.
+
+Check, multimeter against GND (the brown wire):
+
+| Supply | Anode (receiver V) | Cathode (Zero 5V) | Meaning |
+|---|---|---|---|
+| receiver only | 4.750 V | 4.436 V | 0.31 V drop, the module runs through the diode |
+| USB only | - | 5.135 V | the Zero's 5V pin is VBUS directly |
+| USB and receiver | 4.947 V | 5.135 V | cathode higher: the diode blocks, the receiver is isolated from USB |
+
+The module runs fine at about 4.4 V. With USB plugged in the cathode should read the USB voltage (about 5.1 V); if it
+reads about 4.4 V, USB is not seated (a first reading was like that). If the diode is ever removed, the "disconnect V"
+rule applies again.
 
 ## 3. Test order
 1. `pio run -e test_tone -t upload` - expect a steady 440 Hz tone. Checks amplifier and speaker.
