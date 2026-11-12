@@ -19,6 +19,25 @@ each option: `shield-pcb.md` "Ordering at JLCPCB" and "Ordering at PCBWay".
 
 Import VAT (21 %) is added to every option when the parcel enters the EU, so it does not change the order.
 
+## Grand total
+
+Everything paid for 5 finished boards, including the 21 % import VAT on the order and its shipping. J1/J3/J4 for
+the JLCPCB options are bought locally with VAT already in the price. Not included: what all options need anyway
+(the ESP32-S3-Zero, the servo cable and the speaker, `shield-pcb.md` "Needed besides the board") and a possible
+customs-handling fee of the carrier (none with DHL DDP).
+
+| | Order | Shipping | Parts not in the order | VAT 21 % | **Grand total** | Per board |
+|---|---|---|---|---|---|---|
+| PCBWay (parts 15-50) | 108.00-143.00 | 3.16 | - | 23.34-30.69 | **about 135-177** | 27-35 |
+| JLCPCB original, DHL | 54.31 | 23.52 | 3-5 | 16.34 | **about 97-99** | about 20 |
+| JLCPCB original, EuroPacket | 54.31 | 11.00 | 3-5 | 13.72 | **about 82-84** | about 17 |
+| JLCPCB basic, DHL | about 45.04 | 23.52 | 3-5 | 14.40 | **about 86-88** | about 17 |
+| JLCPCB basic, EuroPacket | about 45.04 | 11.00 | 3-5 | 11.77 | **about 71-73** | about 14 |
+
+The PCBWay order is the PCB and assembly (93.00) plus its parts estimate; the JLCPCB order already holds the parts.
+The cheapest option (JLCPCB basic parts, EuroPacket) costs about half of PCBWay but needs the three through-hole
+parts soldered by hand and a red power LED.
+
 ## Where the numbers come from
 
 - **PCBWay:** online SMT quote on 2026-11-12 (turnkey, 24 SMD + 3 THT parts). The parts are bought by PCBWay and
