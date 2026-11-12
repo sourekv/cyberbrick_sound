@@ -59,6 +59,7 @@ Start with `docs/project-overview.md` (the whole project on one page) and `docs/
 | File | What it covers |
 |---|---|
 | `docs/shield-pcb.md` | the shield PCB: scope, schematic, routed board, mounting holes, connectors, ordering at JLCPCB, decided and open points |
+| `docs/shield-cost-comparison.md` | price of 5 assembled boards: PCBWay, JLCPCB with the original parts, JLCPCB with basic parts |
 | `docs/speaker-measurement.md` | how the speaker response is measured (`speaker_sweep`), results bare and in the boxes, the speaker EQ |
 
 The speaker box (OpenSCAD, Fusion 360 script, Bambu Studio project) is in `hardware/speaker_box/`; its notes are in

@@ -9,7 +9,7 @@ reasons, are in `rejected-ideas.md`.
 | Item | Where | Notes |
 |---|---|---|
 | Choose the engine sound | `engine_lab`, `sound-research.md` | candidates are judged by ear on the real speaker |
-| Shield: order | `shield-pcb.md` "Ordering at JLCPCB" / "Ordering at PCBWay" | reviewed in KiCad 2026-11-12; quoted 2026-11-12 for 5 boards: JLCPCB about 54 USD incl. parts (J1/J3/J4 by hand, plus shipping), PCBWay 96.16 USD with shipping but without parts; choose, stock check, confirm the placement preview (C1 and U1 rotations already fixed for JLCPCB) |
+| Shield: order | `shield-pcb.md` "Ordering at JLCPCB" / "Ordering at PCBWay" | reviewed in KiCad 2026-11-12; quoted 2026-11-12 for 5 boards: JLCPCB about 54 USD incl. parts (J1/J3/J4 by hand, plus shipping), PCBWay 96.16 USD with shipping but without parts; a cheaper JLCPCB variant with basic parts (`fab/jlcpcb_basic/`); comparison in `shield-cost-comparison.md`; choose, stock check, confirm the placement preview (C1 and U1 rotations already fixed for JLCPCB) |
 | Speaker for the model | `speaker-measurement.md` | 40 mm or a production candidate (for example 21 mm). The box is done (30 ml best, 15 ml close); more would come from another speaker or amplifier, not from the box |
 | Enclosure for the model | - | designed from scratch around the chosen speaker; the printed box is a test fixture only |
 | Long power test with the motor running | `bringup.md` | does the servo-port 5 V hold with the module and the motor together |

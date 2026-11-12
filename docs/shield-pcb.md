@@ -103,7 +103,7 @@ Steps:
    instead of 8 extended part types (about 9 USD less in loading fees, checked 2026-11-12): C3/C6/C7 YAGEO
    CC0603KRX7R9BB104 (C14663), FB1/FB2 Murata BLM18PG121SN1D (C14709, 120 R, 2 A) and LED1 **red** Kento KT-0603R
    (C2286; no green 0603 is a basic part). C1, F1, J2, TVS1 and U1 have no basic equivalent. Upload one variant or
-   the other, not both.
+   the other, not both. Price comparison of all options: `shield-cost-comparison.md`.
 3. **Check every part in the placement preview.** The rotations are KiCad's and JLCPCB's footprints can be turned
    differently; fix the rotation in the preview where a part is off. Found in the preview on 2026-11-12 and already
    corrected in the CPL (`JLC_ROTATION_FIX` in `tools/make_shield_outputs.py`): C1 was turned 180 degrees (plus side
