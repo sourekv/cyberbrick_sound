@@ -147,7 +147,10 @@ Before ordering, check that the 8.5 mm socket height suits the parts under the Z
 - The amplifier is a bare MAX98357A chip on the board, **assembled by a PCB service** (the TQFN-16 package is not practical to hand-solder). No plug-in breakout module.
 - **Assembly (2026-11-08): the PCB service fits every SMD part** (all on the top side); the Zero's socket strips J3/J4 and the right-angle servo header J1 are soldered by hand. J1 could also be fitted by the service as a through-hole part, for an extra fee.
 
-- **Rejected 2026-11-08 (all rejected ideas: `rejected-ideas.md`): a strain-relief slot next to J1.** Idea: an unplated slot (about 4.4 x 1.6 mm) between the board edge and J1, so that a servo cable soldered into the J1 holes would come up through the slot and a pull would end there instead of at the joints (a cable tie through two small holes was judged too weak). It was drawn and put into the board, then dropped by the project owner: it complicates the prototype, and only 1 mm of board would be left between the slot and the edge. The prototype keeps the right-angle header J1. Could come back with a soldered-cable variant of a later board.
+- **Rejected 2026-11-08 (all rejected ideas: `rejected-ideas.md`): a strain-relief slot next to J1.** Idea: an unplated slot (about 4.4 x 1.6 mm) between the board edge and J1, so that a servo cable soldered into the J1 holes would come up through the slot and a pull would end there instead of at the joints (a cable tie through two small holes was judged too weak). It was drawn and put into the board, then dropped by the project owner: it complicates the prototype, and only 1 mm of board would be left between the slot and the edge. The prototype keeps the right-angle header J1.
+- **The servo cable is not soldered to the board (decided 2026-11-12).** J1 stays a pin header and the cable plugs
+  in with a female connector (component list: "Servo cable"), so a soldered-cable variant and its strain relief are
+  no longer planned.
 
 ## Decisions still open
 
@@ -199,6 +202,7 @@ Part numbers are examples to be checked when the schematic is drawn; values mark
 | | Optional ferrite beads and small capacitors on the speaker outputs | 2 + 2 | only if EMI becomes a problem with longer speaker wires |
 | Speaker | JST SH 1.0 mm 2-pin side-entry SMD connector (for example SM02B-SRSS-TB; footprint about 4 x 4.3 mm, check the datasheet) + mating cable | 1 | same type as the CyberBrick M1/M2 and button ports; at the board end, plug enters from outside; rated about 1 A per contact, enough here (the whole module drew 105 mA at full throttle) |
 | Input | 3-pin 2.54 mm right-angle pin header (S, V, G) | 1 | at the USB end of the board; mates with a 3-pin female servo/Dupont cable to PWM4 (S4) (check the orientation against the receiver's header) |
+| | Servo cable, 3-wire, female 2.54 mm 3-pin connector on **both** ends (S, V, G) | 1 | not part of the PCB order (not in the JLCPCB / PCBWay files), bought separately like the speaker. From J1 to the receiver's S4 header, both ends male pins. Not soldered to the board (decided 2026-11-12). Either a ready-made female-to-female servo/Dupont cable, or made to length: servo wire (3 x 0.08-0.14 mm2 / 26-28 AWG), 6 Dupont female crimp terminals 2.54 mm and 2 Dupont 1x3 housings. Keep the same wire order on both ends (S, V, G) |
 | | Resistor 1 kOhm | 1 | series resistor S to GPIO1 |
 | | Resistor 100 kOhm | 1 | pull-down on GPIO1 (defined level when the cable is unplugged) |
 | | ESD/TVS diode, low capacitance (optional) | 1 | on the S line |

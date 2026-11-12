@@ -16,7 +16,8 @@ the reason no longer holds.
 | Screw terminal or a dual footprint for the speaker | 2026-11-08 | the owner wants the same connector as CyberBrick uses | JST SH 1.0 mm 2-pin, as on the CyberBrick motor port | `shield-pcb.md` |
 | Zero soldered straight onto the shield | 2026-11-08 | the Zero would no longer be replaceable; soldering only pays off with a single board carrying the ESP32-S3 itself | the Zero in two female socket strips | `shield-pcb.md` |
 | Strain relief for a soldered servo cable: a cable tie through two small holes next to J1 | 2026-11-08 | a tie would not hold the cable | (see the next row) | `shield-pcb.md` |
-| Strain relief: an unplated slot (4.4 x 1.6 mm) between the board edge and J1, the cable going up through it | 2026-11-08 | complicates the prototype; only 1 mm of board left between slot and edge | right-angle header J1; may come back with a soldered-cable variant of a later board | `shield-pcb.md` |
+| Strain relief: an unplated slot (4.4 x 1.6 mm) between the board edge and J1, the cable going up through it | 2026-11-08 | complicates the prototype; only 1 mm of board left between slot and edge | right-angle header J1 | `shield-pcb.md` |
+| Servo cable soldered straight into the board (no J1 connector) | 2026-11-12 | decided against by the project owner | J1 pin header and a female-to-female servo cable | `shield-pcb.md` |
 
 ## Link to the receiver
 
