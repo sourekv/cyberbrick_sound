@@ -85,6 +85,12 @@ for _ref, _same in {"C5": "C4", "C6": "C3", "C7": "C3", "D2": "D1", "FB2": "FB1"
     MPN[_ref] = MPN[_same]
 THROUGH_HOLE = {"J1", "J3", "J4"}
 
+# Rotation corrections for the JLCPCB CPL, in degrees counter-clockwise, added to KiCad's rotation. JLCPCB's part
+# models are not always oriented like KiCad's footprints. Found in JLCPCB's placement preview on 2026-11-12 (pin 1 /
+# plus side compared with the silkscreen) and checked there with these values: C1 had its plus side at the wrong
+# end (180), U1 had pin 1 one corner off (rotated right by 90 = -90). D1, D2, LED1 and J2 were right.
+JLC_ROTATION_FIX = {"C1": 180, "U1": -90}
+
 
 def run(*a):
     subprocess.run(a, check=True, capture_output=True)
@@ -140,8 +146,9 @@ def write_boms():
         w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])
         for ref in assembled:
             _v, _fp, x, y, rot, side = parts[ref]
+            rot = (float(rot) + JLC_ROTATION_FIX.get(ref, 0)) % 360
             w.writerow([ref, f"{float(x):.4f}mm", f"{float(y):.4f}mm", "Top" if side == "top" else "Bottom",
-                        f"{float(rot):g}"])
+                        f"{rot:g}"])
 
     # PCBWay turnkey assembly: every fitted part, SMD and through hole, with manufacturer part numbers
     PCBWAY.mkdir(exist_ok=True)

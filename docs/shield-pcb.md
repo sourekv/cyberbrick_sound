@@ -100,7 +100,12 @@ Steps:
 2. Assembly: top side only. Upload `fab/jlcpcb/shield_bom_jlcpcb.csv` (BOM) and `fab/jlcpcb/shield_cpl_jlcpcb.csv`
    (positions). J1, J3, J4, the solder jumpers JP1/JP2, the test points and the holes are not in these files.
 3. **Check every part in the placement preview.** The rotations are KiCad's and JLCPCB's footprints can be turned
-   differently; fix the rotation in the preview where a part is off. Watch the polarised parts: U1 (pin 1 dot),
+   differently; fix the rotation in the preview where a part is off. Found in the preview on 2026-11-12 and already
+   corrected in the CPL (`JLC_ROTATION_FIX` in `tools/make_shield_outputs.py`): C1 was turned 180 degrees (plus side
+   at the wrong end) and U1 by 90 degrees (pin 1 one corner off); D1, D2, LED1 and J2 were right. Choose "Confirm
+   Parts Placement" so JLCPCB sends its placement for approval before production. A quote that day for 5 assembled
+   boards (Economic, top side): 54.31 USD incl. parts (13.48 USD) and the extended-parts fee (24.72 USD), without
+   shipping. Watch the polarised parts: U1 (pin 1 dot),
    D1 and D2 (cathode bar), C1 (plus side), LED1 (cathode), and J2 (the plug opening towards the board edge).
 4. After delivery: solder J3/J4 (the Zero's sockets) and J1 by hand.
 5. First power-up: the checks listed under "Decided" (USB and receiver connected together).
@@ -117,7 +122,10 @@ How it differs from JLCPCB:
   The board arrives complete, nothing is soldered by hand.
 - **The files are checked by a person** before production (including the part rotations); the price is confirmed
   after that review, usually within a day or two, not instantly.
-- For a small series the assembly is usually more expensive than at JLCPCB; compare the real quotes.
+- For a small series the assembly is usually more expensive than at JLCPCB. Online quote on 2026-11-12 for 5
+  boards (turnkey, top side, 24 SMD + 3 THT): PCB 5 USD + assembly 88 USD, DHL to the Czech Republic 33.16 USD minus
+  a 30 USD shipping discount, 96.16 USD in total **without the parts** (priced after PCBWay reviews the BOM). JLCPCB
+  the same day: about 54 USD including the parts but without J1/J3/J4 and without shipping (see above).
 
 Files:
 
