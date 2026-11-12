@@ -10,6 +10,11 @@ The module hangs on a single servo cable to the receiver's **PWM4** header (S4).
 - V: about 4.94 V without load; the module draws about 57 mA idle and 105 mA at full throttle (`MASTER_VOLUME` 0.6, 40 mm speaker)
 - G: ground
 
+**The cable:** a flat 3-wire servo cable with a **JR connector** (female, 2.54 mm, 3 pins) on both ends plugs onto J1 on
+the board and onto the S4 header on the receiver (both are male pins). JR wire colours: orange = S, red = V, brown = G. It is not soldered to the board (decided 2026-11-12) and is
+not part of the PCB order; it is bought or made separately, like the speaker (component list: "Servo cable"). Keep
+the wire order the same on both ends: S, V, G.
+
 S4 is dedicated to the sound module. The original path to the motor (port M1) is untouched, so **the board needs no pass-through connector**. A second servo input for start, stop or horn is not planned (decided 2026-11-07).
 
 Older variant, still accepted by the firmware on the same input: the throttle copied to **PWM2** in the app (`Truck_with_Engine_Sound.json`), 50 Hz, about 3.3 V, 977..1973 us (45..135 deg), centre about 1455 us. Then J1 goes to PWM2 and nothing else may be connected there (a servo would follow the throttle).
@@ -135,6 +140,14 @@ centroid file, and in the comments ask them to check the polarised parts as for 
 plus side, LED1 cathode, J2 opening towards the board edge) and the orientation of J1 (pins out over the top edge).
 Before ordering, check that the 8.5 mm socket height suits the parts under the Zero (`roadmap.md`).
 
+## Needed besides the board (not in the PCB order)
+
+To connect the finished board in the model, whichever service makes it:
+
+- **Waveshare ESP32-S3-Zero-N8R8-M**, plugged into the sockets J3/J4.
+- **Servo cable** to the receiver's S4 header: flat servo cable with a female JR connector on both ends (see "Input").
+- **Speaker** with an SH 1.0 mm 2-pin cable to J2 (see "Connectors used by CyberBrick").
+
 ## Decided
 
 - Board size and shape: CyberBrick-sized rectangle (29 x 30 mm) with the four CyberBrick mounting holes (23.0 x 24.0 mm), Zero in the middle.
@@ -202,7 +215,7 @@ Part numbers are examples to be checked when the schematic is drawn; values mark
 | | Optional ferrite beads and small capacitors on the speaker outputs | 2 + 2 | only if EMI becomes a problem with longer speaker wires |
 | Speaker | JST SH 1.0 mm 2-pin side-entry SMD connector (for example SM02B-SRSS-TB; footprint about 4 x 4.3 mm, check the datasheet) + mating cable | 1 | same type as the CyberBrick M1/M2 and button ports; at the board end, plug enters from outside; rated about 1 A per contact, enough here (the whole module drew 105 mA at full throttle) |
 | Input | 3-pin 2.54 mm right-angle pin header (S, V, G) | 1 | at the USB end of the board; mates with a 3-pin female servo/Dupont cable to PWM4 (S4) (check the orientation against the receiver's header) |
-| | Servo cable, 3-wire, female 2.54 mm 3-pin connector on **both** ends (S, V, G) | 1 | not part of the PCB order (not in the JLCPCB / PCBWay files), bought separately like the speaker. From J1 to the receiver's S4 header, both ends male pins. Not soldered to the board (decided 2026-11-12). Either a ready-made female-to-female servo/Dupont cable, or made to length: servo wire (3 x 0.08-0.14 mm2 / 26-28 AWG), 6 Dupont female crimp terminals 2.54 mm and 2 Dupont 1x3 housings. Keep the same wire order on both ends (S, V, G) |
+| | Servo cable: flat 3-wire servo cable with a female **JR** connector (2.54 mm, 3-pin) on **both** ends (S, V, G = orange, red, brown) | 1 | not part of the PCB order (not in the JLCPCB / PCBWay files), bought separately like the speaker. From J1 to the receiver's S4 header, both ends male pins. Not soldered to the board (decided 2026-11-12). Ready-made JR female-to-female, or made to length from flat servo wire (26-28 AWG) with JR female crimp terminals and two 3-pin JR housings. Keep the same wire order on both ends (S, V, G) |
 | | Resistor 1 kOhm | 1 | series resistor S to GPIO1 |
 | | Resistor 100 kOhm | 1 | pull-down on GPIO1 (defined level when the cable is unplugged) |
 | | ESD/TVS diode, low capacitance (optional) | 1 | on the S line |
