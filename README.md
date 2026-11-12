@@ -15,8 +15,8 @@ State of 2026-11-08; what is still open: `docs/roadmap.md`.
   stop and horn from the transmitter.
 - **Gearbox effects** (2026-11-08): a shift sound on every upshift; reverse is detected from the stick and does not
   shift.
-- **Shield PCB**: KiCad schematic, routed board and JLCPCB assembly files exist (`hardware/shield/`); not yet reviewed
-  by a human or manufactured.
+- **Shield PCB**: KiCad schematic, routed board and assembly files for JLCPCB and PCBWay exist (`hardware/shield/`);
+  reviewed in KiCad by a colleague of the owner on 2026-11-12 (no remarks), quoted by both services, not ordered yet.
 - Which engine sound wins is still being judged by ear (`engine_lab` holds all candidates).
 
 ## How it works

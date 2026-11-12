@@ -25,6 +25,7 @@ PCB = ROOT / "hardware" / "shield" / "shield.kicad_pcb"
 FAB = ROOT / "hardware" / "shield" / "fab"
 POS = FAB / "shield_positions.csv"
 JLC = FAB / "jlcpcb"
+JLC_BASIC_DIR = FAB / "jlcpcb_basic"
 PCBWAY = FAB / "pcbway"
 
 # LCSC part numbers for assembly at JLCPCB, checked on lcsc.com on 2026-11-08 (in stock that day). Check the stock
@@ -91,6 +92,18 @@ THROUGH_HOLE = {"J1", "J3", "J4"}
 # end (180), U1 had pin 1 one corner off (rotated right by 90 = -90). D1, D2, LED1 and J2 were right.
 JLC_ROTATION_FIX = {"C1": 180, "U1": -90}
 
+# Second JLCPCB variant with "basic" parts where one exists (no loading fee of about 3 USD per extended part type),
+# checked in the JLCPCB parts library on 2026-11-12: ref -> (LCSC, comment). Written to fab/jlcpcb_basic/; the
+# default fab/jlcpcb/ keeps the parts above. The other extended parts (C1, F1, J2, TVS1, U1) have no basic equivalent.
+JLC_BASIC = {
+    "C3": ("C14663", "100n"),                  # YAGEO CC0603KRX7R9BB104, 100 nF 50 V X7R 0603
+    "C6": ("C14663", "100n"),
+    "C7": ("C14663", "100n"),
+    "FB1": ("C14709", "ferrite 120R@100MHz"),  # Murata BLM18PG121SN1D, 120 R @ 100 MHz, 2 A, 0603
+    "FB2": ("C14709", "ferrite 120R@100MHz"),
+    "LED1": ("C2286", "red"),                  # Kento KT-0603R, red 0603 (no green 0603 among the basic parts)
+}
+
 
 def run(*a):
     subprocess.run(a, check=True, capture_output=True)
@@ -130,25 +143,27 @@ def write_boms():
             w.writerow([",".join(sorted(refs)), len(refs), val, fp, lcsc, desc])
 
     # JLCPCB assembly: BOM (Comment, Designator, Footprint, LCSC) and CPL (positions) of the assembled parts only
-    JLC.mkdir(exist_ok=True)
     assembled = sorted(r for r in parts if r in LCSC)
-    groups = {}
-    for ref in assembled:
-        val, fp = parts[ref][0], parts[ref][1]
-        groups.setdefault((val, fp, LCSC[ref]), []).append(ref)
-    with open(JLC / "shield_bom_jlcpcb.csv", "w", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["Comment", "Designator", "Footprint", "LCSC"])
-        for (val, fp, lcsc), refs in sorted(groups.items(), key=lambda kv: kv[1][0]):
-            w.writerow([val, ",".join(refs), fp, lcsc])
-    with open(JLC / "shield_cpl_jlcpcb.csv", "w", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])
+    for folder, overrides in ((JLC, {}), (JLC_BASIC_DIR, JLC_BASIC)):
+        folder.mkdir(exist_ok=True)
+        groups = {}
         for ref in assembled:
-            _v, _fp, x, y, rot, side = parts[ref]
-            rot = (float(rot) + JLC_ROTATION_FIX.get(ref, 0)) % 360
-            w.writerow([ref, f"{float(x):.4f}mm", f"{float(y):.4f}mm", "Top" if side == "top" else "Bottom",
-                        f"{rot:g}"])
+            val, fp = parts[ref][0], parts[ref][1]
+            lcsc, val = overrides.get(ref, (LCSC[ref], val))
+            groups.setdefault((val, fp, lcsc), []).append(ref)
+        with open(folder / "shield_bom_jlcpcb.csv", "w", newline="") as f:
+            w = csv.writer(f)
+            w.writerow(["Comment", "Designator", "Footprint", "LCSC"])
+            for (val, fp, lcsc), refs in sorted(groups.items(), key=lambda kv: kv[1][0]):
+                w.writerow([val, ",".join(refs), fp, lcsc])
+        with open(folder / "shield_cpl_jlcpcb.csv", "w", newline="") as f:
+            w = csv.writer(f)
+            w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])
+            for ref in assembled:
+                _v, _fp, x, y, rot, side = parts[ref]
+                rot = (float(rot) + JLC_ROTATION_FIX.get(ref, 0)) % 360
+                w.writerow([ref, f"{float(x):.4f}mm", f"{float(y):.4f}mm", "Top" if side == "top" else "Bottom",
+                            f"{rot:g}"])
 
     # PCBWay turnkey assembly: every fitted part, SMD and through hole, with manufacturer part numbers
     PCBWAY.mkdir(exist_ok=True)
