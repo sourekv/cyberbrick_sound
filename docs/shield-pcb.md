@@ -63,7 +63,11 @@ To check before ordering: find out which way the receiver sits in its housing (t
 
 ## Connectors used by CyberBrick
 
-From the Maker's Supply CyberBrick user's manual (the Bambu store page names only the power input): DC motor ports M1/M2 and the transmitter button ports K1-K4 are **JST SH 1.0 mm 2-pin**; joystick (ADC) and WS2812 LED ports are SH 1.0 mm 3-pin; servo ports S1-S4 are 3-pin headers (2.54 mm); power inputs and the power switch are **XH 2.54 mm 2-pin**. The kit's SH 2-pin wires (button module, N20 motor) therefore fit a speaker connector of the same type, so the speaker connector J2 is SH 1.0 mm 2-pin and users need no crimping: a 2-pin SH cable with one free end is soldered to the speaker (or supplied with it). The CyberBrick kit contains a suitable cable: bag **B-IC004**, "100 mm Wire Pair with SH1.0", SH1.0 2-pin, 10 cm, with a plug on both ends (photo from the project owner). Cut off one plug and solder the wires to the speaker, so the speaker sits within about 10 cm of the board; for a longer run, buy an SH 1.0 mm 2-pin pigtail (plug with one free end) instead. The speaker is not polarised in any way that matters here, so the wire order does not need to be tracked.
+From the Maker's Supply CyberBrick user's manual (the Bambu store page names only the power input): DC motor ports M1/M2 and the transmitter button ports K1-K4 are **JST SH 1.0 mm 2-pin**; joystick (ADC) and WS2812 LED ports are SH 1.0 mm 3-pin; servo ports S1-S4 are 3-pin headers (2.54 mm); power inputs and the power switch are **XH 2.54 mm 2-pin**. The kit's SH 2-pin wires (button module, N20 motor) therefore fit a speaker connector of the same type, so the speaker connector J2 is SH 1.0 mm 2-pin and users need no crimping: a 2-pin SH cable with one free end is soldered to the speaker (or supplied with it). The CyberBrick kit contains a suitable cable: bag **B-IC004**, "100 mm Wire Pair with SH1.0", SH1.0 2-pin, 10 cm, with a plug on both ends (photo from the project owner). Cut off one plug and solder the wires to the speaker, so the speaker sits within about 10 cm of the board. **Chosen cable for the boards (2026-11-12): Bambu Lab "200mm
+Wire Pair with SH1.0 (5PCS) - IC007"** (Bambu Lab store, Maker's Supply): SH1.0-2P, 200 mm, 30 AWG, plugs on both
+ends, 5 pieces per pack, so one pack serves the 5 boards. Cut off one plug and shorten to fit; 20 cm of 30 AWG adds
+about 0.14 Ohm, negligible against the 4 Ohm speaker. Also sold: 50 mm (IC005), 100 mm (IC004) and 300 mm (XC014,
+2 pieces). The speaker is not polarised in any way that matters here, so the wire order does not need to be tracked.
 
 ## Ordering at JLCPCB
 
@@ -161,7 +165,8 @@ To connect the finished board in the model, whichever service makes it:
 
 - **Waveshare ESP32-S3-Zero-N8R8-M**, plugged into the sockets J3/J4.
 - **Servo cable** to the receiver's S4 header: flat servo cable with a female JR connector on both ends (see "Input").
-- **Speaker** with an SH 1.0 mm 2-pin cable to J2 (see "Connectors used by CyberBrick").
+- **Speaker** with an SH 1.0 mm 2-pin cable to J2: Bambu Lab IC007, 200 mm, one plug cut off (see "Connectors used
+  by CyberBrick").
 
 ## Decided
 
@@ -231,7 +236,7 @@ Part numbers are examples to be checked when the schematic is drawn; values mark
 | | GAIN and SD_MODE configuration: 2 solder jumpers (JP1, JP2) and 2 resistors (R4 100 kOhm, R5 about 1 MOhm) | 4 | JP1 open = GAIN floating = 9 dB, bridged = 100 kOhm to ground (15 dB); JP2 is bridged by default and R5 pulls SD_MODE up for the (L+R)/2 mix the firmware needs (it sends the same sample on both channels). Resistor values and gain steps are to be checked in the datasheet |
 | | Optional 22-33 Ohm series resistors on BCLK, LRC, DIN | 3 | EMI damping; can be 0 Ohm |
 | | Optional ferrite beads and small capacitors on the speaker outputs | 2 + 2 | only if EMI becomes a problem with longer speaker wires |
-| Speaker | JST SH 1.0 mm 2-pin side-entry SMD connector (for example SM02B-SRSS-TB; footprint about 4 x 4.3 mm, check the datasheet) + mating cable | 1 | same type as the CyberBrick M1/M2 and button ports; at the board end, plug enters from outside; rated about 1 A per contact, enough here (the whole module drew 105 mA at full throttle) |
+| Speaker | JST SH 1.0 mm 2-pin side-entry SMD connector (for example SM02B-SRSS-TB; footprint about 4 x 4.3 mm, check the datasheet) + mating cable (Bambu Lab IC007, SH1.0-2P 200 mm, one plug cut off; not part of the PCB order) | 1 | same type as the CyberBrick M1/M2 and button ports; at the board end, plug enters from outside; rated about 1 A per contact, enough here (the whole module drew 105 mA at full throttle) |
 | Input | 3-pin 2.54 mm right-angle pin header (S, V, G) | 1 | at the USB end of the board; mates with a 3-pin female servo/Dupont cable to PWM4 (S4) (check the orientation against the receiver's header) |
 | | Servo cable: flat 3-wire servo cable with a female **JR** connector (2.54 mm, 3-pin) on **both** ends (S, V, G = orange, red, brown) | 1 | not part of the PCB order (not in the JLCPCB / PCBWay files), bought separately like the speaker. From J1 to the receiver's S4 header, both ends male pins. Not soldered to the board (decided 2026-11-12). Ready-made JR female-to-female, or made to length from flat servo wire (26-28 AWG) with JR female crimp terminals and two 3-pin JR housings. Keep the same wire order on both ends (S, V, G) |
 | | Resistor 1 kOhm | 1 | series resistor S to GPIO1 |
