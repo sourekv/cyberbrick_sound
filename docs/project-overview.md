@@ -25,9 +25,12 @@ Controls, the receiver program and its auto-start: `controls.md`; measurements: 
 
 ### Prototype (works, on a breadboard)
 
-![The working breadboard prototype: ESP32-S3-Zero, MAX98357A breakout with speaker, servo cable from the receiver, slide switch and battery](prototype.jpg)
+![The whole setup on 2026-11-12: model battery, CyberBrick receiver with the motor, one servo cable to the breadboard with the ESP32-S3-Zero, the MAX98357A breakout, the 1 kOhm resistor and the 1N5819 diode, and the 40 mm speaker in the printed 30 ml box](prototype-2026-11-12.jpg)
 
-*The breadboard prototype that the shield PCB reproduces (photo from the project owner, 2026-11-01).*
+*The whole setup as of 2026-11-12: battery, CyberBrick receiver with the motor, one servo cable to S4, the
+breadboard (ESP32-S3-Zero, MAX98357A breakout, 1 kOhm in the data wire, 1N5819 in the V wire) and the 40 mm speaker
+in the printed 30 ml box. The shield PCB reproduces the breadboard part. Earlier photo (2026-11-01, PWM2 pulse
+input): `prototype.jpg`.*
 
 | Part | Role |
 |---|---|

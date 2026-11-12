@@ -115,6 +115,10 @@ Open `firmware/` in VS Code with the PlatformIO extension, or run `pio run -e <e
 
 ## Wiring
 
+![The whole setup on 2026-11-12: battery, CyberBrick receiver with the motor, the breadboard with the ESP32-S3-Zero and the MAX98357A, and the 40 mm speaker in its printed box](docs/prototype-2026-11-12.jpg)
+
+*The breadboard prototype with the receiver, battery, motor and speaker box (2026-11-12).*
+
 ![Current wiring: one servo cable from the receiver's S4 header carries the data and the 5 V supply](docs/wiring-current.png)
 
 Source: `docs/wiring-current.svg`. Earlier development stages (module on USB, only signal and GND from the receiver;
