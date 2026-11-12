@@ -1,5 +1,7 @@
 # Shield: price comparison of the manufacturing options
 
+**Chosen on 2026-11-12: JLCPCB with basic parts** (`shield-pcb.md` "Decided").
+
 Status: 2026-11-12, 5 assembled boards, top side only, delivery to the Czech Republic. Prices in USD. How to order
 each option: `shield-pcb.md` "Ordering at JLCPCB" and "Ordering at PCBWay".
 
