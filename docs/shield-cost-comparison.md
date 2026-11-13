@@ -39,7 +39,7 @@ contracts), so nothing is paid at the door. Without DDP the carrier collects it 
 Direct Line, JLCPCB collects only the VAT in advance (IOSS); the 3 EUR duty is paid on import. Whether the Czech
 post charges its own fee for EuroPacket is not known.
 
-**Recommended: DHL Express (DDP):** fastest, everything paid up front, no surprise at the door. EuroPacket is about
+**Chosen on 2026-11-13: DHL Express (DDP):** fastest, everything paid up front, no surprise at the door. EuroPacket is about
 33 USD cheaper, but slower and with the duty paid on delivery.
 
 ## Grand total
