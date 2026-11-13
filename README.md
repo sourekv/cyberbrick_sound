@@ -91,7 +91,6 @@ the header of `speaker_box.scad`.
 - `hardware/shield/` - KiCad project of the shield board: schematic, routed PCB, manufacturing files
 - `hardware/speaker_box/` - the sealed speaker box: OpenSCAD source, Fusion 360 script, Bambu Studio project
 - `hardware/solder_stand/` - printed stand for soldering the socket strips and the servo header onto the shield
-- `3d/` - cases, links
 
 ## Firmware
 
