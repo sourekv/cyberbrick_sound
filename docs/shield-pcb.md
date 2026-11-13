@@ -1,6 +1,6 @@
 # Shield PCB (iteration 2): scope
 
-Status: KiCad schematic and a first routed board with manufacturing files exist (`hardware/shield/`), reviewed in KiCad by a colleague of the project owner on 2026-11-12 (no remarks), not manufactured yet. The prototype (iteration 1) is a breadboard with an ESP32-S3-Zero-N8R8-M and a MAX98357A, powered and verified as described in `bringup.md`.
+Status: KiCad schematic and a first routed board with manufacturing files exist (`hardware/shield/`), reviewed in KiCad by a colleague of the project owner on 2026-11-12 (no remarks), ordered at JLCPCB on 2026-11-13 (5 assembled boards), not delivered yet. The prototype (iteration 1) is a breadboard with an ESP32-S3-Zero-N8R8-M and a MAX98357A, powered and verified as described in `bringup.md`.
 
 ## Input: one servo cable to the receiver's S4 header
 
@@ -71,8 +71,24 @@ about 0.14 Ohm, negligible against the 4 Ohm speaker. Also sold: 50 mm (IC005), 
 
 ## Ordering at JLCPCB
 
-Prepared on 2026-11-08; not ordered yet. The KiCad review was done on 2026-11-12. Before ordering: a stock check of the
-parts.
+**Ordered on 2026-11-13** (see "Order of 2026-11-13" below). Prepared on 2026-11-08, reviewed in KiCad on
+2026-11-12.
+
+### Order of 2026-11-13
+
+- JLCPCB order [order number removed], paid 2026-11-13: PCB [number removed] and Economic PCBA [number removed],
+  5 boards, files from `fab/jlcpcb_basic/`.
+- Options: 2 layers, 1.6 mm, green, HASL with lead (free, easiest for hand-soldering J1/J3/J4), Confirm Production
+  file and Confirm Parts Placement (JLCPCB sends both for approval before production), tooling holes added by
+  JLCPCB, nitrogen reflow, PCB build time 24 hours. Customs description: "DIY Hobby Circuit Board - HS Code 902300"
+  (the cart shows it as "jlcpcb_missing_text", a display fault at JLCPCB).
+- Placement preview checked before ordering: LED1 (cathode), C1 (plus), D1 and D2 (cathode), U1 (pin 1) and J2
+  (opening to the board edge) all match the silkscreen; all 15 parts matched and in stock.
+- Paid: goods 45.46 USD, shipping 24.31 USD (DHL Express), customs duties and taxes paid in advance 14.64 USD, total
+  **84.41 USD**. EuroPacket was the plan; DHL Express was what got selected at checkout (about 15 USD more, faster,
+  nothing to pay at the door).
+- Next: approve the production file and the parts placement when JLCPCB sends them; after delivery, solder J1, J3
+  and J4 and do the first power-up checks (`roadmap.md`).
 
 Parts (LCSC numbers, all in stock on 2026-11-08; the list is in `tools/make_shield_outputs.py`):
 
@@ -169,11 +185,25 @@ To connect the finished board in the model, whichever service makes it:
 - **Speaker** with an SH 1.0 mm 2-pin cable to J2: Bambu Lab IC007, 200 mm, one plug cut off (see "Connectors used
   by CyberBrick").
 
+**Shopping list for the 5 boards of the 2026-11-13 order** (JLCPCB fits only the SMD parts):
+
+| What | Qty | Note |
+|---|---|---|
+| J1: right-angle male pin header 1x3, 2.54 mm | 5 | Sullins PRPC003SBAN-M71RC, or cut from a 1x40 right-angle strip; soldered by hand |
+| J3, J4: female socket strip 1x9, 2.54 mm, 8.5 mm tall | 10 | Sullins PPTC091LFBN-RC; soldered by hand (plug them onto the Zero first so they stay straight) |
+| Servo cable, flat, JR female to female | 5 | J1 to the receiver's S4; length to suit the model |
+| Speaker cable Bambu Lab IC007 (SH1.0-2P, 200 mm) | 1 pack of 5 | one plug cut off |
+| Speaker, 4 Ohm | up to 5 | the type is still open (`roadmap.md`) |
+| Waveshare ESP32-S3-Zero-N8R8-M | up to 5 | one is in the prototype; the "-M" variant has its pin headers fitted, so it plugs into J3/J4 |
+
+The solder jumpers JP1/JP2 need no work for the default setting (9 dB gain, JP2 bridged in copper).
+
 ## Decided
 
 - **Manufacturer: JLCPCB with the basic parts (decided 2026-11-12)**, files in `fab/jlcpcb_basic/`, so a red power
   LED. J1, J3 and J4 are soldered by hand. The cheapest option, about half the price of PCBWay
-  (`shield-cost-comparison.md`). All 15 parts were in stock that day (the fewest: F1, 13 083 pieces).
+  (`shield-cost-comparison.md`). All 15 parts were in stock that day (the fewest: F1, 13 083 pieces). Ordered on
+  2026-11-13 ("Order of 2026-11-13").
 - Board size and shape: CyberBrick-sized rectangle (29 x 30 mm) with the four CyberBrick mounting holes (23.0 x 24.0 mm), Zero in the middle.
 - **Flashing with the servo cable plugged in must be safe** (requirement from the project owner, 2026-11-08): the module hangs on one cable and the V wire cannot be unplugged on its own. The OR-ing diode D2 stops the USB 5 V from flowing into the receiver, and the servo 5 V reaches the Zero's 5V pad (= USB VBUS) only through D2, about 0.3 V lower than USB, so normally nothing flows back into the computer either. The breadboard rule (never USB and V together) applies only to the prototype without D2. To check on the first boards: voltages and currents with USB and the receiver connected at the same time.
 - Power LED on the board (from the servo-port 5 V); the signal status is shown by the Zero's RGB LED in firmware.

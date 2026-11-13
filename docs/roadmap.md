@@ -1,6 +1,6 @@
 # Roadmap: what is open
 
-Status: 2026-11-12. The one place for everything that is still open: decisions, checks on hardware and the plans for
+Status: 2026-11-13. The one place for everything that is still open: decisions, checks on hardware and the plans for
 later. The other documents describe what exists and link here for what is missing. Ideas that were dropped, with the
 reasons, are in `rejected-ideas.md`.
 
@@ -9,7 +9,7 @@ reasons, are in `rejected-ideas.md`.
 | Item | Where | Notes |
 |---|---|---|
 | Choose the engine sound | `engine_lab`, `sound-research.md` | candidates are judged by ear on the real speaker |
-| Shield: order | `shield-pcb.md` "Ordering at JLCPCB" | reviewed in KiCad 2026-11-12; decided 2026-11-12: JLCPCB with the basic parts (`fab/jlcpcb_basic/`, red LED, J1/J3/J4 by hand), about 78-111 USD for 5 boards incl. VAT, duty and clearance fees (EuroPacket / DHL DDP; EuroPacket chosen 2026-11-13, about 78 USD) (`shield-cost-comparison.md`); stock checked 2026-11-12; to do: upload, confirm the placement preview (C1 and U1 rotations already fixed, check the LED polarity), shipping EuroPacket, order |
+| Shield: approve and receive | `shield-pcb.md` "Order of 2026-11-13" | ordered at JLCPCB on 2026-11-13 ([order number removed], 5 boards with basic parts, DHL Express, 84.41 USD paid incl. customs); to do: approve the production file and the parts placement when JLCPCB sends them (check where the tooling holes went), buy J1/J3/J4 and the cables (shopping list in `shield-pcb.md` "Needed besides the board"); after delivery solder J1/J3/J4 and do the first checks below |
 | Speaker for the model | `speaker-measurement.md` | 40 mm or a production candidate (for example 21 mm). The box is done (30 ml best, 15 ml close); more would come from another speaker or amplifier, not from the box |
 | Enclosure for the model | - | designed from scratch around the chosen speaker; the printed box is a test fixture only |
 | Long power test with the motor running | `bringup.md` | does the servo-port 5 V hold with the module and the motor together |

@@ -1,6 +1,19 @@
 # Shield: price comparison of the manufacturing options
 
-**Chosen on 2026-11-12: JLCPCB with basic parts** (`shield-pcb.md` "Decided").
+**Chosen on 2026-11-12: JLCPCB with basic parts** (`shield-pcb.md` "Decided"). **Ordered on 2026-11-13 for 84.41 USD
+in total** (see "Actual order" below).
+
+## Actual order (2026-11-13)
+
+| | Estimate | Paid |
+|---|---|---|
+| Goods (PCB + assembly + parts) | about 45.0 | 45.46 (PCB 5.07, PCBA 40.39, incl. nitrogen reflow 0.91 and Confirm Production file 1.05) |
+| Shipping | EuroPacket about 11 / DHL about 24 | 24.31 (DHL Express) |
+| Customs duties and taxes, paid in advance | - | 14.64 |
+| **Total** | about 78 (EuroPacket) / about 111 (DHL DDP) | **84.41** |
+
+The DHL estimate was too high: JLCPCB collected 14.64 USD for customs with the order (about the 21 % VAT on goods and
+shipping), and no separate clearance fee showed at checkout. Still to buy: J1, J3, J4 (about 3-5 USD).
 
 Status: 2026-11-12 (import charges added 2026-11-13), 5 assembled boards, top side only, delivery to the Czech Republic. Prices in USD. How to order
 each option: `shield-pcb.md` "Ordering at JLCPCB" and "Ordering at PCBWay".
