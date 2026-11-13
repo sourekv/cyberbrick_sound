@@ -102,7 +102,8 @@ Chosen on 2026-11-12: the basic-parts variant (`fab/jlcpcb_basic/`, see step 2).
 Steps:
 
 1. PCB: upload `hardware/shield/fab/shield_gerbers.zip`. 2 layers, 1.6 mm, the size is read from the outline
-   (29 x 30 mm).
+   (29 x 30 mm). Colour: green, the default (decided 2026-11-13). Black was possible at no extra cost (one day
+   longer build time; Economic PCBA takes green or black for 2-layer 1.6 mm) but is not needed.
 2. Assembly: top side only. Upload `fab/jlcpcb/shield_bom_jlcpcb.csv` (BOM) and `fab/jlcpcb/shield_cpl_jlcpcb.csv`
    (positions). J1, J3, J4, the solder jumpers JP1/JP2, the test points and the holes are not in these files.
    A cheaper variant is in `fab/jlcpcb_basic/` (same positions): JLCPCB "basic" parts where one exists, so 5
