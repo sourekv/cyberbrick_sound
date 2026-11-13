@@ -2,7 +2,7 @@
 
 **Chosen on 2026-11-12: JLCPCB with basic parts** (`shield-pcb.md` "Decided").
 
-Status: 2026-11-12, 5 assembled boards, top side only, delivery to the Czech Republic. Prices in USD. How to order
+Status: 2026-11-12 (import charges added 2026-11-13), 5 assembled boards, top side only, delivery to the Czech Republic. Prices in USD. How to order
 each option: `shield-pcb.md` "Ordering at JLCPCB" and "Ordering at PCBWay".
 
 ## The three options
@@ -19,26 +19,48 @@ each option: `shield-pcb.md` "Ordering at JLCPCB" and "Ordering at PCBWay".
 | Who checks the files | a person at PCBWay, before production | the customer, in the placement preview | the customer, in the placement preview |
 | Visible difference | green LED | green LED | **red** LED |
 
-Import VAT (21 %) is added to every option when the parcel enters the EU, so it does not change the order.
+Import charges (VAT, customs duty, clearance fees) are added to every option when the parcel enters the EU; see
+"Import charges" below.
+
+## Import charges
+
+Since the EU customs reform (1 July 2026; JLCPCB "EU Tax Reform July 2026 - Client FAQ", read on 2026-11-13), a
+private (B2C) parcel up to 150 EUR pays, with or without DDP:
+
+- **VAT 21 %** on the goods and the shipping.
+- **Temporary customs duty: 3 EUR per HS code.** The boards are most likely one HS code, so 3 EUR.
+- **EU handling fee (UHF): 2 EUR** per customs declaration line, since 1 November 2026.
+- **Carrier's duty & tax disbursement fee** when the carrier advances the duty and VAT: DHL in the Czech Republic
+  2 % of the advanced amount, **at least 400 CZK** (UPS at least 416 CZK, FedEx at least 364 CZK).
+
+**DDP shipping** (DHL Express (DDP) or FedEx Express (DDP) in the JLCPCB order form): JLCPCB calculates, collects
+and pays all of this with the order, the disbursement fee included (possibly at a discount from its carrier
+contracts), so nothing is paid at the door. Without DDP the carrier collects it on delivery. With Global Standard
+Direct Line, JLCPCB collects only the VAT in advance (IOSS); the 3 EUR duty is paid on import. Whether the Czech
+post charges its own fee for EuroPacket is not known.
+
+**Recommended: DHL Express (DDP):** fastest, everything paid up front, no surprise at the door. EuroPacket is about
+33 USD cheaper, but slower and with the duty paid on delivery.
 
 ## Grand total
 
-Everything paid for 5 finished boards, including the 21 % import VAT on the order and its shipping. J1/J3/J4 for
-the JLCPCB options are bought locally with VAT already in the price. Not included: what all options need anyway
-(the ESP32-S3-Zero, the servo cable and the speaker, `shield-pcb.md` "Needed besides the board") and a possible
-customs-handling fee of the carrier (none with DHL DDP).
+Everything paid for 5 finished boards, with the import charges above. J1/J3/J4 for the JLCPCB options are bought
+locally with VAT already in the price. Not included: what all options need anyway (the ESP32-S3-Zero, the servo
+cable and the speaker, `shield-pcb.md` "Needed besides the board"). Approximate rates: 5 EUR (duty + UHF) = about
+6 USD, 400 CZK = about 18 USD.
 
-| | Order | Shipping | Parts not in the order | VAT 21 % | **Grand total** | Per board |
-|---|---|---|---|---|---|---|
-| PCBWay (parts 15-50) | 108.00-143.00 | 3.16 | - | 23.34-30.69 | **about 135-177** | 27-35 |
-| JLCPCB original, DHL | 54.31 | 23.52 | 3-5 | 16.34 | **about 97-99** | about 20 |
-| JLCPCB original, EuroPacket | 54.31 | 11.00 | 3-5 | 13.72 | **about 82-84** | about 17 |
-| JLCPCB basic, DHL | about 45.04 | 23.52 | 3-5 | 14.40 | **about 86-88** | about 17 |
-| JLCPCB basic, EuroPacket | about 45.04 | 11.00 | 3-5 | 11.77 | **about 71-73** | about 14 |
+| | Order | Shipping | Parts not in the order | VAT 21 % | Duty + UHF | Clearance fee | **Grand total** | Per board |
+|---|---|---|---|---|---|---|---|---|
+| PCBWay, DHL (parts 15-50) | 108.00-143.00 | 3.16 | - | 23.34-30.69 | about 6 | about 18 | **about 159-201** | 32-40 |
+| JLCPCB original, DHL DDP | 54.31 | 23.52 | 3-5 | 16.34 | about 6 | up to about 18 | **about 121-123** | about 24 |
+| JLCPCB original, EuroPacket | 54.31 | 11.00 | 3-5 | 13.72 | about 6 | not known | **about 88-90** | about 18 |
+| JLCPCB basic, DHL DDP | about 45.04 | 23.52 | 3-5 | 14.40 | about 6 | up to about 18 | **about 110-112** | about 22 |
+| JLCPCB basic, EuroPacket | about 45.04 | 11.00 | 3-5 | 11.77 | about 6 | not known | **about 77-79** | about 16 |
 
 The PCBWay order is the PCB and assembly (93.00) plus its parts estimate; the JLCPCB order already holds the parts.
-The cheapest option (JLCPCB basic parts, EuroPacket) costs about half of PCBWay but needs the three through-hole
-parts soldered by hand and a red power LED.
+The DDP clearance fee is the carrier's minimum and may be lower through JLCPCB. The cheapest option (JLCPCB basic
+parts, EuroPacket) costs about half of PCBWay but needs the three through-hole parts soldered by hand and a red
+power LED.
 
 ## Where the numbers come from
 
