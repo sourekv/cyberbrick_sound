@@ -209,7 +209,8 @@ The solder jumpers JP1/JP2 need no work for the default setting (9 dB gain, JP2 
 GME has no breakable 8.5 mm female strip (the breakable "precision" strips are 7 mm with round contacts, too tight
 for the Zero's square pins), so the 1x9 pieces are cut: pull out the 10th contact, cut through the empty place,
 file the end. The jumper cable's wire colours are not the JR ones; check pin 1 to pin 1 with a multimeter before
-the first use. Still to buy: the speaker cable (Bambu Lab IC007), the speakers and more Zeros. The first board gets
+the first use. The speaker cable (Bambu Lab IC007, 200 mm) was ordered at the Bambu Lab EU store on 2026-11-13,
+order [order number removed]. Still to buy: the speakers and more Zeros. The first board gets
 the Zero and the speaker of the breadboard prototype (plan of 2026-11-13); more Zeros and speakers are ordered after
 that board works.
 
