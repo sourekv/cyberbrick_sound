@@ -26,12 +26,12 @@
 
 part = "stand";      // "stand" or "preview" (stand with the board and the Zero as ghosts)
 
-base_t     = 2.0;    // base plate thickness
+base_t     = 4.0;    // base plate thickness (heavier, so the stand does not tip over)
+base_w     = 80.0;   // base plate, square, centred under the board (the stand is about 25 mm tall)
 post_h     = 18.0;   // base top to the board's top side (must clear the Zero stack, foam fills the rest)
 post_d     = 4.5;    // post diameter; the copper ring is 6.0 mm, J3 starts 2.6 mm from the hole centre
 pin_d      = 2.3;    // locating pin in the 2.7 mm hole
 pin_h      = 2.2;    // through the 1.6 mm board and a little past it
-margin     = 6.0;    // base plate beyond the board outline
 board_t    = 1.6;
 
 // board, KiCad coordinates (y grows downwards in KiCad; here it is just a mirror, see above)
@@ -46,6 +46,9 @@ j1_x0 = 111.96 - 1.6;  j1_x1 = 117.04 + 1.6;
 j1_body_t = 2.54;
 j1_y_in   = 101.8;   // ledge stops here, short of the Zero's USB-C end (Zero about y 103.2..126.8)
 j1_y_out  = by0 - 7.5;
+guide_w   = 1.6;     // side guides beside the body
+comb_l    = 6.0;     // comb under the long pins (from j1_y_out to 1.5 mm short of the board edge)
+slot_w    = 0.9;     // slot for a 0.64 mm square pin
 
 $fn = 48;
 
@@ -53,8 +56,7 @@ module stand() {
   difference() {
     union() {
       // base plate
-      translate([bx0 - margin, j1_y_out - 2, 0])
-        cube([bx1 - bx0 + 2 * margin, by1 + margin - (j1_y_out - 2), base_t]);
+      translate([cx - base_w / 2, cy - base_w / 2, 0]) cube([base_w, base_w, base_t]);
       // posts with locating pins
       // each post is braced outwards to the board corner (nothing is fitted there), so it does not bend when the
       // board is pressed down while soldering
@@ -72,10 +74,19 @@ module stand() {
       // ledge under the J1 plastic body (the pins over the edge stay 0.9 mm above it)
       translate([j1_x0, j1_y_out, 0])
         cube([j1_x1 - j1_x0, j1_y_in - j1_y_out, base_t + post_h - j1_body_t]);
+      // side guides at both ends of the J1 body, so it cannot turn or slide along the edge
+      for (x = [j1_x0 - guide_w, j1_x1]) translate([x, j1_y_out, 0])
+        cube([guide_w, j1_y_in - j1_y_out, base_t + post_h - 0.3]);
+      // comb past the board edge: one slot per pin keeps the long pins straight and square to the edge
+      translate([j1_x0, j1_y_out, 0]) difference() {
+        cube([j1_x1 - j1_x0, comb_l, base_t + post_h - 0.3]);
+        for (x = [111.96, 114.50, 117.04])
+          translate([x - j1_x0 - slot_w / 2, -1, base_t + post_h - 1.27 - 0.32 - 0.1]) cube([slot_w, comb_l + 2, 5]);
+      }
     }
     // label on the base, so the stand is not taken for something else
-    translate([cx, by1 + margin / 2, base_t - 0.6])
-      linear_extrude(1) text("shield", size = 3, halign = "center", valign = "center");
+    translate([cx, cy + base_w / 2 - 8, base_t - 0.6])
+      linear_extrude(1) text("shield solder stand", size = 4, halign = "center", valign = "center");
   }
 }
 
