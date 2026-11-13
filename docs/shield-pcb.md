@@ -210,9 +210,18 @@ GME has no breakable 8.5 mm female strip (the breakable "precision" strips are 7
 for the Zero's square pins), so the 1x9 pieces are cut: pull out the 10th contact, cut through the empty place,
 file the end. The jumper cable's wire colours are not the JR ones; check pin 1 to pin 1 with a multimeter before
 the first use. The speaker cables (Bambu Lab IC007, 200 mm, one pack of 5 pieces, one per board) were ordered at the Bambu Lab EU store on 2026-11-13,
-order [order number removed]. Still to buy: the speakers and more Zeros. The first board gets
-the Zero and the speaker of the breadboard prototype (plan of 2026-11-13); more Zeros and speakers are ordered after
-that board works.
+order [order number removed]. The first board gets the Zero and the speaker of the breadboard prototype (plan of
+2026-11-13); more Zeros and speakers are ordered after that board works.
+
+**Ordered at Allegro.cz on 2026-11-13** (one parcel per seller, paid):
+
+| Seller | Part | Qty | Price incl. shipping | Delivery expected |
+|---|---|---|---|---|
+| piters_pro | Waveshare ESP32-S3-Zero-N8R8-M (SKU 33549, 8 MB flash, 8 MB PSRAM, pin headers fitted) | 1 | 298 CZK (233 + shipping) | by 2026-11-20 |
+| OMEGA_ZONE | Speaker ACS SPK3W40MM, 40 mm, 4 Ohm, 3 W, 20 mm deep (same size as the prototype's Solectro M0069) | 1 | 126 CZK (61 + shipping) | by 2026-11-19 |
+The Zero is for a second board. On Allegro, many "ESP32-S3-Zero" listings are the ESP32-S3FH4R2 variant (4 MB flash,
+2 MB PSRAM), which does not fit the firmware's 8 MB partition table; only N8R8 boards are usable. Still to buy:
+Zeros and speakers for the remaining boards, once the speaker type is chosen (`roadmap.md`).
 
 ## Decided
 
