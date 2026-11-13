@@ -23,13 +23,15 @@
 // Export (OpenSCAD 2021.01):
 //   openscad -o solder_stand.stl solder_stand.scad
 //   openscad -o solder_stand_preview.png -D 'part="preview"' solder_stand.scad   (with the board, not for printing)
+//   solder_stand_steps.png: three renders with -D 'part="assembly"' -D explode=45 / 18 / 0 (Tomorrow colour scheme),
+//   joined with ImageMagick montage
 
 part = "stand";      // "stand" or "preview" (stand with the board and the Zero as ghosts)
 
 base_t     = 4.0;    // base plate thickness (heavier, so the stand does not tip over)
 base_w     = 80.0;   // base plate, square, centred under the board (the stand is about 25 mm tall)
 post_h     = 18.0;   // base top to the board's top side (must clear the Zero stack, foam fills the rest)
-post_d     = 4.5;    // post diameter; the copper ring is 6.0 mm, J3 starts 2.6 mm from the hole centre
+post_d     = 4.0;    // post diameter; the copper ring is 6.0 mm, J3 starts 2.6 mm and the Zero corner about 2.5 mm from the hole centre
 pin_d      = 2.3;    // locating pin in the 2.7 mm hole
 pin_h      = 2.2;    // through the 1.6 mm board and a little past it
 board_t    = 1.6;
@@ -102,5 +104,47 @@ module ghosts() {
   %for (x = [111.96, 114.50, 117.04]) translate([x - 0.32, 94.05, top - 1.27 - 0.32]) cube([0.64, 8, 0.64]);
 }
 
-stand();
-if (part == "preview") ghosts();
+// Coloured assembly for the how-to pictures (part="assembly"): the board with the Zero, the socket strips and J1,
+// upside down, lifted by `explode` mm above its place; the foam lifted by explode / 2.
+explode = 0;
+foam_t  = 6;
+
+module board_assembly() {
+  top = base_t + post_h;
+  color("darkgreen") difference() {
+    translate([bx0, by0, top]) cube([bx1 - bx0, by1 - by0, board_t]);
+    for (h = holes) translate([h[0], h[1], top - 1]) cylinder(d = 2.7, h = 5);
+  }
+  for (h = holes) color("gold") translate([h[0], h[1], top + board_t - 0.01])
+    difference() { cylinder(d = 6, h = 0.05); cylinder(d = 2.7, h = 1, center = true); }
+  // socket strips with their pins through the board
+  for (x = [106.88, 122.12]) {
+    color([0.1, 0.1, 0.1]) translate([x - 1.27, 104.84 - 1.27, top - 8.5]) cube([2.54, 9 * 2.54, 8.5]);
+    for (i = [0 : 8]) color("silver") translate([x - 0.3, 104.84 + i * 2.54 - 0.3, top]) cube([0.6, 0.6, board_t + 1.5]);
+  }
+  // Zero: its pin headers in the sockets, its board below, the chip and the USB-C facing down
+  zt = top - 8.5 - 2.5;
+  color([0.1, 0.1, 0.1]) for (x = [106.88, 122.12]) translate([x - 1.27, 104.84 - 1.27, zt]) cube([2.54, 9 * 2.54, 2.5]);
+  color("royalblue") translate([cx - 9, cy - 11.75, zt - 1.0]) cube([18, 23.5, 1.0]);
+  color("silver") translate([cx - 4.5, cy - 11.75 - 0.5, zt - 1.0 - 3.2]) cube([9, 7.4, 3.2]);   // USB-C
+  color([0.2, 0.2, 0.2]) translate([cx - 3.5, cy - 1, zt - 1.0 - 0.9]) cube([7, 7, 0.9]);         // chip
+  // J1: body on the board, long pins over the edge, short pins through the board
+  color([0.1, 0.1, 0.1]) translate([j1_x0 + 0.3, by0 + 0.05, top - j1_body_t]) cube([j1_x1 - j1_x0 - 0.6, 2.66, j1_body_t]);
+  for (x = [111.96, 114.50, 117.04]) color("gold") {
+    translate([x - 0.32, 94.05, top - 1.27 - 0.32]) cube([0.64, 104.15 - 94.05 + 0.32, 0.64]);
+    translate([x - 0.32, 104.15 - 0.32, top - 1.27 - 0.32]) cube([0.64, 0.64, 1.27 + 0.32 + board_t + 1.5]);
+  }
+}
+
+module foam() {
+  color([0.95, 0.75, 0.8]) translate([cx - 9, cy - 11, base_t]) cube([18, 22, foam_t]);
+}
+
+if (part == "assembly") {
+  color("orange") stand();
+  translate([0, 0, explode / 2]) foam();
+  translate([0, 0, explode]) board_assembly();
+} else {
+  stand();
+  if (part == "preview") ghosts();
+}
