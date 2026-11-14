@@ -33,6 +33,7 @@ The first real design step: the KiCad 7 schematic `hardware/shield/shield.kicad_
 - 2 layers, 29 x 30 mm, tracks 0.25 mm, clearance 0.2 mm, vias 0.6/0.3 mm, copper-to-edge 0.3 mm. J1 (right-angle header) sticks out of the top edge, the J2 speaker connector opens toward the bottom edge, test pads are on the bottom side.
 - DRC (run through pcbnew, KiCad 7 has no command-line DRC): 0 unconnected, 0 clearance / short / courtyard / edge errors. Remaining messages are warnings only: silkscreen overlaps and silkscreen clipped at the edge (J1 outline hangs outside the board), and a library-path warning from the generated footprints.
 - Manufacturing outputs in `hardware/shield/fab/`: `shield_gerbers.zip` (Gerber + drill), `shield_positions.csv`, `shield_bom.csv` (values, footprints from the board, LCSC part numbers) and the assembly files for JLCPCB in `fab/jlcpcb/` and for PCBWay in `fab/pcbway/` (made by `tools/make_shield_outputs.py`; `--bom-only` rebuilds only the BOMs and assembly files). How to order: "Ordering at JLCPCB" and "Ordering at PCBWay" below.
+- **Interactive BOM** `hardware/shield/fab/shield_ibom.html`: open it in a browser; a part clicked in the list lights up on the picture of the board and the other way round. It is where the reference labels went (R1, C3, ...), because rev B has none on the silkscreen; use it for repairs and measuring. Made by `tools/make_shield_ibom.py` (InteractiveHtmlBom 2.12.0, installation in the file's header); regenerate it after any board change.
 - **Reviewed in KiCad on 2026-11-12** by a colleague of the project owner, with no remarks. Still to do before ordering: a stock check of the parts and the open decisions below (socket height vs the parts under the Zero). The routing is autorouter quality, not hand-optimised; it has not been through any signal-integrity or EMC check.
 
 ## On the board
@@ -182,7 +183,7 @@ finds 0 violations (rev A: 53 silkscreen warnings) and 0 unconnected items. The 
 - **Files**: the title block says rev B (board and schematic) and the gerbers carry `Revision: B`. The board is saved
   by KiCad 10 (rev A: KiCad 7), so it opens in KiCad 10 or newer. `tools/make_shield_pcb.py` still generates the
   rev A board; to rebuild rev B run it, then `tools/make_shield_rev_b.py`, then `tools/make_shield_outputs.py`
-  (with KiCad's `kicad-cli` on the PATH).
+  (with KiCad's `kicad-cli` on the PATH). The interactive BOM comes from `tools/make_shield_ibom.py`.
 - Before ordering: look at the gerber preview once (JLCPCB's or KiCad's viewer) and check the text sizes against
   JLCPCB's current silkscreen rules; then the tag `hw-shield-revB`.
 
