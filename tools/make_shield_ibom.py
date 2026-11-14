@@ -9,7 +9,7 @@ the pcbnew module). Install it once into a folder of your choice, then run:
 
 Output: hardware/shield/fab/shield_ibom.html (committed; regenerate after any board change). Tracks are left out
 (--include-tracks makes KiCad 10's pcbnew raise a wxWidgets assert dialog that blocks the run); pads, outlines,
-pin 1 marks and the silkscreen are drawn. Made with InteractiveHtmlBom 2.12.0, KiCad 10.0.8 on 2026-11-14.
+pin 1 marks and the silkscreen are drawn. No checkbox columns (Sourced, Placed): JLCPCB places the SMD parts. Made with InteractiveHtmlBom 2.12.0, KiCad 10.0.8 on 2026-11-14.
 """
 import subprocess
 import sys
@@ -28,7 +28,7 @@ def main():
         sys.exit(f"{script} not found: install InteractiveHtmlBom there first (see the top of this file)")
     subprocess.run([sys.executable, str(script), str(PCB), "--no-browser", "--dest-dir", str(FAB),
                     "--name-format", "shield_ibom", "--include-nets", "--highlight-pin1", "selected",
-                    "--dark-mode"], check=True)
+                    "--dark-mode", "--checkboxes", ""], check=True)
 
 
 if __name__ == "__main__":
