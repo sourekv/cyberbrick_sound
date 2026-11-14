@@ -81,7 +81,7 @@ about 0.14 Ohm, negligible against the 4 Ohm speaker. Also sold: 50 mm (IC005), 
   5 boards, files from `fab/jlcpcb_basic/`. **LED1 is therefore red** (Kento KT-0603R, C2286), not green: the
   board files and `shield_bom.csv` still say "green" (the design value, rev A tag), the files that were ordered say
   red. Its drop is lower than a green one's, so with the 1 k resistor it takes a little more than the 3 mA estimated
-  below; to be seen at the first power-up.
+  below; to be seen at the first power-up. All differences between the ideal and the ordered parts: `shield-bom-compare.md`.
 - Options: 2 layers, 1.6 mm, green, HASL with lead (free, easiest for hand-soldering J1/J3/J4), Confirm Production
   file and Confirm Parts Placement (JLCPCB sends both for approval before production), tooling holes added by
   JLCPCB, nitrogen reflow, PCB build time 24 hours. Customs description: "DIY Hobby Circuit Board - HS Code 902300"

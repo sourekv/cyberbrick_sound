@@ -1,0 +1,30 @@
+Ref,Footprint,Ideal value,Ideal LCSC,Ordered value,Ordered LCSC,Status,Note
+C1,CP_EIA-6032-28_Kemet-C,100u,C8649,100u,C8649,same,
+C2,C_0805_2012Metric,10u,C15850,10u,C15850,same,
+C3,C_0603_1608Metric,100n,C1591,100n,C14663,different,"Samsung CL10B104KB8NNNC -> YAGEO CC0603KRX7R9BB104: the same 100 nF 50 V X7R 0603, no effect"
+C4,C_0603_1608Metric,100p,C14858,100p,C14858,same,
+C5,C_0603_1608Metric,100p,C14858,100p,C14858,same,
+C6,C_0603_1608Metric,100n,C1591,100n,C14663,different,"Samsung CL10B104KB8NNNC -> YAGEO CC0603KRX7R9BB104: the same 100 nF 50 V X7R 0603, no effect"
+C7,C_0603_1608Metric,100n,C1591,100n,C14663,different,"Samsung CL10B104KB8NNNC -> YAGEO CC0603KRX7R9BB104: the same 100 nF 50 V X7R 0603, no effect"
+D1,D_SOD-123,Schottky 1A,C8598,Schottky 1A,C8598,same,
+D2,D_SOD-123,Schottky 1A,C8598,Schottky 1A,C8598,same,
+F1,Fuse_1206_3216Metric,0.5A PTC,C43379,0.5A PTC,C43379,same,
+FB1,L_0603_1608Metric,ferrite 600R@100MHz,C85833,ferrite 120R@100MHz,C14709,different,"Murata BLM18KG601SN1D (600 R, 1.3 A) -> BLM18PG121SN1D (120 R, 2 A): weaker filtering of the amplifier's switching noise on the speaker wires, lower resistance; the beads are optional in the design (can be 0 R)"
+FB2,L_0603_1608Metric,ferrite 600R@100MHz,C85833,ferrite 120R@100MHz,C14709,different,"Murata BLM18KG601SN1D (600 R, 1.3 A) -> BLM18PG121SN1D (120 R, 2 A): weaker filtering of the amplifier's switching noise on the speaker wires, lower resistance; the beads are optional in the design (can be 0 R)"
+J1,PinHeader_1x03_P2.54mm_Horizontal,Servo input S-V-G,hand-soldered,Servo input S-V-G,hand-soldered,hand-soldered,
+J2,JST_SH_SM02B-SRSS-TB_1x02-1MP_P1.00mm_Horizontal,Speaker JST SH 1.0,C160402,Speaker JST SH 1.0,C160402,same,
+J3,PinSocket_1x09_P2.54mm_Vertical,Zero left: 5V GND 3V3 IO1 IO2 IO3 IO4 IO5 IO6,hand-soldered,Zero left: 5V GND 3V3 IO1 IO2 IO3 IO4 IO5 IO6,hand-soldered,hand-soldered,
+J4,PinSocket_1x09_P2.54mm_Vertical,Zero right: TX RX IO13..IO7 (unused),hand-soldered,Zero right: TX RX IO13..IO7 (unused),hand-soldered,hand-soldered,
+JP1,SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm,GAIN 15 dB,,,,no part (solder jumper),
+JP2,SolderJumper-2_P1.3mm_Bridged_Pad1.0x1.5mm,SD_MODE (L+R)/2,,,,no part (solder jumper),
+LED1,LED_0603_1608Metric,green,C12624,red,C2286,different,"Kento KT-0603G green -> KT-0603R red: no green 0603 LED among JLCPCB's basic parts; the red one has a lower drop, so a little more than the 3 mA through the 1 k resistor (to be seen at the first power-up)"
+R1,R_0603_1608Metric,1k,C21190,1k,C21190,same,
+R2,R_0603_1608Metric,100k,C25803,100k,C25803,same,
+R3,R_0603_1608Metric,1k,C21190,1k,C21190,same,
+R4,R_0603_1608Metric,100k,C25803,100k,C25803,same,
+R5,R_0603_1608Metric,1M,C22935,1M,C22935,same,
+R6,R_0402_1005Metric,33R,C25105,33R,C25105,same,
+R7,R_0402_1005Metric,33R,C25105,33R,C25105,same,
+R8,R_0402_1005Metric,33R,C25105,33R,C25105,same,
+TVS1,D_SOD-323,ESD diode 5 V,C19224,ESD diode 5 V,C19224,same,
+U1,TQFN-16-1EP_3x3mm_P0.5mm_EP1.23x1.23mm,MAX98357AETE+,C910544,MAX98357AETE+,C910544,same,
