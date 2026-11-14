@@ -104,9 +104,13 @@ prepare this exact format.
 
 ## Files of a set
 
-A set is one folder in the data partition, `/sets/<order>_<id>/`, for example `/sets/01_truck/`. The two-digit
-number gives the order in which the BOOT button steps through the sets; `<id>` is a short name of lower-case
-letters, digits and underscores. The files inside always have the same names, so the firmware needs no list of them:
+A set is one folder in the data partition, `/sets/<index>_<description>/`, for example `/sets/01_truck/`
+(decided 2026-11-14). The **first two characters are the index** (01..99): the order in which the BOOT button steps
+through the sets. Everything after the underscore is a **free description for people looking at the files; the
+firmware ignores it** (the set's name comes from `set.json` and `name.wav`). A folder without a two-digit index is
+skipped; when two folders share an index, the firmware takes the first in alphabetical order and reports the other
+over USB serial. The PC tool keeps the indexes unique and renumbers the folders when sets are reordered.
+The files inside always have the same names, so the firmware needs no list of them:
 
 | File | What it holds | How it is played | Length |
 |---|---|---|---|
