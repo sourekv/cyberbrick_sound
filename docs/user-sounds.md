@@ -10,20 +10,61 @@ speaker measurement (`speaker-measurement.md`).
 There are no separate "built-in" and "user" sets. **Every set is a set of files in the data partition**, and the BOOT
 button steps through the sets found there:
 
-- **Default sets**: for now all seven `engine_lab` candidates, each with its voice prompt (decided 2026-11-14;
-  together about 0.85 MB, so they fit even the current 1.5 MB partition). They are written to the data partition
-  when a module is flashed the first time. To the user they are
-  ordinary sets: they can be deleted, replaced or reordered like their own.
+- **Every set is complete** (decided 2026-11-14): it holds all its sounds (idle and loaded loop, start, stop, horn,
+  shift) and its spoken name. Sets do not borrow sounds from each other or from the firmware, so a set can be copied,
+  deleted or replaced on its own; sounds that several sets share (for example the same horn) are simply stored in
+  each of them.
+- **Default sets**: for now all seven `engine_lab` candidates (decided 2026-11-14). They are written to the data
+  partition when a module is flashed the first time. To the user they are ordinary sets: they can be deleted,
+  replaced or reordered like their own.
+- **Two types of set** (decided 2026-11-14): a **sample** set plays its engine from the loops `idle.wav` and
+  `loaded.wav`; a **synth** set makes its engine in real time from combustion grains, so it has no engine loops,
+  only the synth parameters in `set.json` (see "Types of set"). Everything else (name, start, stop, horn, shift) is
+  WAV files in both types.
 - **One fallback set is compiled into the firmware** and is used only when the data partition is empty or damaged
   (for example after a failed upload), so the module never stays silent. It is not in the list the BOOT button steps
-  through. It also supplies the one-shot sounds (start, stop, horn, shift) a set leaves out.
-- Every set carries its own spoken name as a sample (see "Announcing the set"); beeps only for a set without one.
+  through.
 
 Why: one kind of set keeps the firmware and the controls simple, a firmware update (also over OTA) does not touch the
 sounds, and an upload of sounds does not touch the firmware. The sounds take about 0.8 MB of the firmware today
 (engine samples about 355 kB, voice prompts about 480 kB); with most of them moved out, the app slots can shrink and
 the data partition can grow (see "Size"). Cost: the partition table changes once, so every module is flashed
 completely once more (firmware and default sets); after that firmware and sounds are uploaded separately.
+
+Size of a set, estimated from the truck set: idle loop 234 kB, loaded loop 84 kB, start (1.1 s cranking and the
+catch) and stop (1.4 s) about 120 kB together, horn about 25-45 kB, shift 15 kB, name about 70 kB. A sample set is
+about 0.55-0.6 MB, a synth set (no loops) about 0.25-0.3 MB. The seven default sets (two sample, five synth) are
+about 2.5 MB, so they need the larger data partition (see "Size").
+
+## Types of set
+
+**Why two types.** In a synth set every firing of a cylinder starts a short combustion grain of fixed timbre; the rpm
+changes only how often the grains come, as in a real engine (more bangs per second, the exhaust and the block keep
+resonating at the same frequencies), and every firing differs a little (four grain variants). A loop played faster
+raises everything like a tape played fast: at full throttle (3.0x) a resonance at 400 Hz moves to 1200 Hz, and the
+loop repeats the same pattern every few seconds. Rendering the synth candidates into loops would lose exactly what
+they were tuned for, so they stay synthesised.
+
+| | Sample set | Synth set |
+|---|---|---|
+| Engine sound | `idle.wav` and `loaded.wav`, played faster with the throttle | made in real time by the firmware; `set.json` names the synth and its preset |
+| Other files | `name.wav`, `start.wav`, `stop.wav`, `horn.wav`, `shift.wav` | the same |
+| Made by | the user (any recording) or `make_default_sets.py` | `make_default_sets.py`; the user can only change the parameters |
+| Default sets | 01, 02 | 03-07 |
+
+The synths and their grain data stay in the firmware (the grains and presets of `engine_synth2.h` are about 60 kB,
+the old grain synth is smaller); a synth set only chooses one and sets its parameters. A new synth or preset
+therefore comes with a firmware update, while a sample set can be made by anyone.
+
+`set.json` of a synth set, for example:
+
+```json
+{ "name": "V eight", "type": "synth", "synth": "synth2", "preset": "v8", "level": 1.0, "gearbox": true }
+```
+
+## Open questions
+
+- Candidates 1 and 2 differ only in the speaker EQ; the EQ could be a parameter of the set instead of a second copy.
 
 ## The PC tool
 
@@ -58,14 +99,93 @@ prepare this exact format.
 - For comparison, the built-in truck set: idle loop 5.3 s (234 kB), loaded loop 1.9 s (84 kB), shift sound 0.35 s
   (15 kB). One engine set of this kind is about 0.3-0.4 MB, so three to four sets fit.
 
-Suggested limits per file:
+## Files of a set
 
-| Sound | Length | Notes |
-|---|---|---|
-| Idle loop (required) | 1-6 s | a whole number of engine cycles; longer sounds less repetitive, shorter saves space |
-| Loaded loop (optional) | 1-3 s | the same engine under load; blended in with the throttle |
-| Start, stop, horn, shift (optional, one-shot) | up to about 3 s each, shift under 0.5 s | played once; without them the fallback set's ones are used |
-| Name (optional, one-shot) | about 1-2 s | the spoken name of the set, played when the set is chosen; without it the set number is beeped |
+A set is one folder in the data partition, `/sets/<order>_<id>/`, for example `/sets/01_truck/`. The two-digit
+number gives the order in which the BOOT button steps through the sets; `<id>` is a short name of lower-case
+letters, digits and underscores. The files inside always have the same names, so the firmware needs no list of them:
+
+| File | What it holds | How it is played | Length |
+|---|---|---|---|
+| `set.json` | the parameters of the set (see "Parameters of a set") and its name as text for the PC tool | - | - |
+| `name.wav` | the spoken name of the set, for example "Truck" (no number: the order can change) | once, when the set is chosen with BOOT | about 1-2 s |
+| `idle.wav` | the engine at idle (sample sets only) | loop; sped up with the throttle (1.0x..3.0x) | 1-6 s, a whole number of engine cycles |
+| `loaded.wav` | the same engine under load (sample sets only) | loop, blended in with the throttle | 1-3 s |
+| `start.wav` | starter cranking and the engine catching, ending at idle | once, when the ignition switch leaves OFF; `idle.wav` follows | about 1.5-3 s |
+| `stop.wav` | the engine winding down to silence | once, when the ignition switch goes back to OFF | about 1.5-2 s |
+| `horn.wav` | the horn | loop, as long as the horn control is held, so it must loop cleanly like the engine | 0.3-1 s |
+| `shift.wav` | the gear-change sound | once, on every upshift of the virtual gearbox | under 0.5 s |
+
+Every file is required (decided 2026-11-14: every set is complete), except that a synth set has no `idle.wav` and
+`loaded.wav`. The PC tool refuses a set with a file missing.
+All WAVs in the format of "Format on the module".
+
+## Directory structure
+
+**On the module** (the data partition, LittleFS; the `spiffs` partition of `default_8MB.csv` today, 1.5 MB):
+
+```
+/
+├── sets/
+│   ├── 01_truck/
+│   │   ├── set.json
+│   │   ├── name.wav
+│   │   ├── idle.wav
+│   │   ├── loaded.wav
+│   │   ├── start.wav
+│   │   ├── stop.wav
+│   │   ├── horn.wav
+│   │   └── shift.wav
+│   ├── 02_truck_eq/
+│   │   └── ... (the same eight files)
+│   ├── 03_pulse_old/        synth set: the same files without idle.wav and loaded.wav
+│   │   └── ...
+│   └── ... 07_v12/
+└── state.json        the number of the set chosen last, so the module starts with it after power-up
+```
+
+The firmware lists `/sets/` at start-up, sorts the folders by name and skips a folder with a file missing (it
+reports which one over USB serial). The PC tool uploads a set into a temporary folder and renames it when every
+file has arrived, so a broken upload never leaves a half set in the list.
+
+**In the repo:**
+
+```
+assets/
+├── samples/                 the CC0 recordings, as now (LICENSE-SAMPLES.md)
+└── sets/                    sources of the default sets, one folder per set, same layout as on the module
+    ├── 01_truck/
+    │   └── set.json         parameters, and for each WAV where it comes from (a recording, a render, text-to-speech)
+    └── ...
+tools/
+├── make_default_sets.py     builds the WAVs of the default sets from assets/ (renders, EQ, text-to-speech)
+└── sound_upload.py          the PC tool, step 1: checks and converts WAVs, uploads a set over USB
+firmware/
+└── data/                    generated by make_default_sets.py, not committed: the image of the data partition,
+    └── sets/...             written with `pio run -t uploadfs`
+```
+
+The WAVs are built, not committed (about 2.5 MB that a script can make again), like the STL files of the printed
+parts. Only `set.json` and the sources are in git.
+
+## Default sets
+
+For now all seven `engine_lab` candidates (decided 2026-11-14), in their current order and with their current
+numbers.
+
+| Folder | Type | Spoken name | Engine | `start.wav`, `stop.wav`, `horn.wav` | `shift.wav` |
+|---|---|---|---|---|---|
+| `01_truck` | sample | "Truck" | `idle.wav`, `loaded.wav`: the CC0 truck loops (`engine_truck`, `assets/samples/`) | rendered from today's synthesis (`engine_events.h`) | the CC0 shift sound (`shift_sound.h`) |
+| `02_truck_eq` | sample | "Truck with EQ" | the same loops through the speaker EQ for the 30 ml box | as 01 | as 01 |
+| `03_pulse_old` | synth | "Old synth" | the old grain synth (`engine_pulse`), preset a_diesel6 | as 01 | as 01 |
+| `04_diesel` | synth | "Diesel" | the speaker-tuned synth (`engine_synth2.h`), preset diesel | as 01 | as 01 |
+| `05_petrol4` | synth | "Petrol, four cylinder" | the same synth, preset petrol4 | as 01 | as 01 |
+| `06_v8` | synth | "V eight" | the same synth, preset v8 (cross-plane) | as 01 | as 01 |
+| `07_v12` | synth | "V twelve" | the same synth, preset v12 | as 01 | as 01 |
+
+The start, stop, horn and shift sounds are the same in all seven sets today (stored seven times, see "One kind of
+set"); they can be made to suit each engine later. The spoken names are made with the same text-to-speech as today
+(`tools/make_voice_prompts.ps1`, Piper, voice en_US-ljspeech), without the numbers the current prompts start with.
 
 ## The loop
 
@@ -96,29 +216,62 @@ uploading.
 
 ## Parameters of a set
 
-A small text file beside the samples (format to be decided, for example JSON):
+`set.json` beside the WAVs (JSON):
 
-| Parameter | Meaning | Built-in default |
+| Parameter | Meaning | Default |
 |---|---|---|
-| name | shown in the PC tool; spoken on the module only through the name sample (see below) | - |
-| idle file, loaded file | which WAV is which | - |
-| rate range | playback rate at idle and at full throttle | 1.0x..3.0x |
-| loaded rate scale | extra speed of the loaded loop when its firing rate is lower than the idle loop's | 1.18 (`LOADED_RATE_SCALE`) |
-| loaded gain | level of the loaded loop against the idle loop | 0.8 (`LOADED_GAIN`) |
+| name | shown in the PC tool; spoken on the module only through `name.wav` (see below) | - |
+| type | `sample` or `synth` (see "Types of set") | sample |
+| synth, preset | synth sets only: which synth of the firmware and which of its presets | - |
+| rate range | sample sets: playback rate at idle and at full throttle | 1.0x..3.0x |
+| loaded rate scale | sample sets: extra speed of the loaded loop when its firing rate is lower than the idle loop's | 1.18 (`LOADED_RATE_SCALE`) |
+| loaded gain | sample sets: level of the loaded loop against the idle loop | 0.8 (`LOADED_GAIN`) |
 | level | volume of the set | 1.0 |
 | gearbox | use the virtual gearbox and the shift sound | on |
 
 ## Announcing the set
 
 When the BOOT button switches sets, the module now speaks the name of the built-in sound (`voice_prompts.h`). With all
-sets in the data partition, **the name is one of the samples of the set**: an optional short one-shot WAV (see the
-table above) that the module plays when the set is chosen. The user can record it, or the PC tool can make it with
-text-to-speech from the set's name. The default sets get their names this way too (the current voice prompts move
-into them).
+sets in the data partition, **the name is one of the files of the set** (`name.wav`), played when the set is chosen.
+The user can record it, or the PC tool can make it with text-to-speech from the set's name. The default sets get
+their names this way too (the current voice prompts move into them). Every set has a name file, so the beeps are
+only a fallback for a damaged file. The PC tool shows the sets in the order of their folder numbers.
 
-A set without a name sample is announced **by its number as beeps** (set 3 = three beeps), the way `engine_lab`
-already does for a sound without a prompt. The order is the order in the PC tool, which shows the number next to each
-set.
+## Making the name (`name.wav`)
+
+The name is announced once, when the set is chosen, so it only has to be short and clear on a 40 mm speaker.
+
+**What makes a good name sample:**
+
+- One to three words, about 1-2 s: "Truck", "V eight", "Detroit sixty". No number (the order of the sets can
+  change) and no "set" or "sound" around it.
+- Spoken a little slower and more clearly than normal speech. Consonants carry the words on a small speaker; a deep
+  voice loses most of its body below about 300 Hz.
+- No silence at the start or the end (cut it off), a fade of about 10 ms at both ends so it does not click, peak at
+  about -1 dBFS like the engine sounds. A quiet background: the speaker makes noise louder, not softer.
+- Then the usual format: 22 050 Hz, 16 bit, mono (the PC tool converts any WAV).
+
+**Three ways to make it:**
+
+1. **Text-to-speech with Piper** (how the default sets get their names): the same open voice as today's prompts,
+   en_US-ljspeech (trained on LJ Speech, public domain). The user runs piper.exe themselves (it is a downloaded
+   binary):
+   `echo "V eight." | piper.exe --model en_US-ljspeech-medium.onnx --output_file name.wav`.
+   `tools/make_default_sets.py` does this for the default sets (it replaces `make_voice_prompts.ps1`; the texts
+   are in each set's `set.json`). Piper has voices in other languages too, Czech among them (cs_CZ-jirka); check the
+   licence on the voice's model card before a voice goes into the default sets.
+2. **Own recording**: a phone or a PC microphone, a quiet room, about 20 cm from the mouth. In Audacity: record,
+   Effect > Normalize to -1 dB, cut the silence at both ends, Effect > Fade In / Fade Out on the first and last
+   10 ms, File > Export > WAV. The PC tool converts the rest.
+3. **On the web page (step 2 of the PC tool)**: type the name and the page speaks it. Piper also runs in the browser
+   (WebAssembly), so the same voices work there without installing anything. The browser's own speech
+   (Web Speech API) is simpler but uses the voices of the operating system, whose licences for redistributed
+   recordings are unclear (the reason Windows TTS was not used for the prompts, 2026-11-05); it would be fine only
+   for a name that stays on the user's own module. Recording through the microphone in the page is the other
+   option.
+
+The PC tool plays the name through a model of the speaker (`tools/speaker_model.py`) before uploading, so it can be
+checked by ear first.
 
 ## Licence
 

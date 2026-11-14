@@ -43,8 +43,9 @@ Not started; recorded so the design does not block them.
   first with a Python script, then with a web page (Web Serial). The BOOT button keeps switching sets. Decided
   2026-11-14: one kind of set, all in the data partition (the seven `engine_lab` candidates become the default sets,
   each with its spoken name), plus one fallback set compiled into the firmware for an empty or damaged partition;
-  the data partition grows once the sounds leave the firmware. Details, requirements for a sample and the set format:
-  `user-sounds.md`.
+  the data partition grows once the sounds leave the firmware. Details, requirements for a sample, the set format,
+  the directory structure and how to make the spoken name: `user-sounds.md` (the design). For users it gets its
+  own guide later (how to make and upload a set), written when the tool exists.
 - **Firmware updates over Wi-Fi (OTA)**, with Wi-Fi switched on only in an update mode (for example BOOT held at
   power-up). The 8 MB partition table already has two 3.3 MB app slots; `engine_lab` is about 1.15 MB, of which the
   voice prompts are about 480 kB and the engine samples about 355 kB. The sounds are compiled into the firmware, so an
