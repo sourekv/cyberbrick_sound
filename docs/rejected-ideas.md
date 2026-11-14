@@ -51,3 +51,9 @@ the reason no longer holds.
 | Foam on the bottom of the box | 2026-11-08 | measured: no change | empty box | `speaker-measurement.md` |
 | A flat or a polygon outside on the test box, so it does not roll when laid on its side | 2026-11-08 | the box is only a test fixture and does not go into the model; a reprint brings nothing (put it on its bottom or under a bit of plasticine) | the enclosure for the model will be designed from scratch around the chosen speaker; it can have a flat or a mounting foot then | `hardware/speaker_box/speaker_box.scad` |
 | Further box experiments | 2026-11-08 | the 30 ml (and 15 ml) box already works well | if the sound must improve: a larger or different speaker, or a different amplifier / converter | `speaker-measurement.md` |
+
+## User sounds
+
+| Idea | Date | Why it was dropped | Instead | Details |
+|---|---|---|---|---|
+| The module as a USB drive (USB mass storage): the `sets` folder shows up in the file manager and a set is just copied | 2026-11-14 | the owner decided not to develop it. It would need a FAT data partition instead of LittleFS, USB on TinyUSB instead of the chip's own USB-serial (flashing less reliable, BOOT by hand as the fallback), the module keeping off the drive while the PC has it, and nothing would convert or check the sounds | the web page `web/index.html` over Web Serial: converts and checks the sounds and writes the set | `user-sounds.md` |

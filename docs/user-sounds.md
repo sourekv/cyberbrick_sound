@@ -97,8 +97,7 @@ small, so each set simply has its own.
 
 Decided 2026-11-08 as a plan, in two steps that use the same set format. Changed 2026-11-14: the web page came
 first, without the Python script (see "The web page" below); `tools/make_default_sets.py` stays for the default
-sets. **This may still change**: the module could instead show up as a USB drive (see "Alternative: the module as a
-USB drive").
+sets. The module as a USB drive was considered as an alternative and dropped the same day (`rejected-ideas.md`).
 
 1. **A Python script in `tools/`** first, as our working tool: converts the WAVs, helps find the loop point, writes the
    parameter file and uploads the set over USB. Used to settle the set format and the firmware side.
@@ -370,22 +369,6 @@ the current set without speaking its name; a set that is gone gives way to the f
 Still to check on the module: that opening the port from the browser does not reset the Zero (the page retries
 `@hello` for about 8 s, so a reset would only cost time), the transfer speed, and writing while the module runs
 from the receiver.
-
-### Alternative: the module as a USB drive
-
-Raised 2026-11-14 and kept open: the module could show up in the file manager as a USB drive with the `sets`
-folder, so a set is just copied. The ESP32-S3 can do this (USB mass storage with TinyUSB). What it would mean:
-
-- The data partition becomes FAT instead of LittleFS (Windows writes the blocks itself).
-- USB runs on TinyUSB instead of the chip's built-in USB-serial: the drive and a serial port at the same time.
-  Flashing from PlatformIO should still work, perhaps less reliably (BOOT held when plugging in as the fallback).
-- The module must not touch the drive while the PC has it: it keeps playing the set already in PSRAM and reloads
-  after "Safely remove" or when USB is unplugged.
-- Nothing converts the sounds: the files must already be 22 050 Hz, 16 bit, mono. The web page would then become an
-  offline helper that converts the sounds and saves a finished set folder to copy, without talking to the module.
-
-For users this is the simplest way; the web page with Web Serial stays for now, and the protocol, the editor and the
-conversion are useful either way.
 
 ## Trying it (step 1)
 
