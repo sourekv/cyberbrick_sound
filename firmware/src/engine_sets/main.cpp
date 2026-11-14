@@ -12,7 +12,8 @@
 // Without a usable set (no file system, no sets, no PSRAM, every set broken) a fallback compiled into the firmware
 // plays: the diesel synth with the synthesised starter and horn of include/engine_events.h; it beeps once.
 // Over USB the web page (web/index.html) lists, writes and deletes sets (include/set_link.h); while it talks to the
-// module the engine is silent.
+// module the engine is silent. On the page's "Demo" the module speaks the name of the set and plays a scripted demo
+// of about 25 s (demoStep()); BOOT or the receiver's data end it.
 // Everything else as in engine_lab: throttle, ignition, horn from the receiver's channel data on GPIO1
 // (include/rc_link.h) or the servo pulse, virtual gearbox, reverse without upshifts.
 #include <Arduino.h>
@@ -194,6 +195,48 @@ static void selectSet(int i, bool announce = true) {
   useFallback();
 }
 
+// ---------------------------------------------------------------- the demo (@demo from the web page)
+// Time 0 = the name has been spoken. Ignition on (starter, the engine catches), then the throttle profile of
+// engine_demo and tools/engine_lab.py (idle, full throttle through the gears, release, two blips, half throttle,
+// idle) from 2.5 s, the horn at 17 s, ignition off at 21.5 s, then the wind-down.
+static bool demoOn = false;
+static float demoT = 0.0f;
+static const float DEMO_PROFILE_AT = 2.5f, DEMO_HORN_FROM = 17.0f, DEMO_HORN_TO = 17.8f, DEMO_IGN_OFF = 21.5f;
+
+static float demoProfile(float t) {
+  static const float p[][2] = {{0,0},{2,0},{5,1.0f},{7,1.0f},{10,0},{11,0},{11.4f,0.8f},{11.9f,0},
+                               {12.4f,0.8f},{12.9f,0},{14,0},{14.1f,0.5f},{16.5f,0.5f},{18,0},{20,0}};
+  const int n = sizeof(p) / sizeof(p[0]);
+  for (int i = 0; i + 1 < n; i++) {
+    if (t >= p[i][0] && t <= p[i + 1][0]) {
+      float dt = p[i + 1][0] - p[i][0];
+      return dt > 0 ? p[i][1] + (p[i + 1][1] - p[i][1]) * (t - p[i][0]) / dt : p[i + 1][1];
+    }
+  }
+  return 0.0f;
+}
+
+// One block of the demo: returns the throttle for the gearbox, as engineState.block() does.
+static float demoStep(float dt) {
+  if (!namePlayer.active()) demoT += dt;                 // starts after the name
+  bool started = !namePlayer.active() || demoT > 0.0f;
+  bool ign = started && demoT < DEMO_IGN_OFF;
+  float throttle = demoT >= DEMO_PROFILE_AT ? demoProfile(demoT - DEMO_PROFILE_AT) : 0.0f;
+  if (demoT >= DEMO_IGN_OFF) throttle = 0.0f;
+  bool horn = demoT >= DEMO_HORN_FROM && demoT < DEMO_HORN_TO;
+  synthHorn.set(horn);
+  wavHorn.set(horn);
+  float out = fallback ? engineState.block(true, ign, throttle > 0.05f, throttle, dt, gearbox.rpm, synthStarter)
+                       : engineState.block(true, ign, throttle > 0.05f, throttle, dt, gearbox.rpm, wavStarter);
+  if (demoT > DEMO_IGN_OFF + engineState.stopS + 0.5f) {
+    demoOn = false;
+    synthHorn.set(false);
+    wavHorn.set(false);
+    Serial.println("demo: done");
+  }
+  return out;
+}
+
 static bool bootPressed() {
   static bool last = true;
   static uint32_t changedMs = 0;
@@ -272,15 +315,27 @@ void loop() {
         else selectSet(i, false);                                  // the current set again, with its new files
       }
     }
+    if (e.ended && e.demo) {
+      demoOn = true;
+      demoT = 0.0f;
+      Serial.println("demo: start");
+    }
   }
-  if (bootPressed() && !library.folders.empty()) selectSet(fallback ? 0 : curIndex + 1);
+  if (bootPressed()) {
+    demoOn = false;
+    if (!library.folders.empty()) selectSet(fallback ? 0 : curIndex + 1);
+  }
 #if RC_LINK_ENABLED
   rcLink.poll();
 #endif
 
+  if (demoOn && dataActive()) { demoOn = false; Serial.println("demo: ended by the receiver"); }
   float target = readThrottle();
-  statusLed.update(signalPresent(), target);
+  statusLed.update(signalPresent() || demoOn, target);
   const float dt = (float)N / AUDIO_RATE;
+  if (demoOn) {
+    target = demoStep(dt);
+  } else {
 #if RC_LINK_ENABLED
   {
     bool data = dataActive();
@@ -301,6 +356,7 @@ void loop() {
 #else
   target = engineState.block(false, false, true, target, dt, gearbox.rpm, wavStarter);
 #endif
+  }
   {
     static int lastGear = 0;
     if (fallback || cur.gearbox) {

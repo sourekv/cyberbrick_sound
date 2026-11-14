@@ -1,6 +1,6 @@
 # Shield PCB (iteration 2): scope
 
-Status: KiCad schematic and a first routed board with manufacturing files exist (`hardware/shield/`), reviewed in KiCad by a colleague of the project owner on 2026-11-12 (no remarks), ordered at JLCPCB on 2026-11-13 (5 assembled boards), not delivered yet. The prototype (iteration 1) is a breadboard with an ESP32-S3-Zero-N8R8-M and a MAX98357A, powered and verified as described in `bringup.md`.
+Status: KiCad schematic and a first routed board with manufacturing files exist (`hardware/shield/`), reviewed in KiCad by a colleague of the project owner on 2026-11-12 (no remarks), ordered at JLCPCB on 2026-11-13 (5 assembled boards), production file and parts placement confirmed on 2026-11-14, not delivered yet. The prototype (iteration 1) is a breadboard with an ESP32-S3-Zero-N8R8-M and a MAX98357A, powered and verified as described in `bringup.md`.
 
 ## Input: one servo cable to the receiver's S4 header
 
@@ -87,8 +87,17 @@ about 0.14 Ohm, negligible against the 4 Ohm speaker. Also sold: 50 mm (IC005), 
 - Paid: goods 45.46 USD, shipping 24.31 USD (DHL Express), customs duties and taxes paid in advance 14.64 USD, total
   **84.41 USD**. EuroPacket was the plan; DHL Express was what got selected at checkout (about 15 USD more, faster,
   nothing to pay at the door).
-- Next: approve the production file and the parts placement when JLCPCB sends them; after delivery, solder J1, J3
-  and J4 and do the first power-up checks (`roadmap.md`).
+- **Production file and parts placement confirmed on 2026-11-14** (JLCPCB asked for both that morning). Checked
+  before confirming: the production file (top and bottom) matches the board, with the two tooling holes JLCPCB adds;
+  the placement has all 24 parts of the `jlcpcb_basic` BOM, nothing revised by their engineer, and every polarised
+  part matches pin 1 of the board: U1 (pin 1 bottom left), C1 (plus at the bottom), D1 (cathode at the bottom), D2
+  (cathode on the left), LED1 (anode at the top, cathode at the bottom), J2 (pin 1 on the left, opening to the
+  edge).
+- Known and accepted for this order: some reference labels and outlines on the silkscreen run over pads (C2, R5,
+  JP1/JP2, FB1 and others; KiCad's DRC warned about it on 2026-11-01: 13 silkscreen over copper, 17 overlapping,
+  18 too close to the edge). Only cosmetic: JLCPCB clips the silkscreen from exposed pads, so some labels come out
+  cut. Not worth replacing the files of a paid order; fixed in the next revision (see "Next revision").
+- Next: after delivery, solder J1, J3 and J4 and do the first power-up checks (`roadmap.md`).
 
 Parts (LCSC numbers, all in stock on 2026-11-08; the list is in `tools/make_shield_outputs.py`):
 
@@ -137,6 +146,15 @@ Steps:
    D1 and D2 (cathode bar), C1 (plus side), LED1 (cathode), and J2 (the plug opening towards the board edge).
 4. After delivery: solder J3/J4 (the Zero's sockets) and J1 by hand.
 5. First power-up: the checks listed under "Decided" (USB and receiver connected together).
+
+## Next revision
+
+Collected for the next version of the board (nothing changed in the files of the 2026-11-13 order):
+
+- **Silkscreen**: move the reference labels off the pads and away from the board edge until KiCad's DRC shows no
+  silkscreen warnings (`silk_over_copper`, `silk_overlap`, `silk_edge_clearance`); the placement does not change,
+  only the labels.
+- Whatever the first assembled boards show at power-up.
 
 ## Ordering at PCBWay
 

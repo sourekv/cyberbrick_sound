@@ -63,6 +63,10 @@ td.actions { white-space: nowrap; text-align: right; }
 pre#log { max-height: 220px; overflow: auto; font-size: 12px; background: var(--bg); padding: 8px; border-radius: 6px; margin: 8px 0 0; white-space: pre-wrap; }
 .notice { padding: 10px 12px; border-radius: 8px; background: var(--chip); margin-bottom: 12px; }
 details summary { cursor: pointer; }
+details.guide { font-size: 14px; }
+a { color: var(--accent); }
+details.guide ul { margin: 6px 0 0; padding-left: 20px; }
+details.guide li { margin-bottom: 4px; }
 .hidden { display: none !important; }
 </style>
 </head>
@@ -72,8 +76,7 @@ details summary { cursor: pointer; }
   <p class="lead">Sound sets for the cyberbrick_sound module: see what is on it, try one, change or add a set. Chrome or
     Edge on a computer, the module on USB (firmware <code>engine_sets</code>).</p>
 
-  <div id="noSerial" class="notice hidden">This browser cannot reach USB devices (Web Serial). Use Chrome or Edge on a
-    computer. The simulated module still works.</div>
+  <div id="noSerial" class="notice hidden">This page needs Chrome or Edge on a computer.</div>
 
   <section>
     <div class="row">
@@ -84,6 +87,33 @@ details summary { cursor: pointer; }
     </div>
     <div class="hint" style="margin-top:8px">While the page talks to the module, the engine on the module is silent; it
       comes back a few seconds after the last action.</div>
+  </section>
+
+  <section>
+  <details class="guide" id="guide">
+    <summary><strong>What a good sample is like</strong> (format, file names, lengths, loops)</summary>
+    <ul>
+      <li><strong>Format on the module:</strong> WAV (<code>.wav</code>), PCM, 22 050 Hz, 16 bit, mono, with fixed names:
+        <code>name.wav</code>, <code>start.wav</code>, <code>horn.wav</code>, <code>shift.wav</code>, and for a sample set
+        <code>idle.wav</code> and <code>loaded.wav</code>, plus <code>set.json</code> with the parameters, all in the
+        folder <code>NN_description</code> (NN = the number). This page writes all of that itself: you can drop WAV,
+        MP3, OGG, FLAC or M4A at any rate, stereo or mono, under any name; it is converted and renamed. Best source:
+        WAV or FLAC at 44.1 or 48 kHz (MP3 adds its own noise).</li>
+      <li><strong>Lengths:</strong> name 1-2 s, starter 0.5-2 s, horn 1-2 s, shift 0.1-1 s, idle loop 1-6 s, loaded
+        loop 1-3 s. A set takes about 0.2-0.6 MB; the module has room for about 4.6 MB.</li>
+      <li><strong>Loops</strong> (idle, loaded, horn) play over and over: steady rpm, no revving, gear change, voice or
+        wind. Cut both ends at the same point of the engine cycle (ideally whole firing cycles), near a zero crossing,
+        without fades, at an even level, so no click or pumping is heard on each lap.</li>
+      <li><strong>Idle and low rpm:</strong> the module plays the loop up to 3x faster with the throttle, so record the
+        engine idling; a loop recorded at high rpm sounds wrong at both ends.</li>
+      <li><strong>Mid range, not bass:</strong> the 40 mm speaker plays nothing useful below about 200 Hz. The firing
+        rhythm and the rasp above that carry the engine; a deep rumble alone sounds like silence.</li>
+      <li><strong>Level:</strong> peaks at about -1 dB, no clipping, about as loud as the other sets.</li>
+      <li><strong>Quiet background:</strong> noise gets louder and higher with the playback rate.</li>
+      <li><strong>One-shots</strong> (starter, shift): no silence at the start, a short fade-out (about 50 ms) at the end.</li>
+      <li><strong>Rights:</strong> your own recording or one you may use freely (for example CC0).</li>
+    </ul>
+  </details>
   </section>
 
   <section id="secSets" class="hidden">
@@ -122,7 +152,7 @@ details summary { cursor: pointer; }
 
     <h2 style="margin-top:18px">Sounds</h2>
     <div class="hint">Drop a sound file on a row or choose one. Any format the browser plays (WAV, MP3, OGG, FLAC...) is
-      converted to 22 050 Hz, 16 bit, mono.</div>
+      converted to 22 050 Hz, 16 bit, mono. What a good sample is like: <a href="#guide" onclick="document.getElementById('guide').open = true">above</a>.</div>
     <div id="soundRows" style="margin-top:6px"></div>
 
     <h2 style="margin-top:18px">Parameters</h2>
@@ -158,6 +188,9 @@ details summary { cursor: pointer; }
   <pre id="selftest" class="hidden"></pre>
 </main>
 
+<!-- the default sets for the simulated module, made by tools/make_default_sets.py; without the file the simulated
+     module has two small demo sets -->
+<script src="demo_sets.js"></script>
 <script>
 "use strict";
 const RATE = 22050;
@@ -294,10 +327,15 @@ function peakDb(pcm) {
 }
 
 let audioCtx = null, playing = null;
+// Every Stop button carries data-owner: it is active only while its own sound plays.
+function syncStop() {
+  for (const b of document.querySelectorAll("button[data-owner]")) b.disabled = !(playing && playing.owner === b.dataset.owner);
+}
 function stopPlay() {
   if (playing) { try { playing.src.stop(); } catch (e) {} playing.done(); playing = null; }
+  syncStop();
 }
-function playPcm(pcm, { loop = false, rate = 1, onEnd } = {}) {
+function playPcm(pcm, { loop = false, rate = 1, onEnd, owner = "" } = {}) {
   stopPlay();
   audioCtx = audioCtx || new AudioContext();
   const buf = audioCtx.createBuffer(1, pcm.length, RATE), d = buf.getChannelData(0);
@@ -305,11 +343,135 @@ function playPcm(pcm, { loop = false, rate = 1, onEnd } = {}) {
   const src = audioCtx.createBufferSource();
   src.buffer = buf; src.loop = loop; src.playbackRate.value = rate;
   src.connect(audioCtx.destination);
-  const p = { src, done: () => onEnd && onEnd() };
-  src.onended = () => { if (playing === p) { playing = null; p.done(); } };
+  const p = { src, owner, done: () => onEnd && onEnd() };
+  src.onended = () => { if (playing === p) { playing = null; p.done(); syncStop(); } };
   playing = p;
   src.start();
+  syncStop();
   return p;
+}
+
+// ------------------------------------------------------------------ demo of a sample set, rendered in the browser
+// The same script as the module's @demo (firmware/src/engine_sets/main.cpp): the name, ignition on (starter, the
+// engine catches), the throttle profile of engine_demo from 2.5 s, horn at 17 s, ignition off at 21.5 s, wind-down.
+// A port of what the firmware does with a sample set (EngineState, Gearbox, the loops, EQ, starter, horn, shift);
+// without the speaker. Synth sets are made by the module's firmware and cannot be rendered here.
+const DEMO_PROFILE = [[0,0],[2,0],[5,1],[7,1],[10,0],[11,0],[11.4,0.8],[11.9,0],[12.4,0.8],[12.9,0],[14,0],[14.1,0.5],[16.5,0.5],[18,0],[20,0]];
+const GEAR = { count: 5, drop: 0.55, cutS: 0.25, cutGain: 0.15, accelS: 6, decelS: 8 };
+function demoProfile(t) {
+  for (let i = 0; i + 1 < DEMO_PROFILE.length; i++) {
+    const [t0, v0] = DEMO_PROFILE[i], [t1, v1] = DEMO_PROFILE[i + 1];
+    if (t >= t0 && t <= t1) return t1 > t0 ? v0 + (v1 - v0) * (t - t0) / (t1 - t0) : v1;
+  }
+  return 0;
+}
+function renderDemo(files, j) {
+  const fl = (k) => files[k] ? Float32Array.from(files[k], (x) => x / 32768) : new Float32Array(1);
+  const name = fl("name"), start = fl("start"), horn = fl("horn"), shift = fl("shift"), idle = fl("idle"), loaded = fl("loaded");
+  const level = j.level ?? 1, stopS = Math.max(0.1, j.stop_s ?? 1.4), useGearbox = j.gearbox !== false;
+  const [rateLo, rateHi] = Array.isArray(j.rate) ? j.rate : [1, 3];
+  const lrs = j.loaded_rate_scale ?? 1.18, lg = j.loaded_gain ?? 0.8;
+  const eq = (Array.isArray(j.eq) ? j.eq : []).map((c) => ({ c, x1: 0, x2: 0, y1: 0, y2: 0 }));
+  const runEq = (x) => {
+    for (const q of eq) {
+      const y = q.c[0] * x + q.c[1] * q.x1 + q.c[2] * q.x2 - q.c[3] * q.y1 - q.c[4] * q.y2;
+      q.x2 = q.x1; q.x1 = x; q.y2 = q.y1; q.y1 = y; x = y;
+    }
+    return x;
+  };
+  const crankS = Math.max(0.1, start.length / RATE - 0.12);
+  const N = 128, dt = N / RATE, IGN_OFF = 21.5, HORN = [17.0, 17.8];
+  const total = name.length + Math.ceil((IGN_OFF + stopS + 0.8) * RATE);
+  const out = new Float32Array(total);
+  // EngineState
+  let state = "OFF", t = 0, gain = 0, flare = false, flareRpm = 0, rpm0 = 0;
+  const approach = (v, to, step) => v < to ? Math.min(v + step, to) : Math.max(v - step, to);
+  // Gearbox
+  const gb = { rpm: 0, gain: 1, speed: 0, gear: 0, cut: 0 };
+  let plainRpm = 0, lastGear = 0;
+  // players
+  let starterPos = -1, shiftPos = -1, hornEnv = 0, hornBlat = 0, hornPos = 0;
+  let pos = 0, posL = 0, load = 0, prevGain = 1, gainPrev = 0;
+  const loopAt = (c, p) => { const i = Math.floor(p), fr = p - i, n = i + 1 < c.length ? i + 1 : 0; return c[i] + (c[n] - c[i]) * fr; };
+  for (let b = 0; b * N < total; b++) {
+    const s0 = b * N, demoT = (s0 - name.length) / RATE;
+    const started = demoT >= 0, ign = started && demoT < IGN_OFF;
+    let throttle = started && demoT >= 2.5 && demoT < IGN_OFF ? demoProfile(demoT - 2.5) : 0;
+    const hornHeld = demoT >= HORN[0] && demoT < HORN[1];
+    // EngineState.block with data alive
+    const moving = throttle > 0.05;
+    if (ign && state === "OFF") { state = "CRANK"; t = 0; starterPos = 0; }
+    if (!ign && (state === "RUN" || state === "CRANK") && started) { state = "STOP"; t = 0; rpm0 = gb.rpm; }
+    if (moving && (state === "OFF" || state === "STOP")) { state = "RUN"; flare = false; }
+    t += dt;
+    let override = false, rpmSet = 0, gbIn = throttle;
+    if (state === "OFF") { gain = 0; override = true; gbIn = 0; }
+    else if (state === "CRANK") {
+      gain = 0; override = true; gbIn = 0;
+      if (t >= crankS) { state = "RUN"; t = 0; flare = true; }
+    } else if (state === "STOP") {
+      const x = t / stopS; override = true; gbIn = 0;
+      if (x >= 1) { state = "OFF"; gain = 0; rpmSet = 0; }
+      else { rpmSet = rpm0 + (-0.3 - rpm0) * (1 - (1 - x) * (1 - x)); gain = x < 0.6 ? 1 : 1 - (x - 0.6) / 0.4; gain *= gain; }
+    } else {
+      gain = approach(gain, 1, dt / (flare ? 0.06 : 0.3));
+      if (flare) { flareRpm = t < 0.15 ? 0.45 * t / 0.15 : 0.45 * Math.exp(-(t - 0.15) / 0.3); if (t > 1.5) flare = false; }
+    }
+    // Gearbox
+    if (useGearbox) {
+      let shifting = gb.cut > 0;
+      if (shifting) gb.cut -= dt;
+      if (gbIn > gb.speed) { if (!shifting) gb.speed = Math.min(gbIn, gb.speed + dt / GEAR.accelS); }
+      else gb.speed = Math.max(gbIn, gb.speed - dt / GEAR.decelS);
+      const band = 1 / GEAR.count;
+      if (!shifting) {
+        if (gb.gear < GEAR.count - 1 && gb.speed >= (gb.gear + 1) * band) { gb.gear++; gb.cut = GEAR.cutS; shifting = true; }
+        else if (gb.gear > 0 && gb.speed < gb.gear * band - 0.04) gb.gear--;
+      }
+      const p = Math.max(0, Math.min(1, (gb.speed - gb.gear * band) / band)), lo = gb.gear === 0 ? 0 : GEAR.drop;
+      gb.rpm += (lo + (1 - lo) * p - gb.rpm) * Math.min(1, dt * (shifting ? 12 : 6));
+      gb.gain += ((shifting ? GEAR.cutGain : 1) - gb.gain) * Math.min(1, dt * 40);
+      if (gb.gear > lastGear) shiftPos = 0;
+      lastGear = gb.gear;
+    } else {
+      plainRpm += (gbIn - plainRpm) * Math.min(1, dt * 6);
+      gb.rpm = plainRpm; gb.gain = 1;
+    }
+    let rpm = gb.rpm, gbGain = gb.gain;
+    if (override) { rpm = rpmSet; gbGain = 1; }
+    else if (flare && flareRpm > rpm) { rpm = flareRpm; gbGain = 1; }
+    if (override) gb.rpm = rpmSet;
+    // the sample engine
+    const rate = Math.max(0.1, rateLo + (rateHi - rateLo) * rpm), vol = 0.55 + 0.45 * rpm;
+    load += (gbIn - load) * 0.04;
+    const wI = Math.cos(load * Math.PI / 2), wL = Math.sin(load * Math.PI / 2);
+    for (let i = 0; i < N && s0 + i < total; i++) {
+      const g = prevGain + (gbGain - prevGain) * ((i + 1) / N), eg = gainPrev + (gain - gainPrev) * ((i + 1) / N);
+      let e = wI * loopAt(idle, pos) + wL * lg * loopAt(loaded, posL);
+      pos += rate; while (pos >= idle.length) pos -= idle.length;
+      posL += rate * lrs; while (posL >= loaded.length) posL -= loaded.length;
+      e = runEq(e * vol * g) * level * eg;
+      let st = 0;
+      if (starterPos >= 0) { st = start[starterPos]; if (++starterPos >= start.length) starterPos = -1; }
+      let hs = 0;
+      if (hornHeld) { if (hornEnv === 0) { hornBlat = 0; hornPos = 0; } hornEnv = Math.min(1, hornEnv + 1 / (0.025 * RATE)); }
+      else hornEnv = Math.max(0, hornEnv - 1 / (0.12 * RATE));
+      if (hornEnv > 0) {
+        hornBlat += 1 / RATE;
+        hs = loopAt(horn, hornPos) * hornEnv;
+        hornPos += 1 - 0.05 * Math.exp(-hornBlat / 0.06); if (hornPos >= horn.length) hornPos -= horn.length;
+      }
+      let sh = 0;
+      if (shiftPos >= 0) { sh = shift[shiftPos] * (0.35 / 0.6); if (++shiftPos >= shift.length) shiftPos = -1; }
+      const nm = s0 + i < name.length ? name[s0 + i] * 0.9 : 0;
+      out[s0 + i] = (e + st + hs + sh) * 0.6 + nm;
+    }
+    prevGain = gbGain; gainPrev = gain;
+  }
+  let peak = 0;
+  for (const x of out) peak = Math.max(peak, Math.abs(x));
+  const k = peak > 0 ? 0.89 / peak : 1;
+  return toPcm(out.map((x) => x * k));
 }
 
 // ------------------------------------------------------------------ transports
@@ -450,18 +612,33 @@ class MockTransport {
       else return r("@err missing");
       return r("@ok");
     }
-    if (cmd === "@select") {
+    if (cmd === "@select" || cmd === "@demo") {
       if (!this.dirs.has("/sets/" + arg)) return r("@err no such set");
       r("@ok"); this.current = arg;
       out.push(`set ${arg}: loaded (simulated)`);
-      const nm = this.fs.get(`/sets/${arg}/name.wav`), pcm = nm && parseModuleWav(nm);
-      if (pcm) playPcm(pcm);
+      const wav = (k) => { const v = this.fs.get(`/sets/${arg}/${k}.wav`); return v && parseModuleWav(v); };
+      let j = {};
+      try { j = JSON.parse(new TextDecoder().decode(this.fs.get(`/sets/${arg}/set.json`))); } catch (e) {}
+      if (cmd === "@demo" && j.type !== "synth") {
+        const files = {};
+        for (const k of ["name", "start", "horn", "shift", "idle", "loaded"]) files[k] = wav(k);
+        playPcm(renderDemo(files, j), { owner: "set:" + arg });
+        out.push("demo: start (rendered in the browser)");
+      } else if (wav("name")) playPcm(wav("name"), { owner: "set:" + arg });
       return;
     }
     if (cmd === "@bye") return r("@ok");
     r("@err unknown command " + cmd);
   }
   makeDemo() {
+    if (window.DEMO_SETS && location.hash !== "#selftest") {   // the real default sets (demo_sets.js)
+      for (const [folder, files] of Object.entries(window.DEMO_SETS)) {
+        this.dirs.add("/sets/" + folder);
+        for (const [f, b64] of Object.entries(files)) this.fs.set(`/sets/${folder}/${f}`, b64dec(b64));
+      }
+      this.current = Object.keys(window.DEMO_SETS)[0] || "";
+      return;
+    }
     const tone = (secs, fn) => { const n = Math.round(secs * RATE), f = new Float32Array(n); for (let i = 0; i < n; i++) f[i] = fn(i / RATE, i / n); return toPcm(f); };
     const env = (u) => Math.min(1, u * 40, (1 - u) * 40);
     const files = {
@@ -542,6 +719,7 @@ class Link {
   rm(path) { return this.cmd("@rm " + path, 15000); }
   mv(from, to) { return this.cmd(`@mv ${from} ${to}`); }
   select(folder) { return this.cmd("@select " + folder); }
+  demo(folder) { return this.cmd("@demo " + folder); }
   bye() { return this.cmd("@bye"); }
 }
 
@@ -551,13 +729,13 @@ let link = null, transport = null, sets = [], info = {}, editor = null;
 function setStatus(text, cls) { const s = $("connStatus"); s.textContent = text; s.className = "status " + (cls || "muted"); }
 function busy(on) {
   for (const id of ["btnRefresh", "btnNew", "btnSave"]) $(id).disabled = on;
-  for (const b of document.querySelectorAll("#setRows button")) b.disabled = on;
+  for (const b of document.querySelectorAll("#setRows button")) b.disabled = on || b.dataset.never === "1";
 }
 async function guarded(fn) {
   busy(true);
   try { return await fn(); }
   catch (e) { log(e.message, "err"); setStatus(e.message, "err"); }
-  finally { busy(false); }
+  finally { busy(false); syncStop(); }
 }
 
 async function connect(sim) {
@@ -631,7 +809,18 @@ function renderSets() {
     if (note) tr.children[1].insertAdjacentHTML("beforeend", `<div class="warn hint">${note}</div>`);
     const td = document.createElement("td"); td.className = "actions";
     const btn = (label, fn, title) => { const b = document.createElement("button"); b.className = "small"; b.textContent = label; b.title = title || ""; b.onclick = fn; td.appendChild(b); td.appendChild(document.createTextNode(" ")); };
-    btn("Play", () => guarded(async () => { await link.select(s.folder); info.set = s.folder; renderSets(); log("playing " + s.folder + " on the module"); }), "choose this set on the module (it speaks the name)");
+    const sim = transport instanceof MockTransport, synth = j && j.type === "synth";
+    btn("Play", () => guarded(async () => { await link.select(s.folder); info.set = s.folder; renderSets(); log("playing " + s.folder + " on the module"); }),
+        "choose this set on the module (it speaks the name, then waits for the throttle)");
+    btn("Demo", () => guarded(async () => { await link.demo(s.folder); info.set = s.folder; renderSets(); log("demo of " + s.folder + (sim ? " (rendered in the browser)" : " on the module")); }),
+        sim ? (synth ? "synth sounds are made by the module's firmware and cannot be played here as a demo; on the module the demo works"
+                     : "about 25 s: starter, idle, through the gears, horn, stop; rendered in the browser like the module plays it, without the speaker")
+            : "the module plays about 25 s: starter, idle, through the gears, horn, stop (no receiver needed); BOOT or the receiver ends it");
+    if (sim && synth) td.lastChild.previousSibling.disabled = true, td.lastChild.previousSibling.dataset.never = "1";
+    if (sim) {   // the simulated module plays here, in the browser
+      btn("Stop", () => stopPlay(), "stop the name or the demo");
+      td.lastChild.previousSibling.dataset.owner = "set:" + s.folder;
+    }
     btn("Edit", () => openSet(s.folder, false));
     btn("Copy", () => openSet(s.folder, true), "a new set made from this one");
     btn("Delete", () => removeSet(s.folder));
@@ -641,6 +830,7 @@ function renderSets() {
   const total = +info.total || 0, free = +info.free || 0;
   $("spaceText").textContent = total ? `${kB(total - free)} of ${kB(total)} used, ${kB(free)} free` : "";
   $("spaceBar").style.width = total ? ((total - free) / total * 100).toFixed(1) + "%" : "0";
+  syncStop();
 }
 
 async function removeSet(folder) {
@@ -774,11 +964,8 @@ function renderSounds() {
     const b = (label, fn, dis) => { const x = document.createElement("button"); x.className = "small"; x.textContent = label; x.onclick = fn; x.disabled = !!dis; ctl.appendChild(x); return x; };
     b("Choose file", () => file.click());
     if (def.rec) { const rb = b("Record", () => record(def, rb)); }
-    const pb = b(def.loop ? "Play loop" : "Play", () => {
-      if (playing && playing.owner === def.key) { stopPlay(); return; }
-      const p = playPcm(snd.pcm, { loop: !!def.loop, rate: def.rpm ? +rate.value : 1, onEnd: () => { pb.textContent = def.loop ? "Play loop" : "Play"; } });
-      p.owner = def.key; pb.textContent = "Stop";
-    }, !snd);
+    b(def.loop ? "Play loop" : "Play", () => playPcm(snd.pcm, { loop: !!def.loop, rate: def.rpm ? +rate.value : 1, owner: def.key }), !snd);
+    b("Stop", () => stopPlay()).dataset.owner = def.key;
     let rate = null;
     if (def.rpm) {
       const lab = document.createElement("label"); lab.className = "hint"; lab.textContent = " rpm ";
@@ -794,6 +981,7 @@ function renderSounds() {
     row.addEventListener("drop", (e) => { e.preventDefault(); row.classList.remove("drag"); const f = e.dataTransfer.files[0]; if (f) loadFile(def, f); });
     box.appendChild(row);
   }
+  syncStop();
 }
 
 async function soundFromBuffer(def, arrayBuffer, src) {

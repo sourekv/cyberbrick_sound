@@ -189,7 +189,8 @@ assets/
     │   └── set.json         parameters, and for each WAV where it comes from (a recording, a render, text-to-speech)
     └── ...
 web/
-└── index.html               the PC tool: lists, plays, edits, copies, deletes and uploads sets over USB
+├── index.html               the PC tool: lists, plays, edits, copies, deletes and uploads sets over USB
+└── demo_sets.js             generated, not committed: the default sets for the page's simulated module
 tools/
 └── make_default_sets.py     builds the WAVs of the default sets from assets/ (renders, EQ, text-to-speech)
 firmware/
@@ -320,9 +321,22 @@ to them; their licence is the user's responsibility. The default sets that come 
 Serial runs on `file:` pages), press "Connect module" and choose the module's USB port. It needs `engine_sets` on
 the module.
 
+**What the user needs** (for the user guide): a computer (Windows, macOS, Linux or ChromeOS) with **Chrome or Edge**
+(version 89 or newer), and a USB-C cable. Only Chromium browsers have Web Serial. Safari and Firefox do not, and
+neither does any browser on an iPhone or iPad; there the page says so and "Connect module" stays off. On a Mac,
+installing Chrome is enough. Tested so far only in Edge on Windows.
+
 - **On the module**: every set with its number, name, type and size, and the free space. "Play" chooses the set on
-  the module (it speaks the name), "Edit" and "Copy" open it in the editor, "Delete" removes it after a question.
-  Folders the module skips (no number, a number used twice, no `set.json`) are marked.
+  the module (it speaks the name, then waits for the throttle), "Demo" chooses it and plays a demo of about 25 s
+  (below), "Edit" and "Copy" open it in the editor, "Delete" removes it after a question. Folders the module skips
+  (no number, a number used twice, no `set.json`) are marked. Every Play on the page has a Stop beside it.
+- **Demo**: the name, ignition on (starter, the engine catches), the throttle profile of `engine_demo` from 2.5 s
+  (idle, full throttle through the gears, release, two blips, half throttle, idle), the horn at 17 s, ignition off
+  at 21.5 s and the wind-down. On the module (`@demo`) it runs in the firmware for every set, without a receiver;
+  BOOT or the receiver's data end it. In the simulated module the page renders it for sample sets with a port of
+  what the firmware does (EngineState, Gearbox, loops, EQ, starter, horn, shift), without the speaker; synth sets
+  are made by the firmware and cannot be rendered in the browser, so their Demo is off there, with a tooltip saying
+  so.
 - **Editor**: number (only free ones are offered), name, folder description, type (sample, or synth with its
   preset), the sounds and the parameters of `set.json`. A sound is dropped on its row or chosen; any format the
   browser can decode is converted to 22 050 Hz, 16 bit, mono. The name can also be recorded with the microphone;
@@ -333,8 +347,11 @@ the module.
 - **Write to the module** writes only the changed WAVs and `set.json`; a new number or description renames the
   folder first, and a set changed to synth loses its `idle.wav` and `loaded.wav`.
 - **Copy** is the easy way to a new set: the starter, horn and shift come along and only the engine changes.
-- **Simulated module**: the same protocol inside the page, with two demo sets, for trying the page without
-  hardware. `index.html#selftest` runs an automatic test against it (13 checks, all passing on 2026-11-14 in Edge).
+- **Simulated module**: the same protocol inside the page, for trying the page without hardware. It holds the
+  seven default sets from `web/demo_sets.js` (2.8 MB of base64, written by `tools/make_default_sets.py`, or alone
+  with `--demo-only`; generated, not committed); without that file, two small demo sets with beeps. Changes live
+  only until the page is closed. `index.html#selftest` runs an automatic test against the two small demo sets
+  (13 checks, all passing on 2026-11-14 in Edge).
 
 Not on the page yet: making the name with text-to-speech (Piper in the browser), help with the loop points, the
 user guide. Hosting on GitHub Pages needs the repo public or a paid plan; until then the file is opened from disk.
@@ -358,6 +375,7 @@ full).
 | `@rm <path>` | `@ok` (a file, or a set folder with its files) |
 | `@mv <from> <to>` | `@ok` |
 | `@select <folder>` | `@ok`; ends the session, the set plays and speaks its name |
+| `@demo <folder>` | `@ok`; the same, then the demo of about 25 s |
 | `@bye` | `@ok`; ends the session |
 
 `@put` writes to `<path>.tmp` and replaces the file only when the size and the CRC-32 (zlib) match, so a broken

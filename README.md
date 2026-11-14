@@ -16,7 +16,7 @@ State of 2026-11-08; what is still open: `docs/roadmap.md`.
 - **Gearbox effects** (2026-11-08): a shift sound on every upshift; reverse is detected from the stick and does not
   shift.
 - **Shield PCB**: KiCad schematic, routed board and assembly files for JLCPCB and PCBWay exist (`hardware/shield/`);
-  reviewed in KiCad by a colleague of the owner on 2026-11-12 (no remarks), quoted by both services, ordered at JLCPCB on 2026-11-13 (5 assembled boards), not delivered yet.
+  reviewed in KiCad by a colleague of the owner on 2026-11-12 (no remarks), quoted by both services, ordered at JLCPCB on 2026-11-13 (5 assembled boards), production file and parts placement confirmed on 2026-11-14, not delivered yet.
 - Which engine sound wins is still being judged by ear (`engine_lab` holds all candidates).
 
 ## How it works

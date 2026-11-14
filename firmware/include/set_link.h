@@ -18,6 +18,8 @@
 //   @rm <path>             @ok              (a file, or a set folder with its files)
 //   @mv <from> <to>        @ok
 //   @select <folder>       @ok              ends the session, plays that set and speaks its name
+//   @demo <folder>         @ok              the same, then a demo of about 25 s: starter, idle, through the gears,
+//                                           blips, horn, half throttle, stop (no receiver needed)
 //   @bye                   @ok              ends the session
 //
 // Paths are under /sets/. While the page talks to the module (a session: from the first command until @bye,
@@ -38,7 +40,8 @@ class SetLink {
   struct End {
     bool ended = false;
     bool changed = false;   // files were written, moved or deleted: rescan, reload the current set
-    String select;          // @select: this folder
+    String select;          // @select, @demo: this folder
+    bool demo = false;      // @demo: then play the demo
   };
 
   // Before Serial.begin().
@@ -106,10 +109,11 @@ class SetLink {
     if (cmd == "@put") return put(arg);
     if (cmd == "@rm") return rm(arg);
     if (cmd == "@mv") return mv(arg);
-    if (cmd == "@select") {
+    if (cmd == "@select" || cmd == "@demo") {
       if (!LittleFS.exists("/sets/" + arg)) return reply("@err no such set");
       reply("@ok");
       end.select = arg;
+      end.demo = cmd == "@demo";
       return finish();
     }
     if (cmd == "@bye") { reply("@ok"); return finish(); }
