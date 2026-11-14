@@ -7,8 +7,9 @@ uploaded over USB by a PC tool (see "Later" in `roadmap.md`).
 (`firmware/src/engine_sets/`, `firmware/include/sound_sets.h`), the partition table `firmware/partitions_sets.csv`
 (two 1.5 MB app slots, 4.9 MB data partition), the default sets in `assets/sets/` and `tools/make_default_sets.py`.
 The sets go to the module with `pio run -e engine_sets -t uploadfs` for now; the upload tool over USB is the next
-step. Until the names are spoken with Piper (`--piper`, `--model`), the default sets use today's prompts with the
-number in front. See "Trying it" at the end.
+step. The names are spoken with Piper (`--piper`, `--model`, run by the owner on 2026-11-14: plain names without
+the number, 1.90 MB for all seven sets); without Piper the script falls back to today's prompts with the number in
+front. See "Trying it" at the end.
 
 This page says how
 the sets are organised and what a sample has to meet so it sounds right on the module. The numbers come from the current firmware (`engine_lab`) and the
