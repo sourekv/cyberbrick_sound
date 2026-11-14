@@ -59,12 +59,15 @@ therefore comes with a firmware update, while a sample set can be made by anyone
 `set.json` of a synth set, for example:
 
 ```json
-{ "name": "V eight", "type": "synth", "synth": "synth2", "preset": "v8", "level": 1.0, "gearbox": true }
+{ "name": "V eight", "type": "synth", "synth": "synth2", "preset": "v8", "eq": [[1.1087, -2.2174, 1.1087, -1.9274, 0.9289], ...],
+  "level": 1.0, "gearbox": true }
 ```
 
-## Open questions
-
-- Candidates 1 and 2 differ only in the speaker EQ; the EQ could be a parameter of the set instead of a second copy.
+**Speaker EQ (decided 2026-11-14): part of the sound, not a parameter.** A sample set has the EQ baked into its WAVs
+(`02_truck_eq` is its own copy of the truck loops, run through the EQ by `make_default_sets.py`); the firmware plays
+sample sets without an EQ of its own. A synth set carries its EQ in `set.json` (the filter coefficients, today
+`LAB_EQ`), because the synth runs live and its EQ comes after the soft clipper; the copy is small, so each synth set
+simply has its own.
 
 ## The PC tool
 
@@ -223,6 +226,7 @@ uploading.
 | name | shown in the PC tool; spoken on the module only through `name.wav` (see below) | - |
 | type | `sample` or `synth` (see "Types of set") | sample |
 | synth, preset | synth sets only: which synth of the firmware and which of its presets | - |
+| eq | synth sets only: the speaker EQ as biquad stages (b0 b1 b2 a1 a2); sample sets have it in their WAVs | none |
 | rate range | sample sets: playback rate at idle and at full throttle | 1.0x..3.0x |
 | loaded rate scale | sample sets: extra speed of the loaded loop when its firing rate is lower than the idle loop's | 1.18 (`LOADED_RATE_SCALE`) |
 | loaded gain | sample sets: level of the loaded loop against the idle loop | 0.8 (`LOADED_GAIN`) |
