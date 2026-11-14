@@ -66,6 +66,10 @@ Not started; recorded so the design does not block them.
     The page then also knows the newest version without being downloaded again. While the repo is private: a
     `firmware.bin` or a generated JS file beside `index.html` like `demo_sets.js`, or a file the user chooses. Also
     open: whether esptool-js is loaded from a CDN like Piper or kept with the page, and its licence (Apache 2.0).
+- **Revisions for the printed parts** (to consider, noted 2026-11-14): the speaker box, its cap and the solder
+  stand (`hardware/speaker_box/`, `hardware/solder_stand/`) could get revision letters like the shield (rev A, ...,
+  git tags `hw-speaker_box-revA` and so on) once printed copies need telling apart, perhaps with the revision
+  embossed in the part (a small text in the OpenSCAD model). Until then git alone tracks them.
 - **Firmware updates over Wi-Fi (OTA)**, with Wi-Fi switched on only in an update mode (for example BOOT held at
   power-up). The 8 MB partition table already has two 3.3 MB app slots; `engine_lab` is about 1.15 MB, of which the
   voice prompts are about 480 kB and the engine samples about 355 kB. The sounds are compiled into the firmware, so an

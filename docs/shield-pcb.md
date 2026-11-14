@@ -147,9 +147,28 @@ Steps:
 4. After delivery: solder J3/J4 (the Zero's sockets) and J1 by hand.
 5. First power-up: the checks listed under "Decided" (USB and receiver connected together).
 
+## Revisions
+
+The board is versioned with letters (rev A, rev B, ...), apart from the firmware's numbers (0.1.0). Every revision
+that is actually ordered gets the git tag `hw-shield-rev<letter>` on the commit with the files that went to the
+factory; files changed after that belong to the next revision. Decided 2026-11-14.
+
+| Rev | Ordered | Tag (commit) | What changed | Tried with firmware |
+|---|---|---|---|---|
+| A | 2026-11-13, JLCPCB, 5 assembled | `hw-shield-revA` (`b5c9992`) | first board | waiting for delivery |
+
+Rev A carries no revision on the board itself (no text on the silkscreen) and its gerbers say `rev?`; only the
+schematic's title block says rev A. Tell it from later boards by the missing text.
+
 ## Next revision
 
-Collected for the next version of the board (nothing changed in the files of the 2026-11-13 order):
+Collected for the next version of the board, rev B (nothing changed in the files of the 2026-11-13 order):
+
+- **Revision in the files and on the board**: the revision in the board's title block in KiCad (Board Setup >
+  Title Block, then the gerbers carry it instead of `rev?`) and the schematic's, and a text on the silkscreen such
+  as "CB sound shield rev B 2027-01". Then the tag `hw-shield-revB` when it is ordered, and a row in "Revisions".
+- **Optional, only if two revisions need different firmware**: a board ID the firmware can read, for example a
+  resistor divider on one of the spare pins IO10..IO12 read by the ADC. Not needed while the pins stay the same.
 
 - **Silkscreen**: move the reference labels off the pads and away from the board edge until KiCad's DRC shows no
   silkscreen warnings (`silk_over_copper`, `silk_overlap`, `silk_edge_clearance`); the placement does not change,
