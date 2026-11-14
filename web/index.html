@@ -995,28 +995,34 @@ function renderSounds() {
 const PIPER_LIB = "https://cdn.jsdelivr.net/npm/@mintplex-labs/piper-tts-web@1.0.4/+esm";
 const PIPER_VOICE = "en_US-ljspeech-medium";
 const PIPER_ABOUT =
-  "Speak makes the name with Piper text-to-speech (github.com/rhasspy/piper) in this browser, through " +
-  "piper-tts-web (github.com/Mintplex-Labs/piper-tts-web). The first time it downloads from the internet:\n" +
-  "- the voice en_US-ljspeech-medium, about 63 MB, from huggingface.co (trained on the public-domain LJ Speech recordings),\n" +
-  "- the programs that run it: piper-tts-web (MIT), ONNX Runtime Web and the Piper phonemizer, together some tens of MB, " +
-  "from cdn.jsdelivr.net and cdnjs.cloudflare.com.\n" +
-  "The text you type stays on this computer; only these files are downloaded. The browser may keep them in its cache; " +
-  "if it does not, they are downloaded again next time. It needs an internet connection.";
+  "Speak makes the name with Piper text-to-speech, in this browser, through the piper-tts-web library. " +
+  "The first time it downloads from the internet:\n" +
+  "- the library piper-tts-web 1.0.4 (MIT) and the phonemizer piper-wasm 1.0.0 (a WebAssembly build of Piper's " +
+  "phonemizer with eSpeak NG, which is GPL 3 or later), from cdn.jsdelivr.net,\n" +
+  "- ONNX Runtime Web 1.18.0, from cdnjs.cloudflare.com,\n" +
+  "- the voice en_US-ljspeech-medium, about 63 MB, from Diffusion Studio's copy of the Piper voices on huggingface.co " +
+  "(trained on the public-domain LJ Speech recordings).\n" +
+  "Together some tens of MB. The text you type stays on this computer; only these files are downloaded. The browser " +
+  "may keep them in its cache; if it does not, they are downloaded again next time. It needs an internet connection, " +
+  "and it works only as long as those hosts keep the files.";
 const PIPER_ABOUT_HTML =
-  "<p style='margin:4px 0'>The name is made by <a href='https://github.com/rhasspy/piper' target='_blank' rel='noopener'>Piper</a>, an open " +
-  "text-to-speech project (Rhasspy, now cared for by the Open Home Foundation), running in this browser through " +
-  "<a href='https://github.com/Mintplex-Labs/piper-tts-web' target='_blank' rel='noopener'>piper-tts-web</a> (Mintplex Labs, MIT licence) and " +
-  "<a href='https://onnxruntime.ai/' target='_blank' rel='noopener'>ONNX Runtime Web</a> (Microsoft, MIT).</p>" +
-  "<p style='margin:4px 0'>The first Speak downloads from the internet:</p><ul style='margin:0;padding-left:20px'>" +
+  "<p style='margin:4px 0'>The name is made by <a href='https://github.com/rhasspy/piper' target='_blank' rel='noopener'>Piper</a> " +
+  "text-to-speech (that repository is archived since October 2025; development moved to " +
+  "<a href='https://github.com/OHF-Voice/piper1-gpl' target='_blank' rel='noopener'>OHF-Voice/piper1-gpl</a>), running in this browser through " +
+  "<a href='https://github.com/Mintplex-Labs/piper-tts-web' target='_blank' rel='noopener'>piper-tts-web</a> 1.0.4 (Mintplex Labs, MIT licence).</p>" +
+  "<p style='margin:4px 0'>The first Speak downloads from the internet, from third parties, not from this page:</p>" +
+  "<ul style='margin:0;padding-left:20px'>" +
+  "<li>the library and the phonemizer <a href='https://www.npmjs.com/package/@diffusionstudio/piper-wasm' target='_blank' rel='noopener'>piper-wasm</a> " +
+  "1.0.0 (Diffusion Studio; a WebAssembly build of Piper's phonemizer with " +
+  "<a href='https://github.com/espeak-ng/espeak-ng' target='_blank' rel='noopener'>eSpeak NG</a>, GPL 3 or later) from cdn.jsdelivr.net;</li>" +
+  "<li><a href='https://onnxruntime.ai/' target='_blank' rel='noopener'>ONNX Runtime Web</a> 1.18.0 (Microsoft, MIT) from cdnjs.cloudflare.com;</li>" +
   "<li>the voice <a href='https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/ljspeech/medium' target='_blank' rel='noopener'>" +
-  "en_US-ljspeech-medium</a>, about 63 MB, from huggingface.co; trained on the " +
-  "<a href='https://keithito.com/LJ-Speech-Dataset/' target='_blank' rel='noopener'>LJ Speech</a> recordings (public domain); the same voice " +
-  "as the default sets;</li>" +
-  "<li>the programs that run it (piper-tts-web, ONNX Runtime Web, the Piper phonemizer), together some tens of MB, " +
-  "from cdn.jsdelivr.net and cdnjs.cloudflare.com.</li></ul>" +
-  "<p style='margin:4px 0'>The text you type stays on this computer; only these files are downloaded. The browser " +
-  "may keep them in its cache; if it does not, they are downloaded again next time. It needs an internet " +
-  "connection.</p>";
+  "en_US-ljspeech-medium</a>, about 63 MB, from Diffusion Studio's copy of the Piper voices on huggingface.co; " +
+  "trained on the <a href='https://keithito.com/LJ-Speech-Dataset/' target='_blank' rel='noopener'>LJ Speech</a> recordings (public domain); " +
+  "the same voice as the default sets.</li></ul>" +
+  "<p style='margin:4px 0'>Together some tens of MB. The text you type stays on this computer; only these files are " +
+  "downloaded. The browser may keep them in its cache; if it does not, they are downloaded again next time. It needs " +
+  "an internet connection, and works only as long as those hosts keep the files.</p>";
 const NUM_WORDS = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven",
   "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty"];
 let piper = null, piperAgreed = false;

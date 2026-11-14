@@ -354,17 +354,36 @@ installing Chrome is enough. Tested so far only in Edge on Windows.
   (13 checks, all passing on 2026-11-14 in Edge).
 
 - **Speak** (the Name row): the name made with [Piper](https://github.com/rhasspy/piper) text-to-speech in the
-  browser through [piper-tts-web](https://github.com/Mintplex-Labs/piper-tts-web) and
-  [ONNX Runtime Web](https://onnxruntime.ai/), the same voice as the default sets. The part "What is downloaded and
-  used" under the box names these projects with links. The text starts as the number in words and the name ("Eight. Detroit sixty."), and can be changed. Nothing
-  is loaded until the first Speak, and then only after a question that says what is downloaded: the library
-  `@mintplex-labs/piper-tts-web` 1.0.4 (MIT) from cdn.jsdelivr.net, ONNX Runtime Web and the Piper phonemizer
-  (which it loads itself), and the voice en_US-ljspeech-medium (about 63 MB, huggingface.co). The text is turned
-  into speech on the computer, not sent anywhere. The result is 22 050 Hz, 16 bit, mono, then trimmed like any
-  name. The browser's private storage (OPFS) is not available to a page opened from disk, so the voice is not
-  stored for good: the browser's cache may keep it, otherwise it is downloaded again. Tested on 2026-11-14 in Edge
-  from `file://`: about 11 s the first time with the download, about 1.3 s after; Speak on the page tried the same
-  day in Edge and works.
+  browser through [piper-tts-web](https://github.com/Mintplex-Labs/piper-tts-web), the same voice as the default
+  sets. The text starts as the number in words and the name ("Eight. Detroit sixty."), and can be changed. Nothing
+  is loaded until the first Speak, and then only after a question that says what is downloaded and from where. The
+  part "What is downloaded and used" under the box names the projects with links.
+
+  *What the page loads, from third parties (checked on 2026-11-14 in the code of piper-tts-web 1.0.4):*
+
+  | What | From | Licence |
+  |---|---|---|
+  | library `@mintplex-labs/piper-tts-web` 1.0.4 | cdn.jsdelivr.net | MIT (npm field; the package has no LICENSE file) |
+  | phonemizer `@diffusionstudio/piper-wasm` 1.0.0 (0.6 MB wasm + 18 MB data) | cdn.jsdelivr.net | npm says MIT, but it is a build of Piper's phonemizer with eSpeak NG, **GPL 3 or later** (its README gives the build steps) |
+  | ONNX Runtime Web 1.18.0 | cdnjs.cloudflare.com | MIT (not checked here) |
+  | voice en_US-ljspeech-medium (about 63 MB) | `huggingface.co/diffusionstudio/piper-voices/resolve/main`, a copy of the Rhasspy voices, not pinned to a commit | public domain (model card: trained on LJ Speech) |
+
+  The text is turned into speech on the computer, not sent anywhere. The result is 22 050 Hz, 16 bit, mono, then
+  trimmed like any name. The browser's private storage (OPFS) is not available to a page opened from disk, so the
+  voice is not stored for good: the browser's cache may keep it, otherwise it is downloaded again. Tested on
+  2026-11-14 in Edge from `file://`: about 11 s the first time with the download, about 1.3 s after.
+
+  *If a host or an author withdraws or changes a file:* Speak fails with a message and a line in the log; Record,
+  Choose file and everything else keep working, and the names already made (the default sets, in git) are ordinary
+  WAV files. The URLs are fixed inside the library, so changing them (a copy of the files, or a pinned voice) needs
+  a patched copy of it.
+
+  *Copying these files into this repository or its Pages* makes this project a distributor: the MIT parts need
+  their licence texts and notices, the voice a mention of its source, and the phonemizer, which contains eSpeak NG
+  (GPL 3 or later), its licence text and the corresponding source (or an offer of it) with the build steps and
+  versions. Not done; until then nothing is redistributed, the browser fetches the files directly from their hosts.
+  The Piper repository `rhasspy/piper` (MIT) was archived on 2025-10-06 and development moved to
+  `OHF-Voice/piper1-gpl`; that project's licence has not been checked here.
 
 Not on the page yet: help with the loop points, the user guide. Hosting on GitHub Pages needs the repo public or a paid plan; until then the file is opened from disk.
 
