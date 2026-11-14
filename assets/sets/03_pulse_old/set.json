@@ -7,7 +7,7 @@
   "gearbox": true,
   "sources": {
     "name": {
-      "text": "Old synth",
+      "text": "Three. Old synth.",
       "voice_prompt": 2
     },
     "start": "render:starter",

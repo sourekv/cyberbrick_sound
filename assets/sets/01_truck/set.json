@@ -12,7 +12,7 @@
   "gearbox": true,
   "sources": {
     "name": {
-      "text": "Truck",
+      "text": "One. Truck.",
       "voice_prompt": 0
     },
     "start": "render:starter",

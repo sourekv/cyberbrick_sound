@@ -9,7 +9,7 @@
   "gearbox": true,
   "sources": {
     "name": {
-      "text": "V eight",
+      "text": "Six. V eight.",
       "voice_prompt": 5
     },
     "start": "render:starter",

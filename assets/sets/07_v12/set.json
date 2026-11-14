@@ -9,7 +9,7 @@
   "gearbox": true,
   "sources": {
     "name": {
-      "text": "V twelve",
+      "text": "Seven. V twelve.",
       "voice_prompt": 6
     },
     "start": "render:starter",

@@ -14,7 +14,7 @@
   "gearbox": true,
   "sources": {
     "name": {
-      "text": "Truck with EQ",
+      "text": "Two. Truck with E Q.",
       "voice_prompt": 1
     },
     "start": "render:starter",

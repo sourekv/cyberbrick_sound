@@ -7,9 +7,8 @@ uploaded over USB by a PC tool (see "Later" in `roadmap.md`).
 (`firmware/src/engine_sets/`, `firmware/include/sound_sets.h`), the partition table `firmware/partitions_sets.csv`
 (two 1.5 MB app slots, 4.9 MB data partition), the default sets in `assets/sets/` and `tools/make_default_sets.py`.
 The sets go to the module with `pio run -e engine_sets -t uploadfs` for now; the upload tool over USB is the next
-step. The names are spoken with Piper (`--piper`, `--model`, run by the owner on 2026-11-14: plain names without
-the number, 1.90 MB for all seven sets); without Piper the script falls back to today's prompts with the number in
-front. See "Trying it" at the end.
+step. The names are spoken with Piper (`--piper`, `--model`, run by the owner), the number first as in today's
+prompts ("One. Truck."); without Piper the script falls back to those prompts. See "Trying it" at the end.
 
 This page says how
 the sets are organised and what a sample has to meet so it sounds right on the module. The numbers come from the current firmware (`engine_lab`) and the
@@ -140,7 +139,7 @@ The files inside always have the same names, so the firmware needs no list of th
 | File | What it holds | How it is played | Length |
 |---|---|---|---|
 | `set.json` | the parameters of the set (see "Parameters of a set") and its name as text for the PC tool | - | - |
-| `name.wav` | the spoken name of the set, for example "Truck" (no number: the order can change) | once, when the set is chosen with BOOT | about 1-2 s |
+| `name.wav` | the spoken name of the set with its number in front, for example "One. Truck." (the number is part of the name) | once, when the set is chosen with BOOT | about 1-2 s |
 | `idle.wav` | the engine at idle (sample sets only) | loop; sped up with the throttle (1.0x..3.0x) | 1-6 s, a whole number of engine cycles |
 | `loaded.wav` | the same engine under load (sample sets only) | loop, blended in with the throttle | 1-3 s |
 | `start.wav` | the starter cranking the engine, without the catch (see "Start and stop") | once, when the ignition switch leaves OFF; then the engine catches by itself | about 0.5-2 s |
@@ -205,17 +204,17 @@ numbers.
 
 | Folder | Type | Spoken name | Engine | `start.wav`, `horn.wav` | `shift.wav` |
 |---|---|---|---|---|---|
-| `01_truck` | sample | "Truck" | `idle.wav`, `loaded.wav`: the CC0 truck loops (`engine_truck`, `assets/samples/`) | rendered from today's synthesis (`engine_events.h`) | the CC0 shift sound (`shift_sound.h`) |
-| `02_truck_eq` | sample | "Truck with EQ" | the same loops through the speaker EQ for the 30 ml box | as 01 | as 01 |
-| `03_pulse_old` | synth | "Old synth" | the old grain synth (`engine_pulse`), preset a_diesel6 | as 01 | as 01 |
-| `04_diesel` | synth | "Diesel" | the speaker-tuned synth (`engine_synth2.h`), preset diesel | as 01 | as 01 |
-| `05_petrol4` | synth | "Petrol, four cylinder" | the same synth, preset petrol4 | as 01 | as 01 |
-| `06_v8` | synth | "V eight" | the same synth, preset v8 (cross-plane) | as 01 | as 01 |
-| `07_v12` | synth | "V twelve" | the same synth, preset v12 | as 01 | as 01 |
+| `01_truck` | sample | "One. Truck." | `idle.wav`, `loaded.wav`: the CC0 truck loops (`engine_truck`, `assets/samples/`) | rendered from today's synthesis (`engine_events.h`) | the CC0 shift sound (`shift_sound.h`) |
+| `02_truck_eq` | sample | "Two. Truck with E Q." | the same loops through the speaker EQ for the 30 ml box | as 01 | as 01 |
+| `03_pulse_old` | synth | "Three. Old synth." | the old grain synth (`engine_pulse`), preset a_diesel6 | as 01 | as 01 |
+| `04_diesel` | synth | "Four. Diesel." | the speaker-tuned synth (`engine_synth2.h`), preset diesel | as 01 | as 01 |
+| `05_petrol4` | synth | "Five. Petrol, four cylinder." | the same synth, preset petrol4 | as 01 | as 01 |
+| `06_v8` | synth | "Six. V eight." | the same synth, preset v8 (cross-plane) | as 01 | as 01 |
+| `07_v12` | synth | "Seven. V twelve." | the same synth, preset v12 | as 01 | as 01 |
 
 The starter, horn and shift sounds are the same in all seven sets today (stored seven times, see "One kind of
 set"); they can be made to suit each engine later. The spoken names are made with the same text-to-speech as today
-(`tools/make_voice_prompts.ps1`, Piper, voice en_US-ljspeech), without the numbers the current prompts start with.
+(`tools/make_voice_prompts.ps1`, Piper, voice en_US-ljspeech), with the number in front like the current prompts.
 
 ## The loop
 
@@ -275,8 +274,9 @@ The name is announced once, when the set is chosen, so it only has to be short a
 
 **What makes a good name sample:**
 
-- One to three words, about 1-2 s: "Truck", "V eight", "Detroit sixty". No number (the order of the sets can
-  change) and no "set" or "sound" around it.
+- The number of the set, then one to three words, about 1-2 s: "One. Truck.", "Six. V eight.", "Eight. Detroit
+  sixty.". The number is part of the name, so the owner hears where in the order the set is; it is the folder's
+  index, and when a set moves to another index its `name.wav` has to be made again. No "set" or "sound" around it.
 - Spoken a little slower and more clearly than normal speech. Consonants carry the words on a small speaker; a deep
   voice loses most of its body below about 300 Hz.
 - No silence at the start or the end (cut it off), a fade of about 10 ms at both ends so it does not click, peak at
@@ -288,7 +288,7 @@ The name is announced once, when the set is chosen, so it only has to be short a
 1. **Text-to-speech with Piper** (how the default sets get their names): the same open voice as today's prompts,
    en_US-ljspeech (trained on LJ Speech, public domain). The user runs piper.exe themselves (it is a downloaded
    binary):
-   `echo "V eight." | piper.exe --model en_US-ljspeech-medium.onnx --output_file name.wav`.
+   `echo "Six. V eight." | piper.exe --model en_US-ljspeech-medium.onnx --output_file name.wav`.
    `tools/make_default_sets.py` does this for the default sets (it replaces `make_voice_prompts.ps1`; the texts
    are in each set's `set.json`). Piper has voices in other languages too, Czech among them (cs_CZ-jirka); check the
    licence on the voice's model card before a voice goes into the default sets.

@@ -9,7 +9,7 @@
   "gearbox": true,
   "sources": {
     "name": {
-      "text": "Petrol, four cylinder",
+      "text": "Five. Petrol, four cylinder.",
       "voice_prompt": 4
     },
     "start": "render:starter",

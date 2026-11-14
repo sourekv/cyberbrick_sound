@@ -9,7 +9,7 @@
   "gearbox": true,
   "sources": {
     "name": {
-      "text": "Diesel",
+      "text": "Four. Diesel.",
       "voice_prompt": 3
     },
     "start": "render:starter",
