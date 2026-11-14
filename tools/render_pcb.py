@@ -21,7 +21,10 @@ with tempfile.TemporaryDirectory() as d:
     height = int(width * vb[3] / vb[2])
     txt = re.sub(r'<svg[^>]*>', lambda mm: re.sub(r'(width|height)="[^"]*"', '', mm.group(0)).replace("<svg", f'<svg width="{width}" height="{height}"', 1), txt, count=1)
     with sync_playwright() as p:
-        b = p.chromium.launch()
+        try:
+            b = p.chromium.launch()
+        except Exception:                       # no Playwright Chromium: use the installed Edge
+            b = p.chromium.launch(channel="msedge")
         pg = b.new_page(viewport={"width": width, "height": height})
         pg.set_content(f'<body style="margin:0;background:#1d3a2a">{txt}</body>')
         pg.screenshot(path=str(out))

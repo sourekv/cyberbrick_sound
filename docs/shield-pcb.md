@@ -1,6 +1,6 @@
 # Shield PCB (iteration 2): scope
 
-Status: KiCad schematic and a first routed board with manufacturing files exist (`hardware/shield/`), reviewed in KiCad by a colleague of the project owner on 2026-11-12 (no remarks), ordered at JLCPCB on 2026-11-13 (5 assembled boards), production file and parts placement confirmed on 2026-11-14, not delivered yet. The prototype (iteration 1) is a breadboard with an ESP32-S3-Zero-N8R8-M and a MAX98357A, powered and verified as described in `bringup.md`.
+Status: KiCad schematic and a first routed board with manufacturing files exist (`hardware/shield/`), reviewed in KiCad by a colleague of the project owner on 2026-11-12 (no remarks), ordered at JLCPCB on 2026-11-13 (5 assembled boards), production file and parts placement confirmed on 2026-11-14, not delivered yet. Rev B (silkscreen only, same parts and copper) is prepared in `hardware/shield/` since 2026-11-14 and not ordered; rev A is the tag `hw-shield-revA`. The prototype (iteration 1) is a breadboard with an ESP32-S3-Zero-N8R8-M and a MAX98357A, powered and verified as described in `bringup.md`.
 
 ## Input: one servo cable to the receiver's S4 header
 
@@ -96,7 +96,7 @@ about 0.14 Ohm, negligible against the 4 Ohm speaker. Also sold: 50 mm (IC005), 
 - Known and accepted for this order: some reference labels and outlines on the silkscreen run over pads (C2, R5,
   JP1/JP2, FB1 and others; KiCad's DRC warned about it on 2026-11-01: 13 silkscreen over copper, 17 overlapping,
   18 too close to the edge). Only cosmetic: JLCPCB clips the silkscreen from exposed pads, so some labels come out
-  cut. Not worth replacing the files of a paid order; fixed in the next revision (see "Next revision").
+  cut. Not worth replacing the files of a paid order; fixed in rev B (see "Revisions").
 - Next: after delivery, solder J1, J3 and J4 and do the first power-up checks (`roadmap.md`).
 
 Parts (LCSC numbers, all in stock on 2026-11-08; the list is in `tools/make_shield_outputs.py`):
@@ -156,24 +156,43 @@ factory; files changed after that belong to the next revision. Decided 2026-11-1
 | Rev | Ordered | Tag (commit) | What changed | Tried with firmware |
 |---|---|---|---|---|
 | A | 2026-11-13, JLCPCB, 5 assembled | `hw-shield-revA` (`b5c9992`) | first board | waiting for delivery |
+| B | not ordered | (tag when ordered) | silkscreen only: revision and name on the board, labels for the person holding it | - |
 
 Rev A carries no revision on the board itself (no text on the silkscreen) and its gerbers say `rev?`; only the
-schematic's title block says rev A. Tell it from later boards by the missing text.
+schematic's title block says rev A. Tell it from rev B by the text "CB SND rev B" in the right margin. Everything
+of rev A (the board, the manufacturing files that were ordered) is in git under the tag: `git show
+hw-shield-revA:hardware/shield/fab/shield_gerbers.zip`.
+
+### Rev B (prepared 2026-11-14, not ordered)
+
+Made by `tools/make_shield_rev_b.py` from the rev A board; nothing electrical changes (no part, pad, track or zone
+moves). Checked: the BOM, the placement files (`fab/jlcpcb*`, `fab/pcbway`, `shield_positions.csv`) come out the same
+as for rev A, the copper, mask, paste and drill gerbers are the same as rev A's plotted by the same KiCad, KiCad's DRC
+finds 0 violations (rev A: 53 silkscreen warnings) and 0 unconnected items. The silkscreen:
+
+- **Only what helps the person holding the board**: S V G above the servo header J1 (the cable can be put on the
+  wrong way round, which puts the supply on the signal pin), J3 and J4 at the Zero's sockets (square pad = pin 1, for
+  the Zero's orientation), a plus at C1 (tantalum), a dot at pin 1 of U1 (visible only without the Zero), "CB SND" and
+  "rev B" in the right margin, and the outlines of J2, J3, J4 and JP1.
+- **Gone**: the reference labels (R1, C3, ...), the outlines of the small parts (they moved to the fab layer, so the
+  assembly drawing keeps them) and the outline of J1, which hung over the board edge. The references stay in the
+  schematic, the BOM and the placement files; JLCPCB places the parts from those, not from the silkscreen.
+- **Size**: every text is 1.0 mm high with a 0.15 mm stroke (JLCPCB's advice, 1 mm and 0.15 mm; to be checked in their
+  rules before the order). The labels of rev A were 0.8 mm / 0.12 mm.
+- **Files**: the title block says rev B (board and schematic) and the gerbers carry `Revision: B`. The board is saved
+  by KiCad 10 (rev A: KiCad 7), so it opens in KiCad 10 or newer. `tools/make_shield_pcb.py` still generates the
+  rev A board; to rebuild rev B run it, then `tools/make_shield_rev_b.py`, then `tools/make_shield_outputs.py`
+  (with KiCad's `kicad-cli` on the PATH).
+- Before ordering: look at the gerber preview once (JLCPCB's or KiCad's viewer) and check the text sizes against
+  JLCPCB's current silkscreen rules; then the tag `hw-shield-revB`.
 
 ## Next revision
 
-Collected for the next version of the board, rev B (nothing changed in the files of the 2026-11-13 order):
+Collected for the version after rev B (the silkscreen of rev B is done, see "Revisions"):
 
-- **Revision in the files and on the board**: the revision in the board's title block in KiCad (Board Setup >
-  Title Block, then the gerbers carry it instead of `rev?`) and the schematic's, and a text on the silkscreen such
-  as "CB sound shield rev B 2027-01". Then the tag `hw-shield-revB` when it is ordered, and a row in "Revisions".
+- Whatever the first assembled boards (rev A) show at power-up.
 - **Optional, only if two revisions need different firmware**: a board ID the firmware can read, for example a
   resistor divider on one of the spare pins IO10..IO12 read by the ADC. Not needed while the pins stay the same.
-
-- **Silkscreen**: move the reference labels off the pads and away from the board edge until KiCad's DRC shows no
-  silkscreen warnings (`silk_over_copper`, `silk_overlap`, `silk_edge_clearance`); the placement does not change,
-  only the labels.
-- Whatever the first assembled boards show at power-up.
 
 ## Ordering at PCBWay
 

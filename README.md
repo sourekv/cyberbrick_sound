@@ -90,7 +90,8 @@ the header of `speaker_box.scad`.
 - `assets/samples/` - the CC0 recordings and derived loops (`LICENSE-SAMPLES.md`)
 - `docs/` - documentation (see above), wiring pictures, measurements (`docs/measurements/`)
 - `hardware/shield/` - KiCad project of the shield board: schematic, routed PCB, manufacturing files. Versioned by
-  revision letters with git tags `hw-shield-revA`, ... on the ordered files (`docs/shield-pcb.md`, "Revisions");
+  revision letters with git tags `hw-shield-revA`, ... on the ordered files (rev A ordered; rev B, silkscreen only, is
+  prepared and not ordered; `docs/shield-pcb.md`, "Revisions");
   the firmware has its own numbers and tags `v0.1.0`, ... (see "Firmware version")
 - `hardware/speaker_box/` - the sealed speaker box: OpenSCAD source, Fusion 360 script, Bambu Studio project
 - `hardware/solder_stand/` - printed stand for soldering the socket strips and the servo header onto the shield

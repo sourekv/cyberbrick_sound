@@ -1,7 +1,7 @@
 (kicad_sch (version 20230121) (generator eeschema)
   (uuid 8d1c2a52-6f0b-4c53-9a7d-5b7a1f3c9e01)
   (paper "A3")
-  (title_block (title "Sound shield for the CyberBrick receiver") (date "2026-11-01") (rev "A")
+  (title_block (title "Sound shield for the CyberBrick receiver") (date "2026-11-14") (rev "B")
     (comment 1 "Engine sound module: ESP32-S3-Zero + MAX98357A, throttle from the servo port PWM2"))
   (lib_symbols
 (symbol "power:GND" (power) (pin_names (offset 0)) (in_bom yes) (on_board yes)
