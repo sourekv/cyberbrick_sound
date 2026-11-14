@@ -97,6 +97,12 @@ the header of `speaker_box.scad`.
 
 Open `firmware/` in VS Code with the PlatformIO extension, or run `pio run -e <env> -t upload`:
 
+**Firmware version**: `FW_VERSION` in `firmware/include/version.h` (now 0.1.0), raised by hand for every release,
+which gets the git tag `v<version>`. At build time `firmware/version.py` adds the short hash of the commit (with
+`-dirty` for uncommitted changes) and the date, so the full version reads like `0.1.0+8cc34fd`. `engine_sets`
+prints it at boot (`cyberbrick_sound engine_sets 0.1.0+8cc34fd, built 2026-11-14`) and reports it to the web page
+in `@info`.
+
 | Env | What it does |
 |---|---|
 | `engine_lab` | **the current firmware**: all seven engine-sound candidates (the BOOT button switches 1..7 and announces the name), ignition, starter, stop and horn from the channel data, shift sound, no upshift while reversing, speaker EQ for the 30 ml box |

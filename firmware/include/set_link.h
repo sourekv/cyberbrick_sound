@@ -9,7 +9,8 @@
 // bytes when its receive buffer is full).
 //
 //   @hello                 @ok cbsound <protocol version>
-//   @info                  @ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes>
+//   @info                  @ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date>
+//                                           (fw: include/version.h, for example 0.1.0+8cc34fd)
 //   @ls                    @set <bytes> <folder>   (every folder in /sets)          @ok <count>
 //   @files <folder>        @file <bytes> <name>    (every file of /sets/<folder>)   @ok <count>
 //   @get <path>            @d <base64>  (up to 3072 bytes per line)                 @ok <size> <crc32 hex>
@@ -25,6 +26,7 @@
 // Paths are under /sets/. While the page talks to the module (a session: from the first command until @bye,
 // @select or 3 s without a command) the engine is silent, the BOOT button is ignored and the firmware does not
 // write to the serial port by itself.
+#include "version.h"
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <vector>
@@ -123,7 +125,8 @@ class SetLink {
   void info() {
     size_t total = LittleFS.totalBytes(), used = LittleFS.usedBytes();
     reply(String("@ok free=") + (unsigned)(total - used) + " total=" + (unsigned)total + " set=" +
-          (cur.length() ? cur : String("-")) + " psram=" + (unsigned)ESP.getFreePsram());
+          (cur.length() ? cur : String("-")) + " psram=" + (unsigned)ESP.getFreePsram() + " fw=" FW_FULL_VERSION
+          " built=" FW_BUILD);
   }
 
   static uint32_t folderBytes(File dir) {

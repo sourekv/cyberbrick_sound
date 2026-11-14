@@ -253,6 +253,7 @@ static bool bootPressed() {
 void setup() {
   usbLink.begin();
   Serial.begin(115200);
+  Serial.println("cyberbrick_sound engine_sets " FW_FULL_VERSION ", built " FW_BUILD);
   statusLed.begin();
   pinMode(PIN_THROTTLE_IN, INPUT);
   pinMode(PIN_BOOT_BUTTON, INPUT_PULLUP);

@@ -49,8 +49,8 @@ Not started; recorded so the design does not block them.
   the spoken name), the directory structure and the file names of a set, how to upload a set, and what is needed
   for it (a computer with Chrome or Edge: no Safari, Firefox, iPhone or iPad, see `user-sounds.md`, "The web page").
 - **Firmware check and update on the web page** (idea 2026-11-14, after the page has been tried with the module):
-  - *Check*: the firmware reports its version (and the build date) in the reply to `@info`; the page shows it and
-    says when the one it carries is newer ("on the module 1.2, available 1.3"). After an update the page checks
+  - *Check*: the firmware reports its version and build date in the reply to `@info` (done 2026-11-14, see
+    "Firmware version" in the README) and the page shows it; still to do: say when the one it carries is newer ("on the module 1.2, available 1.3"). After an update the page checks
     that the module answers `@hello` with the new version.
   - *Update, preferred way*: esptool-js (Espressif's library for flashing from the browser, the one ESP Web Tools
     uses) over the same Web Serial port. The page puts the Zero into its ROM bootloader through the chip's own USB

@@ -379,7 +379,7 @@ full).
 | Command | Answer |
 |---|---|
 | `@hello` | `@ok cbsound 1` |
-| `@info` | `@ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes>` |
+| `@info` | `@ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date>`; the page shows the firmware version under the list |
 | `@ls` | `@set <bytes> <folder>` per folder in `/sets`, then `@ok <count>` |
 | `@files <folder>` | `@file <bytes> <name>` per file, then `@ok <count>` |
 | `@get <path>` | `@d <base64>` lines of up to 3072 bytes, then `@ok <size> <crc32>` |

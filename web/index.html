@@ -564,7 +564,7 @@ class MockTransport {
     }
     this.put = null;
     if (cmd === "@hello") return r("@ok cbsound 1");
-    if (cmd === "@info") return r(`@ok free=${this.total - this.used()} total=${this.total} set=${this.current || "-"} psram=7800000`);
+    if (cmd === "@info") return r(`@ok free=${this.total - this.used()} total=${this.total} set=${this.current || "-"} psram=7800000 fw=simulated built=-`);
     if (cmd === "@ls") {
       const names = [...this.dirs].filter((d) => d.startsWith("/sets/")).map((d) => d.slice(6));
       for (const n of names) {
@@ -831,7 +831,8 @@ function renderSets() {
     tb.appendChild(tr);
   }
   const total = +info.total || 0, free = +info.free || 0;
-  $("spaceText").textContent = total ? `${kB(total - free)} of ${kB(total)} used, ${kB(free)} free` : "";
+  $("spaceText").textContent = total ? `${kB(total - free)} of ${kB(total)} used, ${kB(free)} free` +
+    (info && info.fw ? ` · firmware ${info.fw}` + (info.built && info.built !== "-" ? `, built ${info.built}` : "") : "") : "";
   $("spaceBar").style.width = total ? ((total - free) / total * 100).toFixed(1) + "%" : "0";
   syncStop();
 }
