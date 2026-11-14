@@ -1,0 +1,24 @@
+{
+  "name": "Truck",
+  "type": "sample",
+  "rate": [
+    1.0,
+    3.0
+  ],
+  "loaded_rate_scale": 1.18,
+  "loaded_gain": 0.8,
+  "level": 1.0,
+  "stop_s": 1.4,
+  "gearbox": true,
+  "sources": {
+    "name": {
+      "text": "Truck",
+      "voice_prompt": 0
+    },
+    "start": "render:starter",
+    "horn": "render:horn",
+    "shift": "header:shift_sound",
+    "idle": "assets/samples/truck_idle_loop.wav",
+    "loaded": "assets/samples/truck_loaded_loop.wav"
+  }
+}

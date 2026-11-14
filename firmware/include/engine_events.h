@@ -106,10 +106,15 @@ class EngineState {
   State state = OFF;          // silent after power-up until the ignition or the throttle starts the engine
   float gain = 0.0f;          // engine sound level 0..1 (multiply the engine samples)
 
+  float crankS = 1.1f;        // starter time before the engine catches (engine_sets: from the length of start.wav)
+  float stopS = 1.4f;         // wind-down after the ignition goes OFF (engine_sets: stop_s of the set)
+
   // dataAlive: channel data present; ignitionOn: switch out of OFF; moving: throttle off rest; rpmNow: the
-  // gearbox rpm of the previous block. Returns the throttle to feed to the gearbox.
+  // gearbox rpm of the previous block. Returns the throttle to feed to the gearbox. Starter: anything with
+  // start(), stop() (StarterSound, or the start.wav player of engine_sets).
+  template <class Starter>
   float block(bool dataAlive, bool ignitionOn, bool moving, float throttle, float dt, float rpmNow,
-              StarterSound& starter) {
+              Starter& starter) {
     override = false;
     if (!dataAlive) {                       // no channel data (servo pulse only): no ignition, the throttle starts it
       wasAlive = false;
@@ -142,10 +147,10 @@ class EngineState {
         return 0.0f;
       case CRANKING:
         gain = 0.0f; override = true; rpmSet = 0.0f;
-        if (t >= CRANK_S) { state = RUNNING; t = 0.0f; flare = true; starter.stop(); }
+        if (t >= crankS) { state = RUNNING; t = 0.0f; flare = true; starter.stop(); }
         return 0.0f;
       case STOPPING: {
-        float x = t / (quietStop ? 0.35f : STOP_S);
+        float x = t / (quietStop ? 0.35f : stopS);
         if (x >= 1.0f) { state = OFF; gain = 0.0f; override = true; rpmSet = 0.0f; return 0.0f; }
         override = true;
         rpmSet = rpm0 + (-0.3f - rpm0) * (1.0f - (1.0f - x) * (1.0f - x));   // falls fast, then slower, below idle
@@ -173,8 +178,6 @@ class EngineState {
   bool silent() const { return state == OFF || state == CRANKING; }
 
  private:
-  static constexpr float CRANK_S = 1.1f;
-  static constexpr float STOP_S = 1.4f;
   bool wasAlive = false, lastIgnition = false, flare = false, quietStop = false, override = false;
   float t = 0.0f, rpm0 = 0.0f, rpmSet = 0.0f, flareRpm = 0.0f;
   static float approach(float v, float to, float step) { return v < to ? fminf(v + step, to) : fmaxf(v - step, to); }

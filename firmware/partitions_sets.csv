@@ -1,0 +1,10 @@
+# Partition table of the `engine_sets` firmware (docs/user-sounds.md), 8 MB flash.
+# The sounds live in the data partition (LittleFS, label "spiffs" as Arduino's LittleFS expects), so the two OTA app
+# slots need only 1.5 MB each (engine_sets is about 0.4 MB); the data partition gets the rest, about 4.9 MB.
+# Name,   Type, SubType, Offset,   Size,     Flags
+nvs,      data, nvs,     0x9000,   0x5000,
+otadata,  data, ota,     0xe000,   0x2000,
+app0,     app,  ota_0,   0x10000,  0x180000,
+app1,     app,  ota_1,   0x190000, 0x180000,
+spiffs,   data, spiffs,  0x310000, 0x4E0000,
+coredump, data, coredump,0x7F0000, 0x10000,

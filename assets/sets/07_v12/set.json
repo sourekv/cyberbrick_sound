@@ -1,0 +1,19 @@
+{
+  "name": "V twelve",
+  "type": "synth",
+  "synth": "synth2",
+  "preset": "v12",
+  "eq": "speaker_box",
+  "level": 1.0,
+  "stop_s": 1.4,
+  "gearbox": true,
+  "sources": {
+    "name": {
+      "text": "V twelve",
+      "voice_prompt": 6
+    },
+    "start": "render:starter",
+    "horn": "render:horn",
+    "shift": "header:shift_sound"
+  }
+}

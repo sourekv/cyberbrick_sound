@@ -1,7 +1,16 @@
 # User sounds: what a sample must meet
 
-Plan for the future (2026-11-08, sets decided 2026-11-14), not implemented. The firmware would load sound sets from
-files in the flash data partition, uploaded over USB by a PC tool (see "Later" in `roadmap.md`). This page says how
+Planned 2026-11-08, sets decided 2026-11-14. The firmware loads sound sets from files in the flash data partition,
+uploaded over USB by a PC tool (see "Later" in `roadmap.md`).
+
+**State 2026-11-14:** step 1 is built, not yet tried on the module: the firmware env `engine_sets`
+(`firmware/src/engine_sets/`, `firmware/include/sound_sets.h`), the partition table `firmware/partitions_sets.csv`
+(two 1.5 MB app slots, 4.9 MB data partition), the default sets in `assets/sets/` and `tools/make_default_sets.py`.
+The sets go to the module with `pio run -e engine_sets -t uploadfs` for now; the upload tool over USB is the next
+step. Until the names are spoken with Piper (`--piper`, `--model`), the default sets use today's prompts with the
+number in front. See "Trying it" at the end.
+
+This page says how
 the sets are organised and what a sample has to meet so it sounds right on the module. The numbers come from the current firmware (`engine_lab`) and the
 speaker measurement (`speaker-measurement.md`).
 
@@ -10,7 +19,7 @@ speaker measurement (`speaker-measurement.md`).
 There are no separate "built-in" and "user" sets. **Every set is a set of files in the data partition**, and the BOOT
 button steps through the sets found there:
 
-- **Every set is complete** (decided 2026-11-14): it holds all its sounds (idle and loaded loop, start, stop, horn,
+- **Every set is complete** (decided 2026-11-14): it holds all its sounds (idle and loaded loop, starter, horn,
   shift) and its spoken name. Sets do not borrow sounds from each other or from the firmware, so a set can be copied,
   deleted or replaced on its own; sounds that several sets share (for example the same horn) are simply stored in
   each of them.
@@ -19,7 +28,7 @@ button steps through the sets found there:
   replaced or reordered like their own.
 - **Two types of set** (decided 2026-11-14): a **sample** set plays its engine from the loops `idle.wav` and
   `loaded.wav`; a **synth** set makes its engine in real time from combustion grains, so it has no engine loops,
-  only the synth parameters in `set.json` (see "Types of set"). Everything else (name, start, stop, horn, shift) is
+  only the synth parameters in `set.json` (see "Types of set"). Everything else (name, starter, horn, shift) is
   WAV files in both types.
 - **One fallback set is compiled into the firmware** and is used only when the data partition is empty or damaged
   (for example after a failed upload), so the module never stays silent. It is not in the list the BOOT button steps
@@ -31,10 +40,24 @@ sounds, and an upload of sounds does not touch the firmware. The sounds take abo
 the data partition can grow (see "Size"). Cost: the partition table changes once, so every module is flashed
 completely once more (firmware and default sets); after that firmware and sounds are uploaded separately.
 
-Size of a set, estimated from the truck set: idle loop 234 kB, loaded loop 84 kB, start (1.1 s cranking and the
-catch) and stop (1.4 s) about 120 kB together, horn about 25-45 kB, shift 15 kB, name about 70 kB. A sample set is
-about 0.55-0.6 MB, a synth set (no loops) about 0.25-0.3 MB. The seven default sets (two sample, five synth) are
-about 2.5 MB, so they need the larger data partition (see "Size").
+Size of a set, estimated from the truck set: idle loop 234 kB, loaded loop 84 kB, starter (1.1 s) about 50 kB,
+horn about 25-45 kB, shift 15 kB, name about 70 kB. A sample set is about 0.5 MB, a synth set (no loops) about
+0.2 MB. The seven default sets (two sample, five synth) are about 2 MB, so they need the larger data partition
+(see "Size").
+
+## Start and stop (decided 2026-11-14)
+
+- **Start:** `start.wav` holds **only the starter** cranking the engine. It plays when the ignition switch leaves OFF;
+  its length is how long the engine cranks. Then the set's own engine (loop or synth) **catches by itself**: a short
+  rev that settles to idle, as the firmware does today. So the catch always matches the engine of the set.
+- **Stop: automatic, no file.** When the ignition switch goes back to OFF, the firmware pulls the rpm of the set's
+  own engine down from wherever it is, fast at first and then slower, below idle, and fades it out (1.4 s; 0.35 s
+  when the engine was still cranking). A stop from full throttle sounds different from one at idle, there is no seam
+  between a recording and the engine, and it works for both types of set. `set.json` may set the length
+  (`stop_s`).
+- From a real start recording only the cranking is kept: it is the even "chug-chug" before the first firing, and the
+  first firing is a sudden jump in level that is easy to see in the waveform. Cut just before it, fade out the last
+  20-50 ms. The catch of the recording is not used.
 
 ## Types of set
 
@@ -48,7 +71,7 @@ they were tuned for, so they stay synthesised.
 | | Sample set | Synth set |
 |---|---|---|
 | Engine sound | `idle.wav` and `loaded.wav`, played faster with the throttle | made in real time by the firmware; `set.json` names the synth and its preset |
-| Other files | `name.wav`, `start.wav`, `stop.wav`, `horn.wav`, `shift.wav` | the same |
+| Other files | `name.wav`, `start.wav`, `horn.wav`, `shift.wav` | the same |
 | Made by | the user (any recording) or `make_default_sets.py` | `make_default_sets.py`; the user can only change the parameters |
 | Default sets | 01, 02 | 03-07 |
 
@@ -63,11 +86,12 @@ therefore comes with a firmware update, while a sample set can be made by anyone
   "level": 1.0, "gearbox": true }
 ```
 
-**Speaker EQ (decided 2026-11-14): part of the sound, not a parameter.** A sample set has the EQ baked into its WAVs
-(`02_truck_eq` is its own copy of the truck loops, run through the EQ by `make_default_sets.py`); the firmware plays
-sample sets without an EQ of its own. A synth set carries its EQ in `set.json` (the filter coefficients, today
-`LAB_EQ`), because the synth runs live and its EQ comes after the soft clipper; the copy is small, so each synth set
-simply has its own.
+**Speaker EQ (decided 2026-11-14): part of the set, not a switch.** Every set carries its own EQ in `set.json`
+(`"eq"`: the filter coefficients; a set without it plays without EQ), and the firmware runs it after the engine,
+live. Live and not baked into the WAVs because the loops are played up to 3x faster: an EQ baked in would move up
+with them (a cut at 420 Hz would sit at 1260 Hz at full throttle), while the speaker's resonance stays where it is.
+So `02_truck_eq` uses the same loops as `01_truck` and differs only in its `eq`. The copy of the coefficients is
+small, so each set simply has its own.
 
 ## The PC tool
 
@@ -118,8 +142,7 @@ The files inside always have the same names, so the firmware needs no list of th
 | `name.wav` | the spoken name of the set, for example "Truck" (no number: the order can change) | once, when the set is chosen with BOOT | about 1-2 s |
 | `idle.wav` | the engine at idle (sample sets only) | loop; sped up with the throttle (1.0x..3.0x) | 1-6 s, a whole number of engine cycles |
 | `loaded.wav` | the same engine under load (sample sets only) | loop, blended in with the throttle | 1-3 s |
-| `start.wav` | starter cranking and the engine catching, ending at idle | once, when the ignition switch leaves OFF; `idle.wav` follows | about 1.5-3 s |
-| `stop.wav` | the engine winding down to silence | once, when the ignition switch goes back to OFF | about 1.5-2 s |
+| `start.wav` | the starter cranking the engine, without the catch (see "Start and stop") | once, when the ignition switch leaves OFF; then the engine catches by itself | about 0.5-2 s |
 | `horn.wav` | the horn | loop, as long as the horn control is held, so it must loop cleanly like the engine | 0.3-1 s |
 | `shift.wav` | the gear-change sound | once, on every upshift of the virtual gearbox | under 0.5 s |
 
@@ -140,11 +163,10 @@ All WAVs in the format of "Format on the module".
 │   │   ├── idle.wav
 │   │   ├── loaded.wav
 │   │   ├── start.wav
-│   │   ├── stop.wav
 │   │   ├── horn.wav
 │   │   └── shift.wav
 │   ├── 02_truck_eq/
-│   │   └── ... (the same eight files)
+│   │   └── ... (the same seven files)
 │   ├── 03_pulse_old/        synth set: the same files without idle.wav and loaded.wav
 │   │   └── ...
 │   └── ... 07_v12/
@@ -172,7 +194,7 @@ firmware/
     └── sets/...             written with `pio run -t uploadfs`
 ```
 
-The WAVs are built, not committed (about 2.5 MB that a script can make again), like the STL files of the printed
+The WAVs are built, not committed (about 2 MB that a script can make again), like the STL files of the printed
 parts. Only `set.json` and the sources are in git.
 
 ## Default sets
@@ -180,7 +202,7 @@ parts. Only `set.json` and the sources are in git.
 For now all seven `engine_lab` candidates (decided 2026-11-14), in their current order and with their current
 numbers.
 
-| Folder | Type | Spoken name | Engine | `start.wav`, `stop.wav`, `horn.wav` | `shift.wav` |
+| Folder | Type | Spoken name | Engine | `start.wav`, `horn.wav` | `shift.wav` |
 |---|---|---|---|---|---|
 | `01_truck` | sample | "Truck" | `idle.wav`, `loaded.wav`: the CC0 truck loops (`engine_truck`, `assets/samples/`) | rendered from today's synthesis (`engine_events.h`) | the CC0 shift sound (`shift_sound.h`) |
 | `02_truck_eq` | sample | "Truck with EQ" | the same loops through the speaker EQ for the 30 ml box | as 01 | as 01 |
@@ -190,7 +212,7 @@ numbers.
 | `06_v8` | synth | "V eight" | the same synth, preset v8 (cross-plane) | as 01 | as 01 |
 | `07_v12` | synth | "V twelve" | the same synth, preset v12 | as 01 | as 01 |
 
-The start, stop, horn and shift sounds are the same in all seven sets today (stored seven times, see "One kind of
+The starter, horn and shift sounds are the same in all seven sets today (stored seven times, see "One kind of
 set"); they can be made to suit each engine later. The spoken names are made with the same text-to-speech as today
 (`tools/make_voice_prompts.ps1`, Piper, voice en_US-ljspeech), without the numbers the current prompts start with.
 
@@ -235,6 +257,7 @@ uploading.
 | loaded rate scale | sample sets: extra speed of the loaded loop when its firing rate is lower than the idle loop's | 1.18 (`LOADED_RATE_SCALE`) |
 | loaded gain | sample sets: level of the loaded loop against the idle loop | 0.8 (`LOADED_GAIN`) |
 | level | volume of the set | 1.0 |
+| stop_s | how long the engine winds down after the ignition is switched off | 1.4 |
 | gearbox | use the virtual gearbox and the shift sound | on |
 
 ## Announcing the set
@@ -286,3 +309,19 @@ checked by ear first.
 Sounds the user uploads stay on their module and do not go into this repo, so the CC0 rule of the repo does not apply
 to them; their licence is the user's responsibility. The default sets that come with the firmware stay CC0 as now
 (`assets/samples/LICENSE-SAMPLES.md`).
+
+## Trying it (step 1)
+
+From the repo root, then from `firmware/`:
+
+1. `python tools/make_default_sets.py` builds the seven default sets into `firmware/data/sets/` (about 2.1 MB). With
+   `--piper <folder with piper.exe> --model <en_US-ljspeech-medium.onnx>` it also speaks the plain names (the user
+   runs it, Piper is a downloaded binary).
+2. `pio run -e engine_sets -t upload` flashes the firmware **and the new partition table**. The first time, the old
+   data partition is gone, so the module plays the fallback (diesel synth) and beeps once until step 3.
+3. `pio run -e engine_sets -t uploadfs` writes the sets (the whole data partition, about 5 MB, takes a while).
+4. The serial monitor (115200 Bd) lists the sets found and every set loaded; BOOT steps to the next set, which
+   speaks its name. After a power cycle the module starts with the set chosen last.
+
+Going back to `engine_lab` is just `pio run -e engine_lab -t upload` (it brings its own partition table).
+Flash with the USB power rule in mind (`bringup.md`).

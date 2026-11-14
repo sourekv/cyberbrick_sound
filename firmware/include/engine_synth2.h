@@ -24,12 +24,20 @@ class Biquad {
   float b0 = 1, b1 = 0, b2 = 0, a1 = 0, a2 = 0, z1 = 0, z2 = 0;
 };
 
+// A chain of biquads, by default the speaker EQ LAB_EQ; set() loads another chain (engine_sets: the "eq" of a
+// set.json), n = 0 passes the signal through unchanged.
 class SpeakerEq {
  public:
-  SpeakerEq() { for (int i = 0; i < LAB_EQ_STAGES; i++) st[i].set(LAB_EQ[i]); }
-  float run(float x) { for (int i = 0; i < LAB_EQ_STAGES; i++) x = st[i].run(x); return x; }
+  static const int MAX_STAGES = 8;
+  SpeakerEq() { set(LAB_EQ, LAB_EQ_STAGES); }
+  void set(const float (*c)[5], int stages) {
+    n = stages > MAX_STAGES ? MAX_STAGES : stages;
+    for (int i = 0; i < n; i++) st[i].set(c[i]);
+  }
+  float run(float x) { for (int i = 0; i < n; i++) x = st[i].run(x); return x; }
  private:
-  Biquad st[LAB_EQ_STAGES];
+  Biquad st[MAX_STAGES];
+  int n = 0;
 };
 
 class EngineSynth2 {
@@ -46,6 +54,9 @@ class EngineSynth2 {
     countdown = 1.0f;
     env = 0.0f;
   }
+
+  // Replaces the speaker EQ at the output (call after setPreset(), which loads LAB_EQ); stages = 0: no EQ.
+  void setEq(const float (*c)[5], int stages) { eq.set(c, stages); }
 
   // Once per audio block, after gearbox.update().
   void block(float throttle, const Gearbox& gb) {

@@ -1,0 +1,17 @@
+{
+  "name": "Old synth",
+  "type": "synth",
+  "synth": "pulse",
+  "level": 1.0,
+  "stop_s": 1.4,
+  "gearbox": true,
+  "sources": {
+    "name": {
+      "text": "Old synth",
+      "voice_prompt": 2
+    },
+    "start": "render:starter",
+    "horn": "render:horn",
+    "shift": "header:shift_sound"
+  }
+}
