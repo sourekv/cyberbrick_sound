@@ -78,7 +78,10 @@ about 0.14 Ohm, negligible against the 4 Ohm speaker. Also sold: 50 mm (IC005), 
 ### Order of 2026-11-13
 
 - JLCPCB order [order number removed], paid 2026-11-13: PCB [number removed] and Economic PCBA [number removed],
-  5 boards, files from `fab/jlcpcb_basic/`.
+  5 boards, files from `fab/jlcpcb_basic/`. **LED1 is therefore red** (Kento KT-0603R, C2286), not green: the
+  board files and `shield_bom.csv` still say "green" (the design value, rev A tag), the files that were ordered say
+  red. Its drop is lower than a green one's, so with the 1 k resistor it takes a little more than the 3 mA estimated
+  below; to be seen at the first power-up.
 - Options: 2 layers, 1.6 mm, green, HASL with lead (free, easiest for hand-soldering J1/J3/J4), Confirm Production
   file and Confirm Parts Placement (JLCPCB sends both for approval before production), tooling holes added by
   JLCPCB, nitrogen reflow, PCB build time 24 hours. Customs description: "DIY Hobby Circuit Board - HS Code 902300"
@@ -113,7 +116,7 @@ Parts (LCSC numbers, all in stock on 2026-11-08; the list is in `tools/make_shie
 | D1, D2 | B5819W, Schottky 40 V 1 A, SOD-123 | C8598 |
 | F1 | PTC 500 mA hold, 13.2 V, 1206 (Ruilon SMD1206P050TF/13.2) | C43379 |
 | FB1, FB2 | ferrite 600 R @ 100 MHz, 1.3 A, 0603 (Murata BLM18KG601SN1D) | C85833 |
-| LED1 | green LED 0603 (Kento KT-0603G; first choice Everlight 19-217/GHC-YR1S2/3T, C72043, out of stock on 2026-11-08) | C12624 |
+| LED1 | green LED 0603 in this full BOM (rev A was ordered with the red one from the basic-parts variant, see "Order of 2026-11-13"; Kento KT-0603G; first choice Everlight 19-217/GHC-YR1S2/3T, C72043, out of stock on 2026-11-08) | C12624 |
 | R1, R3 | 1 k 0603 | C21190 |
 | R2, R4 | 100 k 0603 | C25803 |
 | R5 | 1 M 0603 | C22935 |
@@ -364,5 +367,5 @@ Part numbers are examples to be checked when the schematic is drawn; values mark
 | | Diode (or ideal diode) between servo 5 V and USB 5 V | 1 | so both can be connected; check first whether the Zero's 5V pin already has a diode towards USB |
 | | Ceramic capacitors 100 nF | 2-3 | general decoupling |
 | Service | Test points (5 V, 3.3 V, GND, GPIO1, BCLK, LRC, DIN) | 7 | 1 mm pads on the bottom side |
-| | Power LED (green, 0603) + 1 kOhm resistor | 1 + 1 | beside the Zero; about 3 mA from the servo-port 5 V |
+| | Power LED (0603; red on rev A, green in the full BOM) + 1 kOhm resistor | 1 + 1 | beside the Zero; about 3 mA from the servo-port 5 V |
 | Mechanical | Mounting holes 2.7 mm, 23.0 x 24.0 mm apart | 4 | same pattern as the CyberBrick receiver shield |

@@ -52,7 +52,7 @@ The real KiCad design is in `hardware/shield/` (schematic `shield.kicad_sch`, bo
 - **Protection and power:** 1 kOhm series resistor and 100 kOhm pull-down on the signal, resettable fuse, Schottky reverse-polarity diode, an OR-ing diode so USB and servo-port 5 V can be connected together, 100 uF bulk and ceramic decoupling capacitors.
 - **Amplifier:** bare MAX98357A chip (TQFN-16), to be **assembled by a PCB service** because it cannot be hand-soldered in practice. No plug-in breakout module.
 - **Speaker J2:** JST SH 1.0 mm 2-pin side-entry connector, the same type as the CyberBrick motor and button ports. The CyberBrick kit contains a suitable 10 cm cable (bag B-IC004), and SH 1.0 pigtails are cheap, so users need no crimping.
-- **Service items:** a green power LED (from the servo-port 5 V) beside the Zero, bottom test pads, four mounting holes.
+- **Service items:** a power LED (from the servo-port 5 V; red on the rev A boards, see `shield-pcb.md`) beside the Zero, bottom test pads, four mounting holes.
 - **Rejected on the way:** a Zero-sized board without holes (no room for anything), a variant with fragile "ears" for the holes, a spare GPIO header (recorded as a future option); the full list is in `rejected-ideas.md`.
 
 ## Firmware (`firmware/`, PlatformIO, Arduino framework)
