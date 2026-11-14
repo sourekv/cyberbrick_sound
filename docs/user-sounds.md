@@ -1,9 +1,29 @@
 # User sounds: what a sample must meet
 
-Plan for the future (2026-11-08), not implemented. The firmware would load sound sets from files in the flash data
-partition, uploaded over USB by a PC tool (see "Later" in `roadmap.md`). This page says what a
-sample has to meet so it sounds right on the module. The numbers come from the current firmware (`engine_lab`) and the
+Plan for the future (2026-11-08, sets decided 2026-11-14), not implemented. The firmware would load sound sets from
+files in the flash data partition, uploaded over USB by a PC tool (see "Later" in `roadmap.md`). This page says how
+the sets are organised and what a sample has to meet so it sounds right on the module. The numbers come from the current firmware (`engine_lab`) and the
 speaker measurement (`speaker-measurement.md`).
+
+## One kind of set (decided 2026-11-14)
+
+There are no separate "built-in" and "user" sets. **Every set is a set of files in the data partition**, and the BOOT
+button steps through the sets found there:
+
+- **Default sets**: for now all seven `engine_lab` candidates, each with its voice prompt (decided 2026-11-14;
+  together about 0.85 MB, so they fit even the current 1.5 MB partition). They are written to the data partition
+  when a module is flashed the first time. To the user they are
+  ordinary sets: they can be deleted, replaced or reordered like their own.
+- **One fallback set is compiled into the firmware** and is used only when the data partition is empty or damaged
+  (for example after a failed upload), so the module never stays silent. It is not in the list the BOOT button steps
+  through. It also supplies the one-shot sounds (start, stop, horn, shift) a set leaves out.
+- Every set carries its own spoken name as a sample (see "Announcing the set"); beeps only for a set without one.
+
+Why: one kind of set keeps the firmware and the controls simple, a firmware update (also over OTA) does not touch the
+sounds, and an upload of sounds does not touch the firmware. The sounds take about 0.8 MB of the firmware today
+(engine samples about 355 kB, voice prompts about 480 kB); with most of them moved out, the app slots can shrink and
+the data partition can grow (see "Size"). Cost: the partition table changes once, so every module is flashed
+completely once more (firmware and default sets); after that firmware and sounds are uploaded separately.
 
 ## The PC tool
 
@@ -31,8 +51,10 @@ prepare this exact format.
 ## Size
 
 - One second costs 44.1 kB (22 050 samples x 2 bytes).
-- The data partition has 1.5 MB, so about **35 s of sound in total**, for all loaded sets together (minus a little for
-  the file system and the parameter files).
+- The data partition has 1.5 MB today, so about **35 s of sound in total**, for all sets together (minus a little for
+  the file system and the parameter files). With the sounds moved out of the firmware (see "One kind of set") the
+  two OTA app slots can be smaller and the data partition can grow to about 4-5 MB, about 100 s of sound; the new
+  partition table is to be worked out with the firmware's real size.
 - For comparison, the built-in truck set: idle loop 5.3 s (234 kB), loaded loop 1.9 s (84 kB), shift sound 0.35 s
   (15 kB). One engine set of this kind is about 0.3-0.4 MB, so three to four sets fit.
 
@@ -42,7 +64,7 @@ Suggested limits per file:
 |---|---|---|
 | Idle loop (required) | 1-6 s | a whole number of engine cycles; longer sounds less repetitive, shorter saves space |
 | Loaded loop (optional) | 1-3 s | the same engine under load; blended in with the throttle |
-| Start, stop, horn, shift (optional, one-shot) | up to about 3 s each, shift under 0.5 s | played once; without them the built-in ones are used |
+| Start, stop, horn, shift (optional, one-shot) | up to about 3 s each, shift under 0.5 s | played once; without them the fallback set's ones are used |
 | Name (optional, one-shot) | about 1-2 s | the spoken name of the set, played when the set is chosen; without it the set number is beeped |
 
 ## The loop
@@ -88,10 +110,11 @@ A small text file beside the samples (format to be decided, for example JSON):
 
 ## Announcing the set
 
-When the BOOT button switches sets, the module now speaks the name of the built-in sound (`voice_prompts.h`). A loaded
-set has no spoken name in the firmware, so **the name is one of the samples of the set**: an optional short one-shot
-WAV (see the table above) that the module plays when the set is chosen. The user can record it, or the PC tool can
-make it with text-to-speech from the set's name. A built-in set uses its built-in prompt the same way.
+When the BOOT button switches sets, the module now speaks the name of the built-in sound (`voice_prompts.h`). With all
+sets in the data partition, **the name is one of the samples of the set**: an optional short one-shot WAV (see the
+table above) that the module plays when the set is chosen. The user can record it, or the PC tool can make it with
+text-to-speech from the set's name. The default sets get their names this way too (the current voice prompts move
+into them).
 
 A set without a name sample is announced **by its number as beeps** (set 3 = three beeps), the way `engine_lab`
 already does for a sound without a prompt. The order is the order in the PC tool, which shows the number next to each
@@ -100,5 +123,5 @@ set.
 ## Licence
 
 Sounds the user uploads stay on their module and do not go into this repo, so the CC0 rule of the repo does not apply
-to them; their licence is the user's responsibility. Sets that should come with the firmware stay CC0 as now
+to them; their licence is the user's responsibility. The default sets that come with the firmware stay CC0 as now
 (`assets/samples/LICENSE-SAMPLES.md`).

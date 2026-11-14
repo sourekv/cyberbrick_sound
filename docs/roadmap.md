@@ -40,8 +40,11 @@ reasons, are in `rejected-ideas.md`.
 Not started; recorded so the design does not block them.
 
 - **User-changeable sounds** (planned 2026-11-08): sound sets as files in the 1.5 MB data partition, loaded over USB,
-  first with a Python script, then with a web page (Web Serial). The BOOT button keeps switching sets; the built-in
-  sets stay as a fallback. Requirements for a sample and the set format: `user-sounds.md`.
+  first with a Python script, then with a web page (Web Serial). The BOOT button keeps switching sets. Decided
+  2026-11-14: one kind of set, all in the data partition (the seven `engine_lab` candidates become the default sets,
+  each with its spoken name), plus one fallback set compiled into the firmware for an empty or damaged partition;
+  the data partition grows once the sounds leave the firmware. Details, requirements for a sample and the set format:
+  `user-sounds.md`.
 - **Firmware updates over Wi-Fi (OTA)**, with Wi-Fi switched on only in an update mode (for example BOOT held at
   power-up). The 8 MB partition table already has two 3.3 MB app slots; `engine_lab` is about 1.15 MB, of which the
   voice prompts are about 480 kB and the engine samples about 355 kB. The sounds are compiled into the firmware, so an
