@@ -187,6 +187,13 @@ finds 0 violations (rev A: 53 silkscreen warnings) and 0 unconnected items. The 
   by KiCad 10 (rev A: KiCad 7), so it opens in KiCad 10 or newer. `tools/make_shield_pcb.py` still generates the
   rev A board; to rebuild rev B run it, then `tools/make_shield_rev_b.py`, then `tools/make_shield_outputs.py`
   (with KiCad's `kicad-cli` on the PATH). The interactive BOM comes from `tools/make_shield_ibom.py`.
+- **Parts, decided 2026-11-14: if rev B is ordered, try to fit the ideal parts**, that is the files of the full BOM
+  in `fab/jlcpcb/` (green LED C12624, Samsung 100 nF C1591, ferrites 600 R C85833), not the basic-parts variant of
+  rev A; the differences are in `shield-bom-compare.md`. Costs about 9 USD more in loading fees; check the stock of
+  those parts at LCSC again before ordering (the first choices were out of stock on 2026-11-08), and the placement
+  preview as for rev A. It is a try, not a must: if the rev A parts prove fine at the first power-up (red LED, 120 R ferrites), or the extra
+  cost is not worth it, the basic-parts variant stays. If one ideal part is not available, fall back to its basic
+  equivalent and record it.
 - Before ordering: look at the gerber preview once (JLCPCB's or KiCad's viewer) and check the text sizes against
   JLCPCB's current silkscreen rules; then the tag `hw-shield-revB`.
 
