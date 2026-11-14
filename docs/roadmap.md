@@ -48,6 +48,24 @@ Not started; recorded so the design does not block them.
   own guide later, written when the tool exists: what each sample must meet and how to make it (loops, one-shots,
   the spoken name), the directory structure and the file names of a set, how to upload a set, and what is needed
   for it (a computer with Chrome or Edge: no Safari, Firefox, iPhone or iPad, see `user-sounds.md`, "The web page").
+- **Firmware check and update on the web page** (idea 2026-11-14, after the page has been tried with the module):
+  - *Check*: the firmware reports its version (and the build date) in the reply to `@info`; the page shows it and
+    says when the one it carries is newer ("on the module 1.2, available 1.3"). After an update the page checks
+    that the module answers `@hello` with the new version.
+  - *Update, preferred way*: esptool-js (Espressif's library for flashing from the browser, the one ESP Web Tools
+    uses) over the same Web Serial port. The page puts the Zero into its ROM bootloader through the chip's own USB
+    (no buttons) and writes only the app: never the data partition with the user's sets. Works even when the
+    firmware on the module is broken, because the bootloader is in ROM. With the two app slots of
+    `partitions_sets.csv` it has to write `app0` (0x10000) and reset `otadata` (0xe000), or the module may keep
+    booting `app1`.
+  - *Other way*: an update through the page's own protocol into the other app slot (Arduino's `Update`), which
+    the partition table already allows. Simpler for the page, but no way back if the new firmware does not start.
+  - Open: where the page gets the firmware. From git once the repo is public: the built `firmware.bin` attached
+    to a GitHub release, fetched through a host that allows it from the page (raw.githubusercontent.com or
+    cdn.jsdelivr.net/gh/..., by the release tag; GitHub's own release downloads do not allow a page to read them).
+    The page then also knows the newest version without being downloaded again. While the repo is private: a
+    `firmware.bin` or a generated JS file beside `index.html` like `demo_sets.js`, or a file the user chooses. Also
+    open: whether esptool-js is loaded from a CDN like Piper or kept with the page, and its licence (Apache 2.0).
 - **Firmware updates over Wi-Fi (OTA)**, with Wi-Fi switched on only in an update mode (for example BOOT held at
   power-up). The 8 MB partition table already has two 3.3 MB app slots; `engine_lab` is about 1.15 MB, of which the
   voice prompts are about 480 kB and the engine samples about 355 kB. The sounds are compiled into the firmware, so an
