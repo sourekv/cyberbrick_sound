@@ -299,8 +299,8 @@ The name is announced once, when the set is chosen, so it only has to be short a
 2. **Own recording**: a phone or a PC microphone, a quiet room, about 20 cm from the mouth. In Audacity: record,
    Effect > Normalize to -1 dB, cut the silence at both ends, Effect > Fade In / Fade Out on the first and last
    10 ms, File > Export > WAV. The PC tool converts the rest.
-3. **On the web page** (`web/index.html`): today it records the name with the microphone; planned: type the name and the page speaks it. Piper also runs in the browser
-   (WebAssembly), so the same voices work there without installing anything. The browser's own speech
+3. **On the web page** (`web/index.html`): Record (the microphone) or Speak (type the name, Piper speaks it in
+   the browser with the same voice as the default sets; see "The web page"). The browser's own speech
    (Web Speech API) is simpler but uses the voices of the operating system, whose licences for redistributed
    recordings are unclear (the reason Windows TTS was not used for the prompts, 2026-11-05); it would be fine only
    for a name that stays on the user's own module. Recording through the microphone in the page is the other
@@ -353,8 +353,20 @@ installing Chrome is enough. Tested so far only in Edge on Windows.
   only until the page is closed. `index.html#selftest` runs an automatic test against the two small demo sets
   (13 checks, all passing on 2026-11-14 in Edge).
 
-Not on the page yet: making the name with text-to-speech (Piper in the browser), help with the loop points, the
-user guide. Hosting on GitHub Pages needs the repo public or a paid plan; until then the file is opened from disk.
+- **Speak** (the Name row): the name made with [Piper](https://github.com/rhasspy/piper) text-to-speech in the
+  browser through [piper-tts-web](https://github.com/Mintplex-Labs/piper-tts-web) and
+  [ONNX Runtime Web](https://onnxruntime.ai/), the same voice as the default sets. The part "What is downloaded and
+  used" under the box names these projects with links. The text starts as the number in words and the name ("Eight. Detroit sixty."), and can be changed. Nothing
+  is loaded until the first Speak, and then only after a question that says what is downloaded: the library
+  `@mintplex-labs/piper-tts-web` 1.0.4 (MIT) from cdn.jsdelivr.net, ONNX Runtime Web and the Piper phonemizer
+  (which it loads itself), and the voice en_US-ljspeech-medium (about 63 MB, huggingface.co). The text is turned
+  into speech on the computer, not sent anywhere. The result is 22 050 Hz, 16 bit, mono, then trimmed like any
+  name. The browser's private storage (OPFS) is not available to a page opened from disk, so the voice is not
+  stored for good: the browser's cache may keep it, otherwise it is downloaded again. Tested on 2026-11-14 in Edge
+  from `file://`: about 11 s the first time with the download, about 1.3 s after; Speak on the page tried the same
+  day in Edge and works.
+
+Not on the page yet: help with the loop points, the user guide. Hosting on GitHub Pages needs the repo public or a paid plan; until then the file is opened from disk.
 
 ### The USB protocol
 

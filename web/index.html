@@ -68,6 +68,9 @@ a { color: var(--accent); }
 details.guide ul { margin: 6px 0 0; padding-left: 20px; }
 details.guide li { margin-bottom: 4px; }
 .hidden { display: none !important; }
+.speak { margin-top: 6px; }
+.speak input[type=text] { flex: 1; min-width: 180px; }
+.speakwarn { font-size: 13px; color: var(--warn); margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -975,6 +978,7 @@ function renderSounds() {
     }
     ctl.appendChild(file);
     body.appendChild(infoEl); body.appendChild(hint); body.appendChild(ctl);
+    if (def.name) body.appendChild(speakBox(def));
     row.appendChild(head); row.appendChild(body);
     row.addEventListener("dragover", (e) => { e.preventDefault(); row.classList.add("drag"); });
     row.addEventListener("dragleave", () => row.classList.remove("drag"));
@@ -982,6 +986,96 @@ function renderSounds() {
     box.appendChild(row);
   }
   syncStop();
+}
+
+// ---------------------------------------------------------------- the name spoken by Piper, in the browser
+// Text-to-speech with the same voice as the default sets. Nothing is loaded until the first "Speak", and then only
+// after the user agrees to the download. The text is turned into speech on this computer; it is not sent anywhere.
+const PIPER_LIB = "https://cdn.jsdelivr.net/npm/@mintplex-labs/piper-tts-web@1.0.4/+esm";
+const PIPER_VOICE = "en_US-ljspeech-medium";
+const PIPER_ABOUT =
+  "Speak makes the name with Piper text-to-speech (github.com/rhasspy/piper) in this browser, through " +
+  "piper-tts-web (github.com/Mintplex-Labs/piper-tts-web). The first time it downloads from the internet:\n" +
+  "- the voice en_US-ljspeech-medium, about 63 MB, from huggingface.co (trained on the public-domain LJ Speech recordings),\n" +
+  "- the programs that run it: piper-tts-web (MIT), ONNX Runtime Web and the Piper phonemizer, together some tens of MB, " +
+  "from cdn.jsdelivr.net and cdnjs.cloudflare.com.\n" +
+  "The text you type stays on this computer; only these files are downloaded. The browser may keep them in its cache; " +
+  "if it does not, they are downloaded again next time. It needs an internet connection.";
+const PIPER_ABOUT_HTML =
+  "<p style='margin:4px 0'>The name is made by <a href='https://github.com/rhasspy/piper' target='_blank' rel='noopener'>Piper</a>, an open " +
+  "text-to-speech project (Rhasspy, now cared for by the Open Home Foundation), running in this browser through " +
+  "<a href='https://github.com/Mintplex-Labs/piper-tts-web' target='_blank' rel='noopener'>piper-tts-web</a> (Mintplex Labs, MIT licence) and " +
+  "<a href='https://onnxruntime.ai/' target='_blank' rel='noopener'>ONNX Runtime Web</a> (Microsoft, MIT).</p>" +
+  "<p style='margin:4px 0'>The first Speak downloads from the internet:</p><ul style='margin:0;padding-left:20px'>" +
+  "<li>the voice <a href='https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/ljspeech/medium' target='_blank' rel='noopener'>" +
+  "en_US-ljspeech-medium</a>, about 63 MB, from huggingface.co; trained on the " +
+  "<a href='https://keithito.com/LJ-Speech-Dataset/' target='_blank' rel='noopener'>LJ Speech</a> recordings (public domain); the same voice " +
+  "as the default sets;</li>" +
+  "<li>the programs that run it (piper-tts-web, ONNX Runtime Web, the Piper phonemizer), together some tens of MB, " +
+  "from cdn.jsdelivr.net and cdnjs.cloudflare.com.</li></ul>" +
+  "<p style='margin:4px 0'>The text you type stays on this computer; only these files are downloaded. The browser " +
+  "may keep them in its cache; if it does not, they are downloaded again next time. It needs an internet " +
+  "connection.</p>";
+const NUM_WORDS = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven",
+  "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty"];
+let piper = null, piperAgreed = false;
+
+function speakDefault() {
+  const n = parseInt($("fIndex").value, 10), name = $("fName").value.trim();
+  const num = NUM_WORDS[n] || String(n || "");
+  return [num, name].filter(Boolean).map((s) => s.replace(/[.\s]+$/, "") + ".").join(" ");
+}
+function syncSpeakText() {
+  const t = $("speakText");
+  if (t && editor && !editor.speakTouched) t.value = speakDefault();
+}
+function speakBox(def) {
+  const box = document.createElement("div"); box.className = "speak";
+  const r = document.createElement("div"); r.className = "row";
+  const t = document.createElement("input"); t.type = "text"; t.id = "speakText"; t.maxLength = 80;
+  t.placeholder = "Eight. Detroit sixty.";
+  t.value = editor.speakTouched ? editor.speakText : speakDefault();
+  t.oninput = () => { editor.speakTouched = true; editor.speakText = t.value; };
+  const go = document.createElement("button"); go.className = "small"; go.textContent = "Speak";
+  go.title = "make name.wav from this text with Piper text-to-speech (downloads the voice the first time)";
+  const st = document.createElement("span"); st.className = "hint";
+  go.onclick = () => speakName(def, t.value, go, st);
+  r.appendChild(t); r.appendChild(go); r.appendChild(st);
+  const w = document.createElement("div"); w.className = "speakwarn";
+  w.textContent = "Speak downloads the voice (about 63 MB) and its programs from the internet the first time. " +
+    "The text stays on this computer. English voice; write numbers as words.";
+  const more = document.createElement("details"); more.className = "hint";
+  more.innerHTML = "<summary>What is downloaded and used</summary>";
+  const p = document.createElement("div"); p.innerHTML = PIPER_ABOUT_HTML;
+  more.appendChild(p);
+  box.appendChild(r); box.appendChild(w); box.appendChild(more);
+  return box;
+}
+async function speakName(def, text, btn, st) {
+  text = text.trim();
+  if (!text) { st.textContent = "write the text first"; return; }
+  if (!piperAgreed) {
+    if (!confirm(PIPER_ABOUT + "\n\nDownload and continue?")) return;
+    piperAgreed = true;
+  }
+  btn.disabled = true;
+  try {
+    if (!piper) { st.textContent = "loading the programs..."; piper = await import(PIPER_LIB); }
+    st.textContent = "speaking...";
+    let last = -1;
+    const t0 = performance.now();
+    const wav = await piper.predict({ text, voiceId: PIPER_VOICE }, (p) => {
+      if (!p || !p.total) return;
+      const pc = Math.floor(p.loaded * 100 / p.total);
+      if (pc !== last) { last = pc; st.textContent = `downloading the voice ${pc} %`; }
+    });
+    await soundFromBuffer(def, await wav.arrayBuffer(), "spoken by Piper");
+    log(`${def.key}.wav spoken by Piper: "${text}" (${((performance.now() - t0) / 1000).toFixed(1)} s)`);
+    playPcm(editor.sounds[def.key].pcm, { owner: def.key });
+  } catch (e) {
+    st.textContent = "failed: " + (e && e.message || e);
+    log("Piper failed: " + (e && e.message || e), "err");
+  } finally { btn.disabled = false; }
 }
 
 async function soundFromBuffer(def, arrayBuffer, src) {
@@ -1090,8 +1184,8 @@ $("btnRefresh").onclick = refresh;
 $("btnNew").onclick = () => { editor = newEditor(); showEditor("New set"); setSaveStatus("Choose the sounds; a copy of an existing set is often the easier start.", "muted"); setBar("saveBar", 0); };
 $("btnCancel").onclick = closeEditor;
 $("btnSave").onclick = save;
-$("fIndex").onchange = () => { $("fIndexEcho").textContent = $("fIndex").value; };
-$("fName").oninput = () => { if (editor && !editor.descTouched) $("fDesc").value = slug($("fName").value); };
+$("fIndex").onchange = () => { $("fIndexEcho").textContent = $("fIndex").value; syncSpeakText(); };
+$("fName").oninput = () => { if (editor && !editor.descTouched) $("fDesc").value = slug($("fName").value); syncSpeakText(); };
 $("fDesc").oninput = () => { if (editor) editor.descTouched = true; };
 $("fType").onchange = () => { editor.type = $("fType").value; updateTypeVisibility(); renderSounds(); };
 $("pEq").onchange = () => { editor.eqMode = $("pEq").value; updateTypeVisibility(); };
