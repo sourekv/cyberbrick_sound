@@ -1,0 +1,975 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engine Sound Sets</title>
+<!--
+  The PC tool for the sound sets of the cyberbrick_sound module (docs/user-sounds.md). One file, no build, no
+  server: open it in Chrome or Edge (from disk or from a web server) and connect the module over USB (Web Serial).
+  It lists the sets on the module, plays one, edits, copies, deletes and uploads sets. Sounds are converted in the
+  browser to what the module plays: WAV, 22 050 Hz, 16 bit, mono.
+  The protocol is in firmware/include/set_link.h. "Simulated module" runs the same protocol in the page, without
+  hardware; #selftest at the end of the address runs an automatic test against it.
+-->
+<style>
+:root {
+  --bg: #f6f6f3; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #deded8;
+  --accent: #b5461b; --accent-ink: #ffffff; --ok: #2e7d32; --warn: #a15c00; --err: #b3261e; --chip: #efefea;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161615; --panel: #1f1f1d; --ink: #ecece6; --muted: #a2a29a; --line: #34342f;
+    --accent: #e07a4b; --accent-ink: #161615; --ok: #7cc47f; --warn: #e0a84b; --err: #f08a80; --chip: #2a2a27;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161615; --panel: #1f1f1d; --ink: #ecece6; --muted: #a2a29a; --line: #34342f;
+  --accent: #e07a4b; --accent-ink: #161615; --ok: #7cc47f; --warn: #e0a84b; --err: #f08a80; --chip: #2a2a27;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, "Segoe UI", sans-serif; }
+main { max-width: 980px; margin: 0 auto; padding: 20px 16px 60px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 17px; margin: 0 0 12px; }
+p.lead { color: var(--muted); margin: 0 0 18px; }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+button, select, input { font: inherit; color: inherit; }
+button { background: var(--chip); border: 1px solid var(--line); border-radius: 7px; padding: 5px 11px; cursor: pointer; }
+button:hover:not(:disabled) { border-color: var(--muted); }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; }
+button.small { padding: 2px 8px; font-size: 13px; }
+input[type=text], input[type=number], select { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 4px 7px; }
+input[type=number] { width: 80px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.muted { color: var(--muted); }
+.status { font-size: 14px; }
+.ok { color: var(--ok); } .warn { color: var(--warn); } .err { color: var(--err); }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 6px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-weight: 600; font-size: 13px; color: var(--muted); }
+td.actions { white-space: nowrap; text-align: right; }
+.tablewrap { overflow-x: auto; }
+.bar { height: 8px; background: var(--chip); border-radius: 4px; overflow: hidden; margin-top: 8px; }
+.bar > div { height: 100%; background: var(--accent); width: 0; }
+.grid { display: grid; grid-template-columns: 150px 1fr; gap: 8px 12px; align-items: center; }
+@media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+.sound { border-top: 1px solid var(--line); padding: 10px 0; display: grid; grid-template-columns: 150px 1fr; gap: 6px 12px; }
+@media (max-width: 640px) { .sound { grid-template-columns: 1fr; } }
+.sound.drag { background: var(--chip); }
+.sound .info { font-size: 13px; }
+.hint { font-size: 13px; color: var(--muted); }
+pre#log { max-height: 220px; overflow: auto; font-size: 12px; background: var(--bg); padding: 8px; border-radius: 6px; margin: 8px 0 0; white-space: pre-wrap; }
+.notice { padding: 10px 12px; border-radius: 8px; background: var(--chip); margin-bottom: 12px; }
+details summary { cursor: pointer; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Engine sound sets</h1>
+  <p class="lead">Sound sets for the cyberbrick_sound module: see what is on it, try one, change or add a set. Chrome or
+    Edge on a computer, the module on USB (firmware <code>engine_sets</code>).</p>
+
+  <div id="noSerial" class="notice hidden">This browser cannot reach USB devices (Web Serial). Use Chrome or Edge on a
+    computer. The simulated module still works.</div>
+
+  <section>
+    <div class="row">
+      <button id="btnConnect" class="primary">Connect module</button>
+      <button id="btnSim">Simulated module</button>
+      <button id="btnDisconnect" class="hidden">Disconnect</button>
+      <span id="connStatus" class="status muted">Not connected.</span>
+    </div>
+    <div class="hint" style="margin-top:8px">While the page talks to the module, the engine on the module is silent; it
+      comes back a few seconds after the last action.</div>
+  </section>
+
+  <section id="secSets" class="hidden">
+    <div class="row" style="justify-content:space-between">
+      <h2 style="margin:0">On the module</h2>
+      <div class="row"><button id="btnRefresh" class="small">Refresh</button><button id="btnNew" class="small">New empty set</button></div>
+    </div>
+    <div class="tablewrap" style="margin-top:8px">
+      <table>
+        <thead><tr><th>#</th><th>Name</th><th>Type</th><th>Size</th><th>Folder</th><th></th></tr></thead>
+        <tbody id="setRows"></tbody>
+      </table>
+    </div>
+    <div class="hint" id="spaceText" style="margin-top:10px"></div>
+    <div class="bar"><div id="spaceBar"></div></div>
+  </section>
+
+  <section id="secEdit" class="hidden">
+    <h2 id="editTitle">Set</h2>
+    <div class="grid">
+      <label for="fIndex">Number</label>
+      <div class="row"><select id="fIndex"></select><span class="hint">order of the BOOT button; say it in the name too</span></div>
+      <label for="fName">Name</label>
+      <div class="row"><input id="fName" type="text" maxlength="40" style="flex:1;min-width:180px" placeholder="Detroit sixty"></div>
+      <label for="fDesc">Folder</label>
+      <div class="row"><span class="muted" id="fIndexEcho">01</span>_<input id="fDesc" type="text" maxlength="24" placeholder="detroit_60"><span class="hint">a-z, 0-9 and _; the module ignores it</span></div>
+      <label for="fType">Type</label>
+      <div class="row">
+        <select id="fType"><option value="sample">sample (your recordings)</option><option value="synth">synth (made by the module)</option></select>
+        <select id="fSynth" class="hidden">
+          <option value="synth2:diesel">diesel</option><option value="synth2:petrol4">petrol, four cylinder</option>
+          <option value="synth2:v8">V8</option><option value="synth2:v12">V12</option><option value="pulse:">old synth</option>
+        </select>
+      </div>
+    </div>
+
+    <h2 style="margin-top:18px">Sounds</h2>
+    <div class="hint">Drop a sound file on a row or choose one. Any format the browser plays (WAV, MP3, OGG, FLAC...) is
+      converted to 22 050 Hz, 16 bit, mono.</div>
+    <div id="soundRows" style="margin-top:6px"></div>
+
+    <h2 style="margin-top:18px">Parameters</h2>
+    <div class="grid">
+      <label for="pLevel">Level</label>
+      <div class="row"><input id="pLevel" type="number" step="0.05" min="0.1" max="3"><span class="hint">loudness of the engine, 1 = as recorded</span></div>
+      <label for="pStop">Stop</label>
+      <div class="row"><input id="pStop" type="number" step="0.1" min="0.2" max="5"><span class="hint">seconds the engine takes to wind down after the ignition goes off</span></div>
+      <label for="pGearbox">Gearbox</label>
+      <div class="row"><input id="pGearbox" type="checkbox"><span class="hint">virtual gearbox with shift sounds; off: the rpm follows the throttle</span></div>
+      <label class="sampleOnly" for="pRateLo">Playback rate</label>
+      <div class="row sampleOnly"><input id="pRateLo" type="number" step="0.05" min="0.3" max="2"> to
+        <input id="pRateHi" type="number" step="0.05" min="1" max="5"><span class="hint">loop speed at idle and at full rpm</span></div>
+      <label class="sampleOnly" for="pLrs">Loaded loop</label>
+      <div class="row sampleOnly">rate x <input id="pLrs" type="number" step="0.01" min="0.5" max="2">
+        gain <input id="pLg" type="number" step="0.05" min="0" max="2"><span class="hint">against the idle loop</span></div>
+      <label for="pEq">Speaker EQ</label>
+      <div class="row"><select id="pEq"><option value="none">none</option><option value="box">30 ml box, 40 mm speaker</option><option value="keep">as in the set</option></select>
+        gain <input id="pEqGain" type="number" step="0.1" min="0.1" max="4"><span class="hint">EQ after the engine; gain lifts the whole set</span></div>
+    </div>
+
+    <div class="row" style="margin-top:18px">
+      <button id="btnSave" class="primary">Write to the module</button>
+      <button id="btnCancel">Close</button>
+      <span id="saveStatus" class="status"></span>
+    </div>
+    <div class="bar"><div id="saveBar"></div></div>
+  </section>
+
+  <section>
+    <details id="logBox"><summary>Log</summary><pre id="log"></pre></details>
+  </section>
+  <pre id="selftest" class="hidden"></pre>
+</main>
+
+<script>
+"use strict";
+const RATE = 22050;
+const CHUNK = 3072;                       // bytes per @w line (4096 base64 characters, set_link.h)
+const SPEAKER_BOX_EQ = [                  // LAB_EQ (firmware/include/engine_lab_data.h): the 30 ml box, 40 mm speaker
+  [1.10869112, -2.21738224, 1.10869112, -1.92739111, 0.928925821],
+  [0.984575592, -1.96915118, 0.984575592, -1.96836751, 0.969934854],
+  [0.933169216, -1.82428545, 0.904259499, -1.82428545, 0.837428714],
+  [0.976836103, -1.89944636, 0.930287778, -1.89944636, 0.907123882],
+  [1.10499333, -0.104702938, 0.625197825, -0.104702938, 0.730191158]];
+const SOUNDS = [
+  { key: "name", label: "Name", hint: "spoken once when the set is chosen: the number, then the name (\"Eight. Detroit sixty.\"), 1-2 s. Silence at the ends is cut, the level set to -1 dB.", min: 0.3, max: 3, rec: true, name: true },
+  { key: "start", label: "Starter", hint: "the starter cranking, without the engine catching; 0.5-2 s. The engine catches by itself at its end.", min: 0.3, max: 3 },
+  { key: "horn", label: "Horn", hint: "played as a loop while the horn is held, about 1-2 s; the end must join the start.", min: 0.2, max: 4, loop: true },
+  { key: "shift", label: "Shift", hint: "one gear change, 0.1-1 s.", min: 0.05, max: 1.5 },
+  { key: "idle", label: "Idle loop", hint: "steady idle, cut at the same point of the engine cycle at both ends, 1-6 s. Played faster with the rpm.", min: 0.5, max: 6, loop: true, sampleOnly: true, rpm: true },
+  { key: "loaded", label: "Loaded loop", hint: "the same engine under load, 1-3 s; blended in with the throttle.", min: 0.5, max: 4, loop: true, sampleOnly: true, rpm: true },
+];
+const $ = (id) => document.getElementById(id);
+
+// ------------------------------------------------------------------ log
+function log(s, cls) {
+  const el = $("log");
+  const line = document.createElement("div");
+  if (cls) line.className = cls;
+  line.textContent = new Date().toLocaleTimeString() + "  " + s;
+  el.appendChild(line);
+  while (el.childNodes.length > 400) el.removeChild(el.firstChild);
+  el.scrollTop = el.scrollHeight;
+}
+
+// ------------------------------------------------------------------ bytes, base64, crc32, WAV
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
+  return t;
+})();
+function crc32(bytes, crc = 0) {
+  crc = ~crc >>> 0;
+  for (let i = 0; i < bytes.length; i++) crc = CRC_TABLE[(crc ^ bytes[i]) & 255] ^ (crc >>> 8);
+  return ~crc >>> 0;
+}
+const hex8 = (n) => n.toString(16).padStart(8, "0");
+function b64enc(bytes) {
+  let s = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+function b64dec(s) {
+  const bin = atob(s), out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+function concat(parts) {
+  const n = parts.reduce((a, p) => a + p.length, 0), out = new Uint8Array(n);
+  let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+
+function wavBytes(pcm) {
+  const b = new ArrayBuffer(44 + pcm.length * 2), v = new DataView(b);
+  const str = (o, s) => { for (let i = 0; i < 4; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  str(0, "RIFF"); v.setUint32(4, 36 + pcm.length * 2, true); str(8, "WAVE"); str(12, "fmt ");
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, RATE, true);
+  v.setUint32(28, RATE * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); str(36, "data");
+  v.setUint32(40, pcm.length * 2, true);
+  for (let i = 0; i < pcm.length; i++) v.setInt16(44 + i * 2, pcm[i], true);
+  return new Uint8Array(b);
+}
+// A WAV that is already in the module's format: its samples, else null.
+function parseModuleWav(bytes) {
+  const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const tag = (o) => String.fromCharCode(bytes[o], bytes[o + 1], bytes[o + 2], bytes[o + 3]);
+  if (bytes.length < 12 || tag(0) !== "RIFF" || tag(8) !== "WAVE") return null;
+  let o = 12, fmtOk = false;
+  while (o + 8 <= bytes.length) {
+    const id = tag(o), size = v.getUint32(o + 4, true);
+    if (id === "fmt ") {
+      fmtOk = v.getUint16(o + 8, true) === 1 && v.getUint16(o + 10, true) === 1 && v.getUint32(o + 12, true) === RATE &&
+              v.getUint16(o + 22, true) === 16;
+      if (!fmtOk) return null;
+    } else if (id === "data" && fmtOk) {
+      const n = Math.min(size, bytes.length - o - 8) >> 1, pcm = new Int16Array(n);
+      for (let i = 0; i < n; i++) pcm[i] = v.getInt16(o + 8 + i * 2, true);
+      return pcm;
+    }
+    o += 8 + size + (size & 1);
+  }
+  return null;
+}
+
+// ------------------------------------------------------------------ audio in the browser
+// Any file the browser can decode -> mono float at 22 050 Hz (decodeAudioData resamples to the context's rate).
+async function decodeToMono(arrayBuffer) {
+  const ctx = new OfflineAudioContext(1, 1, RATE);
+  const ab = await ctx.decodeAudioData(arrayBuffer.slice(0));
+  const n = ab.length, mono = new Float32Array(n);
+  for (let c = 0; c < ab.numberOfChannels; c++) {
+    const d = ab.getChannelData(c);
+    for (let i = 0; i < n; i++) mono[i] += d[i] / ab.numberOfChannels;
+  }
+  return mono;
+}
+function toPcm(f) {
+  const pcm = new Int16Array(f.length);
+  for (let i = 0; i < f.length; i++) pcm[i] = Math.max(-32768, Math.min(32767, Math.round(f[i] * 32768)));
+  return pcm;
+}
+// For the name: cut the silence at both ends, 10 ms fades, peak at -1 dBFS (docs/user-sounds.md).
+function prepareName(f) {
+  let peak = 0;
+  for (const x of f) peak = Math.max(peak, Math.abs(x));
+  if (peak < 1e-4) return f;
+  const thr = Math.max(0.01, peak * 0.05);
+  let a = 0, b = f.length - 1;
+  while (a < b && Math.abs(f[a]) < thr) a++;
+  while (b > a && Math.abs(f[b]) < thr) b--;
+  const pad = Math.round(0.01 * RATE);
+  a = Math.max(0, a - pad); b = Math.min(f.length - 1, b + pad);
+  const out = f.slice(a, b + 1), g = 0.891 / peak, fade = Math.min(pad, out.length >> 1);
+  for (let i = 0; i < out.length; i++) {
+    let e = 1;
+    if (i < fade) e = i / fade;
+    if (out.length - 1 - i < fade) e = Math.min(e, (out.length - 1 - i) / fade);
+    out[i] *= g * e;
+  }
+  return out;
+}
+function peakDb(pcm) {
+  let p = 0;
+  for (const x of pcm) p = Math.max(p, Math.abs(x));
+  return p ? 20 * Math.log10(p / 32768) : -Infinity;
+}
+
+let audioCtx = null, playing = null;
+function stopPlay() {
+  if (playing) { try { playing.src.stop(); } catch (e) {} playing.done(); playing = null; }
+}
+function playPcm(pcm, { loop = false, rate = 1, onEnd } = {}) {
+  stopPlay();
+  audioCtx = audioCtx || new AudioContext();
+  const buf = audioCtx.createBuffer(1, pcm.length, RATE), d = buf.getChannelData(0);
+  for (let i = 0; i < pcm.length; i++) d[i] = pcm[i] / 32768;
+  const src = audioCtx.createBufferSource();
+  src.buffer = buf; src.loop = loop; src.playbackRate.value = rate;
+  src.connect(audioCtx.destination);
+  const p = { src, done: () => onEnd && onEnd() };
+  src.onended = () => { if (playing === p) { playing = null; p.done(); } };
+  playing = p;
+  src.start();
+  return p;
+}
+
+// ------------------------------------------------------------------ transports
+// Web Serial: the module's USB port. Text lines both ways.
+class SerialTransport {
+  constructor() { this.onLine = () => {}; this.onClose = () => {}; this.enc = new TextEncoder(); }
+  async open() {
+    this.port = await navigator.serial.requestPort();
+    await this.port.open({ baudRate: 115200, bufferSize: 65536 });
+    this.writer = this.port.writable.getWriter();
+    this.reading = this.readLoop();
+  }
+  async readLoop() {
+    const dec = new TextDecoder();
+    let buf = "";
+    this.reader = this.port.readable.getReader();
+    try {
+      while (true) {
+        const { value, done } = await this.reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        let k;
+        while ((k = buf.indexOf("\n")) >= 0) {
+          const line = buf.slice(0, k).replace(/\r$/, "");
+          buf = buf.slice(k + 1);
+          this.onLine(line);
+        }
+      }
+    } catch (e) {
+      log("USB: " + e.message, "err");
+    } finally {
+      try { this.reader.releaseLock(); } catch (e) {}
+    }
+    this.onClose();
+  }
+  async write(s) { await this.writer.write(this.enc.encode(s)); }
+  async close() {
+    try { await this.reader.cancel(); } catch (e) {}
+    try { await this.reading; } catch (e) {}
+    try { this.writer.releaseLock(); } catch (e) {}
+    try { await this.port.close(); } catch (e) {}
+  }
+}
+
+// The simulated module: the protocol of set_link.h over an in-memory file system.
+class MockTransport {
+  constructor() {
+    this.onLine = () => {}; this.onClose = () => {};
+    this.fs = new Map();                    // path -> Uint8Array
+    this.dirs = new Set(["/sets"]);
+    this.total = 4882432; this.current = "";
+    this.inbuf = ""; this.put = null;
+    this.makeDemo();
+  }
+  async open() { setTimeout(() => this.onLine("engine_sets: simulated module"), 0); }
+  async close() { this.onClose(); }
+  used() { let n = 0; for (const v of this.fs.values()) n += Math.ceil(v.length / 4096) * 4096; return n + this.dirs.size * 4096; }
+  async write(s) {
+    this.inbuf += s;
+    let k;
+    while ((k = this.inbuf.indexOf("\n")) >= 0) {
+      const line = this.inbuf.slice(0, k); this.inbuf = this.inbuf.slice(k + 1);
+      const out = []; this.handle(line, out);
+      await new Promise((r) => setTimeout(r, 1));
+      for (const o of out) this.onLine(o);
+    }
+  }
+  pathOk(p) { return p.startsWith("/sets/") && p.length > 6 && p.length < 80 && !p.includes("..") && !p.includes("//") && !p.endsWith("/") && !p.includes(" "); }
+  handle(l, out) {
+    if (!l.startsWith("@")) return;
+    const sp = l.indexOf(" "), cmd = sp < 0 ? l : l.slice(0, sp), arg = sp < 0 ? "" : l.slice(sp + 1);
+    const r = (s) => out.push(s);
+    if (cmd === "@w") {
+      if (!this.put) return r("@err no @put");
+      let b; try { b = b64dec(arg); } catch (e) { this.put = null; return r("@err bad data"); }
+      if (this.put.parts.reduce((a, p) => a + p.length, 0) + b.length > this.put.size) { this.put = null; return r("@err bad data"); }
+      this.put.parts.push(b); this.put.done += b.length;
+      return r("@ok " + this.put.done);
+    }
+    if (cmd === "@end") {
+      if (!this.put) return r("@err no @put");
+      const data = concat(this.put.parts), p = this.put; this.put = null;
+      if (data.length !== p.size) return r("@err short file");
+      if (parseInt(arg, 16) >>> 0 !== crc32(data)) return r("@err crc mismatch");
+      this.fs.set(p.path, data);
+      return r("@ok");
+    }
+    this.put = null;
+    if (cmd === "@hello") return r("@ok cbsound 1");
+    if (cmd === "@info") return r(`@ok free=${this.total - this.used()} total=${this.total} set=${this.current || "-"} psram=7800000`);
+    if (cmd === "@ls") {
+      const names = [...this.dirs].filter((d) => d.startsWith("/sets/")).map((d) => d.slice(6));
+      for (const n of names) {
+        let size = 0;
+        for (const [p, v] of this.fs) if (p.startsWith("/sets/" + n + "/")) size += v.length;
+        r(`@set ${size} ${n}`);
+      }
+      return r("@ok " + names.length);
+    }
+    if (cmd === "@files") {
+      if (!this.dirs.has("/sets/" + arg)) return r("@err no such set");
+      let n = 0;
+      for (const [p, v] of this.fs) if (p.startsWith("/sets/" + arg + "/")) { r(`@file ${v.length} ${p.split("/").pop()}`); n++; }
+      return r("@ok " + n);
+    }
+    if (cmd === "@get") {
+      if (!this.pathOk(arg)) return r("@err bad path");
+      const v = this.fs.get(arg);
+      if (!v) return r("@err missing");
+      for (let i = 0; i < v.length; i += CHUNK) r("@d " + b64enc(v.subarray(i, i + CHUNK)));
+      return r(`@ok ${v.length} ${hex8(crc32(v))}`);
+    }
+    if (cmd === "@put") {
+      const s2 = arg.indexOf(" "), size = parseInt(arg.slice(0, s2), 10), path = arg.slice(s2 + 1);
+      if (s2 < 0 || !this.pathOk(path) || path.indexOf("/", 6) < 0) return r("@err bad path");
+      if (size + 16384 > this.total - this.used()) return r("@err no space");
+      this.dirs.add(path.slice(0, path.lastIndexOf("/")));
+      this.put = { path, size, parts: [], done: 0 };
+      return r("@ok");
+    }
+    if (cmd === "@rm") {
+      if (!this.pathOk(arg)) return r("@err bad path");
+      if (this.dirs.has(arg)) {
+        for (const p of [...this.fs.keys()]) if (p.startsWith(arg + "/")) this.fs.delete(p);
+        this.dirs.delete(arg); return r("@ok");
+      }
+      if (!this.fs.delete(arg)) return r("@err missing");
+      return r("@ok");
+    }
+    if (cmd === "@mv") {
+      const [from, to] = arg.split(" ");
+      if (!this.pathOk(from) || !this.pathOk(to || "")) return r("@err bad path");
+      if (this.dirs.has(to) || this.fs.has(to)) return r("@err target exists");
+      if (this.dirs.has(from)) {
+        for (const [p, v] of [...this.fs]) if (p.startsWith(from + "/")) { this.fs.delete(p); this.fs.set(to + p.slice(from.length), v); }
+        this.dirs.delete(from); this.dirs.add(to);
+      } else if (this.fs.has(from)) { this.fs.set(to, this.fs.get(from)); this.fs.delete(from); }
+      else return r("@err missing");
+      return r("@ok");
+    }
+    if (cmd === "@select") {
+      if (!this.dirs.has("/sets/" + arg)) return r("@err no such set");
+      r("@ok"); this.current = arg;
+      out.push(`set ${arg}: loaded (simulated)`);
+      const nm = this.fs.get(`/sets/${arg}/name.wav`), pcm = nm && parseModuleWav(nm);
+      if (pcm) playPcm(pcm);
+      return;
+    }
+    if (cmd === "@bye") return r("@ok");
+    r("@err unknown command " + cmd);
+  }
+  makeDemo() {
+    const tone = (secs, fn) => { const n = Math.round(secs * RATE), f = new Float32Array(n); for (let i = 0; i < n; i++) f[i] = fn(i / RATE, i / n); return toPcm(f); };
+    const env = (u) => Math.min(1, u * 40, (1 - u) * 40);
+    const files = {
+      "name.wav": tone(0.6, (t, u) => 0.5 * env(u) * Math.sin(2 * Math.PI * (440 + 220 * u) * t)),
+      "start.wav": tone(1.0, (t, u) => 0.4 * env(u) * (Math.random() * 2 - 1) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 9 * t))),
+      "horn.wav": tone(2.0, (t) => 0.3 * (Math.sin(2 * Math.PI * 415 * t) + Math.sin(2 * Math.PI * 523 * t))),
+      "shift.wav": tone(0.25, (t, u) => 0.5 * (1 - u) * (Math.random() * 2 - 1)),
+    };
+    const sets = [["01_demo_diesel", "Demo diesel", "diesel"], ["02_demo_v8", "Demo V8", "v8"]];
+    for (const [folder, name, preset] of sets) {
+      this.dirs.add("/sets/" + folder);
+      const j = { name, type: "synth", synth: "synth2", preset, eq: SPEAKER_BOX_EQ, level: 1.0, stop_s: 1.4, gearbox: true };
+      this.fs.set(`/sets/${folder}/set.json`, new TextEncoder().encode(JSON.stringify(j, null, 1) + "\n"));
+      for (const [f, pcm] of Object.entries(files)) this.fs.set(`/sets/${folder}/${f}`, wavBytes(pcm));
+    }
+    this.current = "01_demo_diesel";
+  }
+}
+
+// ------------------------------------------------------------------ the protocol (set_link.h)
+class Link {
+  constructor(t) {
+    this.t = t; this.queue = Promise.resolve(); this.pending = null;
+    t.onLine = (l) => this.line(l);
+  }
+  line(l) {
+    if (!l.startsWith("@")) { if (l.trim()) log("module: " + l, "muted"); return; }
+    const p = this.pending;
+    if (!p) { log("unexpected: " + l.slice(0, 80), "warn"); return; }
+    if (l === "@ok" || l.startsWith("@ok ")) { this.pending = null; clearTimeout(p.timer); p.resolve({ data: p.data, ok: l.slice(3).trim() }); }
+    else if (l.startsWith("@err")) { this.pending = null; clearTimeout(p.timer); p.reject(new Error(l.slice(5) || "error")); }
+    else p.data.push(l);
+  }
+  // Sends one command and waits for its @ok / @err; commands go one after another.
+  cmd(text, timeout = 6000) {
+    const run = () => new Promise((resolve, reject) => {
+      this.pending = { resolve, reject, data: [], timer: setTimeout(() => { this.pending = null; reject(new Error("no answer to " + text.split(" ")[0])); }, timeout) };
+      this.t.write(text + "\n").catch((e) => { clearTimeout(this.pending && this.pending.timer); this.pending = null; reject(e); });
+    });
+    const r = this.queue.then(run, run);
+    this.queue = r.catch(() => {});
+    return r;
+  }
+  async hello() {
+    for (let i = 0; i < 10; i++) {
+      try { const r = await this.cmd("@hello", 800); return r.ok; } catch (e) { if (!/no answer/.test(e.message)) throw e; }
+    }
+    throw new Error("the module does not answer (is the engine_sets firmware on it?)");
+  }
+  async info() {
+    const r = await this.cmd("@info"), o = {};
+    for (const kv of r.ok.split(" ")) { const k = kv.indexOf("="); if (k > 0) o[kv.slice(0, k)] = kv.slice(k + 1); }
+    return o;
+  }
+  async ls() {
+    const r = await this.cmd("@ls");
+    return r.data.filter((l) => l.startsWith("@set ")).map((l) => { const p = l.split(" "); return { bytes: +p[1], folder: p.slice(2).join(" ") }; });
+  }
+  async files(folder) {
+    const r = await this.cmd("@files " + folder);
+    return r.data.filter((l) => l.startsWith("@file ")).map((l) => { const p = l.split(" "); return { bytes: +p[1], name: p.slice(2).join(" ") }; });
+  }
+  async get(path) {
+    const r = await this.cmd("@get " + path, 20000);
+    const data = concat(r.data.filter((l) => l.startsWith("@d ")).map((l) => b64dec(l.slice(3))));
+    const [size, crc] = r.ok.split(" ");
+    if (data.length !== +size || crc32(data) !== parseInt(crc, 16) >>> 0) throw new Error(path + ": damaged in transfer");
+    return data;
+  }
+  async put(path, bytes, progress) {
+    await this.cmd(`@put ${bytes.length} ${path}`);
+    for (let i = 0; i < bytes.length; i += CHUNK) {
+      await this.cmd("@w " + b64enc(bytes.subarray(i, i + CHUNK)));
+      if (progress) progress(Math.min(bytes.length, i + CHUNK));
+    }
+    await this.cmd("@end " + hex8(crc32(bytes)), 10000);
+  }
+  rm(path) { return this.cmd("@rm " + path, 15000); }
+  mv(from, to) { return this.cmd(`@mv ${from} ${to}`); }
+  select(folder) { return this.cmd("@select " + folder); }
+  bye() { return this.cmd("@bye"); }
+}
+
+// ------------------------------------------------------------------ page state
+let link = null, transport = null, sets = [], info = {}, editor = null;
+
+function setStatus(text, cls) { const s = $("connStatus"); s.textContent = text; s.className = "status " + (cls || "muted"); }
+function busy(on) {
+  for (const id of ["btnRefresh", "btnNew", "btnSave"]) $(id).disabled = on;
+  for (const b of document.querySelectorAll("#setRows button")) b.disabled = on;
+}
+async function guarded(fn) {
+  busy(true);
+  try { return await fn(); }
+  catch (e) { log(e.message, "err"); setStatus(e.message, "err"); }
+  finally { busy(false); }
+}
+
+async function connect(sim) {
+  try {
+    transport = sim ? new MockTransport() : new SerialTransport();
+    await transport.open();
+    link = new Link(transport);
+    transport.onClose = () => { if (transport) { log("disconnected", "warn"); disconnected(); } };
+    const v = await link.hello();
+    log("connected: " + v + (sim ? " (simulated)" : ""), "ok");
+    setStatus(sim ? "Simulated module (nothing is written to a real module)." : "Connected.", "ok");
+    $("btnConnect").classList.add("hidden"); $("btnSim").classList.add("hidden"); $("btnDisconnect").classList.remove("hidden");
+    $("secSets").classList.remove("hidden");
+    await refresh();
+  } catch (e) {
+    if (e.name === "NotFoundError") { setStatus("No port chosen.", "muted"); return; }
+    log(e.message, "err"); setStatus(e.message, "err");
+    if (transport) { const t = transport; transport = null; await t.close(); }
+  }
+}
+function disconnected() {
+  transport = null; link = null;
+  $("btnConnect").classList.remove("hidden"); $("btnSim").classList.remove("hidden"); $("btnDisconnect").classList.add("hidden");
+  $("secSets").classList.add("hidden"); $("secEdit").classList.add("hidden");
+  setStatus("Not connected.");
+}
+async function disconnect() {
+  const t = transport;
+  if (!t) return;
+  try { await link.bye(); } catch (e) {}
+  transport = null;
+  await t.close();
+  disconnected();
+}
+
+async function readSetJson(folder) {
+  try { return JSON.parse(new TextDecoder().decode(await link.get(`/sets/${folder}/set.json`))); }
+  catch (e) { return null; }
+}
+
+async function refresh() {
+  await guarded(async () => {
+    info = await link.info();
+    const list = await link.ls();
+    list.sort((a, b) => a.folder.localeCompare(b.folder));
+    for (const s of list) s.json = await readSetJson(s.folder);
+    sets = list;
+    await link.bye();
+    renderSets();
+  });
+}
+
+function kB(n) { return n >= 1048576 ? (n / 1048576).toFixed(2) + " MB" : Math.round(n / 1024) + " kB"; }
+function indexOf(folder) { return /^\d\d/.test(folder) ? folder.slice(0, 2) : null; }
+
+function renderSets() {
+  const tb = $("setRows");
+  tb.textContent = "";
+  const seen = new Set();
+  for (const s of sets) {
+    const tr = document.createElement("tr"), idx = indexOf(s.folder), j = s.json;
+    let note = "";
+    if (!idx) note = "no number: the module skips it";
+    else if (seen.has(idx)) note = "number used twice: the module skips it";
+    else if (!j) note = "set.json missing or broken";
+    if (idx) seen.add(idx);
+    const type = j ? (j.type === "synth" ? "synth: " + (j.synth === "pulse" ? "old synth" : j.preset || "") : "sample") : "?";
+    const cells = [idx || "-", j ? j.name || "" : "", type, kB(s.bytes), s.folder];
+    for (const c of cells) { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); }
+    if (s.folder === info.set) tr.children[1].insertAdjacentHTML("beforeend", ' <span class="ok" title="playing on the module">&#9679;</span>');
+    if (note) tr.children[1].insertAdjacentHTML("beforeend", `<div class="warn hint">${note}</div>`);
+    const td = document.createElement("td"); td.className = "actions";
+    const btn = (label, fn, title) => { const b = document.createElement("button"); b.className = "small"; b.textContent = label; b.title = title || ""; b.onclick = fn; td.appendChild(b); td.appendChild(document.createTextNode(" ")); };
+    btn("Play", () => guarded(async () => { await link.select(s.folder); info.set = s.folder; renderSets(); log("playing " + s.folder + " on the module"); }), "choose this set on the module (it speaks the name)");
+    btn("Edit", () => openSet(s.folder, false));
+    btn("Copy", () => openSet(s.folder, true), "a new set made from this one");
+    btn("Delete", () => removeSet(s.folder));
+    tr.appendChild(td);
+    tb.appendChild(tr);
+  }
+  const total = +info.total || 0, free = +info.free || 0;
+  $("spaceText").textContent = total ? `${kB(total - free)} of ${kB(total)} used, ${kB(free)} free` : "";
+  $("spaceBar").style.width = total ? ((total - free) / total * 100).toFixed(1) + "%" : "0";
+}
+
+async function removeSet(folder) {
+  if (!confirm(`Delete the set ${folder} from the module? This cannot be undone.`)) return;
+  await guarded(async () => { await link.rm("/sets/" + folder); await link.bye(); log("deleted " + folder); });
+  if (editor && editor.orig === folder) closeEditor();
+  await refresh();
+}
+
+// ------------------------------------------------------------------ editor
+function usedIndices(exceptFolder) {
+  const u = new Set();
+  for (const s of sets) if (s.folder !== exceptFolder && indexOf(s.folder)) u.add(indexOf(s.folder));
+  return u;
+}
+function firstFreeIndex() {
+  const u = usedIndices(null);
+  for (let i = 1; i < 100; i++) { const k = String(i).padStart(2, "0"); if (!u.has(k)) return k; }
+  return null;
+}
+function slug(s) {
+  return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 24);
+}
+
+function newEditor() {
+  return {
+    orig: null, index: firstFreeIndex(), desc: "", name: "", type: "sample", synth: "synth2", preset: "diesel",
+    level: 1.0, stop_s: 1.4, gearbox: true, rateLo: 1.0, rateHi: 3.0, lrs: 1.18, lg: 0.8,
+    eqMode: "none", eqGain: 1.0, eqKeep: null, sounds: {}, origFiles: [], descTouched: false,
+  };
+}
+
+async function openSet(folder, copy) {
+  await guarded(async () => {
+    const ed = newEditor();
+    const j = (await readSetJson(folder)) || {};
+    const files = await link.files(folder);
+    setSaveStatus("Reading " + folder + "...", "muted");
+    let done = 0;
+    for (const f of files) {
+      const m = /^(\w+)\.wav$/.exec(f.name);
+      if (!m || !SOUNDS.some((s) => s.key === m[1])) continue;
+      const pcm = parseModuleWav(await link.get(`/sets/${folder}/${f.name}`));
+      if (pcm) ed.sounds[m[1]] = { pcm, src: "from the module", dirty: copy };
+      setBar("saveBar", ++done / files.length);
+    }
+    await link.bye();
+    ed.name = j.name || "";
+    ed.type = j.type === "synth" ? "synth" : "sample";
+    ed.synth = j.synth === "pulse" ? "pulse" : "synth2";
+    ed.preset = j.preset || "diesel";
+    ed.level = j.level ?? 1.0; ed.stop_s = j.stop_s ?? 1.4; ed.gearbox = j.gearbox ?? true;
+    if (Array.isArray(j.rate)) { ed.rateLo = j.rate[0]; ed.rateHi = j.rate[1]; }
+    ed.lrs = j.loaded_rate_scale ?? 1.18; ed.lg = j.loaded_gain ?? 0.8;
+    if (Array.isArray(j.eq) && j.eq.length) { ed.eqMode = "keep"; ed.eqKeep = j.eq; }
+    ed.desc = folder.length > 3 ? folder.slice(3) : slug(ed.name);
+    ed.descTouched = true;
+    if (copy) { ed.index = firstFreeIndex(); ed.desc = (ed.desc + "_copy").slice(0, 24); ed.name = ed.name + " (copy)"; }
+    else { ed.orig = folder; ed.index = indexOf(folder) || firstFreeIndex(); ed.origFiles = files.map((f) => f.name); }
+    editor = ed;
+    showEditor(copy ? "New set, copied from " + folder : "Set " + folder);
+    setSaveStatus(copy ? "Change what should differ, then write it to the module." : "", "muted");
+    setBar("saveBar", 0);
+  });
+}
+
+function setBar(id, frac) { $(id).style.width = (Math.max(0, Math.min(1, frac)) * 100).toFixed(1) + "%"; }
+function setSaveStatus(t, cls) { const s = $("saveStatus"); s.textContent = t; s.className = "status " + (cls || ""); }
+
+function showEditor(title) {
+  const ed = editor;
+  $("editTitle").textContent = title;
+  const sel = $("fIndex"), used = usedIndices(ed.orig);
+  sel.textContent = "";
+  for (let i = 1; i < 100; i++) {
+    const k = String(i).padStart(2, "0");
+    if (used.has(k)) continue;
+    const o = document.createElement("option"); o.value = o.textContent = k; sel.appendChild(o);
+  }
+  sel.value = ed.index;
+  $("fIndexEcho").textContent = ed.index;
+  $("fName").value = ed.name; $("fDesc").value = ed.desc; $("fType").value = ed.type;
+  $("fSynth").value = ed.synth === "pulse" ? "pulse:" : "synth2:" + ed.preset;
+  $("pLevel").value = ed.level; $("pStop").value = ed.stop_s; $("pGearbox").checked = ed.gearbox;
+  $("pRateLo").value = ed.rateLo; $("pRateHi").value = ed.rateHi; $("pLrs").value = ed.lrs; $("pLg").value = ed.lg;
+  $("pEq").querySelector('option[value="keep"]').disabled = !ed.eqKeep;
+  $("pEq").value = ed.eqMode; $("pEqGain").value = ed.eqGain;
+  $("secEdit").classList.remove("hidden");
+  updateTypeVisibility();
+  renderSounds();
+  $("secEdit").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function closeEditor() { stopPlay(); editor = null; $("secEdit").classList.add("hidden"); }
+
+function updateTypeVisibility() {
+  const sample = editor.type === "sample";
+  $("fSynth").classList.toggle("hidden", sample);
+  for (const el of document.querySelectorAll(".sampleOnly")) el.classList.toggle("hidden", !sample);
+  $("pEqGain").disabled = editor.eqMode === "none";
+}
+
+function soundInfo(def, snd) {
+  if (!snd) return { text: "missing", cls: "err" };
+  const secs = snd.pcm.length / RATE, pk = peakDb(snd.pcm);
+  const parts = [`${secs.toFixed(2)} s`, `${kB(snd.pcm.length * 2 + 44)}`, `peak ${isFinite(pk) ? pk.toFixed(1) : "-inf"} dB`, snd.src];
+  let cls = "muted", warn = "";
+  if (secs < def.min) warn = "shorter than expected";
+  else if (secs > def.max) warn = "longer than expected";
+  if (pk > -0.1) warn = (warn ? warn + "; " : "") + "clipping";
+  else if (pk < -24) warn = (warn ? warn + "; " : "") + "very quiet";
+  if (warn) { cls = "warn"; parts.push(warn); }
+  return { text: parts.join(" · "), cls };
+}
+
+function renderSounds() {
+  const box = $("soundRows");
+  box.textContent = "";
+  for (const def of SOUNDS) {
+    if (def.sampleOnly && editor.type !== "sample") continue;
+    const snd = editor.sounds[def.key];
+    const row = document.createElement("div"); row.className = "sound";
+    const head = document.createElement("div");
+    head.innerHTML = `<strong>${def.label}</strong><div class="hint">${def.key}.wav</div>`;
+    const body = document.createElement("div");
+    const inf = soundInfo(def, snd);
+    const infoEl = document.createElement("div"); infoEl.className = "info " + inf.cls; infoEl.textContent = inf.text;
+    const hint = document.createElement("div"); hint.className = "hint"; hint.textContent = def.hint;
+    const ctl = document.createElement("div"); ctl.className = "row"; ctl.style.marginTop = "4px";
+    const file = document.createElement("input"); file.type = "file"; file.accept = "audio/*,.wav,.mp3,.ogg,.flac,.m4a"; file.className = "hidden";
+    file.onchange = () => file.files[0] && loadFile(def, file.files[0]);
+    const b = (label, fn, dis) => { const x = document.createElement("button"); x.className = "small"; x.textContent = label; x.onclick = fn; x.disabled = !!dis; ctl.appendChild(x); return x; };
+    b("Choose file", () => file.click());
+    if (def.rec) { const rb = b("Record", () => record(def, rb)); }
+    const pb = b(def.loop ? "Play loop" : "Play", () => {
+      if (playing && playing.owner === def.key) { stopPlay(); return; }
+      const p = playPcm(snd.pcm, { loop: !!def.loop, rate: def.rpm ? +rate.value : 1, onEnd: () => { pb.textContent = def.loop ? "Play loop" : "Play"; } });
+      p.owner = def.key; pb.textContent = "Stop";
+    }, !snd);
+    let rate = null;
+    if (def.rpm) {
+      const lab = document.createElement("label"); lab.className = "hint"; lab.textContent = " rpm ";
+      rate = document.createElement("input"); rate.type = "range"; rate.min = editor.rateLo; rate.max = editor.rateHi; rate.step = 0.01; rate.value = editor.rateLo;
+      rate.oninput = () => { if (playing && playing.owner === def.key) playing.src.playbackRate.value = +rate.value; };
+      lab.appendChild(rate); ctl.appendChild(lab);
+    }
+    ctl.appendChild(file);
+    body.appendChild(infoEl); body.appendChild(hint); body.appendChild(ctl);
+    row.appendChild(head); row.appendChild(body);
+    row.addEventListener("dragover", (e) => { e.preventDefault(); row.classList.add("drag"); });
+    row.addEventListener("dragleave", () => row.classList.remove("drag"));
+    row.addEventListener("drop", (e) => { e.preventDefault(); row.classList.remove("drag"); const f = e.dataTransfer.files[0]; if (f) loadFile(def, f); });
+    box.appendChild(row);
+  }
+}
+
+async function soundFromBuffer(def, arrayBuffer, src) {
+  let pcm = parseModuleWav(new Uint8Array(arrayBuffer));
+  if (!pcm || def.name) {
+    let f = pcm ? Float32Array.from(pcm, (x) => x / 32768) : await decodeToMono(arrayBuffer);
+    if (def.name) f = prepareName(f);
+    pcm = toPcm(f);
+  }
+  editor.sounds[def.key] = { pcm, src, dirty: true };
+  renderSounds();
+}
+async function loadFile(def, file) {
+  try { await soundFromBuffer(def, await file.arrayBuffer(), file.name); log(`${def.key}.wav from ${file.name}`); }
+  catch (e) { log(`${file.name}: cannot be read as sound (${e.message})`, "err"); setSaveStatus(file.name + ": not a sound the browser can read", "err"); }
+}
+
+let recorder = null;
+async function record(def, btn) {
+  if (recorder) { recorder.stop(); return; }
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: true } }); }
+  catch (e) { setSaveStatus("No microphone: " + e.message, "err"); return; }
+  const chunks = [];
+  recorder = new MediaRecorder(stream);
+  recorder.ondataavailable = (e) => chunks.push(e.data);
+  recorder.onstop = async () => {
+    stream.getTracks().forEach((t) => t.stop());
+    recorder = null; btn.textContent = "Record";
+    try { await soundFromBuffer(def, await new Blob(chunks).arrayBuffer(), "recorded"); }
+    catch (e) { setSaveStatus("Recording failed: " + e.message, "err"); }
+  };
+  recorder.start();
+  btn.textContent = "Stop recording";
+}
+
+function readFields() {
+  const ed = editor;
+  ed.index = $("fIndex").value; ed.name = $("fName").value.trim(); ed.desc = slug($("fDesc").value);
+  ed.type = $("fType").value;
+  const [syn, pre] = $("fSynth").value.split(":"); ed.synth = syn; if (pre) ed.preset = pre;
+  ed.level = +$("pLevel").value || 1; ed.stop_s = +$("pStop").value || 1.4; ed.gearbox = $("pGearbox").checked;
+  ed.rateLo = +$("pRateLo").value || 1; ed.rateHi = +$("pRateHi").value || 3; ed.lrs = +$("pLrs").value || 1.18;
+  ed.lg = +$("pLg").value; ed.eqMode = $("pEq").value; ed.eqGain = +$("pEqGain").value || 1;
+}
+
+function setJson(ed) {
+  const j = { name: ed.name, type: ed.type };
+  if (ed.type === "synth") { j.synth = ed.synth; if (ed.synth === "synth2") j.preset = ed.preset; }
+  else { j.rate = [ed.rateLo, ed.rateHi]; j.loaded_rate_scale = ed.lrs; j.loaded_gain = ed.lg; }
+  let eq = ed.eqMode === "box" ? SPEAKER_BOX_EQ : ed.eqMode === "keep" ? ed.eqKeep : null;
+  if (eq) {
+    eq = eq.map((c) => c.slice());
+    const g = ed.eqGain;
+    if (g !== 1) eq[0] = [eq[0][0] * g, eq[0][1] * g, eq[0][2] * g, eq[0][3], eq[0][4]];
+    j.eq = eq.map((c) => c.map((v) => +v.toPrecision(9)));
+  }
+  j.level = ed.level; j.stop_s = ed.stop_s; j.gearbox = ed.gearbox;
+  return JSON.stringify(j, null, 1) + "\n";
+}
+
+async function save() {
+  readFields();
+  const ed = editor;
+  const need = SOUNDS.filter((s) => !s.sampleOnly || ed.type === "sample");
+  const missing = need.filter((s) => !ed.sounds[s.key]).map((s) => s.label);
+  if (!ed.name) return setSaveStatus("The set needs a name.", "err");
+  if (!ed.desc) ed.desc = slug(ed.name) || "set";
+  if (missing.length) return setSaveStatus("Missing: " + missing.join(", ") + ".", "err");
+  if (!/^\d\d$/.test(ed.index)) return setSaveStatus("Choose a number.", "err");
+  const folder = ed.index + "_" + ed.desc, dir = "/sets/" + folder;
+  if (sets.some((s) => s.folder === folder && s.folder !== ed.orig)) return setSaveStatus(folder + " exists already.", "err");
+
+  const writes = need.filter((s) => ed.sounds[s.key].dirty || !ed.orig).map((s) => ({ name: s.key + ".wav", bytes: wavBytes(ed.sounds[s.key].pcm) }));
+  writes.push({ name: "set.json", bytes: new TextEncoder().encode(setJson(ed)) });
+  const total = writes.reduce((a, w) => a + w.bytes.length, 0);
+  const own = ed.orig ? (sets.find((s) => s.folder === ed.orig) || { bytes: 0 }).bytes : 0;
+  if (total > (+info.free || 0) + own) return setSaveStatus(`Not enough room: ${kB(total)} needed, ${kB(+info.free + own)} free.`, "err");
+
+  await guarded(async () => {
+    if (ed.orig && ed.orig !== folder) { await link.mv("/sets/" + ed.orig, dir); log(`renamed ${ed.orig} -> ${folder}`); ed.orig = folder; }
+    let sent = 0;
+    for (const w of writes) {
+      setSaveStatus(`Writing ${w.name}...`, "muted");
+      await link.put(`${dir}/${w.name}`, w.bytes, (n) => setBar("saveBar", (sent + n) / total));
+      sent += w.bytes.length;
+      log(`wrote ${dir}/${w.name} (${kB(w.bytes.length)})`);
+    }
+    const keep = new Set(need.map((s) => s.key + ".wav").concat(["set.json"]));
+    for (const f of ed.origFiles) if (!keep.has(f) && /\.wav$/.test(f)) { await link.rm(`${dir}/${f}`); log("removed " + f); }
+    await link.bye();
+    ed.orig = folder; ed.origFiles = [...keep];
+    for (const s of Object.values(ed.sounds)) s.dirty = false;
+    setBar("saveBar", 1);
+    setSaveStatus(`Written to the module as ${folder}. Use Play in the list to hear it there.`, "ok");
+    $("editTitle").textContent = "Set " + folder;
+  });
+  await refresh();
+}
+
+// ------------------------------------------------------------------ wiring
+$("btnConnect").onclick = () => connect(false);
+$("btnSim").onclick = () => connect(true);
+$("btnDisconnect").onclick = disconnect;
+$("btnRefresh").onclick = refresh;
+$("btnNew").onclick = () => { editor = newEditor(); showEditor("New set"); setSaveStatus("Choose the sounds; a copy of an existing set is often the easier start.", "muted"); setBar("saveBar", 0); };
+$("btnCancel").onclick = closeEditor;
+$("btnSave").onclick = save;
+$("fIndex").onchange = () => { $("fIndexEcho").textContent = $("fIndex").value; };
+$("fName").oninput = () => { if (editor && !editor.descTouched) $("fDesc").value = slug($("fName").value); };
+$("fDesc").oninput = () => { if (editor) editor.descTouched = true; };
+$("fType").onchange = () => { editor.type = $("fType").value; updateTypeVisibility(); renderSounds(); };
+$("pEq").onchange = () => { editor.eqMode = $("pEq").value; updateTypeVisibility(); };
+for (const id of ["pRateLo", "pRateHi"]) $(id).onchange = () => { readFields(); renderSounds(); };
+if (!("serial" in navigator)) { $("noSerial").classList.remove("hidden"); $("btnConnect").disabled = true; }
+window.addEventListener("beforeunload", () => { if (link) link.bye().catch(() => {}); });
+
+// ------------------------------------------------------------------ self-test (#selftest): the page against the simulated module
+async function selftest() {
+  const out = $("selftest"), lines = [];
+  const check = (ok, what) => { lines.push((ok ? "PASS " : "FAIL ") + what); out.textContent = lines.join("\n"); };
+  out.classList.remove("hidden");
+  try {
+    window.confirm = () => true;
+    check("serial" in navigator, "Web Serial available in this browser (" + location.protocol + ")");
+    await connect(true);
+    check(sets.length === 2 && sets[0].json && sets[0].json.name === "Demo diesel", "list of the demo sets");
+    // a 44.1 kHz stereo WAV, as a user would bring: converted to 22 050 Hz mono
+    const n = 44100, sr = 44100, b = new ArrayBuffer(44 + n * 4), v = new DataView(b);
+    const str = (o, s) => { for (let i = 0; i < 4; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+    str(0, "RIFF"); v.setUint32(4, 36 + n * 4, true); str(8, "WAVE"); str(12, "fmt "); v.setUint32(16, 16, true);
+    v.setUint16(20, 1, true); v.setUint16(22, 2, true); v.setUint32(24, sr, true); v.setUint32(28, sr * 4, true);
+    v.setUint16(32, 4, true); v.setUint16(34, 16, true); str(36, "data"); v.setUint32(40, n * 4, true);
+    for (let i = 0; i < n; i++) { const s = Math.round(8000 * Math.sin(2 * Math.PI * 100 * i / sr)); v.setInt16(44 + i * 4, s, true); v.setInt16(46 + i * 4, s, true); }
+    await openSet("01_demo_diesel", true);
+    check(editor && editor.orig === null && Object.keys(editor.sounds).length === 4, "copy of a set reads its 4 sounds");
+    $("fType").value = "sample"; $("fType").onchange();
+    const idleDef = SOUNDS.find((s) => s.key === "idle"), loadedDef = SOUNDS.find((s) => s.key === "loaded");
+    await soundFromBuffer(idleDef, b.slice(0), "test.wav");
+    await soundFromBuffer(loadedDef, b.slice(0), "test.wav");
+    const idle = editor.sounds.idle.pcm;
+    check(Math.abs(idle.length - 22050) <= 2, "44.1 kHz stereo -> 22 050 Hz mono (" + idle.length + " samples)");
+    check(Math.abs(peakDb(idle) - 20 * Math.log10(8000 / 32768)) < 0.6, "level kept (" + peakDb(idle).toFixed(2) + " dB)");
+    $("fName").value = "Test truck"; $("fDesc").value = "test_truck"; $("pEq").value = "box"; $("pEqGain").value = "1.5";
+    await save();
+    const ns = sets.find((s) => s.folder === "03_test_truck");
+    check(!!ns && ns.json.type === "sample" && ns.json.eq.length === 5 && Math.abs(ns.json.eq[0][0] - SPEAKER_BOX_EQ[0][0] * 1.5) < 1e-6, "new sample set written with EQ and gain");
+    const files = (await link.files("03_test_truck")).map((f) => f.name).sort().join(",");
+    check(files === "horn.wav,idle.wav,loaded.wav,name.wav,set.json,shift.wav,start.wav", "its files: " + files);
+    const back = parseModuleWav(await link.get("/sets/03_test_truck/idle.wav"));
+    check(back && back.length === idle.length && back.every((x, i) => x === idle[i]), "idle.wav reads back the same");
+    // edit: a new number and synth type -> folder renamed, idle/loaded removed
+    await openSet("03_test_truck", false);
+    $("fIndex").value = "05"; $("fType").value = "synth"; $("fType").onchange(); $("fSynth").value = "synth2:v8";
+    await save();
+    const f2 = (await link.files("05_test_truck")).map((f) => f.name).sort().join(",");
+    check(!sets.some((s) => s.folder === "03_test_truck") && f2 === "horn.wav,name.wav,set.json,shift.wav,start.wav", "renumbered to 05, changed to synth: " + f2);
+    check(sets.find((s) => s.folder === "05_test_truck").json.preset === "v8", "preset v8 in set.json");
+    // a corrupted transfer is refused
+    await link.cmd("@put 4 /sets/05_test_truck/x.wav");
+    await link.cmd("@w " + b64enc(new Uint8Array([1, 2, 3, 4])));
+    let refused = false;
+    try { await link.cmd("@end 00000000"); } catch (e) { refused = /crc/.test(e.message); }
+    check(refused && !(await link.files("05_test_truck")).some((f) => f.name === "x.wav"), "a wrong CRC is refused, nothing written");
+    await link.select("05_test_truck");
+    stopPlay();
+    await removeSet("05_test_truck");
+    check(!sets.some((s) => s.folder === "05_test_truck") && sets.length === 2, "delete");
+    check(/\n$/.test(setJson(editor || newEditor())), "set.json ends with a newline");
+  } catch (e) {
+    check(false, "exception: " + e.message);
+  }
+  lines.push("DONE");
+  out.textContent = lines.join("\n");
+}
+if (location.hash === "#selftest") selftest();
+</script>
+</body>
+</html>

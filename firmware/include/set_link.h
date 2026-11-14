@@ -1,0 +1,316 @@
+#pragma once
+// The USB link of the `engine_sets` firmware: the web page (web/index.html) lists, reads, writes and deletes the
+// sound sets in the data partition over the USB serial port (Web Serial). Protocol: docs/user-sounds.md,
+// "The USB protocol".
+//
+// Text lines both ways, binary data as base64, so log lines of the firmware can share the port: the page reads only
+// lines that start with '@'. Every command gets exactly one final line, "@ok ..." or "@err <why>", sometimes after
+// data lines. The page sends the next command only after that line, which is the flow control (the USB driver drops
+// bytes when its receive buffer is full).
+//
+//   @hello                 @ok cbsound <protocol version>
+//   @info                  @ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes>
+//   @ls                    @set <bytes> <folder>   (every folder in /sets)          @ok <count>
+//   @files <folder>        @file <bytes> <name>    (every file of /sets/<folder>)   @ok <count>
+//   @get <path>            @d <base64>  (up to 3072 bytes per line)                 @ok <size> <crc32 hex>
+//   @put <size> <path>     @ok              then  @w <base64>  ->  @ok <bytes so far>
+//                                           then  @end <crc32 hex>  ->  @ok   (the file is replaced only now)
+//   @rm <path>             @ok              (a file, or a set folder with its files)
+//   @mv <from> <to>        @ok
+//   @select <folder>       @ok              ends the session, plays that set and speaks its name
+//   @bye                   @ok              ends the session
+//
+// Paths are under /sets/. While the page talks to the module (a session: from the first command until @bye,
+// @select or 3 s without a command) the engine is silent, the BOOT button is ignored and the firmware does not
+// write to the serial port by itself.
+#include <Arduino.h>
+#include <LittleFS.h>
+#include <vector>
+
+class SetLink {
+ public:
+  static const int VERSION = 1;
+  static const uint32_t SESSION_TIMEOUT_MS = 3000;
+  static const size_t RX_BUFFER = 8192;    // > the longest line (@w with 3072 bytes = 4096 base64 characters)
+  static const size_t MAX_LINE = 6000;
+
+  // What the session asks of the firmware when it ends (takeEnd()).
+  struct End {
+    bool ended = false;
+    bool changed = false;   // files were written, moved or deleted: rescan, reload the current set
+    String select;          // @select: this folder
+  };
+
+  // Before Serial.begin().
+  void begin() { Serial.setRxBufferSize(RX_BUFFER); }
+
+  // Reads and runs the commands that have arrived. Returns true while a session is active.
+  bool poll(const String& currentSet) {
+    cur = currentSet;
+    while (Serial.available()) {
+      int c = Serial.read();
+      if (c < 0) break;
+      if (c == '\r') continue;
+      if (c == '\n') {
+        if (overflow) reply("@err line too long");
+        else if (line.length() && line[0] == '@') { lastMs = millis(); active = true; run(line); }
+        line = "";
+        overflow = false;
+        continue;
+      }
+      if (line.length() < MAX_LINE) line += (char)c;
+      else overflow = true;
+    }
+    if (active && millis() - lastMs > SESSION_TIMEOUT_MS) finish();
+    return active;
+  }
+
+  // Once after a session has ended: what to do now.
+  End takeEnd() { End e = end; end = End(); return e; }
+
+ private:
+  String line, cur;
+  bool overflow = false, active = false;
+  uint32_t lastMs = 0;
+  End end;
+  // the file being written by @put
+  File wf;
+  String wPath, wTmp;
+  uint32_t wSize = 0, wDone = 0, wCrc = 0;
+
+  void finish() {
+    abortPut();
+    active = false;
+    end.ended = true;
+  }
+
+  void reply(const String& s) { Serial.print(s); Serial.print('\n'); }
+
+  static bool pathOk(const String& p) {
+    return p.startsWith("/sets/") && p.length() > 6 && p.length() < 80 && p.indexOf("..") < 0 && p.indexOf("//") < 0 &&
+           !p.endsWith("/") && p.indexOf(' ') < 0;
+  }
+
+  void run(const String& l) {
+    int sp = l.indexOf(' ');
+    String cmd = sp < 0 ? l : l.substring(0, sp);
+    String arg = sp < 0 ? String() : l.substring(sp + 1);
+    if (cmd == "@w") return write(arg);
+    if (cmd == "@end") return endPut(arg);
+    if (wf) abortPut();                    // any other command abandons an unfinished @put
+    if (cmd == "@hello") return reply(String("@ok cbsound ") + VERSION);
+    if (cmd == "@info") return info();
+    if (cmd == "@ls") return ls();
+    if (cmd == "@files") return files(arg);
+    if (cmd == "@get") return get(arg);
+    if (cmd == "@put") return put(arg);
+    if (cmd == "@rm") return rm(arg);
+    if (cmd == "@mv") return mv(arg);
+    if (cmd == "@select") {
+      if (!LittleFS.exists("/sets/" + arg)) return reply("@err no such set");
+      reply("@ok");
+      end.select = arg;
+      return finish();
+    }
+    if (cmd == "@bye") { reply("@ok"); return finish(); }
+    reply("@err unknown command " + cmd);
+  }
+
+  void info() {
+    size_t total = LittleFS.totalBytes(), used = LittleFS.usedBytes();
+    reply(String("@ok free=") + (unsigned)(total - used) + " total=" + (unsigned)total + " set=" +
+          (cur.length() ? cur : String("-")) + " psram=" + (unsigned)ESP.getFreePsram());
+  }
+
+  static uint32_t folderBytes(File dir) {
+    uint32_t n = 0;
+    for (File f = dir.openNextFile(); f; f = dir.openNextFile()) if (!f.isDirectory()) n += f.size();
+    return n;
+  }
+
+  static String baseName(const char* p) {
+    String s(p);
+    int k = s.lastIndexOf('/');
+    return k >= 0 ? s.substring(k + 1) : s;
+  }
+
+  void ls() {
+    File root = LittleFS.open("/sets");
+    int n = 0;
+    if (root && root.isDirectory()) {
+      for (File f = root.openNextFile(); f; f = root.openNextFile()) {
+        if (!f.isDirectory()) continue;
+        String name = baseName(f.name());
+        File d = LittleFS.open("/sets/" + name);
+        reply(String("@set ") + (unsigned)folderBytes(d) + " " + name);
+        n++;
+      }
+    }
+    reply(String("@ok ") + n);
+  }
+
+  void files(const String& folder) {
+    File d = LittleFS.open("/sets/" + folder);
+    if (!d || !d.isDirectory()) return reply("@err no such set");
+    int n = 0;
+    for (File f = d.openNextFile(); f; f = d.openNextFile()) {
+      if (f.isDirectory()) continue;
+      reply(String("@file ") + (unsigned)f.size() + " " + baseName(f.name()));
+      n++;
+    }
+    reply(String("@ok ") + n);
+  }
+
+  void get(const String& path) {
+    if (!pathOk(path)) return reply("@err bad path");
+    File f = LittleFS.open(path, "r");
+    if (!f || f.isDirectory()) return reply("@err missing");
+    static uint8_t buf[3072];
+    uint32_t crc = 0, size = 0;
+    while (true) {
+      int n = f.read(buf, sizeof(buf));
+      if (n <= 0) break;
+      crc = crc32(crc, buf, n);
+      size += n;
+      reply("@d " + b64enc(buf, n));
+    }
+    char tail[40];
+    snprintf(tail, sizeof(tail), "@ok %u %08x", (unsigned)size, (unsigned)crc);
+    reply(tail);
+  }
+
+  void put(const String& arg) {
+    int sp = arg.indexOf(' ');
+    if (sp < 0) return reply("@err usage: @put <size> <path>");
+    uint32_t size = (uint32_t)arg.substring(0, sp).toInt();
+    String path = arg.substring(sp + 1);
+    if (!pathOk(path) || path.indexOf('/', 6) < 0) return reply("@err bad path");
+    size_t total = LittleFS.totalBytes(), used = LittleFS.usedBytes();
+    if (size + 16384 > total - used) return reply("@err no space");
+    String dir = path.substring(0, path.lastIndexOf('/'));
+    if (!LittleFS.exists("/sets")) LittleFS.mkdir("/sets");
+    if (!LittleFS.exists(dir)) LittleFS.mkdir(dir);
+    wPath = path;
+    wTmp = path + ".tmp";
+    wf = LittleFS.open(wTmp, "w");
+    if (!wf) return reply("@err cannot create " + wTmp);
+    wSize = size;
+    wDone = 0;
+    wCrc = 0;
+    reply("@ok");
+  }
+
+  void write(const String& b64) {
+    if (!wf) return reply("@err no @put");
+    static uint8_t buf[3200];
+    int n = b64dec(b64, buf, sizeof(buf));
+    if (n < 0 || wDone + n > wSize) { abortPut(); return reply("@err bad data"); }
+    if (wf.write(buf, n) != (size_t)n) { abortPut(); return reply("@err write failed (full?)"); }
+    wCrc = crc32(wCrc, buf, n);
+    wDone += n;
+    reply(String("@ok ") + (unsigned)wDone);
+  }
+
+  void endPut(const String& crcHex) {
+    if (!wf) return reply("@err no @put");
+    wf.close();
+    uint32_t want = (uint32_t)strtoul(crcHex.c_str(), nullptr, 16);
+    if (wDone != wSize || want != wCrc) {
+      LittleFS.remove(wTmp);
+      return reply(wDone != wSize ? "@err short file" : "@err crc mismatch");
+    }
+    if (LittleFS.exists(wPath)) LittleFS.remove(wPath);
+    if (!LittleFS.rename(wTmp, wPath)) { LittleFS.remove(wTmp); return reply("@err rename failed"); }
+    end.changed = true;
+    reply("@ok");
+  }
+
+  void abortPut() {
+    if (!wf) return;
+    wf.close();
+    LittleFS.remove(wTmp);
+  }
+
+  void rm(const String& path) {
+    if (!pathOk(path)) return reply("@err bad path");
+    File f = LittleFS.open(path);
+    if (!f) return reply("@err missing");
+    if (f.isDirectory()) {
+      std::vector<String> names;
+      for (File g = f.openNextFile(); g; g = f.openNextFile()) names.push_back(baseName(g.name()));
+      f.close();
+      for (const String& n : names) LittleFS.remove(path + "/" + n);
+      if (!LittleFS.rmdir(path)) return reply("@err cannot remove the folder");
+    } else {
+      f.close();
+      if (!LittleFS.remove(path)) return reply("@err cannot remove");
+    }
+    end.changed = true;
+    reply("@ok");
+  }
+
+  void mv(const String& arg) {
+    int sp = arg.indexOf(' ');
+    String from = sp < 0 ? arg : arg.substring(0, sp), to = sp < 0 ? String() : arg.substring(sp + 1);
+    if (!pathOk(from) || !pathOk(to)) return reply("@err bad path");
+    if (!LittleFS.exists(from)) return reply("@err missing");
+    if (LittleFS.exists(to)) return reply("@err target exists");
+    if (!LittleFS.rename(from, to)) return reply("@err rename failed");
+    end.changed = true;
+    reply("@ok");
+  }
+
+  // ------------------------------------------------------------ helpers
+  static uint32_t crc32(uint32_t crc, const uint8_t* p, size_t n) {   // the zlib CRC-32
+    crc = ~crc;
+    while (n--) {
+      crc ^= *p++;
+      for (int k = 0; k < 8; k++) crc = (crc >> 1) ^ (0xEDB88320u & (0u - (crc & 1u)));
+    }
+    return ~crc;
+  }
+
+  static String b64enc(const uint8_t* p, size_t n) {
+    static const char T[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    String s;
+    s.reserve((n + 2) / 3 * 4);
+    for (size_t i = 0; i < n; i += 3) {
+      uint32_t v = (uint32_t)p[i] << 16 | (i + 1 < n ? p[i + 1] << 8 : 0) | (i + 2 < n ? p[i + 2] : 0);
+      s += T[v >> 18 & 63];
+      s += T[v >> 12 & 63];
+      s += i + 1 < n ? T[v >> 6 & 63] : '=';
+      s += i + 2 < n ? T[v & 63] : '=';
+    }
+    return s;
+  }
+
+  static int b64val(char c) {
+    if (c >= 'A' && c <= 'Z') return c - 'A';
+    if (c >= 'a' && c <= 'z') return c - 'a' + 26;
+    if (c >= '0' && c <= '9') return c - '0' + 52;
+    if (c == '+') return 62;
+    if (c == '/') return 63;
+    return -1;
+  }
+
+  // Returns the number of bytes, or -1 for bad input.
+  static int b64dec(const String& s, uint8_t* out, size_t cap) {
+    size_t n = 0;
+    uint32_t acc = 0;
+    int bits = 0;
+    for (size_t i = 0; i < s.length(); i++) {
+      char c = s[i];
+      if (c == '=') break;
+      int v = b64val(c);
+      if (v < 0) return -1;
+      acc = acc << 6 | v;
+      bits += 6;
+      if (bits >= 8) {
+        bits -= 8;
+        if (n >= cap) return -1;
+        out[n++] = (uint8_t)(acc >> bits);
+      }
+    }
+    return (int)n;
+  }
+};

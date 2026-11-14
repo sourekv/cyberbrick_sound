@@ -71,7 +71,7 @@ the header of `speaker_box.scad`.
 |---|---|
 | `docs/sound-research.md` | engine sound research: constraints of a small speaker, approaches tried, speaker-tuned candidates, lessons |
 | `docs/audio-simulation/README.md` | rendered previews of the engine sounds (`engine_lab` candidates and earlier firmware) |
-| `docs/user-sounds.md` | plan: user-changeable sound sets, what a sample must meet, the PC tool |
+| `docs/user-sounds.md` | user-changeable sound sets: the set format, what a sample must meet, the web page and its USB protocol |
 | `assets/samples/LICENSE-SAMPLES.md` | origin and licence of every sound (CC0 recordings, synthesised sounds, voice prompts) |
 
 **Plans and decisions**
@@ -84,6 +84,7 @@ the header of `speaker_box.scad`.
 ## Structure
 
 - `firmware/` - PlatformIO (Arduino) project; pins and all tunable constants in `firmware/include/config.h`
+- `web/index.html` - the PC tool for the sound sets: open it in Chrome or Edge, connect the module over USB
 - `tools/` - Python and C++ helpers: sound generation and rendering (`engine_lab.py`, `speaker_model.py`), header
   generators, the speaker-measurement analysis, the shield PCB generators and checks, host tests
 - `assets/samples/` - the CC0 recordings and derived loops (`LICENSE-SAMPLES.md`)
@@ -99,7 +100,7 @@ Open `firmware/` in VS Code with the PlatformIO extension, or run `pio run -e <e
 | Env | What it does |
 |---|---|
 | `engine_lab` | **the current firmware**: all seven engine-sound candidates (the BOOT button switches 1..7 and announces the name), ignition, starter, stop and horn from the channel data, shift sound, no upshift while reversing, speaker EQ for the 30 ml box |
-| `engine_sets` | **new, not tried on the module yet**: the sounds as sets in the data partition (`docs/user-sounds.md`): BOOT steps through them and speaks the name, sample and synth sets, fallback set compiled in; sets built by `tools/make_default_sets.py`, written with `-t uploadfs` |
+| `engine_sets` | **new, not tried on the module yet**: the sounds as sets in the data partition (`docs/user-sounds.md`): BOOT steps through them and speaks the name, sample and synth sets, fallback set compiled in; sets built by `tools/make_default_sets.py`, written with `-t uploadfs` or one by one with the web page `web/index.html` over USB |
 | `engine_demo` | the same, plays every sound through the whole rpm range by itself with a spoken announcement (no receiver needed) |
 | `engine_pulse` | real-time grain synthesis (preset a_diesel6) |
 | `engine`, `engine_diesel`, `engine_truck`, `engine_gears` | earlier variants: synthesised loop, CC0 diesel and truck loops with the virtual gearbox, one loop per gear |

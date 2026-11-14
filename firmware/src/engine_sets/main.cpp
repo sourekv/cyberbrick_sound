@@ -11,6 +11,8 @@
 // automatic: the engine of the set winds down from its rpm (stop_s).
 // Without a usable set (no file system, no sets, no PSRAM, every set broken) a fallback compiled into the firmware
 // plays: the diesel synth with the synthesised starter and horn of include/engine_events.h; it beeps once.
+// Over USB the web page (web/index.html) lists, writes and deletes sets (include/set_link.h); while it talks to the
+// module the engine is silent.
 // Everything else as in engine_lab: throttle, ignition, horn from the receiver's channel data on GPIO1
 // (include/rc_link.h) or the servo pulse, virtual gearbox, reverse without upshifts.
 #include <Arduino.h>
@@ -26,6 +28,7 @@
 #include "engine_events.h"         // EngineState; StarterSound and HornSound for the fallback
 #include "shift_sound.h"           // CC0 shift sound for the fallback
 #include "sound_sets.h"
+#include "set_link.h"
 
 #define PIN_BOOT_BUTTON 0
 
@@ -105,6 +108,7 @@ static EngineState engineState;
 static float engGain = 1.0f, engGainPrev = 1.0f;
 
 static SetLibrary library;
+static SetLink usbLink;
 static SoundSet cur;                 // the loaded set
 static int curIndex = -1;            // index in library.folders; -1 = fallback
 static bool fallback = true;
@@ -160,7 +164,7 @@ static void useFallback() {
 }
 
 // Loads set i; if it is broken, tries the following ones; with none left, the fallback.
-static void selectSet(int i) {
+static void selectSet(int i, bool announce = true) {
   int n = (int)library.folders.size();
   namePlayer.stopNow();
   shiftPlayer.stopNow();
@@ -180,7 +184,7 @@ static void selectSet(int i) {
     wavHorn.setClip(&cur.hornWav);
     engineState.crankS = fmaxf(0.1f, (float)cur.startWav.len / AUDIO_RATE - START_TAIL_S);
     engineState.stopS = fmaxf(0.1f, cur.stopS);
-    namePlayer.play(&cur.nameWav);
+    if (announce) namePlayer.play(&cur.nameWav);
     SetLibrary::writeState(cur.folder);
     Serial.printf("set %s: \"%s\", %s, loaded in %lu ms, %u kB PSRAM free\n", cur.folder.c_str(), cur.name.c_str(),
                   cur.type == SoundSet::SAMPLE ? "sample" : "synth", (unsigned long)(millis() - t0),
@@ -204,6 +208,7 @@ static bool bootPressed() {
 }
 
 void setup() {
+  usbLink.begin();
   Serial.begin(115200);
   statusLed.begin();
   pinMode(PIN_THROTTLE_IN, INPUT);
@@ -240,6 +245,7 @@ void setup() {
     useFallback();
     return;
   }
+  if (!LittleFS.begin(true)) Serial.println("sets: the data partition cannot be mounted or formatted");
   if (library.scan() == 0) { useFallback(); return; }
   int i = library.find(SetLibrary::readState());
   selectSet(i < 0 ? 0 : i);
@@ -251,6 +257,22 @@ void loop() {
   const int N = 128;
   int16_t buf[N * 2];
 
+  if (usbLink.poll(fallback ? String() : cur.folder)) {   // the web page is talking to the module: silent
+    vTaskDelay(1);
+    return;
+  }
+  {
+    SetLink::End e = usbLink.takeEnd();
+    if (e.ended && (e.changed || e.select.length()) && psramFound()) {
+      String want = e.select.length() ? e.select : (fallback ? String() : cur.folder);
+      if (library.scan() == 0) useFallback();
+      else {
+        int i = library.find(want);
+        if (e.select.length() || i < 0) selectSet(i < 0 ? 0 : i);   // announced
+        else selectSet(i, false);                                  // the current set again, with its new files
+      }
+    }
+  }
   if (bootPressed() && !library.folders.empty()) selectSet(fallback ? 0 : curIndex + 1);
 #if RC_LINK_ENABLED
   rcLink.poll();
