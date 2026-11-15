@@ -329,7 +329,7 @@ installing Chrome is enough. Tested so far only in Edge on Windows.
 - **On the module**: every set with its number, name, type and size, and the free space. "Play" chooses the set on
   the module (it speaks the name, then waits for the throttle), "Demo" chooses it and plays a demo of about 25 s
   (below), "Edit" and "Copy" open it in the editor, "Delete" removes it after a question. Folders the module skips
-  (no number, a number used twice, no `set.json`) are marked. Every Play on the page has a Stop beside it.
+  (no number, a number used twice, no `set.json`) are marked. Every Play on the page has a Stop beside it (on the module it sends `@stop`; written 2026-11-15, not yet tried on the module).
 - **Demo**: the name, ignition on (starter, the engine catches), the throttle profile of `engine_demo` from 2.5 s
   (idle, full throttle through the gears, release, two blips, half throttle, idle), the horn at 17 s, ignition off
   at 21.5 s and the wind-down. On the module (`@demo`) it runs in the firmware for every set, without a receiver;
@@ -407,6 +407,7 @@ full).
 | `@mv <from> <to>` | `@ok` |
 | `@select <folder>` | `@ok`; ends the session, the set plays and speaks its name |
 | `@demo <folder>` | `@ok`; the same, then the demo of about 25 s |
+| `@stop` | `@ok`; ends the session and silences the name and the demo that are playing (the set stays chosen, the engine winds down); added 2026-11-15, the Stop button of every row uses it; an older firmware answers `@err unknown command` |
 | `@bye` | `@ok`; ends the session |
 
 `@put` writes to `<path>.tmp` and replaces the file only when the size and the CRC-32 (zlib) match, so a broken

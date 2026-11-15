@@ -316,6 +316,12 @@ void loop() {
         else selectSet(i, false);                                  // the current set again, with its new files
       }
     }
+    if (e.ended && e.stop) {
+      demoOn = false;
+      namePlayer.stopNow();
+      shiftPlayer.stopNow();
+      Serial.println("stop (from the web page)");
+    }
     if (e.ended && e.demo) {
       demoOn = true;
       demoT = 0.0f;

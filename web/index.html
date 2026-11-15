@@ -630,6 +630,7 @@ class MockTransport {
       } else if (wav("name")) playPcm(wav("name"), { owner: "set:" + arg });
       return;
     }
+    if (cmd === "@stop") { r("@ok"); stopPlay(); return; }
     if (cmd === "@bye") return r("@ok");
     r("@err unknown command " + cmd);
   }
@@ -723,6 +724,7 @@ class Link {
   mv(from, to) { return this.cmd(`@mv ${from} ${to}`); }
   select(folder) { return this.cmd("@select " + folder); }
   demo(folder) { return this.cmd("@demo " + folder); }
+  stop() { return this.cmd("@stop"); }
   bye() { return this.cmd("@bye"); }
 }
 
@@ -820,10 +822,9 @@ function renderSets() {
                      : "about 25 s: starter, idle, through the gears, horn, stop; rendered in the browser like the module plays it, without the speaker")
             : "the module plays about 25 s: starter, idle, through the gears, horn, stop (no receiver needed); BOOT or the receiver ends it");
     if (sim && synth) td.lastChild.previousSibling.disabled = true, td.lastChild.previousSibling.dataset.never = "1";
-    if (sim) {   // the simulated module plays here, in the browser
-      btn("Stop", () => stopPlay(), "stop the name or the demo");
-      td.lastChild.previousSibling.dataset.owner = "set:" + s.folder;
-    }
+    btn("Stop", () => guarded(async () => { await link.stop(); stopPlay(); log("stopped"); }),
+        sim ? "stop the name or the demo" : "silence the name and the demo that the module is playing (the engine winds down)");
+    if (sim) td.lastChild.previousSibling.dataset.owner = "set:" + s.folder;   // plays here, in the browser
     btn("Edit", () => openSet(s.folder, false));
     btn("Copy", () => openSet(s.folder, true), "a new set made from this one");
     btn("Delete", () => removeSet(s.folder));

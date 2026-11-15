@@ -21,6 +21,8 @@
 //   @select <folder>       @ok              ends the session, plays that set and speaks its name
 //   @demo <folder>         @ok              the same, then a demo of about 25 s: starter, idle, through the gears,
 //                                           blips, horn, half throttle, stop (no receiver needed)
+//   @stop                  @ok              ends the session and silences the name and the demo that are playing
+//                                           (the set stays chosen; the engine winds down)
 //   @bye                   @ok              ends the session
 //
 // Paths are under /sets/. While the page talks to the module (a session: from the first command until @bye,
@@ -44,6 +46,7 @@ class SetLink {
     bool changed = false;   // files were written, moved or deleted: rescan, reload the current set
     String select;          // @select, @demo: this folder
     bool demo = false;      // @demo: then play the demo
+    bool stop = false;      // @stop: silence the name and the demo
   };
 
   // Before Serial.begin().
@@ -118,6 +121,7 @@ class SetLink {
       end.demo = cmd == "@demo";
       return finish();
     }
+    if (cmd == "@stop") { reply("@ok"); end.stop = true; return finish(); }
     if (cmd == "@bye") { reply("@ok"); return finish(); }
     reply("@err unknown command " + cmd);
   }
