@@ -45,7 +45,7 @@ input[type=number] { width: 80px; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .muted { color: var(--muted); }
 .status { font-size: 14px; }
-tr.isdef td { background: #eef6ee; }
+tr.isdef td { background: color-mix(in srgb, var(--ok) 13%, transparent); }
 .defbadge { font-size: 11px; background: var(--ok); color: #fff; border-radius: 9px; padding: 1px 7px; margin-left: 4px; vertical-align: 1px; }
 .ok { color: var(--ok); } .warn { color: var(--warn); } .err { color: var(--err); }
 table { width: 100%; border-collapse: collapse; }
@@ -92,6 +92,42 @@ details.guide li { margin-bottom: 4px; }
     </div>
     <div class="hint" style="margin-top:8px">While the page talks to the module, the engine on the module is silent; it
       comes back a few seconds after the last action.</div>
+  </section>
+
+  <section>
+  <details class="guide" id="howto">
+    <summary><strong>How it works</strong> (the steps, and what each button does)</summary>
+    <svg viewBox="0 0 900 96" role="img" aria-label="Steps: connect, test, default, copy or edit, write" style="width:100%;height:auto;margin:10px 0 4px">
+      <defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--muted)"/></marker></defs>
+      <g font-size="15" text-anchor="middle" fill="var(--ink)">
+        <g><rect x="2" y="8" width="150" height="62" rx="9" fill="var(--chip)" stroke="var(--line)"/><text x="77" y="34" font-weight="600">1 Connect</text><text x="77" y="55" font-size="12.5" fill="var(--muted)">module on USB</text></g>
+        <g><rect x="190" y="8" width="150" height="62" rx="9" fill="var(--chip)" stroke="var(--line)"/><text x="265" y="34" font-weight="600">2 Test</text><text x="265" y="55" font-size="12.5" fill="var(--muted)">listen, Stop</text></g>
+        <g><rect x="378" y="8" width="150" height="62" rx="9" fill="var(--chip)" stroke="var(--line)"/><text x="453" y="34" font-weight="600">3 Default</text><text x="453" y="55" font-size="12.5" fill="var(--muted)">the set it starts with</text></g>
+        <g><rect x="566" y="8" width="150" height="62" rx="9" fill="var(--chip)" stroke="var(--line)"/><text x="641" y="34" font-weight="600">4 Copy / Edit</text><text x="641" y="55" font-size="12.5" fill="var(--muted)">your own sounds</text></g>
+        <g><rect x="754" y="8" width="144" height="62" rx="9" fill="var(--accent)" stroke="var(--accent)"/><text x="826" y="34" font-weight="600" fill="var(--accent-ink)">5 Write</text><text x="826" y="55" font-size="12.5" fill="var(--accent-ink)">to the module</text></g>
+      </g>
+      <g stroke="var(--muted)" stroke-width="1.6" marker-end="url(#arr)"><path d="M154 39 H186"/><path d="M342 39 H374"/><path d="M530 39 H562"/><path d="M718 39 H750"/></g>
+    </svg>
+    <ul>
+      <li><strong>Connect module:</strong> choose the module's USB port (Chrome or Edge). "Simulated module" lets you
+        try the page without hardware; nothing is written anywhere. While the page is connected the engine on the module
+        is silent, and the module may speak the name of its start set when the page connects.</li>
+      <li><strong>Test</strong> chooses the set on the module, which says its name and plays a demo of about 25 s
+        (starter, engine, gears, horn, stop); no receiver is needed. <strong>Stop</strong> silences it at once. Test
+        does not change which set the module starts with.</li>
+      <li><strong>Default</strong> makes the set the module starts with after power-up (the green "default" mark). The
+        BOOT button on the module steps to the next set and also makes it the start set.</li>
+      <li><strong>Copy</strong> is the easy way to a new set: the starter, horn and shift come along and only the engine
+        changes. <strong>Edit</strong> changes a set in place. <strong>New empty set</strong> starts from nothing.</li>
+      <li>In the editor, drop a sound on its row or <strong>Choose file</strong>; <strong>Play</strong> lets you hear it
+        (loops looped, at any rpm). The <strong>Name</strong> is the set's spoken number by default;
+        <strong>Record</strong>, a file or <strong>Speak</strong> make a spoken name instead.</li>
+      <li><strong>Write to the module</strong> writes only what you changed. <strong>Delete</strong> removes a set after a
+        question; it cannot be undone.</li>
+    </ul>
+    <p class="hint" style="margin:8px 0 0">A fuller manual with pictures and what to do when something does not work:
+      <code>docs/user-guide.md</code> in the project.</p>
+  </details>
   </section>
 
   <section>

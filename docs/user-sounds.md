@@ -336,6 +336,10 @@ the module.
 neither does any browser on an iPhone or iPad; there the page says so and "Connect module" stays off. On a Mac,
 installing Chrome is enough. Tested so far only in Edge on Windows.
 
+- **User guide (2026-11-15):** `user-guide.md`, with pictures made by `tools/make_guide_images.py` (always the light
+  look, whatever the system's colour setting is) and a panel "How it works" at the top of the page. The firmware
+  version shows in the connection line and under the list (both confirmed on the real module by the owner,
+  2026-11-15).
 - **Default set (2026-11-15)**: the row of the set the module starts with after power-up is tinted and has a green
   "default" mark; the button "Default" on any other row makes it the start set (`@default`). Test only
   tries a set and does not change it; BOOT on the module does (it steps to the next set and remembers it). The small
