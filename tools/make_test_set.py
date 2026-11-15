@@ -3,13 +3,13 @@
 made of synthetic sounds that are easy to tell apart, so that writing a set to the module, playing it and the demo can
 be checked by ear. Everything is generated here (no recordings, no third-party sound), so the files are ours (MIT).
 
-    python tools/make_test_set.py            writes assets/test_set/08_test/ (about 0.3 MB)
+    python tools/make_test_set.py            writes assets/test_set/09_test/ (about 0.3 MB)
 
-Then on the web page: "Add set" (or Copy), number 8, drop each WAV on its row, "Write to the module". Or copy the
+Then on the web page: "Add set" (or Copy), number 9, drop each WAV on its row, "Write to the module". Or copy the
 folder to firmware/data/sets/ and run `pio run -e engine_sets -t uploadfs` (this writes all the sets).
 
 What to hear:
-  name.wav    three rising beeps (a spoken name needs Piper: make it with the page's Speak button, "Eight. Test.")
+  name.wav    three rising beeps (a spoken name needs Piper: make it with the page's Speak button, "Nine. Test.")
   idle.wav    2 s, a slow low "tuk tuk tuk" (12 pulses per second), loops seamlessly
   loaded.wav  1 s, a faster and brighter "trrr" (18 pulses per second), blends in with the throttle
   start.wav   1 s, a slow crank that speeds up (no catch; the engine catches by itself)
@@ -21,7 +21,7 @@ import json, os, wave
 import numpy as np
 
 RATE = 22050
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "test_set", "08_test")
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "test_set", "09_test")
 rng = np.random.default_rng(8)
 
 
