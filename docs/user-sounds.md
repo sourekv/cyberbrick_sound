@@ -327,19 +327,19 @@ neither does any browser on an iPhone or iPad; there the page says so and "Conne
 installing Chrome is enough. Tested so far only in Edge on Windows.
 
 - **Default set (2026-11-15)**: the row of the set the module starts with after power-up is tinted and has a green
-  "default" mark; the button "Default" on any other row makes it the start set (`@default`). Play and Demo only
-  try a set and do not change it; BOOT on the module does (it steps to the next set and remembers it). The small
+  "default" mark; the button "Default" on any other row makes it the start set (`@default`). Test only
+  tries a set and does not change it; BOOT on the module does (it steps to the next set and remembers it). The small
   green dot is the set chosen on the module now. Renaming the default set keeps it the default.
-- **On the module**: every set with its number, name, type and size, and the free space. "Play" chooses the set on
-  the module (it speaks the name, then waits for the throttle), "Demo" chooses it and plays a demo of about 25 s
-  (below), "Edit" and "Copy" open it in the editor, "Delete" removes it after a question. Folders the module skips
-  (no number, a number used twice, no `set.json`) are marked. Every Play on the page has a Stop beside it (on the module it sends `@stop`; checked on the module on 2026-11-15: it stops a running demo).
-- **Demo**: the name, ignition on (starter, the engine catches), the throttle profile of `engine_demo` from 2.5 s
+- **On the module**: every set with its number, name, type and size, and the free space. "Test" chooses the set on
+  the module, it speaks the name and plays a demo of about 25 s (below; this was "Demo", and a separate "Play" that
+  only spoke the name was dropped on 2026-11-15 because users could not tell the two apart), "Edit" and "Copy" open it in the editor, "Delete" removes it after a question. Folders the module skips
+  (no number, a number used twice, no `set.json`) are marked. Every Test and every Play of a sound on the page has a Stop beside it (on the module it sends `@stop`; checked on the module on 2026-11-15: it stops a running demo).
+- **Test** (the demo): the name, ignition on (starter, the engine catches), the throttle profile of `engine_demo` from 2.5 s
   (idle, full throttle through the gears, release, two blips, half throttle, idle), the horn at 17 s, ignition off
   at 21.5 s and the wind-down. On the module (`@demo`) it runs in the firmware for every set, without a receiver;
   BOOT or the receiver's data end it. In the simulated module the page renders it for sample sets with a port of
   what the firmware does (EngineState, Gearbox, loops, EQ, starter, horn, shift), without the speaker; synth sets
-  are made by the firmware and cannot be rendered in the browser, so their Demo is off there, with a tooltip saying
+  are made by the firmware and cannot be rendered in the browser, so their Test is off there, with a tooltip saying
   so.
 - **Editor**: number (only free ones are offered), name, folder description, type (sample, or synth with its
   preset), the sounds and the parameters of `set.json`. A sound is dropped on its row or chosen; any format the

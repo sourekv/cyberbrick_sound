@@ -824,9 +824,7 @@ function renderSets() {
     const td = document.createElement("td"); td.className = "actions";
     const btn = (label, fn, title) => { const b = document.createElement("button"); b.className = "small"; b.textContent = label; b.title = title || ""; b.onclick = fn; td.appendChild(b); td.appendChild(document.createTextNode(" ")); return b; };
     const sim = transport instanceof MockTransport, synth = j && j.type === "synth";
-    btn("Play", () => guarded(async () => { await link.select(s.folder); info.set = s.folder; renderSets(); log("playing " + s.folder + " on the module"); }),
-        "choose this set on the module (it speaks the name, then waits for the throttle)");
-    btn("Demo", () => guarded(async () => { await link.demo(s.folder); info.set = s.folder; renderSets(); log("demo of " + s.folder + (sim ? " (rendered in the browser)" : " on the module")); }),
+    btn("Test", () => guarded(async () => { await link.demo(s.folder); info.set = s.folder; renderSets(); log("testing " + s.folder + (sim ? " (rendered in the browser)" : " on the module")); }),
         sim ? (synth ? "synth sounds are made by the module's firmware and cannot be played here as a demo; on the module the demo works"
                      : "about 25 s: starter, idle, through the gears, horn, stop; rendered in the browser like the module plays it, without the speaker")
             : "the module plays about 25 s: starter, idle, through the gears, horn, stop (no receiver needed); BOOT or the receiver ends it");
@@ -835,7 +833,7 @@ function renderSets() {
         sim ? "stop the name or the demo" : "silence the name and the demo that the module is playing (the engine winds down)");
     if (sim) td.lastChild.previousSibling.dataset.owner = "set:" + s.folder;   // plays here, in the browser
     const bd = btn("Default", () => guarded(async () => { await link.setDefault(s.folder); info.default = s.folder; renderSets(); log(s.folder + " is now the set the module starts with"); }),
-        isDef ? "the module starts with this set after power-up" : "make this the set the module starts with after power-up (Play and Demo do not change it)");
+        isDef ? "the module starts with this set after power-up" : "make this the set the module starts with after power-up (Test does not change it)");
     if (isDef) { bd.disabled = true; bd.dataset.never = "1"; }
     btn("Edit", () => openSet(s.folder, false));
     btn("Copy", () => openSet(s.folder, true), "a new set made from this one");
@@ -1194,7 +1192,7 @@ async function save() {
     ed.orig = folder; ed.origFiles = [...keep];
     for (const s of Object.values(ed.sounds)) s.dirty = false;
     setBar("saveBar", 1);
-    setSaveStatus(`Written to the module as ${folder}. Use Play in the list to hear it there.`, "ok");
+    setSaveStatus(`Written to the module as ${folder}. Use Test in the list to hear it there.`, "ok");
     $("editTitle").textContent = "Set " + folder;
   });
   await refresh();
