@@ -13,7 +13,7 @@ can be remade after any change of the app. How the sets and the protocol work in
 
 ## The steps
 
-![How it works](guide/01-how-it-works.png)
+![How to use](guide/01-how-to-use.png)
 
 1. **Connect** the module. 2. **Test** the sets you have. 3. Choose the **Default** one. 4. **Copy** or **Edit** a set to
 make your own. 5. **Write** it to the module.

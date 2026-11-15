@@ -23,7 +23,7 @@ def main():
         pg = b.new_page(viewport={"width": 1040, "height": 900}, color_scheme="light")
         pg.goto(PAGE); pg.wait_for_timeout(600)
         pg.click("#howto summary"); pg.wait_for_timeout(300)
-        pg.locator("#howto").locator("xpath=..").screenshot(path=os.path.join(OUT, "01-how-it-works.png"))
+        pg.locator("#howto").locator("xpath=..").screenshot(path=os.path.join(OUT, "01-how-to-use.png"))
         pg.click("#howto summary")
         pg.screenshot(path=os.path.join(OUT, "02-start.png"), clip={"x": 0, "y": 0, "width": 1040, "height": 260})
         pg.click("#btnSim"); pg.wait_for_timeout(1500)

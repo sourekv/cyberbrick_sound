@@ -337,7 +337,7 @@ neither does any browser on an iPhone or iPad; there the app says so and "Connec
 installing Chrome is enough. Tested so far only in Edge on Windows.
 
 - **User guide (2026-11-15):** `user-guide.md`, with pictures made by `tools/make_guide_images.py` (always the light
-  look, whatever the system's colour setting is) and a panel "How it works" at the top of the app. The firmware
+  look, whatever the system's colour setting is) and a panel "How to use" at the top of the app. The firmware
   version shows in the connection line and under the list (both confirmed on the real module by the owner,
   2026-11-15).
 - **Default set (2026-11-15)**: the row of the set the module starts with after power-up is tinted and has a green
