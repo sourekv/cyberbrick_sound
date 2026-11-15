@@ -196,6 +196,7 @@ details.guide li { margin-bottom: 4px; }
 <!-- the default sets for the simulated module, made by tools/make_default_sets.py; without the file the simulated
      module has two small demo sets -->
 <script src="demo_sets.js"></script>
+<script src="number_names.js"></script>
 <script>
 "use strict";
 const RATE = 22050;
@@ -207,7 +208,7 @@ const SPEAKER_BOX_EQ = [                  // LAB_EQ (firmware/include/engine_lab
   [0.976836103, -1.89944636, 0.930287778, -1.89944636, 0.907123882],
   [1.10499333, -0.104702938, 0.625197825, -0.104702938, 0.730191158]];
 const SOUNDS = [
-  { key: "name", label: "Name", hint: "spoken once when the set is chosen: the number, then the name (\"Eight. Detroit sixty.\"), 1-2 s. Silence at the ends is cut, the level set to -1 dB.", min: 0.3, max: 3, rec: true, name: true },
+  { key: "name", label: "Name", hint: "spoken once when the set is chosen. By default only its number (\"Eight.\", from the page, nothing to download); a spoken name (\"Eight. Detroit sixty.\") you can record, choose as a file or make with Speak, 1-2 s. Silence at the ends is cut, the level set to -1 dB.", min: 0.3, max: 3, rec: true, name: true },
   { key: "start", label: "Starter", hint: "the starter cranking, without the engine catching; 0.5-2 s. The engine catches by itself at its end.", min: 0.3, max: 3 },
   { key: "horn", label: "Horn", hint: "played as a loop while the horn is held, about 1-2 s; the end must join the start.", min: 0.2, max: 4, loop: true },
   { key: "shift", label: "Shift", hint: "one gear change, 0.1-1 s.", min: 0.05, max: 1.5 },
@@ -978,6 +979,7 @@ function renderSounds() {
     file.onchange = () => file.files[0] && loadFile(def, file.files[0]);
     const b = (label, fn, dis) => { const x = document.createElement("button"); x.className = "small"; x.textContent = label; x.onclick = fn; x.disabled = !!dis; ctl.appendChild(x); return x; };
     b("Choose file", () => file.click());
+    if (def.name && window.NUMBER_NAMES) b("Number only", () => useNumber(), false).title = "the spoken number of the set, from this page (nothing to download)";
     if (def.rec) { const rb = b("Record", () => record(def, rb)); }
     b(def.loop ? "Play loop" : "Play", () => playPcm(snd.pcm, { loop: !!def.loop, rate: def.rpm ? +rate.value : 1, owner: def.key }), !snd);
     b("Stop", () => stopPlay()).dataset.owner = def.key;
@@ -1034,8 +1036,30 @@ const PIPER_ABOUT_HTML =
   "<p style='margin:4px 0'>Together some tens of MB. The text you type stays on this computer; only these files are " +
   "downloaded. The browser may keep them in its cache; if it does not, they are downloaded again next time. It needs " +
   "an internet connection, and works only as long as those hosts keep the files.</p>";
-const NUM_WORDS = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven",
-  "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty"];
+const NUM_WORDS = (() => {
+  const ones = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve",
+    "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+  const w = ones.slice();
+  for (let n = 20; n < 100; n++) w.push(tens[Math.floor(n / 10)] + (n % 10 ? " " + ones[n % 10].toLowerCase() : ""));
+  return w;
+})();
+
+// The default name of a set is its number, spoken (number_names.js: 1..99 made by tools/make_number_names.py, Opus
+// in base64). It is kept up to date while the sound is the number: a new number gives a new sound.
+const NAME_DEF = () => SOUNDS.find((s) => s.key === "name");
+async function useNumber() {
+  if (!editor || !window.NUMBER_NAMES) return false;
+  const idx = $("fIndex").value, b64 = window.NUMBER_NAMES[idx];
+  if (!b64) return false;
+  const bytes = b64dec(b64);
+  await soundFromBuffer(NAME_DEF(), bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), "number " + idx);
+  return true;
+}
+async function autoNumber() {
+  const s = editor && editor.sounds.name;
+  if (editor && (!s || String(s.src).startsWith("number "))) await useNumber();
+}
 let piper = null, piperAgreed = false;
 
 function speakDefault() {
@@ -1159,6 +1183,7 @@ async function save() {
   readFields();
   const ed = editor;
   const need = SOUNDS.filter((s) => !s.sampleOnly || ed.type === "sample");
+  if (!ed.sounds.name) await autoNumber();   // no name sound: its number
   const missing = need.filter((s) => !ed.sounds[s.key]).map((s) => s.label);
   if (!ed.name) return setSaveStatus("The set needs a name.", "err");
   if (!ed.desc) ed.desc = slug(ed.name) || "set";
@@ -1203,10 +1228,10 @@ $("btnConnect").onclick = () => connect(false);
 $("btnSim").onclick = () => connect(true);
 $("btnDisconnect").onclick = disconnect;
 $("btnRefresh").onclick = refresh;
-$("btnNew").onclick = () => { editor = newEditor(); showEditor("New set"); setSaveStatus("Choose the sounds; a copy of an existing set is often the easier start.", "muted"); setBar("saveBar", 0); };
+$("btnNew").onclick = () => { editor = newEditor(); showEditor("New set"); autoNumber(); setSaveStatus("Choose the sounds; a copy of an existing set is often the easier start.", "muted"); setBar("saveBar", 0); };
 $("btnCancel").onclick = closeEditor;
 $("btnSave").onclick = save;
-$("fIndex").onchange = () => { $("fIndexEcho").textContent = $("fIndex").value; syncSpeakText(); };
+$("fIndex").onchange = () => { $("fIndexEcho").textContent = $("fIndex").value; syncSpeakText(); autoNumber(); };
 $("fName").oninput = () => { if (editor && !editor.descTouched) $("fDesc").value = slug($("fName").value); syncSpeakText(); };
 $("fDesc").oninput = () => { if (editor) editor.descTouched = true; };
 $("fType").onchange = () => { editor.type = $("fType").value; updateTypeVisibility(); renderSounds(); };

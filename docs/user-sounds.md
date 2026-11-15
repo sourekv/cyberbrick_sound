@@ -272,6 +272,16 @@ The user can record it, or the PC tool can make it with text-to-speech from the 
 their names this way too (the current voice prompts move into them). Every set has a name file, so the beeps are
 only a fallback for a damaged file. The PC tool shows the sets in the order of their folder numbers.
 
+**The default name is the number (decided and built 2026-11-15).** A new set on the web page gets `name.wav` with only
+its number spoken, "One." to "Ninety nine.", from `web/number_names.js` (99 numbers, Opus in Ogg as base64, about
+0.35 MB, committed; made by `tools/make_number_names.py` with the user's `piper.exe`, same voice as the default sets,
+public domain, so the sounds are ours). Nothing is downloaded for it. The page keeps the sound in step with the number
+while it is "number NN": choosing another number gives the new sound, and a set without any name sound gets its
+number when it is written. The button "Number only" in the Name row puts the number back. A spoken name ("Eight.
+Detroit sixty.") is still made with Speak (downloads Piper, see below), recorded, or chosen as a file; such a sound is
+not replaced when the number changes, so it has to be made again then. A set opened for editing keeps the name sound it
+has. The default sets keep their spoken names, made offline.
+
 ## Making the name (`name.wav`)
 
 The name is announced once, when the set is chosen, so it only has to be short and clear on a 40 mm speaker.
