@@ -1,13 +1,13 @@
 # Engine sound sets: user guide
 
-How to see, try, change and add the engine sounds of the cyberbrick_sound module with the web page
-(`web/index.html`). The pictures are made by `tools/make_guide_images.py` from the page's simulated module, so they
-can be remade after any change of the page. How the sets and the protocol work inside: `user-sounds.md`.
+How to see, try, change and add the engine sounds of the cyberbrick_sound module with the web app
+(`web/index.html`, a web app). The pictures are made by `tools/make_guide_images.py` from the app's simulated module, so they
+can be remade after any change of the app. How the sets and the protocol work inside: `user-sounds.md`.
 
 ## What you need
 
 - A computer with **Chrome or Edge** (version 89 or newer; Windows, macOS, Linux or ChromeOS). Safari, Firefox and
-  browsers on phones and tablets have no Web Serial, so the page cannot reach the module there.
+  browsers on phones and tablets have no Web Serial, so the app cannot reach the module there.
 - The module with the **`engine_sets` firmware**, connected to the computer with a USB-C cable.
 - Open `web/index.html` in the browser (from disk, or from a web server when the project publishes it).
 
@@ -20,17 +20,17 @@ make your own. 5. **Write** it to the module.
 
 ## 1. Connect
 
-![Start of the page](guide/02-start.png)
+![Start of the app](guide/02-start.png)
 
 Press **Connect module** and choose the module's USB port in the browser's list (on Windows it is named like
 "USB Serial Device (COM5)"). When it works the line next to the button reads "Connected, firmware 0.1.0+..., built
 ..." and the list of sets appears. The firmware version is also under the list.
 
-**Simulated module** lets you try the whole page without hardware: it holds the default sets, everything works, and
-nothing is written anywhere. Changes are gone when you close the page.
+**Simulated module** lets you try the whole app without hardware: it holds the default sets, everything works, and
+nothing is written anywhere. Changes are gone when you close the app.
 
-While the page is connected the engine on the module is **silent** and the BOOT button does nothing; the engine
-comes back a few seconds after your last action. The module may restart when the page connects, and then speaks the
+While the app is connected the engine on the module is **silent** and the BOOT button does nothing; the engine
+comes back a few seconds after your last action. The module may restart when the app connects, and then speaks the
 number of the set it starts with: that is normal.
 
 ## 2. The list of sets
@@ -60,15 +60,15 @@ The small green dot after a name means that this set is the one chosen on the mo
 Open **Copy** (or **New empty set**, or **Edit**). In the editor:
 
 - **Number**: the place in the order of the BOOT button; only the free numbers are offered.
-- **Name**: what the page shows. The folder name is made from it and can be changed.
+- **Name**: what the app shows. The folder name is made from it and can be changed.
 - **Type**: **sample** (your recordings: an idle loop and a loaded loop, played faster with the throttle) or
   **synth** (one of the firmware's synthesised engines with its preset). Everything else (starter, horn, shift,
   name) works the same in both.
 - **Sounds**: drop a sound file on its row, or press **Choose file**. Any format the browser can play (WAV, MP3, OGG,
   FLAC, M4A, any rate, stereo or mono) is converted to what the module needs (22 050 Hz, 16 bit, mono). **Play**
-  lets you hear it; loops play looped and, for the engine loops, at any rpm of the slider. The page warns about a
+  lets you hear it; loops play looped and, for the engine loops, at any rpm of the slider. The app warns about a
   length outside the usual range, clipping and a very quiet sound. What makes a good loop: the part "What a good
-  sample is like" on the page.
+  sample is like" on the app.
 - **Parameters**: loudness, the wind-down time after the ignition goes off, the virtual gearbox, the playback rate
   range, the loaded loop's speed and gain, and the **speaker EQ** (none, the one tuned for the 30 ml box, or the
   one already in the set).
@@ -80,13 +80,13 @@ set is in the list; use **Test** to hear it on the module.
 
 ![The Name row](guide/05-name-row.png)
 
-The name is spoken once, when the set is chosen. **By default it is only the number** ("Eight."), taken from the page,
+The name is spoken once, when the set is chosen. **By default it is only the number** ("Eight."), taken from the app,
 with nothing to download, and it changes by itself when you change the number. For a spoken name there are three
 ways, all in the Name row:
 
-- **Record**: say it into the microphone (the page cuts the silence and sets the level).
+- **Record**: say it into the microphone (the app cuts the silence and sets the level).
 - **Choose file**: a recording you made elsewhere.
-- **Speak**: type the text ("Eight. Detroit sixty.") and the page makes it with the Piper voice. The first time it
+- **Speak**: type the text ("Eight. Detroit sixty.") and the app makes it with the Piper voice. The first time it
   **downloads** the voice (about 63 MB) and its programs from the internet, after asking; the text stays on your
   computer. English; write numbers as words. The part "What is downloaded and used" under the box names the
   projects and their licences.
@@ -99,17 +99,17 @@ original: press **Number only** (or make a new name) so that it says its own num
 
 | What you see | What to do |
 |---|---|
-| "This page needs Chrome or Edge on a computer." | Open the page in Chrome or Edge on a computer. |
+| "This app needs Chrome or Edge on a computer." | Open the app in Chrome or Edge on a computer. |
 | The module is not in the list of ports | Check the cable (some are charge-only) and try another USB port. |
 | "No port chosen." | You closed the list without choosing; press Connect module again. |
-| The port cannot be opened | Another program or browser tab holds it (a serial monitor, an upload from PlatformIO, a second copy of the page). Close it, then connect again. The same applies the other way: flashing the firmware from the computer fails while the page is connected, so press Disconnect first. |
+| The port cannot be opened | Another program or browser tab holds it (a serial monitor, an upload from PlatformIO, a second copy of the app). Close it, then connect again. The same applies the other way: flashing the firmware from the computer fails while the app is connected, so press Disconnect first. |
 | "the module does not answer (is the engine_sets firmware on it?)" | The module has another firmware. Flash `engine_sets` (`pio run -e engine_sets -t upload`, and `-t uploadfs` for the default sets), see `user-sounds.md`, "Trying it". |
 | "Not enough room" | Delete a set you do not need, or use shorter sounds. A set takes about 0.2-0.6 MB. |
 | A write stops half way | Press Write to the module again; the file is replaced only when it has arrived whole. |
 | Speak does not work | It needs the internet and a browser that can run it (Chrome, Edge). Without it use Number only, Record or Choose file. |
-| The module speaks a set name when the page connects | Normal: the module restarts when the port is opened and says the number of the set it starts with. |
+| The module speaks a set name when the app connects | Normal: the module restarts when the port is opened and says the number of the set it starts with. |
 
-## What is not in the page yet
+## What is not in the app yet
 
-Checking whether the module's firmware is the newest, and updating it from the page (planned, see `roadmap.md`),
+Checking whether the module's firmware is the newest, and updating it from the app (planned, see `roadmap.md`),
 and help with finding the loop points of a recording.

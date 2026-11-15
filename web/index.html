@@ -81,7 +81,7 @@ details.guide li { margin-bottom: 4px; }
   <p class="lead">Sound sets for the cyberbrick_sound module: see what is on it, try one, change or add a set. Chrome or
     Edge on a computer, the module on USB.</p>
 
-  <div id="noSerial" class="notice hidden">This page needs Chrome or Edge on a computer.</div>
+  <div id="noSerial" class="notice hidden">This app needs Chrome or Edge on a computer.</div>
 
   <section>
     <div class="row">
@@ -90,7 +90,7 @@ details.guide li { margin-bottom: 4px; }
       <button id="btnDisconnect" class="hidden">Disconnect</button>
       <span id="connStatus" class="status muted">Not connected.</span>
     </div>
-    <div class="hint" style="margin-top:8px">While the page talks to the module, the engine on the module is silent; it
+    <div class="hint" style="margin-top:8px">While the app talks to the module, the engine on the module is silent; it
       comes back a few seconds after the last action.</div>
   </section>
 
@@ -110,8 +110,8 @@ details.guide li { margin-bottom: 4px; }
     </svg>
     <ul>
       <li><strong>Connect module:</strong> choose the module's USB port (Chrome or Edge). "Simulated module" lets you
-        try the page without hardware; nothing is written anywhere. While the page is connected the engine on the module
-        is silent, and the module may speak the name of its start set when the page connects.</li>
+        try the app without hardware; nothing is written anywhere. While the app is connected the engine on the module
+        is silent, and the module may speak the name of its start set when the app connects.</li>
       <li><strong>Test</strong> chooses the set on the module, which says its name and plays a demo of about 25 s
         (starter, engine, gears, horn, stop); no receiver is needed. <strong>Stop</strong> silences it at once. Test
         does not change which set the module starts with.</li>
@@ -137,7 +137,7 @@ details.guide li { margin-bottom: 4px; }
       <li><strong>Format on the module:</strong> WAV (<code>.wav</code>), PCM, 22 050 Hz, 16 bit, mono, with fixed names:
         <code>name.wav</code>, <code>start.wav</code>, <code>horn.wav</code>, <code>shift.wav</code>, and for a sample set
         <code>idle.wav</code> and <code>loaded.wav</code>, plus <code>set.json</code> with the parameters, all in the
-        folder <code>NN_description</code> (NN = the number). This page writes all of that itself: you can drop WAV,
+        folder <code>NN_description</code> (NN = the number). This app writes all of that itself: you can drop WAV,
         MP3, OGG, FLAC or M4A at any rate, stereo or mono, under any name; it is converted and renamed. Best source:
         WAV or FLAC at 44.1 or 48 kHz (MP3 adds its own noise).</li>
       <li><strong>Lengths:</strong> name 1-2 s, starter 0.5-2 s, horn 1-2 s, shift 0.1-1 s, idle loop 1-6 s, loaded
@@ -244,7 +244,7 @@ const SPEAKER_BOX_EQ = [                  // LAB_EQ (firmware/include/engine_lab
   [0.976836103, -1.89944636, 0.930287778, -1.89944636, 0.907123882],
   [1.10499333, -0.104702938, 0.625197825, -0.104702938, 0.730191158]];
 const SOUNDS = [
-  { key: "name", label: "Name", hint: "spoken once when the set is chosen. By default only its number (\"Eight.\", from the page, nothing to download); a spoken name (\"Eight. Detroit sixty.\") you can record, choose as a file or make with Speak, 1-2 s. Silence at the ends is cut, the level set to -1 dB.", min: 0.3, max: 3, rec: true, name: true },
+  { key: "name", label: "Name", hint: "spoken once when the set is chosen. By default only its number (\"Eight.\", from the app, nothing to download); a spoken name (\"Eight. Detroit sixty.\") you can record, choose as a file or make with Speak, 1-2 s. Silence at the ends is cut, the level set to -1 dB.", min: 0.3, max: 3, rec: true, name: true },
   { key: "start", label: "Starter", hint: "the starter cranking, without the engine catching; 0.5-2 s. The engine catches by itself at its end.", min: 0.3, max: 3 },
   { key: "horn", label: "Horn", hint: "played as a loop while the horn is held, about 1-2 s; the end must join the start.", min: 0.2, max: 4, loop: true },
   { key: "shift", label: "Shift", hint: "one gear change, 0.1-1 s.", min: 0.05, max: 1.5 },
@@ -1016,7 +1016,7 @@ function renderSounds() {
     file.onchange = () => file.files[0] && loadFile(def, file.files[0]);
     const b = (label, fn, dis) => { const x = document.createElement("button"); x.className = "small"; x.textContent = label; x.onclick = fn; x.disabled = !!dis; ctl.appendChild(x); return x; };
     b("Choose file", () => file.click());
-    if (def.name && window.NUMBER_NAMES) b("Number only", () => useNumber(), false).title = "the spoken number of the set, from this page (nothing to download)";
+    if (def.name && window.NUMBER_NAMES) b("Number only", () => useNumber(), false).title = "the spoken number of the set, from this app (nothing to download)";
     if (def.rec) { const rb = b("Record", () => record(def, rb)); }
     const sb = def.name ? speakBox(def) : null;
     if (sb) ctl.appendChild(sb.go);   // Speak sits with the other buttons; its text is below
@@ -1062,7 +1062,7 @@ const PIPER_ABOUT_HTML =
   "text-to-speech (that repository is archived since October 2025; development moved to " +
   "<a href='https://github.com/OHF-Voice/piper1-gpl' target='_blank' rel='noopener'>OHF-Voice/piper1-gpl</a>), running in this browser through " +
   "<a href='https://github.com/Mintplex-Labs/piper-tts-web' target='_blank' rel='noopener'>piper-tts-web</a> 1.0.4 (Mintplex Labs, MIT licence).</p>" +
-  "<p style='margin:4px 0'>The first Speak downloads from the internet, from third parties, not from this page:</p>" +
+  "<p style='margin:4px 0'>The first Speak downloads from the internet, from third parties, not from this app:</p>" +
   "<ul style='margin:0;padding-left:20px'>" +
   "<li>the library and the phonemizer <a href='https://www.npmjs.com/package/@diffusionstudio/piper-wasm' target='_blank' rel='noopener'>piper-wasm</a> " +
   "1.0.0 (Diffusion Studio; a WebAssembly build of Piper's phonemizer with " +
