@@ -140,7 +140,7 @@ details.guide li { margin-bottom: 4px; }
     <h2 id="editTitle">Set</h2>
     <div class="grid">
       <label for="fIndex">Number</label>
-      <div class="row"><select id="fIndex"></select><span class="hint">order of the BOOT button; say it in the name too</span></div>
+      <div class="row"><select id="fIndex"></select><span class="hint">order of the BOOT button; the Name sound says it (changes with the number)</span></div>
       <label for="fName">Name</label>
       <div class="row"><input id="fName" type="text" maxlength="40" style="flex:1;min-width:180px" placeholder="Detroit sixty"></div>
       <label for="fDesc">Folder</label>
@@ -981,6 +981,8 @@ function renderSounds() {
     b("Choose file", () => file.click());
     if (def.name && window.NUMBER_NAMES) b("Number only", () => useNumber(), false).title = "the spoken number of the set, from this page (nothing to download)";
     if (def.rec) { const rb = b("Record", () => record(def, rb)); }
+    const sb = def.name ? speakBox(def) : null;
+    if (sb) ctl.appendChild(sb.go);   // Speak sits with the other buttons; its text is below
     b(def.loop ? "Play loop" : "Play", () => playPcm(snd.pcm, { loop: !!def.loop, rate: def.rpm ? +rate.value : 1, owner: def.key }), !snd);
     b("Stop", () => stopPlay()).dataset.owner = def.key;
     let rate = null;
@@ -992,7 +994,7 @@ function renderSounds() {
     }
     ctl.appendChild(file);
     body.appendChild(infoEl); body.appendChild(hint); body.appendChild(ctl);
-    if (def.name) body.appendChild(speakBox(def));
+    if (sb) body.appendChild(sb);
     row.appendChild(head); row.appendChild(body);
     row.addEventListener("dragover", (e) => { e.preventDefault(); row.classList.add("drag"); });
     row.addEventListener("dragleave", () => row.classList.remove("drag"));
@@ -1075,14 +1077,14 @@ function speakBox(def) {
   const box = document.createElement("div"); box.className = "speak";
   const r = document.createElement("div"); r.className = "row";
   const t = document.createElement("input"); t.type = "text"; t.id = "speakText"; t.maxLength = 80;
-  t.placeholder = "Eight. Detroit sixty.";
+  t.placeholder = "Text for Speak, e.g. Eight. Detroit sixty.";
   t.value = editor.speakTouched ? editor.speakText : speakDefault();
   t.oninput = () => { editor.speakTouched = true; editor.speakText = t.value; };
   const go = document.createElement("button"); go.className = "small"; go.textContent = "Speak";
   go.title = "make name.wav from this text with Piper text-to-speech (downloads the voice the first time)";
   const st = document.createElement("span"); st.className = "hint";
   go.onclick = () => speakName(def, t.value, go, st);
-  r.appendChild(t); r.appendChild(go); r.appendChild(st);
+  r.appendChild(t); r.appendChild(st);
   const w = document.createElement("div"); w.className = "speakwarn";
   w.textContent = "Speak downloads the voice (about 63 MB) and its programs from the internet the first time. " +
     "The text stays on this computer. English voice; write numbers as words.";
@@ -1091,6 +1093,7 @@ function speakBox(def) {
   const p = document.createElement("div"); p.innerHTML = PIPER_ABOUT_HTML;
   more.appendChild(p);
   box.appendChild(r); box.appendChild(w); box.appendChild(more);
+  box.go = go;
   return box;
 }
 async function speakName(def, text, btn, st) {
