@@ -79,7 +79,7 @@ details.guide li { margin-bottom: 4px; }
 <main>
   <h1>Engine sound sets</h1>
   <p class="lead">Sound sets for the cyberbrick_sound module: see what is on it, try one, change or add a set. Chrome or
-    Edge on a computer, the module on USB (firmware <code>engine_sets</code>).</p>
+    Edge on a computer, the module on USB.</p>
 
   <div id="noSerial" class="notice hidden">This page needs Chrome or Edge on a computer.</div>
 
@@ -763,6 +763,7 @@ async function connect(sim) {
     $("btnConnect").classList.add("hidden"); $("btnSim").classList.add("hidden"); $("btnDisconnect").classList.remove("hidden");
     $("secSets").classList.remove("hidden");
     await refresh();
+    if (!sim && info && info.fw) setStatus("Connected, firmware " + info.fw + (info.built && info.built !== "-" ? ", built " + info.built : "") + ".", "ok");
   } catch (e) {
     if (e.name === "NotFoundError") { setStatus("No port chosen.", "muted"); return; }
     log(e.message, "err"); setStatus(e.message, "err");
