@@ -10,6 +10,7 @@
 //
 //   @hello                 @ok cbsound <protocol version>
 //   @info                  @ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date>
+//                                           default=<folder the module starts with, or ->
 //                                           (fw: include/version.h, for example 0.1.0+8cc34fd)
 //   @ls                    @set <bytes> <folder>   (every folder in /sets)          @ok <count>
 //   @files <folder>        @file <bytes> <name>    (every file of /sets/<folder>)   @ok <count>
@@ -23,12 +24,15 @@
 //                                           blips, horn, half throttle, stop (no receiver needed)
 //   @stop                  @ok              ends the session and silences the name and the demo that are playing
 //                                           (the set stays chosen; the engine winds down)
+//   @default <folder>      @ok              the set the module starts with after power-up (/state.json); does not
+//                                           change what is playing. BOOT on the module changes it too.
 //   @bye                   @ok              ends the session
 //
 // Paths are under /sets/. While the page talks to the module (a session: from the first command until @bye,
 // @select or 3 s without a command) the engine is silent, the BOOT button is ignored and the firmware does not
 // write to the serial port by itself.
 #include "version.h"
+#include "sound_sets.h"
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <vector>
@@ -122,6 +126,11 @@ class SetLink {
       return finish();
     }
     if (cmd == "@stop") { reply("@ok"); end.stop = true; return finish(); }
+    if (cmd == "@default") {
+      if (!LittleFS.exists("/sets/" + arg)) return reply("@err no such set");
+      SetLibrary::writeState(arg);
+      return reply("@ok");
+    }
     if (cmd == "@bye") { reply("@ok"); return finish(); }
     reply("@err unknown command " + cmd);
   }
@@ -130,7 +139,7 @@ class SetLink {
     size_t total = LittleFS.totalBytes(), used = LittleFS.usedBytes();
     reply(String("@ok free=") + (unsigned)(total - used) + " total=" + (unsigned)total + " set=" +
           (cur.length() ? cur : String("-")) + " psram=" + (unsigned)ESP.getFreePsram() + " fw=" FW_FULL_VERSION
-          " built=" FW_BUILD);
+          " built=" FW_BUILD " default=" + (SetLibrary::readState().length() ? SetLibrary::readState() : String("-")));
   }
 
   static uint32_t folderBytes(File dir) {

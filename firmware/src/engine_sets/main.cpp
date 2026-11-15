@@ -165,7 +165,7 @@ static void useFallback() {
 }
 
 // Loads set i; if it is broken, tries the following ones; with none left, the fallback.
-static void selectSet(int i, bool announce = true) {
+static void selectSet(int i, bool announce = true, bool persist = true) {
   int n = (int)library.folders.size();
   namePlayer.stopNow();
   shiftPlayer.stopNow();
@@ -186,7 +186,7 @@ static void selectSet(int i, bool announce = true) {
     engineState.crankS = fmaxf(0.1f, (float)cur.startWav.len / AUDIO_RATE - START_TAIL_S);
     engineState.stopS = fmaxf(0.1f, cur.stopS);
     if (announce) namePlayer.play(&cur.nameWav);
-    SetLibrary::writeState(cur.folder);
+    if (persist) SetLibrary::writeState(cur.folder);   // the page's Play and Demo do not change the start set
     Serial.printf("set %s: \"%s\", %s, loaded in %lu ms, %u kB PSRAM free\n", cur.folder.c_str(), cur.name.c_str(),
                   cur.type == SoundSet::SAMPLE ? "sample" : "synth", (unsigned long)(millis() - t0),
                   (unsigned)(ESP.getFreePsram() / 1024));
@@ -312,8 +312,8 @@ void loop() {
       if (library.scan() == 0) useFallback();
       else {
         int i = library.find(want);
-        if (e.select.length() || i < 0) selectSet(i < 0 ? 0 : i);   // announced
-        else selectSet(i, false);                                  // the current set again, with its new files
+        if (e.select.length() || i < 0) selectSet(i < 0 ? 0 : i, true, false);   // announced, not remembered
+        else selectSet(i, false, false);                               // the current set again, with its new files
       }
     }
     if (e.ended && e.stop) {

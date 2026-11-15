@@ -172,7 +172,7 @@ All WAVs in the format of "Format on the module".
 │   ├── 03_pulse_old/        synth set: the same files without idle.wav and loaded.wav
 │   │   └── ...
 │   └── ... 07_v12/
-└── state.json        the number of the set chosen last, so the module starts with it after power-up
+└── state.json        the set the module starts with after power-up (the default; set by BOOT or by the page's Default)
 ```
 
 The firmware lists `/sets/` at start-up, sorts the folders by name and skips a folder with a file missing (it
@@ -326,6 +326,10 @@ the module.
 neither does any browser on an iPhone or iPad; there the page says so and "Connect module" stays off. On a Mac,
 installing Chrome is enough. Tested so far only in Edge on Windows.
 
+- **Default set (2026-11-15)**: the row of the set the module starts with after power-up is tinted and has a green
+  "default" mark; the button "Default" on any other row makes it the start set (`@default`). Play and Demo only
+  try a set and do not change it; BOOT on the module does (it steps to the next set and remembers it). The small
+  green dot is the set chosen on the module now. Renaming the default set keeps it the default.
 - **On the module**: every set with its number, name, type and size, and the free space. "Play" chooses the set on
   the module (it speaks the name, then waits for the throttle), "Demo" chooses it and plays a demo of about 25 s
   (below), "Edit" and "Copy" open it in the editor, "Delete" removes it after a question. Folders the module skips
@@ -398,7 +402,8 @@ full).
 | Command | Answer |
 |---|---|
 | `@hello` | `@ok cbsound 1` |
-| `@info` | `@ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date>`; the page shows the firmware version under the list |
+| `@info` | `@ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date> default=<folder or ->`; the page shows the firmware version under the list and marks the default set |
+| `@default <folder>` | `@ok`; the set the module starts with after power-up (written 2026-11-15, checked on the module); it does not change what is playing, and `@select` and `@demo` do not change it |
 | `@ls` | `@set <bytes> <folder>` per folder in `/sets`, then `@ok <count>` |
 | `@files <folder>` | `@file <bytes> <name>` per file, then `@ok <count>` |
 | `@get <path>` | `@d <base64>` lines of up to 3072 bytes, then `@ok <size> <crc32>` |
@@ -431,7 +436,7 @@ From the repo root, then from `firmware/`:
    data partition is gone, so the module plays the fallback (diesel synth) and beeps once until step 3.
 3. `pio run -e engine_sets -t uploadfs` writes the sets (the whole data partition, about 5 MB, takes a while).
 4. The serial monitor (115200 Bd) lists the sets found and every set loaded; BOOT steps to the next set, which
-   speaks its name. After a power cycle the module starts with the set chosen last.
+   speaks its name. After a power cycle the module starts with the set chosen last with BOOT, or with the default set of the web page.
 
 Going back to `engine_lab` is just `pio run -e engine_lab -t upload` (it brings its own partition table).
 Flash with the USB power rule in mind (`bringup.md`).

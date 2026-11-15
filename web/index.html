@@ -45,6 +45,8 @@ input[type=number] { width: 80px; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .muted { color: var(--muted); }
 .status { font-size: 14px; }
+tr.isdef td { background: #eef6ee; }
+.defbadge { font-size: 11px; background: var(--ok); color: #fff; border-radius: 9px; padding: 1px 7px; margin-left: 4px; vertical-align: 1px; }
 .ok { color: var(--ok); } .warn { color: var(--warn); } .err { color: var(--err); }
 table { width: 100%; border-collapse: collapse; }
 th, td { text-align: left; padding: 6px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
@@ -564,7 +566,11 @@ class MockTransport {
     }
     this.put = null;
     if (cmd === "@hello") return r("@ok cbsound 1");
-    if (cmd === "@info") return r(`@ok free=${this.total - this.used()} total=${this.total} set=${this.current || "-"} psram=7800000 fw=simulated built=-`);
+    if (cmd === "@info") return r(`@ok free=${this.total - this.used()} total=${this.total} set=${this.current || "-"} psram=7800000 fw=simulated built=- default=${this.def || "-"}`);
+    if (cmd === "@default") {
+      if (!this.dirs.has("/sets/" + arg)) return r("@err no such set");
+      this.def = arg; return r("@ok");
+    }
     if (cmd === "@ls") {
       const names = [...this.dirs].filter((d) => d.startsWith("/sets/")).map((d) => d.slice(6));
       for (const n of names) {
@@ -725,6 +731,7 @@ class Link {
   select(folder) { return this.cmd("@select " + folder); }
   demo(folder) { return this.cmd("@demo " + folder); }
   stop() { return this.cmd("@stop"); }
+  setDefault(folder) { return this.cmd("@default " + folder); }
   bye() { return this.cmd("@bye"); }
 }
 
@@ -810,10 +817,12 @@ function renderSets() {
     const type = j ? (j.type === "synth" ? "synth: " + (j.synth === "pulse" ? "old synth" : j.preset || "") : "sample") : "?";
     const cells = [idx || "-", j ? j.name || "" : "", type, kB(s.bytes), s.folder];
     for (const c of cells) { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); }
-    if (s.folder === info.set) tr.children[1].insertAdjacentHTML("beforeend", ' <span class="ok" title="playing on the module">&#9679;</span>');
+    const isDef = s.folder === info.default;
+    if (isDef) { tr.className = "isdef"; tr.children[1].insertAdjacentHTML("beforeend", ' <span class="defbadge" title="the module starts with this set after power-up">default</span>'); }
+    if (s.folder === info.set) tr.children[1].insertAdjacentHTML("beforeend", ' <span class="ok" title="chosen on the module now">&#9679;</span>');
     if (note) tr.children[1].insertAdjacentHTML("beforeend", `<div class="warn hint">${note}</div>`);
     const td = document.createElement("td"); td.className = "actions";
-    const btn = (label, fn, title) => { const b = document.createElement("button"); b.className = "small"; b.textContent = label; b.title = title || ""; b.onclick = fn; td.appendChild(b); td.appendChild(document.createTextNode(" ")); };
+    const btn = (label, fn, title) => { const b = document.createElement("button"); b.className = "small"; b.textContent = label; b.title = title || ""; b.onclick = fn; td.appendChild(b); td.appendChild(document.createTextNode(" ")); return b; };
     const sim = transport instanceof MockTransport, synth = j && j.type === "synth";
     btn("Play", () => guarded(async () => { await link.select(s.folder); info.set = s.folder; renderSets(); log("playing " + s.folder + " on the module"); }),
         "choose this set on the module (it speaks the name, then waits for the throttle)");
@@ -825,6 +834,9 @@ function renderSets() {
     btn("Stop", () => guarded(async () => { await link.stop(); stopPlay(); log("stopped"); }),
         sim ? "stop the name or the demo" : "silence the name and the demo that the module is playing (the engine winds down)");
     if (sim) td.lastChild.previousSibling.dataset.owner = "set:" + s.folder;   // plays here, in the browser
+    const bd = btn("Default", () => guarded(async () => { await link.setDefault(s.folder); info.default = s.folder; renderSets(); log(s.folder + " is now the set the module starts with"); }),
+        isDef ? "the module starts with this set after power-up" : "make this the set the module starts with after power-up (Play and Demo do not change it)");
+    if (isDef) { bd.disabled = true; bd.dataset.never = "1"; }
     btn("Edit", () => openSet(s.folder, false));
     btn("Copy", () => openSet(s.folder, true), "a new set made from this one");
     btn("Delete", () => removeSet(s.folder));
@@ -1164,7 +1176,11 @@ async function save() {
   if (total > (+info.free || 0) + own) return setSaveStatus(`Not enough room: ${kB(total)} needed, ${kB(+info.free + own)} free.`, "err");
 
   await guarded(async () => {
-    if (ed.orig && ed.orig !== folder) { await link.mv("/sets/" + ed.orig, dir); log(`renamed ${ed.orig} -> ${folder}`); ed.orig = folder; }
+    if (ed.orig && ed.orig !== folder) {
+      const wasDefault = info.default === ed.orig;
+      await link.mv("/sets/" + ed.orig, dir); log(`renamed ${ed.orig} -> ${folder}`); ed.orig = folder;
+      if (wasDefault) { await link.setDefault(folder); info.default = folder; }   // the start set follows the rename
+    }
     let sent = 0;
     for (const w of writes) {
       setSaveStatus(`Writing ${w.name}...`, "muted");
