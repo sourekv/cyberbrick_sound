@@ -3,7 +3,7 @@
 Planned 2026-11-08, sets decided 2026-11-14. The firmware loads sound sets from files in the flash data partition,
 uploaded over USB by a PC tool (see "Later" in `roadmap.md`).
 
-**State 2026-11-15:** step 1 is built and works on the module (flashed with `upload` and `uploadfs` on 2026-11-15: boot, 7 sets found, `@hello`/`@info`/`@ls` answered, the web page connects, lists the sets and plays the sounds, checked by the owner on 2026-11-15; not tried yet: writing or changing a set from the page, recording, `@demo`, how the module reacts when the port is opened; the first `uploadfs` stopped at 17 % with "The chip stopped responding", the second went through): the firmware env `engine_sets`
+**State 2026-11-15:** step 1 is built and works on the module (flashed with `upload` and `uploadfs` on 2026-11-15: boot, 7 sets found, `@hello`/`@info`/`@ls` answered, the web page connects, lists the sets, plays the sounds and runs the Demo (`@demo`), checked by the owner on 2026-11-15; not tried yet: writing or changing a set from the page (a test set for it: `tools/make_test_set.py`, `assets/test_set/08_test/`), recording, how the module reacts when the port is opened; the first `uploadfs` stopped at 17 % with "The chip stopped responding", the second went through): the firmware env `engine_sets`
 (`firmware/src/engine_sets/`, `firmware/include/sound_sets.h`), the partition table `firmware/partitions_sets.csv`
 (two 1.5 MB app slots, 4.9 MB data partition), the default sets in `assets/sets/` and `tools/make_default_sets.py`.
 The sets go to the module with `pio run -e engine_sets -t uploadfs`, or one by one with the web page

@@ -1,0 +1,13 @@
+{
+  "name": "Test",
+  "type": "sample",
+  "rate": [
+    1.0,
+    3.0
+  ],
+  "loaded_rate_scale": 1.18,
+  "loaded_gain": 0.8,
+  "level": 1.0,
+  "stop_s": 1.4,
+  "gearbox": true
+}
