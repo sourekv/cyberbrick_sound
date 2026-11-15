@@ -321,6 +321,7 @@ Also collected with all other open points in `roadmap.md`.
 
 - The speaker it has to carry (40 mm or a production candidate; see `sound-research.md`). The board size itself is settled: 29 x 30 mm, the size of the CyberBrick receiver shield.
 - Whether the Zero's underside is flat (the headers leave about 7 mm of clearance under it, enough for everything on the board; check the real module).
+- **Option, to be considered (noted 2026-11-15): low sockets for J3/J4.** LaskaKit sells a 1x9 female strip with a 3.5 mm body (`LA217087H`, 0.24 EUR, 2.54 mm pitch, holes 1.02 mm, tails 2.6 mm; https://www.laskakit.cz/en/dutinkova-lista-2-54-mm-nizka-3-5mm-jednorada-prima/). Same footprint as the 8.5 mm strip, so no board change; the stack would be lower. Open points: the Zero-M's pins are probably longer (about 6 mm) than the 3.5 mm body, so the Zero would grip only on the contacts; measure the pins and try one pair on the prototype first; `hardware/solder_stand/` assumes the tall strips and would need a new pocket depth. A try, not a must.
 
 ## Out of scope for this iteration
 
