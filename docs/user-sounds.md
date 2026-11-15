@@ -3,11 +3,11 @@
 Planned 2026-11-08, sets decided 2026-11-14. The firmware loads sound sets from files in the flash data partition,
 uploaded over USB by a PC tool (see "Later" in `roadmap.md`).
 
-**State 2026-11-14:** step 1 is built, not yet tried on the module: the firmware env `engine_sets`
+**State 2026-11-15:** step 1 is built and works on the module (flashed with `upload` and `uploadfs` on 2026-11-15: boot, 7 sets found, `@hello`/`@info`/`@ls` answered, the web page connects and works; the first `uploadfs` stopped at 17 % with "The chip stopped responding", the second went through): the firmware env `engine_sets`
 (`firmware/src/engine_sets/`, `firmware/include/sound_sets.h`), the partition table `firmware/partitions_sets.csv`
 (two 1.5 MB app slots, 4.9 MB data partition), the default sets in `assets/sets/` and `tools/make_default_sets.py`.
 The sets go to the module with `pio run -e engine_sets -t uploadfs`, or one by one with the web page
-`web/index.html` over USB (built 2026-11-14, tried only against its simulated module so far; see "The web page"). The names are spoken with Piper (`--piper`, `--model`, run by the owner), the number first as in today's
+`web/index.html` over USB (built 2026-11-14, tried against its simulated module and on 2026-11-15 on the real one over USB; see "The web page"). The names are spoken with Piper (`--piper`, `--model`, run by the owner), the number first as in today's
 prompts ("One. Truck."); without Piper the script falls back to those prompts. See "Trying it" at the end.
 
 This page says how

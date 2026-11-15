@@ -40,7 +40,7 @@ reasons, are in `rejected-ideas.md`.
 Not started; recorded so the design does not block them.
 
 - **User-changeable sounds** (planned 2026-11-08): sound sets as files in the 1.5 MB data partition, loaded over USB
-  with a web page (Web Serial, `web/index.html`, built 2026-11-14, not yet tried on the module). The BOOT button keeps switching sets. Decided
+  with a web page (Web Serial, `web/index.html`, built 2026-11-14, works on the module since 2026-11-15). The BOOT button keeps switching sets. Decided
   2026-11-14: one kind of set, all in the data partition (the seven `engine_lab` candidates become the default sets,
   each with its spoken name), plus one fallback set compiled into the firmware for an empty or damaged partition;
   the data partition grows once the sounds leave the firmware. Details, requirements for a sample, the set format,
