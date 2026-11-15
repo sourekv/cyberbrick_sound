@@ -320,6 +320,11 @@ void loop() {
       demoOn = false;
       namePlayer.stopNow();
       shiftPlayer.stopNow();
+      wavStarter.stop();
+      synthStarter.stop();
+      synthHorn.set(false);
+      wavHorn.set(false);
+      engineState.silence();      // else the engine would idle on without a receiver
       Serial.println("stop (from the web page)");
     }
     if (e.ended && e.demo) {

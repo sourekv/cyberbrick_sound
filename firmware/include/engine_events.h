@@ -177,6 +177,10 @@ class EngineState {
 
   bool silent() const { return state == OFF || state == CRANKING; }
 
+  // Back to the silent start state at once (the web page's Stop): without channel data the engine would otherwise
+  // stay RUNNING and idle on. The caller stops the starter and the horn.
+  void silence() { state = OFF; gain = 0.0f; t = 0.0f; wasAlive = false; lastIgnition = false; flare = false; quietStop = false; }
+
  private:
   bool wasAlive = false, lastIgnition = false, flare = false, quietStop = false, override = false;
   float t = 0.0f, rpm0 = 0.0f, rpmSet = 0.0f, flareRpm = 0.0f;
