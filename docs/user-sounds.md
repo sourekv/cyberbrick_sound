@@ -3,11 +3,11 @@
 Planned 2026-11-08, sets decided 2026-11-14. The firmware loads sound sets from files in the flash data partition,
 uploaded over USB by a PC tool (see "Later" in `roadmap.md`).
 
-**State 2026-11-15:** step 1 is built and works on the module (flashed with `upload` and `uploadfs` on 2026-11-15: boot, 7 sets found, `@hello`/`@info`/`@ls` answered, the web page connects, lists the sets, plays the sounds and runs the Demo (`@demo`), checked by the owner on 2026-11-15; Copy and Delete work too (the owner, 2026-11-15; Copy writes a new set, so writing sets from the page works); a set made from scratch is written too: the test set (`tools/make_test_set.py`, `assets/test_set/09_test/`) was saved to the module from the page (the owner, 2026-11-15); Speak (the name made with Piper) works too (the owner, 2026-11-15); not tried yet: recording the name with the microphone, how the module reacts when the port is opened; the first `uploadfs` stopped at 17 % with "The chip stopped responding", the second went through): the firmware env `engine_sets`
+**State 2026-11-15:** step 1 is built and works on the module (flashed with `upload` and `uploadfs` on 2026-11-15: boot, 7 sets found, `@hello`/`@info`/`@ls` answered, the web app connects, lists the sets, plays the sounds and runs the Demo (`@demo`), checked by the owner on 2026-11-15; Copy and Delete work too (the owner, 2026-11-15; Copy writes a new set, so writing sets from the app works); a set made from scratch is written too: the test set (`tools/make_test_set.py`, `assets/test_set/09_test/`) was saved to the module from the app (the owner, 2026-11-15); Speak (the name made with Piper) works too (the owner, 2026-11-15); not tried yet: recording the name with the microphone, how the module reacts when the port is opened; the first `uploadfs` stopped at 17 % with "The chip stopped responding", the second went through): the firmware env `engine_sets`
 (`firmware/src/engine_sets/`, `firmware/include/sound_sets.h`), the partition table `firmware/partitions_sets.csv`
 (two 1.5 MB app slots, 4.9 MB data partition), the default sets in `assets/sets/` and `tools/make_default_sets.py`.
-The sets go to the module with `pio run -e engine_sets -t uploadfs`, or one by one with the web page
-`web/index.html` over USB (built 2026-11-14, tried against its simulated module and on 2026-11-15 on the real one over USB; see "The web page"). The names are spoken with Piper (`--piper`, `--model`, run by the owner), the number first as in today's
+The sets go to the module with `pio run -e engine_sets -t uploadfs`, or one by one with the web app
+`web/index.html` over USB (built 2026-11-14, tried against its simulated module and on 2026-11-15 on the real one over USB; see "The web app"). The names are spoken with Piper (`--piper`, `--model`, run by the owner), the number first as in today's
 prompts ("One. Truck."); without Piper the script falls back to those prompts. See "Trying it" at the end.
 
 This page says how
@@ -96,7 +96,7 @@ small, so each set simply has its own.
 ## The PC tool
 
 Decided 2026-11-08 as a plan, in two steps that use the same set format. Changed 2026-11-14: the web page came
-first, without the Python script (see "The web page" below); `tools/make_default_sets.py` stays for the default
+first, without the Python script (see "The web app" below); `tools/make_default_sets.py` stays for the default
 sets. The module as a USB drive was considered as an alternative and dropped the same day (`rejected-ideas.md`).
 
 1. **A Python script in `tools/`** first, as our working tool: converts the WAVs, helps find the loop point, writes the
@@ -172,7 +172,7 @@ All WAVs in the format of "Format on the module".
 │   ├── 03_pulse_old/        synth set: the same files without idle.wav and loaded.wav
 │   │   └── ...
 │   └── ... 07_v12/
-└── state.json        the set the module starts with after power-up (the default; set by BOOT or by the page's Default)
+└── state.json        the set the module starts with after power-up (the default; set by BOOT or by the app's Default)
 ```
 
 The firmware lists `/sets/` at start-up, sorts the folders by name and skips a folder with a file missing (it
@@ -190,7 +190,7 @@ assets/
     └── ...
 web/
 ├── index.html               the PC tool: lists, plays, edits, copies, deletes and uploads sets over USB
-└── demo_sets.js             generated, not committed: the default sets for the page's simulated module
+└── demo_sets.js             generated, not committed: the default sets for the app's simulated module
 tools/
 └── make_default_sets.py     builds the WAVs of the default sets from assets/ (renders, EQ, text-to-speech)
 firmware/
@@ -272,10 +272,10 @@ The user can record it, or the PC tool can make it with text-to-speech from the 
 their names this way too (the current voice prompts move into them). Every set has a name file, so the beeps are
 only a fallback for a damaged file. The PC tool shows the sets in the order of their folder numbers.
 
-**The default name is the number (decided and built 2026-11-15).** A new set on the web page gets `name.wav` with only
+**The default name is the number (decided and built 2026-11-15).** A new set on the web app gets `name.wav` with only
 its number spoken, "One." to "Ninety nine.", from `web/number_names.js` (99 numbers, Opus in Ogg as base64, about
 0.35 MB, committed; made by `tools/make_number_names.py` with the user's `piper.exe`, same voice as the default sets,
-public domain, so the sounds are ours). Nothing is downloaded for it. The page keeps the sound in step with the number
+public domain, so the sounds are ours). Nothing is downloaded for it. The app keeps the sound in step with the number
 while it is "number NN": choosing another number gives the new sound, and a set without any name sound gets its
 number when it is written. The button "Number only" in the Name row puts the number back. A spoken name ("Eight.
 Detroit sixty.") is still made with Speak (downloads Piper, see below), recorded, or chosen as a file; such a sound is
@@ -309,11 +309,11 @@ The name is announced once, when the set is chosen, so it only has to be short a
 2. **Own recording**: a phone or a PC microphone, a quiet room, about 20 cm from the mouth. In Audacity: record,
    Effect > Normalize to -1 dB, cut the silence at both ends, Effect > Fade In / Fade Out on the first and last
    10 ms, File > Export > WAV. The PC tool converts the rest.
-3. **On the web page** (`web/index.html`): Record (the microphone) or Speak (type the name, Piper speaks it in
-   the browser with the same voice as the default sets; see "The web page"). The browser's own speech
+3. **On the web app** (`web/index.html`): Record (the microphone) or Speak (type the name, Piper speaks it in
+   the browser with the same voice as the default sets; see "The web app"). The browser's own speech
    (Web Speech API) is simpler but uses the voices of the operating system, whose licences for redistributed
    recordings are unclear (the reason Windows TTS was not used for the prompts, 2026-11-05); it would be fine only
-   for a name that stays on the user's own module. Recording through the microphone in the page is the other
+   for a name that stays on the user's own module. Recording through the microphone in the app is the other
    option.
 
 The PC tool plays the name through a model of the speaker (`tools/speaker_model.py`) before uploading, so it can be
@@ -325,7 +325,7 @@ Sounds the user uploads stay on their module and do not go into this repo, so th
 to them; their licence is the user's responsibility. The default sets that come with the firmware stay CC0 as now
 (`assets/samples/LICENSE-SAMPLES.md`).
 
-## The web page
+## The web app
 
 `web/index.html` is one file without a build step or a server: open it in Chrome or Edge (from disk works, Web
 Serial runs on `file:` pages), press "Connect module" and choose the module's USB port. It needs `engine_sets` on
@@ -333,42 +333,42 @@ the module.
 
 **What the user needs** (for the user guide): a computer (Windows, macOS, Linux or ChromeOS) with **Chrome or Edge**
 (version 89 or newer), and a USB-C cable. Only Chromium browsers have Web Serial. Safari and Firefox do not, and
-neither does any browser on an iPhone or iPad; there the page says so and "Connect module" stays off. On a Mac,
+neither does any browser on an iPhone or iPad; there the app says so and "Connect module" stays off. On a Mac,
 installing Chrome is enough. Tested so far only in Edge on Windows.
 
 - **User guide (2026-11-15):** `user-guide.md`, with pictures made by `tools/make_guide_images.py` (always the light
-  look, whatever the system's colour setting is) and a panel "How it works" at the top of the page. The firmware
+  look, whatever the system's colour setting is) and a panel "How it works" at the top of the app. The firmware
   version shows in the connection line and under the list (both confirmed on the real module by the owner,
   2026-11-15).
 - **Default set (2026-11-15)**: the row of the set the module starts with after power-up is tinted and has a green
-  "default" mark; the button "Default" on any other row makes it the start set (`@default`). Test only
+  "default" mark; the button "Default" on any other row makes it the default set (`@default`). Test only
   tries a set and does not change it; BOOT on the module does (it steps to the next set and remembers it). The small
   green dot is the set chosen on the module now. Renaming the default set keeps it the default.
 - **On the module**: every set with its number, name, type and size, and the free space. "Test" chooses the set on
   the module, it speaks the name and plays a demo of about 25 s (below; this was "Demo", and a separate "Play" that
   only spoke the name was dropped on 2026-11-15 because users could not tell the two apart), "Edit" and "Copy" open it in the editor, "Delete" removes it after a question. Folders the module skips
-  (no number, a number used twice, no `set.json`) are marked. Every Test and every Play of a sound on the page has a Stop beside it (on the module it sends `@stop`; checked on the module on 2026-11-15: it stops a running demo).
+  (no number, a number used twice, no `set.json`) are marked. Every Test and every Play of a sound on the app has a Stop beside it (on the module it sends `@stop`; checked on the module on 2026-11-15: it stops a running demo).
 - **Test** (the demo): the name, ignition on (starter, the engine catches), the throttle profile of `engine_demo` from 2.5 s
   (idle, full throttle through the gears, release, two blips, half throttle, idle), the horn at 17 s, ignition off
   at 21.5 s and the wind-down. On the module (`@demo`) it runs in the firmware for every set, without a receiver;
-  BOOT or the receiver's data end it. In the simulated module the page renders it for sample sets with a port of
+  BOOT or the receiver's data end it. In the simulated module the app renders it for sample sets with a port of
   what the firmware does (EngineState, Gearbox, loops, EQ, starter, horn, shift), without the speaker; synth sets
   are made by the firmware and cannot be rendered in the browser, so their Test is off there, with a tooltip saying
   so.
 - **Editor**: number (only free ones are offered), name, folder description, type (sample, or synth with its
   preset), the sounds and the parameters of `set.json`. A sound is dropped on its row or chosen; any format the
   browser can decode is converted to 22 050 Hz, 16 bit, mono. The name can also be recorded with the microphone;
-  the page cuts the silence, adds 10 ms fades and sets the peak to -1 dB. Each sound can be heard in the browser,
+  the app cuts the silence, adds 10 ms fades and sets the peak to -1 dB. Each sound can be heard in the browser,
   the loops looped and at any playback rate of the rpm range. Lengths outside the expected range, clipping and very
   quiet sounds are flagged, not refused. Speaker EQ: none, the 30 ml box, or the one already in the set, with a
   gain.
 - **Write to the module** writes only the changed WAVs and `set.json`; a new number or description renames the
   folder first, and a set changed to synth loses its `idle.wav` and `loaded.wav`.
 - **Copy** is the easy way to a new set: the starter, horn and shift come along and only the engine changes.
-- **Simulated module**: the same protocol inside the page, for trying the page without hardware. It holds the
+- **Simulated module**: the same protocol inside the app, for trying the app without hardware. It holds the
   seven default sets from `web/demo_sets.js` (2.8 MB of base64, written by `tools/make_default_sets.py`, or alone
   with `--demo-only`; generated, not committed); without that file, two small demo sets with beeps. Changes live
-  only until the page is closed. `index.html#selftest` runs an automatic test against the two small demo sets
+  only until the app is closed. `index.html#selftest` runs an automatic test against the two small demo sets
   (13 checks, all passing on 2026-11-14 in Edge).
 
 - **Speak** (the Name row): the name made with [Piper](https://github.com/rhasspy/piper) text-to-speech in the
@@ -377,7 +377,7 @@ installing Chrome is enough. Tested so far only in Edge on Windows.
   is loaded until the first Speak, and then only after a question that says what is downloaded and from where. The
   part "What is downloaded and used" under the box names the projects with links.
 
-  *What the page loads, from third parties (checked on 2026-11-14 in the code of piper-tts-web 1.0.4):*
+  *What the app loads, from third parties (checked on 2026-11-14 in the code of piper-tts-web 1.0.4):*
 
   | What | From | Licence |
   |---|---|---|
@@ -403,20 +403,20 @@ installing Chrome is enough. Tested so far only in Edge on Windows.
   The Piper repository `rhasspy/piper` (MIT) was archived on 2025-10-06 and development moved to
   `OHF-Voice/piper1-gpl`; that project's licence has not been checked here.
 
-Not on the page yet: help with the loop points, the user guide. Hosting on GitHub Pages needs the repo public or a paid plan; until then the file is opened from disk.
+Not on the app yet: help with the loop points, the user guide. Hosting on GitHub Pages needs the repo public or a paid plan; until then the file is opened from disk.
 
 ### The USB protocol
 
 `firmware/include/set_link.h`, version 1. Text lines both ways over the USB serial port (115200 Bd, the rate does
-not matter on USB), binary data as base64, so the firmware's log lines can share the port: the page reads only
-lines starting with `@`. Every command ends with one line `@ok ...` or `@err <why>`, and the page sends the next
+not matter on USB), binary data as base64, so the firmware's log lines can share the port: the app reads only
+lines starting with `@`. Every command ends with one line `@ok ...` or `@err <why>`, and the app sends the next
 command only after it; that is the flow control (the ESP32-S3 USB driver drops bytes when its 8 kB receive buffer is
 full).
 
 | Command | Answer |
 |---|---|
 | `@hello` | `@ok cbsound 1` |
-| `@info` | `@ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date> default=<folder or ->`; the page shows the firmware version under the list and marks the default set |
+| `@info` | `@ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date> default=<folder or ->`; the app shows the firmware version under the list and marks the default set |
 | `@default <folder>` | `@ok`; the set the module starts with after power-up (written 2026-11-15, checked on the module); it does not change what is playing, and `@select` and `@demo` do not change it |
 | `@ls` | `@set <bytes> <folder>` per folder in `/sets`, then `@ok <count>` |
 | `@files <folder>` | `@file <bytes> <name>` per file, then `@ok <count>` |
@@ -430,12 +430,12 @@ full).
 | `@bye` | `@ok`; ends the session |
 
 `@put` writes to `<path>.tmp` and replaces the file only when the size and the CRC-32 (zlib) match, so a broken
-transfer leaves the old file. Paths must be under `/sets/`. While the page talks to the module (a session: from the
+transfer leaves the old file. Paths must be under `/sets/`. While the app talks to the module (a session: from the
 first command until `@bye`, `@select` or 3 s without a command) the engine is silent, BOOT is ignored and the
 firmware writes no log lines. When a session that changed files ends, the module scans `/sets` again and reloads
 the current set without speaking its name; a set that is gone gives way to the first one.
 
-Still to check on the module: that opening the port from the browser does not reset the Zero (the page retries
+Still to check on the module: that opening the port from the browser does not reset the Zero (the app retries
 `@hello` for about 8 s, so a reset would only cost time), the transfer speed, and writing while the module runs
 from the receiver.
 
@@ -450,7 +450,7 @@ From the repo root, then from `firmware/`:
    data partition is gone, so the module plays the fallback (diesel synth) and beeps once until step 3.
 3. `pio run -e engine_sets -t uploadfs` writes the sets (the whole data partition, about 5 MB, takes a while).
 4. The serial monitor (115200 Bd) lists the sets found and every set loaded; BOOT steps to the next set, which
-   speaks its name. After a power cycle the module starts with the set chosen last with BOOT, or with the default set of the web page.
+   speaks its name. After a power cycle the module starts with the set chosen last with BOOT, or with the default set of the web app.
 
 Going back to `engine_lab` is just `pio run -e engine_lab -t upload` (it brings its own partition table).
 Flash with the USB power rule in mind (`bringup.md`).

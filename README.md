@@ -71,7 +71,7 @@ the header of `speaker_box.scad`.
 |---|---|
 | `docs/sound-research.md` | engine sound research: constraints of a small speaker, approaches tried, speaker-tuned candidates, lessons |
 | `docs/audio-simulation/README.md` | rendered previews of the engine sounds (`engine_lab` candidates and earlier firmware) |
-| `docs/user-sounds.md` | user-changeable sound sets: the set format, what a sample must meet, the web page and its USB protocol |
+| `docs/user-sounds.md` | user-changeable sound sets: the set format, what a sample must meet, the web app and its USB protocol |
 | `assets/samples/LICENSE-SAMPLES.md` | origin and licence of every sound (CC0 recordings, synthesised sounds, voice prompts) |
 
 **Plans and decisions**
@@ -103,13 +103,13 @@ Open `firmware/` in VS Code with the PlatformIO extension, or run `pio run -e <e
 **Firmware version**: `FW_VERSION` in `firmware/include/version.h` (now 0.1.0), raised by hand for every release,
 which gets the git tag `v<version>`. At build time `firmware/version.py` adds the short hash of the commit (with
 `-dirty` for uncommitted changes) and the date, so the full version reads like `0.1.0+8cc34fd`. `engine_sets`
-prints it at boot (`cyberbrick_sound engine_sets 0.1.0+8cc34fd, built 2026-11-14`) and reports it to the web page
+prints it at boot (`cyberbrick_sound engine_sets 0.1.0+8cc34fd, built 2026-11-14`) and reports it to the web app
 in `@info`.
 
 | Env | What it does |
 |---|---|
 | `engine_lab` | **the current firmware**: all seven engine-sound candidates (the BOOT button switches 1..7 and announces the name), ignition, starter, stop and horn from the channel data, shift sound, no upshift while reversing, speaker EQ for the 30 ml box |
-| `engine_sets` | **tried on the module and the web page on 2026-11-15** (works): the sounds as sets in the data partition (`docs/user-sounds.md`): BOOT steps through them and speaks the name, sample and synth sets, fallback set compiled in; sets built by `tools/make_default_sets.py`, written with `-t uploadfs` or one by one with the web page `web/index.html` over USB |
+| `engine_sets` | **tried on the module and the web app on 2026-11-15** (works): the sounds as sets in the data partition (`docs/user-sounds.md`): BOOT steps through them and speaks the name, sample and synth sets, fallback set compiled in; sets built by `tools/make_default_sets.py`, written with `-t uploadfs` or one by one with the web page `web/index.html` over USB |
 | `engine_demo` | the same, plays every sound through the whole rpm range by itself with a spoken announcement (no receiver needed) |
 | `engine_pulse` | real-time grain synthesis (preset a_diesel6) |
 | `engine`, `engine_diesel`, `engine_truck`, `engine_gears` | earlier variants: synthesised loop, CC0 diesel and truck loops with the virtual gearbox, one loop per gear |
