@@ -67,6 +67,7 @@ Not started; recorded so the design does not block them.
     The page then also knows the newest version without being downloaded again. While the repo is private: a
     `firmware.bin` or a generated JS file beside `index.html` like `demo_sets.js`, or a file the user chooses. Also
     open: whether esptool-js is loaded from a CDN like Piper or kept with the page, and its licence (Apache 2.0).
+  - *Leaning (2026-11-17, not decided)*: both ways of getting the firmware, online as the main one and a file the user chooses as the fallback. Build the file chooser first: it works with the repo private, and it is how the flashing itself gets tested. Online comes once the repo is public (with a small manifest: version, date, checksum, fetched through a host that allows it, as above; it does not work from `file://`). For a chosen file the page checks the image header (magic byte 0xE9, chip ESP32-S3) and the project name in the app descriptor before it writes, and it always asks first. Both ways use the same esptool-js writer, the app slot only.
 - **Revisions for the printed parts** (to consider, noted 2026-11-14): the speaker box, its cap and the solder
   stand (`hardware/speaker_box/`, `hardware/solder_stand/`) could get revision letters like the shield (rev A, ...,
   git tags `hw-speaker_box-revA` and so on) once printed copies need telling apart, perhaps with the revision
