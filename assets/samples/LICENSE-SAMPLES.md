@@ -16,6 +16,8 @@ or it is polite, it is in the last column; the details of each sound are in the 
 | Spoken names and numbers (`firmware/include/voice_prompts.h`, `web/number_names.js`, `name.wav` of the default sets) | made with [Piper](https://github.com/rhasspy/piper) and the voice `en_US-ljspeech-medium` ([model card](https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/ljspeech/medium)), trained on the LJ Speech dataset | Piper: rhasspy; the voice: LJ Speech (public domain) | Piper MIT; voice public domain | Thanks to the Piper project and the LJ Speech dataset |
 | Synthesised engines, starter, horn, test set (`assets/test_set/`, the synth presets) | made by this project's own code from formulas | this project | MIT (our own) | none |
 
+The CC0 of the craigsmith sounds is the digitiser's declaration: the rights to the original 1930s-60s Hollywood effects cannot be verified.
+
 Checked on the Freesound pages of all Freesound sounds and of the craigsmith pack on 2026-11-17: all show Creative Commons 0, and only wesleywestmusic asks for something.
 
 Source: https://opengameart.org/content/racing-car-engine-sound-loops
@@ -86,7 +88,7 @@ Content (own analysis): old noisy optical recordings of a large old truck, a vis
 The `engine_pulse` grain synth (`tools/make_engine_grains.py`, `firmware/include/engine_synth.h`), the earlier synthesised loop (`tools/make_engine_synth.py`) and the speaker-tuned grain synth with the presets `diesel`, `petrol4`, `v8` and `v12` (`tools/engine_lab.py`, `firmware/include/engine_synth2.h`, data in `firmware/include/engine_lab_data.h`) are generated entirely by this project's code from formulas. They contain no recorded audio, so no third-party licence applies.
 
 ## Voice prompts (used by the `engine_lab` / `engine_demo` firmware)
-Text-to-speech: Piper (https://github.com/rhasspy/piper, MIT licence), voice `en_US-ljspeech-medium` (https://huggingface.co/rhasspy/piper-voices, en/en_US/ljspeech/medium), trained on the LJ Speech dataset, which its model card lists as public domain.
+Text-to-speech: Piper (https://github.com/rhasspy/piper, MIT licence), voice `en_US-ljspeech-medium` (https://huggingface.co/rhasspy/piper-voices, en/en_US/ljspeech/medium), trained on the LJ Speech dataset, which its model card lists as public domain; the card also says the voice was trained from scratch, not fine-tuned from another voice (checked 2026-11-17), so it does not inherit the research-only licence of the Blizzard 2013 data under the Lessac voice. The newer Piper repository `OHF-Voice/piper1-gpl` is GPL-3.0-or-later for its code and grants nothing over voices (details: `docs/user-sounds.md`).
 Generated file: `firmware/include/voice_prompts.h` (six short English prompts "One. Truck." .. "Six. V eight."; "Seven. V twelve." is in the script but the committed header still has six prompts until it is regenerated), made with `pwsh tools/make_voice_prompts.ps1` and `tools/make_voice_header.py` (resampled to 22.05 kHz, trimmed, high-passed at 250 Hz, normalised). Neither Piper nor the voice model is stored here.
 Replaced the earlier Windows text-to-speech prompts (2026-11-05), because the licence of the Windows voices for redistribution was unclear.
 

@@ -401,7 +401,7 @@ installing Chrome is enough. Tested so far only in Edge on Windows.
   (GPL 3 or later), its licence text and the corresponding source (or an offer of it) with the build steps and
   versions. Not done; until then nothing is redistributed, the browser fetches the files directly from their hosts.
   The Piper repository `rhasspy/piper` (MIT) was archived on 2025-10-06 and development moved to
-  `OHF-Voice/piper1-gpl`; that project's licence has not been checked here.
+  `OHF-Voice/piper1-gpl`. Checked 2026-11-17: its code is **GPL-3.0-or-later** (`COPYING`), and its `docs/LICENSING.md` says it grants no licence over voice models; a voice's rights come from its training data and trainer (each `MODEL_CARD`), and whether a model is a derivative of its training data is called "unsettled". The card of our voice `en_US-ljspeech-medium` says: LJ Speech, public domain, trained from scratch (not fine-tuned from the Lessac voice, whose Blizzard 2013 data is research-only). The text does not say whether the GPL reaches the audio a Piper build produces; we make the audio on the project owner's computer or in the user's browser and ship only the audio, with the source and licence of the tools named here.
 
 Not on the app yet: help with the loop points, the user guide. Hosting on GitHub Pages needs the repo public or a paid plan; until then the file is opened from disk.
 
