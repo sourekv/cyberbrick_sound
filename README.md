@@ -124,7 +124,7 @@ in `@info`.
   inertia and shifts through 5 gears; an effect, not a simulation. Tunable in `config.h`.
 - **Status LED** on the Zero's onboard RGB LED (GPIO21): blue flash at start, red without valid data, dim green at
   rest, brightening cyan with the throttle (`STATUS_LED_*` in `config.h`).
-- **Sounds**: recordings are CC0, or CC BY with the author credited (decided 2026-11-02); everything else is synthesised. Each sound keeps its own licence: the table in `assets/samples/LICENSE-SAMPLES.md` lists source, author, licence and credit. Why the sound is built this way:
+- **Sounds**: recordings should be CC0, but we had to make some concessions (CC BY with the author credited is accepted, decided 2026-11-02; a few origins cannot be fully verified); everything else is synthesised. Each sound keeps its own licence: the table in `assets/samples/LICENSE-SAMPLES.md` lists source, author, licence, credit and the doubts. Why the sound is built this way:
   `docs/sound-research.md`.
 
 ## Wiring

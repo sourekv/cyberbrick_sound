@@ -85,7 +85,7 @@ The constraints that decided everything:
 
 - The speaker is small (40 mm prototype, 21 mm production candidates) and reproduces almost nothing below about 300 Hz. Sound that lives below 150 Hz is nearly inaudible and turns into hiss. The first CC0 car loops were almost pure 40 to 80 Hz tones and failed for exactly this reason.
 - Playing a loop faster shifts the whole timbre, not just the firing rate, so a single loop turns into a siren at high rates. That is why the synthesised grain engine (`engine_pulse`) keeps the grain timbre fixed and changes only the rate, and why the real-loop firmware limits the rate range and adds a second layer.
-- Real recordings used must be **CC0, or CC BY with the author credited**; each sound keeps its own licence. Origins, authors and checks are in `assets/samples/LICENSE-SAMPLES.md`: Citroen diesel idle (chlund), truck idle (wesleywestmusic), truck under load (kyles). Only short derived loops are stored, not the originals. The tools that cut and convert them are `tools/make_diesel_loop.py` and `tools/make_engine_diesel.py`.
+- Real recordings used **should be CC0**, but we had to make some concessions (CC BY with the author credited is accepted; a few origins cannot be fully verified); each sound keeps its own licence. Origins, authors and checks are in `assets/samples/LICENSE-SAMPLES.md`: Citroen diesel idle (chlund), truck idle (wesleywestmusic), truck under load (kyles). Only short derived loops are stored, not the originals. The tools that cut and convert them are `tools/make_diesel_loop.py` and `tools/make_engine_diesel.py`.
 
 ## What was tested, and how
 
