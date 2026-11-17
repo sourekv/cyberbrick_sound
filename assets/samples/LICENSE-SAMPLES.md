@@ -4,7 +4,8 @@ Source: https://opengameart.org/content/racing-car-engine-sound-loops
 Author: domasx2
 License: CC0 (public domain)
 Files: loop_0.wav .. loop_5.wav (differ in pitch only)
-Note: a 2011 comment questioned the origin of the sample; the author states the loops were remade from a public domain sample. Re-verify before any commercial use.
+Origin (checked 2026-11-17 on the OpenGameArt page and on an archive.org copy of the source): the author made the loops for banditracer.eu by cutting a piece out of "start up car with seat belt warning beep" (Stephan, 2007-04-02, https://www.pdsounds.org/sounds/start_up_car_with_seat_belt_warning_beep), editing it into a loop and changing the pitch. pdsounds.org stated on every page "Recordings are in the public domain" (archive.org copy of 2012-01-02; the site is gone).
+Note on the 2011 comment: the user qubodup pointed out on 2011-07-24 that sounds under cc-sampling-plus cannot be released as CC BY. The author replied the same day (15:28) "Remade these using a public domain sample"; the question concerned the earlier version of the loops, not the files now on the page. Remaining uncertainty: the public domain statement of pdsounds.org is a site-wide statement that can no longer be checked. Credit (not a condition): domasx2, and Stephan of pdsounds.org.
 
 Download URLs:
 - loop_0.wav https://opengameart.org/sites/default/files/loop_0.wav
