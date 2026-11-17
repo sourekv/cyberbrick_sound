@@ -16,7 +16,7 @@ or it is polite, it is in the last column; the details of each sound are in the 
 | Spoken names and numbers (`firmware/include/voice_prompts.h`, `web/number_names.js`, `name.wav` of the default sets) | made with [Piper](https://github.com/rhasspy/piper) and the voice `en_US-ljspeech-medium` ([model card](https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/ljspeech/medium)), trained on the LJ Speech dataset | Piper: rhasspy; the voice: LJ Speech (public domain) | Piper MIT; voice public domain | Thanks to the Piper project and the LJ Speech dataset |
 | Synthesised engines, starter, horn, test set (`assets/test_set/`, the synth presets) | made by this project's own code from formulas | this project | MIT (our own) | none |
 
-To fill in or check: whether the authors have asked for anything on their Freesound pages beyond what is listed (only wesleywestmusic is known).
+Checked on the Freesound pages of all Freesound sounds and of the craigsmith pack on 2026-11-17: all show Creative Commons 0, and only wesleywestmusic asks for something.
 
 Source: https://opengameart.org/content/racing-car-engine-sound-loops
 Author: domasx2
@@ -44,7 +44,7 @@ Note: the same recording is also offered on Pixabay under the Pixabay licence; u
 ## Truck idle recording (used by the `engine_truck` firmware)
 Source: https://freesound.org/people/wesleywestmusic/sounds/680686/
 Author: wesleywestmusic (recorded in Bellville, Western Cape, South Africa; uploaded 2023-03-27)
-License: CC0 1.0 (public domain dedication); the licence on the Freesound page was checked on 2026-10-31 from a screenshot of the page supplied by the project owner (the page itself could not be fetched from the build environment)
+License: CC0 1.0 (public domain dedication); the licence on the Freesound page was checked on 2026-10-31 from a screenshot of the page supplied by the project owner, and again on the page itself on 2026-11-17 (CC0; the author's text asks only for the YouTube subscription)
 Original: "Truck Revving Idling Engine Sound", 48 s, 48 kHz 16 bit stereo WAV, recorded and edited by the author in Logic Pro. The original is not stored here.
 Derived file: `truck_idle_loop.wav` (5.34 s, 22.05 kHz mono), cut from the idle part from 10 s with `python tools/make_diesel_loop.py <original> assets/samples/truck_idle_loop.wav --start 10 --min 3 --max 6`; `tools/make_engine_diesel.py assets/samples/truck_idle_loop.wav firmware/include/engine_truck.h` turns it into the firmware header.
 Content (own analysis): a steady idle of a larger diesel at about 8 crank revolutions per second (roughly 500 rpm, about 25 firing pulses per second), constant level from 2 s to 46 s, no real rev sweep; the first 2 s are louder and lower.
@@ -53,7 +53,7 @@ The author asks (not a licence condition) that users of his sounds subscribe to 
 ## Truck "under load" loop (used by the `engine_truck` firmware as a second layer)
 Source: https://freesound.org/s/637914/ ("truck big diesel engine work up a hill sustained rev and pass by2.flac")
 Author: kyles (uploaded 2022-06-09)
-License: CC0 1.0 (public domain dedication); checked on 2026-11-01 from a screenshot of the Freesound page supplied by the project owner (the page itself could not be fetched from the build environment)
+License: CC0 1.0 (public domain dedication); checked on 2026-11-01 from a screenshot of the Freesound page supplied by the project owner, and again on the page itself on 2026-11-17 (CC0, no requests in the description)
 Original: 25 s, 48 kHz mono FLAC, a big diesel truck working up a hill and passing by. The original is not stored here.
 Derived file: `truck_loaded_loop.wav` (1.90 s, 22.05 kHz mono), cut from the louder approach part with `python tools/make_diesel_loop.py <original> assets/samples/truck_loaded_loop.wav --start 6.6 --min 1.5 --max 2.6`; `python tools/make_engine_diesel.py assets/samples/truck_loaded_loop.wav firmware/include/engine_truck_loaded.h ENGINE_LOADED` turns it into the firmware header.
 Content (own analysis): the firing rate stays at about 21 Hz throughout (no real rev change), the level and brightness change because the truck passes; the loop seam is weak (match 0.22), so the repetition may be audible. Used only as a brighter, louder layer that is blended in with the throttle.
@@ -74,7 +74,7 @@ Six engine recordings were provided by the project owner for evaluation (mono, 8
 
 ## Per-gear loops (used by the `engine_gears` firmware)
 Source: Freesound pack "Vintage Trucks (Red Lib)" by craigsmith, https://freesound.org/people/craigsmith/packs/27529/ (the Red Library: 1930s-40s nitrate optical sound effects made for Hollywood studios, digitised and cleaned of splices)
-License: Creative Commons 0 (CC0 1.0); the pack's readme lists CC0 for every sound in it (checked 2026-11-01 from the readme of the pack download supplied by the project owner)
+License: Creative Commons 0 (CC0 1.0); the pack's readme lists CC0 for every sound in it (checked 2026-11-01 from the readme of the pack download supplied by the project owner; on 2026-11-17 the Freesound pages of the pack and of both sounds show CC0 too, with no requests; the pack text only explains the Red Library and asks to "embrace the noise")
 Used sounds (48 kHz mono, originals not stored here):
 - https://freesound.org/s/487151/ "R03-29-Large Truck Constant Engine" (10.8 s) -> `gear_a_r03-29.wav` (5.00 s, 22.05 kHz mono): `python tools/make_gear_loop.py <original> assets/samples/gear_a_r03-29.wav --start 0.6 --end 6.6`
 - https://freesound.org/s/487152/ "R03-32-Old Truck Engine Working Hard" (33.1 s) -> `gear_b_r03-32.wav` (7.00 s): `python tools/make_gear_loop.py <original> assets/samples/gear_b_r03-32.wav --start 5 --end 13`
