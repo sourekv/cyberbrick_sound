@@ -83,6 +83,8 @@ the header of `speaker_box.scad`.
 
 ## Structure
 
+A short map of every directory: `docs/contents.md`.
+
 - `firmware/` - PlatformIO (Arduino) project; pins and all tunable constants in `firmware/include/config.h`
 - `web/index.html` - the PC tool for the sound sets: open it in Chrome or Edge, connect the module over USB
 - `tools/` - Python and C++ helpers: sound generation and rendering (`engine_lab.py`, `speaker_model.py`), header
