@@ -97,12 +97,12 @@ details.guide li { margin-bottom: 4px; }
   <section>
   <details class="guide" id="howto">
     <summary><strong>How to use</strong> (the steps, and what each button does)</summary>
-    <svg viewBox="0 0 900 96" role="img" aria-label="Steps: connect, test, default, copy or edit, write" style="width:100%;height:auto;margin:10px 0 4px">
+    <svg viewBox="0 0 900 96" role="img" aria-label="Steps: connect, test, activate, copy or edit, write" style="width:100%;height:auto;margin:10px 0 4px">
       <defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--muted)"/></marker></defs>
       <g font-size="15" text-anchor="middle" fill="var(--ink)">
         <g><rect x="2" y="8" width="150" height="62" rx="9" fill="var(--chip)" stroke="var(--line)"/><text x="77" y="34" font-weight="600">1 Connect</text><text x="77" y="55" font-size="12.5" fill="var(--muted)">module on USB</text></g>
         <g><rect x="190" y="8" width="150" height="62" rx="9" fill="var(--chip)" stroke="var(--line)"/><text x="265" y="34" font-weight="600">2 Test</text><text x="265" y="55" font-size="12.5" fill="var(--muted)">listen, Stop</text></g>
-        <g><rect x="378" y="8" width="150" height="62" rx="9" fill="var(--chip)" stroke="var(--line)"/><text x="453" y="34" font-weight="600">3 Default</text><text x="453" y="55" font-size="12.5" fill="var(--muted)">the set it starts with</text></g>
+        <g><rect x="378" y="8" width="150" height="62" rx="9" fill="var(--chip)" stroke="var(--line)"/><text x="453" y="34" font-weight="600">3 Activate</text><text x="453" y="55" font-size="12.5" fill="var(--muted)">the set it starts with</text></g>
         <g><rect x="566" y="8" width="150" height="62" rx="9" fill="var(--chip)" stroke="var(--line)"/><text x="641" y="34" font-weight="600">4 Copy / Edit</text><text x="641" y="55" font-size="12.5" fill="var(--muted)">your own sounds</text></g>
         <g><rect x="754" y="8" width="144" height="62" rx="9" fill="var(--accent)" stroke="var(--accent)"/><text x="826" y="34" font-weight="600" fill="var(--accent-ink)">5 Write</text><text x="826" y="55" font-size="12.5" fill="var(--accent-ink)">to the module</text></g>
       </g>
@@ -115,8 +115,8 @@ details.guide li { margin-bottom: 4px; }
       <li><strong>Test</strong> chooses the set on the module, which says its name and plays a demo of about 25 s
         (starter, engine, gears, horn, stop); no receiver is needed. <strong>Stop</strong> silences it at once. Test
         does not change which set the module starts with.</li>
-      <li><strong>Default</strong> makes the set the module starts with after power-up (the green "default" mark). The
-        BOOT button on the module steps to the next set and also makes it the start set.</li>
+      <li><strong>Activate</strong> makes the set the active one: the module starts with it after power-up (the green
+        "active" mark). The BOOT button on the module steps to the next set and also makes it the active set.</li>
       <li><strong>Copy</strong> is the easy way to a new set: the starter, horn and shift come along and only the engine
         changes. <strong>Edit</strong> changes a set in place. <strong>New empty set</strong> starts from nothing.</li>
       <li>In the editor, drop a sound on its row or <strong>Choose file</strong>; <strong>Play</strong> lets you hear it
@@ -856,7 +856,7 @@ function renderSets() {
     const cells = [idx || "-", j ? j.name || "" : "", type, kB(s.bytes), s.folder];
     for (const c of cells) { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); }
     const isDef = s.folder === info.default;
-    if (isDef) { tr.className = "isdef"; tr.children[1].insertAdjacentHTML("beforeend", ' <span class="defbadge" title="the module starts with this set after power-up">default</span>'); }
+    if (isDef) { tr.className = "isdef"; tr.children[1].insertAdjacentHTML("beforeend", ' <span class="defbadge" title="the active set: the module starts with it after power-up">active</span>'); }
     if (s.folder === info.set) tr.children[1].insertAdjacentHTML("beforeend", ' <span class="ok" title="chosen on the module now">&#9679;</span>');
     if (note) tr.children[1].insertAdjacentHTML("beforeend", `<div class="warn hint">${note}</div>`);
     const td = document.createElement("td"); td.className = "actions";
@@ -870,8 +870,8 @@ function renderSets() {
     btn("Stop", () => guarded(async () => { await link.stop(); stopPlay(); log("stopped"); }),
         sim ? "stop the name or the demo" : "silence the name and the demo that the module is playing (the engine winds down)");
     if (sim) td.lastChild.previousSibling.dataset.owner = "set:" + s.folder;   // plays here, in the browser
-    const bd = btn("Default", () => guarded(async () => { await link.setDefault(s.folder); info.default = s.folder; renderSets(); log(s.folder + " is now the set the module starts with"); }),
-        isDef ? "the module starts with this set after power-up" : "make this the set the module starts with after power-up (Test does not change it)");
+    const bd = btn("Activate", () => guarded(async () => { await link.setDefault(s.folder); info.default = s.folder; renderSets(); log(s.folder + " is now the active set (the module starts with it)"); }),
+        isDef ? "this is the active set: the module starts with it after power-up" : "make this the active set: the module starts with it after power-up (Test does not change it)");
     if (isDef) { bd.disabled = true; bd.dataset.never = "1"; }
     btn("Edit", () => openSet(s.folder, false));
     btn("Copy", () => openSet(s.folder, true), "a new set made from this one");

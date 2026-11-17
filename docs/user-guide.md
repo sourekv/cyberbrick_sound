@@ -15,7 +15,7 @@ can be remade after any change of the app. How the sets and the protocol work in
 
 ![How to use](guide/01-how-to-use.png)
 
-1. **Connect** the module. 2. **Test** the sets you have. 3. Choose the **Default** one. 4. **Copy** or **Edit** a set to
+1. **Connect** the module. 2. **Test** the sets you have. 3. **Activate** the one you want. 4. **Copy** or **Edit** a set to
 make your own. 5. **Write** it to the module.
 
 ## 1. Connect
@@ -44,7 +44,7 @@ and free memory of the module (about 4.6 MB of sounds in all) and the firmware v
 |---|---|
 | **Test** | The module chooses this set, says its name and plays a demo of about 25 s: the starter, the engine catching, full throttle through the gears, a release, two blips, the horn and the stop. No receiver is needed. It does **not** change which set the module starts with. (Synth sets cannot be tested in the simulated module, only on the real one.) |
 | **Stop** | Silences the test at once. |
-| **Default** | Makes this set the one the module **starts with** after power-up (the row is tinted and has the green "default" mark). The BOOT button on the module also steps to the next set and makes it the default set. |
+| **Activate** | Makes this the **active** set, the one the module **starts with** after power-up (the row is tinted and has the green "active" mark). The BOOT button on the module also steps to the next set and makes it the active set. |
 | **Edit** | Opens the set in the editor to change it in place. |
 | **Copy** | Opens a copy as a new set, the easy start for your own: the starter, the horn and the shift sound come along and you change only the engine. |
 | **Delete** | Removes the set from the module after a question. It cannot be undone. |

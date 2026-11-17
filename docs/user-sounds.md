@@ -172,7 +172,7 @@ All WAVs in the format of "Format on the module".
 │   ├── 03_pulse_old/        synth set: the same files without idle.wav and loaded.wav
 │   │   └── ...
 │   └── ... 07_v12/
-└── state.json        the set the module starts with after power-up (the default; set by BOOT or by the app's Default)
+└── state.json        the set the module starts with after power-up (the active set; set by BOOT or by the app's Activate)
 ```
 
 The firmware lists `/sets/` at start-up, sorts the folders by name and skips a folder with a file missing (it
@@ -340,10 +340,10 @@ installing Chrome is enough. Tested so far only in Edge on Windows.
   look, whatever the system's colour setting is) and a panel "How to use" at the top of the app. The firmware
   version shows in the connection line and under the list (both confirmed on the real module by the owner,
   2026-11-15).
-- **Default set (2026-11-15)**: the row of the set the module starts with after power-up is tinted and has a green
-  "default" mark; the button "Default" on any other row makes it the default set (`@default`). Test only
+- **Active set (2026-11-15, renamed from "default" on 2026-11-17)**: the row of the set the module starts with after power-up is tinted and has a green
+  "active" mark; the button "Activate" on any other row makes it the active set (the protocol keeps the old word: `@default`). Test only
   tries a set and does not change it; BOOT on the module does (it steps to the next set and remembers it). The small
-  green dot is the set chosen on the module now. Renaming the default set keeps it the default.
+  green dot is the set chosen on the module now. Renaming the active set keeps it the active one.
 - **On the module**: every set with its number, name, type and size, and the free space. "Test" chooses the set on
   the module, it speaks the name and plays a demo of about 25 s (below; this was "Demo", and a separate "Play" that
   only spoke the name was dropped on 2026-11-15 because users could not tell the two apart), "Edit" and "Copy" open it in the editor, "Delete" removes it after a question. Folders the module skips
@@ -416,7 +416,7 @@ full).
 | Command | Answer |
 |---|---|
 | `@hello` | `@ok cbsound 1` |
-| `@info` | `@ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date> default=<folder or ->`; the app shows the firmware version under the list and marks the default set |
+| `@info` | `@ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date> default=<folder or ->`; the app shows the firmware version under the list and marks the active set |
 | `@default <folder>` | `@ok`; the set the module starts with after power-up (written 2026-11-15, checked on the module); it does not change what is playing, and `@select` and `@demo` do not change it |
 | `@ls` | `@set <bytes> <folder>` per folder in `/sets`, then `@ok <count>` |
 | `@files <folder>` | `@file <bytes> <name>` per file, then `@ok <count>` |
@@ -450,7 +450,7 @@ From the repo root, then from `firmware/`:
    data partition is gone, so the module plays the fallback (diesel synth) and beeps once until step 3.
 3. `pio run -e engine_sets -t uploadfs` writes the sets (the whole data partition, about 5 MB, takes a while).
 4. The serial monitor (115200 Bd) lists the sets found and every set loaded; BOOT steps to the next set, which
-   speaks its name. After a power cycle the module starts with the set chosen last with BOOT, or with the default set of the web app.
+   speaks its name. After a power cycle the module starts with the set chosen last with BOOT, or with the active set of the web app.
 
 Going back to `engine_lab` is just `pio run -e engine_lab -t upload` (it brings its own partition table).
 Flash with the USB power rule in mind (`bringup.md`).

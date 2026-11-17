@@ -27,7 +27,7 @@ def main():
         pg.click("#howto summary")
         pg.screenshot(path=os.path.join(OUT, "02-start.png"), clip={"x": 0, "y": 0, "width": 1040, "height": 260})
         pg.click("#btnSim"); pg.wait_for_timeout(1500)
-        pg.locator("#setRows tr").nth(1).get_by_text("Default", exact=True).click(); pg.wait_for_timeout(500)
+        pg.locator("#setRows tr").nth(1).get_by_text("Activate", exact=True).click(); pg.wait_for_timeout(500)
         pg.locator("#secSets").screenshot(path=os.path.join(OUT, "03-list.png"))
         pg.locator("#setRows tr").first.get_by_text("Copy", exact=True).click(); pg.wait_for_timeout(2500)
         pg.locator("#secEdit").screenshot(path=os.path.join(OUT, "04-editor.png"))
