@@ -54,7 +54,7 @@ A short map of the repository. What each document says is in the table in `READM
 |---|---|
 | Sound | `engine_lab.py`, `simulate_engine.py`, `speaker_model.py`, `make_engine_*.py`, `make_*_loop.py`, `make_shift_sound.py`, `make_sample.py` |
 | Sets and web app | `make_default_sets.py`, `make_user_sounds.py`, `make_test_set.py`, `make_number_names.py`, `make_voice_*`, `make_guide_images.py` |
-| Shield | `make_shield_*.py`, `shield_*.py`, `place_shield.py`, `check_shield_netlist.py`, `render_pcb.py` |
+| Shield | `make_shield_*.py`, `shield_*.py`, `place_shield.py`, `check_shield_netlist.py`, `check_shield_3d.py` (3D sizes, collisions, room under the Zero), `render_pcb.py` |
 | Measurement | `analyze_speaker_sweep.py` |
 | Tests | `test_gearbox.cpp`, `test_gear_beep.cpp`, `render_engine_*.cpp` |
 
