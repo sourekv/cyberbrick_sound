@@ -6,6 +6,8 @@ docs/shield-3d.html (tools/make_shield_mock.py): an illustrative model of boxes 
 
     python tools/make_shield_3d_kicad.py          (plain Python; it calls KiCad's kicad-cli)
 
+The page is not committed (it is in .gitignore, about 5 MB): run the tool to make it.
+
 The 3D models of the board are named .wrl, which KiCad 10 does not ship, so a temporary copy of the board with the
 .step files is exported; the board in the repository is not changed. The page loads three.js from cdn.jsdelivr.net
 (same version as docs/shield-3d.html). Made with KiCad 10.0.8, 2026-11-18.
