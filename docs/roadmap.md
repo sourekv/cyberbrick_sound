@@ -49,7 +49,7 @@ Not started; recorded so the design does not block them.
   the spoken name), the directory structure and the file names of a set, how to upload a set, and what is needed
   for it (a computer with Chrome or Edge: no Safari, Firefox, iPhone or iPad, see `user-sounds.md`, "The web page").
 - **Shield revision ID by a resistor** (considered 2026-11-16, not planned). A resistor (or a divider) on the shield on a free pin of the Zero's right column, read by the firmware at start (ADC), would tell one firmware which shield revision the Zero is plugged into; no resistor (breadboard) would mean "prototype" and the default setting. The firmware runs on the Zero, which can be moved between boards, so the ID belongs to the shield. Not worth it while the shield does not change in function: rev A and rev B do not differ in a way the firmware must know, so rev B gets none. Add it to the first revision whose pin assignment, gain or inputs differ; keep a free pin for it when that board is designed.
-- **Firmware check and update on the web page** (idea 2026-11-14, after the page has been tried with the module; **low priority** since 2026-11-18, flashing from the computer with PlatformIO is enough for now):
+- **Firmware check and update on the web page** (idea 2026-11-14, after the page has been tried with the module; makes sense, confirmed 2026-11-18, over USB with esptool-js, not over Wi-Fi):
   - *Check*: the firmware reports its version and build date in the reply to `@info` (done 2026-11-14, see
     "Firmware version" in the README) and the page shows it; still to do: say when the one it carries is newer ("on the module 1.2, available 1.3"). After an update the page checks
     that the module answers `@hello` with the new version.
