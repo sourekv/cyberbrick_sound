@@ -289,9 +289,9 @@ order [order number removed]; shipped on 2026-11-14 by DHL ([tracking number rem
 
 | Seller | Part | Qty | Price incl. shipping | Delivery expected |
 |---|---|---|---|---|
-| piters_pro | Waveshare ESP32-S3-Zero-N8R8-M (SKU 33549, 8 MB flash, 8 MB PSRAM, pin headers fitted) | 1 | 298 CZK (233 + shipping) | by 2026-11-20 |
+| piters_pro | Waveshare ESP32-S3-Zero-N8R8-M (SKU 33549, 8 MB flash, 8 MB PSRAM, pin headers fitted) | 1 | 298 CZK (233 + shipping) | by 2026-11-20; **received** (reported by the owner on 2026-11-20) |
 | OMEGA_ZONE | Speaker ACS SPK3W40MM, 40 mm, 4 Ohm, 3 W, 20 mm deep (same size as the prototype's Solectro M0069) | 1 | 126 CZK (61 + shipping) | by 2026-11-19 |
-The Zero is for a second board. On Allegro, many "ESP32-S3-Zero" listings are the ESP32-S3FH4R2 variant (4 MB flash,
+The Zero is for a second board (received, so there are now two Zeros: the prototype's and this one). On Allegro, many "ESP32-S3-Zero" listings are the ESP32-S3FH4R2 variant (4 MB flash,
 2 MB PSRAM), which does not fit the firmware's 8 MB partition table; only N8R8 boards are usable. Still to buy:
 Zeros and speakers for the remaining boards, once the speaker type is chosen (`roadmap.md`).
 
