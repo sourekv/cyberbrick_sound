@@ -41,7 +41,7 @@ input): `prototype.jpg`.*
 Power on the breadboard: a 1N5819 in the V wire (since 2026-11-12, measured in `bringup.md`) lets USB and the
 servo-port 5 V be connected together; without it they must never be. Current wiring: `wiring-current.png` (one servo cable to S4, data and power); earlier stages: `wiring-overview.png`, `wiring-stage2.png`, `wiring-test-tone.png`.
 
-### Shield PCB (iteration 2: KiCad schematic and routed board exist, reviewed 2026-11-12, ordered at JLCPCB 2026-11-13, not delivered yet)
+### Shield PCB (iteration 2: KiCad schematic and routed board exist, reviewed 2026-11-12, ordered at JLCPCB 2026-11-13, delivered by 2026-11-20)
 
 A carrier board ("shield") that replaces the loose wires. Scope and component list: `shield-pcb.md`; 2D mock `shield-mock.png`; interactive 3D model `shield-3d.html`; both are generated from `tools/shield_layout.py` by `tools/make_shield_mock.py`.
 

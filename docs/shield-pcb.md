@@ -1,6 +1,6 @@
 # Shield PCB (iteration 2): scope
 
-Status: KiCad schematic and a first routed board with manufacturing files exist (`hardware/shield/`), reviewed in KiCad by a colleague of the project owner on 2026-11-12 (no remarks), ordered at JLCPCB on 2026-11-13 (5 assembled boards), production file and parts placement confirmed on 2026-11-14, not delivered yet. Rev B (silkscreen only, same parts and copper) is prepared in `hardware/shield/` since 2026-11-14 and not ordered; rev A is the tag `hw-shield-revA`. The prototype (iteration 1) is a breadboard with an ESP32-S3-Zero-N8R8-M and a MAX98357A, powered and verified as described in `bringup.md`.
+Status: KiCad schematic and a first routed board with manufacturing files exist (`hardware/shield/`), reviewed in KiCad by a colleague of the project owner on 2026-11-12 (no remarks), ordered at JLCPCB on 2026-11-13 (5 assembled boards), production file and parts placement confirmed on 2026-11-14, delivered by 2026-11-20 (photo of the five boards: SMD parts fitted, J1/J3/J4 not yet soldered; the owner calls them "rev. 0", in the repository they are rev A). Rev B (silkscreen only, same parts and copper) is prepared in `hardware/shield/` since 2026-11-14 and not ordered; rev A is the tag `hw-shield-revA`. The prototype (iteration 1) is a breadboard with an ESP32-S3-Zero-N8R8-M and a MAX98357A, powered and verified as described in `bringup.md`.
 
 ## Input: one servo cable to the receiver's S4 header
 
@@ -101,7 +101,7 @@ about 0.14 Ohm, negligible against the 4 Ohm speaker. Also sold: 50 mm (IC005), 
   JP1/JP2, FB1 and others; KiCad's DRC warned about it on 2026-11-01: 13 silkscreen over copper, 17 overlapping,
   18 too close to the edge). Only cosmetic: JLCPCB clips the silkscreen from exposed pads, so some labels come out
   cut. Not worth replacing the files of a paid order; fixed in rev B (see "Revisions").
-- Next: after delivery, solder J1, J3 and J4 and do the first power-up checks (`roadmap.md`).
+- Delivered by 2026-11-20 (five boards). Next: solder J1, J3 and J4 and do the first power-up checks (`roadmap.md`).
 
 Parts (LCSC numbers, all in stock on 2026-11-08; the list is in `tools/make_shield_outputs.py`):
 
@@ -159,7 +159,7 @@ factory; files changed after that belong to the next revision. Decided 2026-11-1
 
 | Rev | Ordered | Tag (commit) | What changed | Tried with firmware |
 |---|---|---|---|---|
-| A | 2026-11-13, JLCPCB, 5 assembled | `hw-shield-revA` (`b5c9992`) | first board | waiting for delivery |
+| A | 2026-11-13, JLCPCB, 5 assembled | `hw-shield-revA` (`b5c9992`) | first board | delivered by 2026-11-20, soldering J1/J3/J4 and the first power-up next |
 | B | not ordered | (tag when ordered) | silkscreen only: revision and name on the board, labels for the person holding it | - |
 
 Rev A carries no revision on the board itself (no text on the silkscreen) and its gerbers say `rev?`; only the
