@@ -270,7 +270,7 @@ steps are in the header of `solder_stand.scad`).
 
 The solder jumpers JP1/JP2 need no work for the default setting (9 dB gain, JP2 bridged in copper).
 
-**Ordered at GM Electronic (gme.cz) on 2026-11-13, order [number removed]**, 187.50 CZK incl. VAT plus shipping:
+**Ordered at GM Electronic (gme.cz) on 2026-11-13, order [number removed]**, 187.50 CZK incl. VAT plus shipping: **the servo cables (775-123, five pieces) have arrived (reported by the owner on 2026-11-20); the male header and the socket strips of the same order: not confirmed yet.**
 
 | GME code | Part | Qty | For |
 |---|---|---|---|
