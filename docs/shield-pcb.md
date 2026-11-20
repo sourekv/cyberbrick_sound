@@ -194,6 +194,7 @@ finds 0 violations (rev A: 53 silkscreen warnings) and 0 unconnected items. The 
   preview as for rev A. It is a try, not a must: if the rev A parts prove fine at the first power-up (red LED, 120 R ferrites), or the extra
   cost is not worth it, the basic-parts variant stays. If one ideal part is not available, fall back to its basic
   equivalent and record it.
+- **Note from the first boards (2026-11-20): the S V G labels of rev B are covered by the connector.** `make_shield_rev_b.py` puts them at y 101.9 mm, which is under the black plastic body of the right-angle header J1 (it lies on the board from y 100.05 to 102.71), so once J1 is soldered, and with the cable plugged in, the letters cannot be seen. Fix for rev B: move the letters to the free strip between the pad row of J1 (y 104.15, pads end at about 105.0) and R1/F1 (from y 106.6), for example y 105.8 mm with 1.0 mm text, still above the three pins' x positions (111.96, 114.50, 117.04); check the DRC and that the text does not touch the pads or R1/F1. Rev A has no S V G letters at all (only the outline of J1).
 - Before ordering: look at the gerber preview once (JLCPCB's or KiCad's viewer) and check the text sizes against
   JLCPCB's current silkscreen rules; then the tag `hw-shield-revB`.
 
