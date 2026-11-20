@@ -316,6 +316,8 @@ Zeros and speakers for the remaining boards, once the speaker type is chosen (`r
   in with a female connector (component list: "Servo cable"), so a soldered-cable variant and its strain relief are
   no longer planned.
 
+- **A servo cable turned 180 degrees is solved by the labels, not by a circuit (decided 2026-11-20).** Turning the symmetric 3-pin plug swaps S and G (V stays in the middle), which the series diode D1 does not stop (it stops a swapped V and G). The result is mild (the module does not start; the receiver output is loaded a little, not checked), it can only happen when the cable is first plugged in, and a protection would need more parts and would spoil the ground of the data signal. So: the S V G labels of rev B (now below the J1 pads, visible), the square pad at pin 1, a colour mark on the S wire of the cable at both ends (the GME cable has no JR colours), and the pin-to-pin check with a multimeter before the first plug-in. Reconsider only if a later revision changes the input connector: a polarised (keyed) one would be a mechanical protection.
+
 ## Decisions still open
 
 Also collected with all other open points in `roadmap.md`.
