@@ -6,7 +6,7 @@ What changes:
   - the reference labels go (R1, C3, U1, ...), except J3 and J4 at the Zero's sockets (the Zero's orientation);
   - the outlines of the small parts go from the silkscreen to the fab layer (F.Fab), so the assembly drawing keeps
     them; J2, J3, J4 and JP1 keep theirs, J1's outline (it hangs over the edge) goes;
-  - new text, all 1.0 mm high with a 0.15 mm stroke (JLCPCB's advice for silkscreen): S V G above the servo header
+  - new text, all 1.0 mm high with a 0.15 mm stroke (JLCPCB's advice for silkscreen): S V G below the pads of the servo header
     J1, "+" at C1, "CB SND" and "rev B" in the right margin; a dot at pin 1 of U1;
   - title block of the board: revision B, date, title.
 
@@ -29,6 +29,7 @@ MM = 1e6
 
 REV = "B"
 DATE = "2026-11-14"
+LETTER_Y = 105.8                           # S V G: below the J1 pads, not under its plastic body (rev B note of 2026-11-20)
 KEEP_REF = {"J3", "J4"}                      # reference labels that stay
 KEEP_OUTLINE = {"J2", "J3", "J4", "JP1"}     # outlines that stay on the silkscreen
 TEXT_H = 1.0                                 # mm
@@ -85,10 +86,11 @@ def main():
         g.SetWidth(0)
         board.Add(g)
 
-    # servo header J1: the letters above the pins (the pins are 2.54 mm apart, the first at x 111.96)
+    # servo header J1: the letters below the pad row (J1's plastic body covers y 100.05..102.71, so they must not sit there;
+    # free strip between the pads, ending at y 105.0, and R1 / F1 from y 106.6); pins 2.54 mm apart, the first at x 111.96
     j1 = board.FindFootprintByReference("J1")
     for pad, letter in zip(sorted(j1.Pads(), key=lambda p: p.GetPosition().x), "SVG"):
-        text(letter, pad.GetPosition().x / MM, 101.9)
+        text(letter, pad.GetPosition().x / MM, LETTER_Y)
     # J1's own outline hangs over the board edge: to the fab layer
     for g in list(j1.GraphicalItems()):
         if g.GetLayer() == silk and isinstance(g, pcbnew.PCB_SHAPE):
