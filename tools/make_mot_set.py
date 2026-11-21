@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+"""Builds one sound set (docs/user-sounds.md) from the user's old "mot..." recordings (8 bit, 22 050 Hz, mono).
+
+The recordings are of unknown origin, so they are NOT in the repository: the sources are read from a folder given on
+the command line (work/mot_src, which is git-ignored), and the finished set is written to another git-ignored folder
+(work/mot_set/08_retro). Only this script is committed.
+
+What is made of what (all passed through a 150 Hz high-pass, the 40 mm speaker plays nothing useful below it):
+  idle.wav    motidle.wav, a steady 4 s stretch cut to a whole number of its repeat period, the end crossfaded into the
+              start (equal power, 150 ms) so that the loop has no seam
+  loaded.wav  motcrui1.wav (steady cruise), the same way, about 2.6 s
+  start.wav   motstar3.wav, the cranking only (2.0 s, 40 ms fade-out)
+  shift.wav   motshup2.wav, the first 0.45 s with a 50 ms fade-out
+  horn.wav    copied from the default set 01_truck (the recordings have no horn)
+  name.wav    spoken with Piper ("Eight. Retro."), as tools/make_default_sets.py does
+Loudness: every file gets the RMS of the same file of the default set 01_truck, the peak is kept below -1 dBFS.
+
+Usage (from the repo root):
+    python tools/make_mot_set.py --src work/mot_src --out work/mot_set [--piper DIR --model ONNX]
+"""
+import argparse, json, os, sys, wave
+import numpy as np
+from scipy.signal import butter, sosfilt
+
+ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+RATE = 22050
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+
+
+def load8(path):
+    with wave.open(path) as w:
+        r, n, sw = w.getframerate(), w.getnframes(), w.getsampwidth()
+        raw = w.readframes(n)
+    x = (np.frombuffer(raw, np.uint8).astype(np.float64) - 128.0) / 128.0 if sw == 1 else \
+        np.frombuffer(raw, "<i2").astype(np.float64) / 32768.0
+    if r != RATE:
+        x = np.interp(np.arange(int(len(x) * RATE / r)) * r / RATE, np.arange(len(x)), x)
+    return x
+
+
+def read16(path):
+    with wave.open(path) as w:
+        return np.frombuffer(w.readframes(w.getnframes()), "<i2").astype(np.float64) / 32768.0
+
+
+def write16(path, x):
+    d = np.clip(np.round(np.asarray(x) * 32768.0), -32768, 32767).astype("<i2")
+    with wave.open(path, "wb") as w:
+        w.setnchannels(1); w.setsampwidth(2); w.setframerate(RATE)
+        w.writeframes(d.tobytes())
+
+
+def highpass(x, f=150.0):
+    return sosfilt(butter(2, f, "highpass", fs=RATE, output="sos"), x)
+
+
+def rms(x):
+    return float(np.sqrt(np.mean(np.square(x))))
+
+
+def repeat_period(x, lo=0.02, hi=0.5):
+    """Strongest repeat period in seconds, by autocorrelation of the envelope-free signal."""
+    x = x - x.mean()
+    n2 = 1 << (2 * len(x)).bit_length()
+    F = np.fft.rfft(x, n2)
+    ac = np.fft.irfft(F * np.conj(F))[:len(x)]
+    ac /= ac[0]
+    a, b = int(lo * RATE), int(hi * RATE)
+    return (a + int(np.argmax(ac[a:b]))) / RATE
+
+
+def make_loop(x, start_s, length_s, period_s, fade_s=0.15):
+    k = max(1, round(length_s / period_s))
+    L = int(round(k * period_s * RATE))
+    X = int(fade_s * RATE)
+    s = int(start_s * RATE)
+    seg = x[s:s + L + X]
+    if len(seg) < L + X:
+        raise SystemExit("source too short for the loop")
+    out = seg[:L].copy()
+    t = np.linspace(0, np.pi / 2, X)
+    out[:X] = seg[:X] * np.sin(t) + seg[L:L + X] * np.cos(t)     # equal power: end of the cut fades into its start
+    return out, k
+
+
+def fade_out(x, s):
+    n = min(len(x) // 2, int(s * RATE)); y = x.copy(); y[-n:] *= np.linspace(1, 0, n); return y
+
+
+def level_to(x, target_rms, peak=0.89):
+    y = x * (target_rms / max(rms(x), 1e-9))
+    p = np.max(np.abs(y))
+    return y * (peak / p) if p > peak else y
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--src", default=os.path.join(ROOT, "work", "mot_src"))
+    ap.add_argument("--out", default=os.path.join(ROOT, "work", "mot_set"))
+    ap.add_argument("--piper"); ap.add_argument("--model")
+    ap.add_argument("--ref", default=os.path.join(ROOT, "firmware", "data", "sets", "01_truck"))
+    ap.add_argument("--folder", default="08_retro")
+    a = ap.parse_args()
+    dst = os.path.join(a.out, a.folder)
+    os.makedirs(dst, exist_ok=True)
+    S = lambda f: highpass(load8(os.path.join(a.src, f)))
+    ref = lambda f: rms(read16(os.path.join(a.ref, f)))
+    report = []
+
+    x = S("motidle.wav")
+    p = repeat_period(x[:RATE * 6])
+    idle, k = make_loop(x, 1.0, 4.0, p)
+    report.append("idle: repeat period %.1f ms, %d periods, %.2f s" % (p * 1000, k, len(idle) / RATE))
+    write16(os.path.join(dst, "idle.wav"), level_to(idle, ref("idle.wav")))
+
+    x = S("motcrui1.wav")
+    p = repeat_period(x[:RATE * 6])
+    loaded, k = make_loop(x, 1.0, 2.6, p)
+    report.append("loaded: repeat period %.1f ms, %d periods, %.2f s" % (p * 1000, k, len(loaded) / RATE))
+    write16(os.path.join(dst, "loaded.wav"), level_to(loaded, ref("loaded.wav")))
+
+    x = S("motstar3.wav")[:int(2.0 * RATE)]
+    write16(os.path.join(dst, "start.wav"), level_to(fade_out(x, 0.04), ref("start.wav")))
+
+    x = S("motshup2.wav")[:int(0.45 * RATE)]
+    write16(os.path.join(dst, "shift.wav"), level_to(fade_out(x, 0.05), ref("shift.wav")))
+
+    write16(os.path.join(dst, "horn.wav"), read16(os.path.join(a.ref, "horn.wav")))
+
+    if a.piper and a.model:
+        import make_default_sets as m
+        write16(os.path.join(dst, "name.wav"), m.piper_name("Eight. Retro.", a.piper, a.model).astype(np.float64) / 32768.0)
+        report.append("name: spoken with Piper")
+    else:
+        report.append("name.wav NOT written (no --piper/--model)")
+
+    with open(os.path.join(dst, "set.json"), "w", encoding="utf8") as f:
+        json.dump({"name": "Retro", "type": "sample", "rate": [1.0, 3.0], "loaded_rate_scale": 1.18,
+                   "loaded_gain": 0.8, "level": 1.0, "stop_s": 1.4, "gearbox": True}, f, indent=1)
+    print("\n".join(report))
+    print("written:", dst)
+
+
+if __name__ == "__main__":
+    main()
