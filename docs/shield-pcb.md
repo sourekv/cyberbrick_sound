@@ -162,6 +162,10 @@ factory; files changed after that belong to the next revision. Decided 2026-11-1
 | A | 2026-11-13, JLCPCB, 5 assembled | `hw-shield-revA` (`b5c9992`) | first board | delivered 2026-11-20 12:14, soldering J1/J3/J4 and the first power-up next |
 | B | not ordered | (tag when ordered) | silkscreen only: revision and name on the board, labels for the person holding it | - |
 
+![Rev A board as delivered: SMD parts fitted by JLCPCB, J1, J3 and J4 not yet soldered](shield-revA-board.jpg)
+
+Rev A as delivered on 2026-11-20 (photo of 2026-11-21): the SMD parts are fitted, J1, J3 and J4 are soldered by hand.
+
 Rev A carries no revision on the board itself (no text on the silkscreen) and its gerbers say `rev?`; only the
 schematic's title block says rev A. Tell it from rev B by the text "CB SND rev B" in the right margin. Everything
 of rev A (the board, the manufacturing files that were ordered) is in git under the tag: `git show
