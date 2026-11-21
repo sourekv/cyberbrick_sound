@@ -8,7 +8,7 @@ reasons, are in `rejected-ideas.md`.
 
 | Item | Where | Notes |
 |---|---|---|
-| Choose the engine sound (**done**: the truck engine is a Detroit Diesel Series 60, shift sound in all sounds) | `engine_lab`, `sound-research.md` | the candidates became the default sets of the sets app; every user can change them (see "User-changeable sounds" below) |
+| Choose the engine sound (**done**: the choice is left to the user; the candidates are the default sets, shift sound in all of them) | `engine_lab`, `sound-research.md` | the candidates became the default sets of the sets app; every user can change them (see "User-changeable sounds" below) |
 | Shield: approve and receive (**done 2026-11-21**: the first rev A board works) | `shield-pcb.md` "Order of 2026-11-13" | ordered at JLCPCB on 2026-11-13 ([order number removed], 5 boards with basic parts, DHL Express, 84.41 USD paid incl. customs); approved on 2026-11-14; delivered 2026-11-20 at 12:14 (five boards, SMD fitted); J1/J3/J4 and the servo cables ordered at GME on 2026-11-13 (arrived); speaker cables (IC007) ordered at Bambu Lab on 2026-11-13 (arrived); J1/J3/J4 soldered on the first board on 2026-11-21 and the first power-up done (`shield-pcb.md` "First power-up of rev A"); the other four boards are not fitted yet |
 | Speaker for the model | `speaker-measurement.md` | 40 mm or a production candidate (for example 21 mm). The box is done (30 ml best, 15 ml close); more would come from another speaker or amplifier, not from the box |
 | Enclosure for the model | - | designed from scratch around the chosen speaker; the printed box is a test fixture only |
