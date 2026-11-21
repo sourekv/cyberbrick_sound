@@ -21,7 +21,7 @@ reasons, are in `rejected-ideas.md`.
   parts under it (about 7 mm of clearance).
 - **MAX98357A at 22.05 kHz:** the datasheet does not list 22.05 kHz as a supported sample rate, yet the prototype
   plays fine at it. Keep an eye on it with the bare chip on the shield; 44.1 kHz would be the fallback.
-- **Lower sockets for rev B (goal, noted 2026-11-21):** measure the Zero's pin length, try the 3.5 mm LaskaKit
+- **Lower sockets for rev B (open, decided 2026-11-21 to keep the 8.5 mm sockets for now; only if the model is too tight):** measure the Zero's pin length, try the 3.5 mm LaskaKit
   strip on one rev A board (`shield-pcb.md` "low sockets"); the solder stand needs a new pocket depth.
 - **The loaded layer** of the truck sound (`LOADED_GAIN`, `LOADED_RATE_SCALE`): set from measured values, not by ear.
 - **`engine_diesel`** (an earlier variant): never run on hardware.
