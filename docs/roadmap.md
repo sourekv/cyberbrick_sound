@@ -1,6 +1,6 @@
 # Roadmap: what is open
 
-Status: 2026-11-13. The one place for everything that is still open: decisions, checks on hardware and the plans for
+Status: 2026-11-21. The one place for everything that is still open: decisions, checks on hardware and the plans for
 later. The other documents describe what exists and link here for what is missing. Ideas that were dropped, with the
 reasons, are in `rejected-ideas.md`.
 
@@ -9,18 +9,17 @@ reasons, are in `rejected-ideas.md`.
 | Item | Where | Notes |
 |---|---|---|
 | Choose the engine sound | `engine_lab`, `sound-research.md` | candidates are judged by ear on the real speaker |
-| Shield: approve and receive | `shield-pcb.md` "Order of 2026-11-13" | ordered at JLCPCB on 2026-11-13 ([order number removed], 5 boards with basic parts, DHL Express, 84.41 USD paid incl. customs); approved on 2026-11-14; **delivered 2026-11-20 at 12:14** (five boards, SMD fitted); to do: J1/J3/J4 and the servo cables ordered at GME on 2026-11-13; the first board gets the prototype's Zero and speaker, more are ordered once it works; speaker cables (IC007) ordered at Bambu Lab on 2026-11-13 (`shield-pcb.md` "Needed besides the board"); after delivery solder J1/J3/J4 and do the first checks below |
+| Shield: approve and receive (**done 2026-11-21**: the first rev A board works) | `shield-pcb.md` "Order of 2026-11-13" | ordered at JLCPCB on 2026-11-13 ([order number removed], 5 boards with basic parts, DHL Express, 84.41 USD paid incl. customs); approved on 2026-11-14; delivered 2026-11-20 at 12:14 (five boards, SMD fitted); J1/J3/J4 and the servo cables ordered at GME on 2026-11-13 (arrived); speaker cables (IC007) ordered at Bambu Lab on 2026-11-13 (arrived); J1/J3/J4 soldered on the first board on 2026-11-21 and the first power-up done (`shield-pcb.md` "First power-up of rev A"); the other four boards are not fitted yet |
 | Speaker for the model | `speaker-measurement.md` | 40 mm or a production candidate (for example 21 mm). The box is done (30 ml best, 15 ml close); more would come from another speaker or amplifier, not from the box |
 | Enclosure for the model | - | designed from scratch around the chosen speaker; the printed box is a test fixture only |
 | Long power test with the motor running | `bringup.md` | does the servo-port 5 V hold with the module and the motor together |
 
 ## To check on hardware
 
-- **First shield boards** (the first rev A board plays sound since 2026-11-21, see `shield-pcb.md` "First power-up of rev A"; still open: current, the long run with the motor, the other four boards): voltages and currents with USB and the receiver connected at the same time (the OR-ing
-  diode D2 should make this safe, `shield-pcb.md` "Decided"); whether the Zero's underside is flat enough for the
-  parts under it (about 7 mm of clearance).
+- **First shield boards: done on the first board, 2026-11-21** (`shield-pcb.md` "First power-up of rev A"). Checked by the working board: USB and the receiver connected at the same time (the OR-ing diode D2, `shield-pcb.md` "Decided"; the currents were not measured), the Zero's underside clears the parts under it (it sits on the sockets and nothing touches). Still open: the current, the long run with the motor, the other four boards.
 - **MAX98357A at 22.05 kHz:** the datasheet does not list 22.05 kHz as a supported sample rate, yet the prototype
-  plays fine at it. Keep an eye on it with the bare chip on the shield; 44.1 kHz would be the fallback.
+  plays fine at it, and so does the bare chip on the first rev A shield (checked by ear on 2026-11-21, not measured).
+  Keep an eye on it in the long run; 44.1 kHz would be the fallback.
 - **Lower sockets for rev B (open, decided 2026-11-21 to keep the 8.5 mm sockets for now; only if the model is too tight):** measure the Zero's pin length, try the 3.5 mm LaskaKit
   strip on one rev A board (`shield-pcb.md` "low sockets"); the solder stand needs a new pocket depth.
 - **The loaded layer** of the truck sound (`LOADED_GAIN`, `LOADED_RATE_SCALE`): set from measured values, not by ear.
