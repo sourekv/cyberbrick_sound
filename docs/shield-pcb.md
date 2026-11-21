@@ -166,6 +166,14 @@ factory; files changed after that belong to the next revision. Decided 2026-11-1
 
 Rev A as delivered on 2026-11-20 (photo of 2026-11-21): the SMD parts are fitted, J1, J3 and J4 are soldered by hand.
 
+**First power-up of rev A (2026-11-21, first board, Zero fitted on the 8.5 mm sockets):**
+
+- J1, J3 and J4 soldered by hand; no short between 5V and GND; with USB only the 3V3 is 3.3 V (TP2 against TP3).
+- With USB alone the amplifier is silent and LED1 is dark: by design the amplifier and the LED are on the +5V rail, which only the servo port feeds (D2 lets the rail feed the Zero, not the other way). Sound needs the receiver.
+- Firmware `engine_sets` (`pio run -e engine_sets -t upload`, then `-t uploadfs` for the seven sets) and the web app work over USB; the module answers with firmware 0.1.0+7890eb9.
+- **The servo cable was turned at first**: with S and G swapped the voltage at J1 fell to 2.6 V with the Zero fitted and 3.1 V without it (the receiver port gives 4.7 V unloaded), LED1 still lit, nothing got warm, the Zero stayed dark. Turned right, J1 showed 4.8 V. So a turned cable is more than "mild": the module does not start, but nothing is damaged. The labels and the colour mark on the S wire are worth it (see "A servo cable turned 180 degrees" below). With the GME cable 775-123 used here, the yellow wire is S (seen from the bottom of the board it is on the right).
+- Result: **there is sound** (the module speaks and plays the demo through the speaker).
+
 Rev A carries no revision on the board itself (no text on the silkscreen) and its gerbers say `rev?`; only the
 schematic's title block says rev A. Tell it from rev B by the text "CB SND rev B" in the right margin. Everything
 of rev A (the board, the manufacturing files that were ordered) is in git under the tag: `git show

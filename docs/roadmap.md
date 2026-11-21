@@ -16,7 +16,7 @@ reasons, are in `rejected-ideas.md`.
 
 ## To check on hardware
 
-- **First shield boards:** voltages and currents with USB and the receiver connected at the same time (the OR-ing
+- **First shield boards** (the first rev A board plays sound since 2026-11-21, see `shield-pcb.md` "First power-up of rev A"; still open: current, the long run with the motor, the other four boards): voltages and currents with USB and the receiver connected at the same time (the OR-ing
   diode D2 should make this safe, `shield-pcb.md` "Decided"); whether the Zero's underside is flat enough for the
   parts under it (about 7 mm of clearance).
 - **MAX98357A at 22.05 kHz:** the datasheet does not list 22.05 kHz as a supported sample rate, yet the prototype
