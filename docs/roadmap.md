@@ -8,7 +8,7 @@ reasons, are in `rejected-ideas.md`.
 
 | Item | Where | Notes |
 |---|---|---|
-| Choose the engine sound | `engine_lab`, `sound-research.md` | candidates are judged by ear on the real speaker |
+| Choose the engine sound (**done**: the truck engine is a Detroit Diesel Series 60, shift sound in all sounds) | `engine_lab`, `sound-research.md` | the candidates became the default sets of the sets app; every user can change them (see "User-changeable sounds" below) |
 | Shield: approve and receive (**done 2026-11-21**: the first rev A board works) | `shield-pcb.md` "Order of 2026-11-13" | ordered at JLCPCB on 2026-11-13 ([order number removed], 5 boards with basic parts, DHL Express, 84.41 USD paid incl. customs); approved on 2026-11-14; delivered 2026-11-20 at 12:14 (five boards, SMD fitted); J1/J3/J4 and the servo cables ordered at GME on 2026-11-13 (arrived); speaker cables (IC007) ordered at Bambu Lab on 2026-11-13 (arrived); J1/J3/J4 soldered on the first board on 2026-11-21 and the first power-up done (`shield-pcb.md` "First power-up of rev A"); the other four boards are not fitted yet |
 | Speaker for the model | `speaker-measurement.md` | 40 mm or a production candidate (for example 21 mm). The box is done (30 ml best, 15 ml close); more would come from another speaker or amplifier, not from the box |
 | Enclosure for the model | - | designed from scratch around the chosen speaker; the printed box is a test fixture only |
@@ -40,7 +40,7 @@ reasons, are in `rejected-ideas.md`.
 
 Not started; recorded so the design does not block them.
 
-- **User-changeable sounds** (planned 2026-11-08): sound sets as files in the 1.5 MB data partition, loaded over USB
+- **User-changeable sounds** (**done**: planned 2026-11-08, the sets and the web page work on the module since 2026-11-15, the user guide is `user-guide.md`; the text below is the original plan, the design is `user-sounds.md`): sound sets as files in the 1.5 MB data partition, loaded over USB
   with a web page (Web Serial, `web/index.html`, built 2026-11-14, works on the module since 2026-11-15). The BOOT button keeps switching sets. Decided
   2026-11-14: one kind of set, all in the data partition (the seven `engine_lab` candidates become the default sets,
   each with its spoken name), plus one fallback set compiled into the firmware for an empty or damaged partition;
@@ -53,7 +53,7 @@ Not started; recorded so the design does not block them.
 - **Shield revision ID by a resistor** (considered 2026-11-16, not planned). A resistor (or a divider) on the shield on a free pin of the Zero's right column, read by the firmware at start (ADC), would tell one firmware which shield revision the Zero is plugged into; no resistor (breadboard) would mean "prototype" and the default setting. The firmware runs on the Zero, which can be moved between boards, so the ID belongs to the shield. Not worth it while the shield does not change in function: rev A and rev B do not differ in a way the firmware must know, so rev B gets none. Add it to the first revision whose pin assignment, gain or inputs differ; keep a free pin for it when that board is designed.
 - **Firmware check and update on the web page** (idea 2026-11-14, after the page has been tried with the module; makes sense, confirmed 2026-11-18, over USB with esptool-js, not over Wi-Fi):
   - *Check*: the firmware reports its version and build date in the reply to `@info` (done 2026-11-14, see
-    "Firmware version" in the README) and the page shows it; still to do: say when the one it carries is newer ("on the module 1.2, available 1.3"). After an update the page checks
+    "Firmware version" in the README) and the page shows it (**done**, seen on the real module 2026-11-21); still to do: say when the one it carries is newer ("on the module 1.2, available 1.3"). After an update the page checks
     that the module answers `@hello` with the new version.
   - *Update, preferred way*: esptool-js (Espressif's library for flashing from the browser, the one ESP Web Tools
     uses) over the same Web Serial port. The page puts the Zero into its ROM bootloader through the chip's own USB
