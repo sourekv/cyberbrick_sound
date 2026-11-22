@@ -13,6 +13,24 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 import voice_clarify
 import make_default_sets as m   # piper_name: speaks a text, trims the silence, 10 ms fades, -1 dBFS
 
+TARGET_DB = -9.0          # every digit gets about this RMS (the quiet ones, five and eight, were 4 dB below the others)
+
+
+def equalise(pcm):
+    """The same RMS for every digit: a soft clip (tanh) with a strength found by bisection, peak at -1 dBFS."""
+    x = np.asarray(pcm, dtype=np.float64) / 32768.0
+    x = x / max(np.max(np.abs(x)), 1e-9)
+    lo, hi = 1.0, 12.0
+    for _ in range(30):
+        k = 0.5 * (lo + hi)
+        y = np.tanh(k * x) / math.tanh(k)
+        if voice_clarify.rms_db(y * 32768.0) < TARGET_DB: lo = k
+        else: hi = k
+    y = np.tanh(hi * x) / math.tanh(hi)
+    y = y * (0.891 / max(np.max(np.abs(y)), 1e-9))
+    return np.clip(np.round(y * 32768.0), -32768, 32767).astype(np.int16)
+
+
 WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 
 
@@ -24,7 +42,7 @@ def main():
     os.makedirs(a.out, exist_ok=True)
     for d, word in enumerate(WORDS):
         raw = m.piper_name(word.capitalize() + ".", a.piper, a.model, clarify=False)
-        pcm = voice_clarify.clarify(raw)
+        pcm = equalise(voice_clarify.clarify(raw))
         with wave.open(os.path.join(a.out, "d%d.wav" % d), "wb") as w:
             w.setnchannels(1); w.setsampwidth(2); w.setframerate(m.RATE)
             w.writeframes(np.asarray(pcm, dtype="<i2").tobytes())

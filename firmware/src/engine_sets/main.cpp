@@ -322,7 +322,8 @@ void setup() {
   String nm = SetLink::moduleName(), adv = nm.length() ? "CBSound-" + nm : String("CBSound");
   bleUart.begin(adv.c_str());
   bleLink.attach(&bleUart);
-  blePin = String(1000 + esp_random() % 9000);
+  // only digits that sound different on the small speaker: 0 1 2 3 4 6 8 (no 5, 7, 9: five and nine, six and seven run together)
+  { static const char ok[] = "0123468"; blePin = ""; for (int k = 0; k < 4; k++) blePin += ok[esp_random() % 7]; }
   bleLink.requireAuth(blePin);
   bleUart.advertise(true);
   pinNextMs = millis() + 6000;            // after the name of the set
