@@ -122,6 +122,9 @@ static String blePin;                   // random for every power-up, spoken by 
 static std::vector<int> pinQueue;       // the digits still to speak
 static uint32_t pinNextMs = 0;          // when the PIN is spoken again
 static bool bleWasConnected = false;
+static bool pinSpokenAtStart = false;   // the PIN is spoken once after power-up, again only while a page has connected and has not entered it
+static bool bleActive = false;          // started after a real power-up; not after the restart that follows a session
+static uint32_t bleRestartAt = 0;       // after the page has left: restart the module then
 #endif
 static SoundSet cur;                 // the loaded set
 static int curIndex = -1;            // index in library.folders; -1 = fallback
@@ -308,7 +311,11 @@ void setup() {
   int i = library.find(SetLibrary::readState());
   selectSet(i < 0 ? 0 : i);
 #if BLE_LINK_ENABLED
-  // Bluetooth prototype: the name of the module in the advertising, a random PIN spoken with the digit clips
+  // Bluetooth prototype: the name of the module in the advertising, a random PIN spoken with the digit clips. Only after
+  // a real power-up: the restart that ends a session (esp_restart) leaves Bluetooth off.
+  if (esp_reset_reason() == ESP_RST_SW) Serial.println("ble: off (restart after a Bluetooth session)");
+  else {
+  bleActive = true;
   for (int d = 0; d < 10; d++) { String err; loadWav("/voice/d" + String(d) + ".wav", digitClip[d], err); }
   String nm = SetLink::moduleName(), adv = nm.length() ? "CBSound-" + nm : String("CBSound");
   bleUart.begin(adv.c_str());
@@ -318,6 +325,7 @@ void setup() {
   bleUart.advertise(true);
   pinNextMs = millis() + 6000;            // after the name of the set
   Serial.println("ble: advertising as " + adv + " for 180 s, PIN " + blePin + " (spoken by the module)");
+  }
 #endif
 }
 
@@ -358,8 +366,10 @@ void loop() {
 
   bool talking = usbLink.poll(fallback ? String() : cur.folder);   // the web page is talking to the module: silent
 #if BLE_LINK_ENABLED
-  talking = bleLink.poll(fallback ? String() : cur.folder) || talking;
-  if (bleUart.isAdvertising() && millis() > bleWindowMs) { bleUart.advertise(false); Serial.println("ble: advertising window over"); }
+  if (bleActive) {
+    talking = bleLink.poll(fallback ? String() : cur.folder) || talking;
+    if (bleUart.isAdvertising() && millis() > bleWindowMs) { bleUart.advertise(false); bleActive = false; Serial.println("ble: nobody came in the 3 minutes, advertising off"); }
+  }
 #endif
   if (talking) {
     vTaskDelay(1);
@@ -367,12 +377,15 @@ void loop() {
   }
   applyEnd(usbLink.takeEnd());
 #if BLE_LINK_ENABLED
-  applyEnd(bleLink.takeEnd());
-  {
-    // the PIN: spoken when the advertising starts and again every 40 s until the page has authenticated
-    const bool needPin = bleUart.isAdvertising() || (bleUart.isConnected() && !bleLink.isAuthed());
-    if (needPin && pinQueue.empty() && millis() > pinNextMs && !namePlayer.active() && !demoOn && !bleLink.isLocked())
+  if (bleRestartAt && millis() > bleRestartAt) ESP.restart();
+  if (bleActive) applyEnd(bleLink.takeEnd());
+  if (bleActive) {
+    // the PIN: once after power-up, and again (every 40 s) only while a page is connected and has not entered it
+    const bool needPin = (bleUart.isAdvertising() && !pinSpokenAtStart) || (bleUart.isConnected() && !bleLink.isAuthed());
+    if (needPin && pinQueue.empty() && millis() > pinNextMs && !namePlayer.active() && !demoOn && !bleLink.isLocked()) {
       for (char c : blePin) pinQueue.push_back(c - '0');
+      pinSpokenAtStart = true;
+    }
     if (!pinQueue.empty() && !namePlayer.active()) {
       int d = pinQueue.front();
       pinQueue.erase(pinQueue.begin());
@@ -380,9 +393,11 @@ void loop() {
       if (pinQueue.empty()) pinNextMs = millis() + 40000;
     }
     bool c = bleUart.isConnected();
-    if (bleWasConnected && !c) {          // the page left: the PIN again, and advertise for another window
-      bleLink.resetAuth(); pinNextMs = millis() + 3000;
-      if (!bleLink.isLocked()) { bleWindowMs = millis() + 180000; bleUart.advertise(true); }
+    if (c && !bleWasConnected) pinNextMs = millis() + 500;      // a page has connected: the PIN now
+    if (bleWasConnected && !c) {          // the page left: advertising off and a restart, which loads the new sets
+      bleLink.resetAuth(); pinQueue.clear(); bleUart.advertise(false);
+      bleActive = false; bleRestartAt = millis() + 1500;
+      Serial.println("ble: the page left, restarting in 1.5 s (Bluetooth stays off after it)");
     }
     bleWasConnected = c;
     if (bleLink.isLocked() && bleUart.isAdvertising()) { bleUart.advertise(false); Serial.println("ble: locked after 3 wrong PINs"); }

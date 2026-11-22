@@ -91,3 +91,12 @@ before. The page also got a progress bar with percentage, size, speed and time l
 is written or deleted.
 
 So over Bluetooth: a default-size set of 0.2 to 0.6 MB takes about 17 to 50 s to write.
+
+## Behaviour agreed after the first trials (2026-11-22, built, not yet tried)
+
+- **Window of 3 minutes after a real power-up**: advertising and the PIN, spoken **once** after the name of the set
+  (no repeating while nobody connects). If nobody connects in the 3 minutes, Bluetooth is switched off.
+- **A page connects**: the PIN is spoken again (every 40 s) until it has been entered.
+- **The page leaves**: advertising off, and after 1.5 s the module **restarts** (loads the new sets, frees the memory).
+  After this restart Bluetooth stays **off** (the reset reason is a software reset), so it does not speak the PIN again
+  after every session. It starts again at the next real power-up of the receiver.
