@@ -59,6 +59,10 @@ td.actions { white-space: nowrap; text-align: right; }
 .progress { height: 24px; background: var(--chip); border: 1px solid var(--line); border-radius: 7px; overflow: hidden; margin-top: 4px; }
 .progress > div { height: 100%; background: var(--accent); width: 0; transition: width .2s; }
 .progtext { margin-top: 12px; font-weight: 600; min-height: 1.4em; }
+#toast { position: fixed; right: 16px; bottom: 16px; max-width: min(420px, calc(100vw - 32px)); padding: 14px 18px; border-radius: 10px; font-weight: 600;
+  background: var(--ok); color: var(--accent-ink); box-shadow: 0 6px 24px rgba(0,0,0,.28); opacity: 0; transform: translateY(12px); transition: opacity .25s, transform .25s; pointer-events: none; z-index: 50; }
+#toast.show { opacity: 1; transform: none; }
+#toast.err { background: var(--err); }
 .grid { display: grid; grid-template-columns: 150px 1fr; gap: 8px 12px; align-items: center; }
 @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
 .sound { border-top: 1px solid var(--line); padding: 10px 0; display: grid; grid-template-columns: 150px 1fr; gap: 6px 12px; }
@@ -247,6 +251,7 @@ details.guide li { margin-bottom: 4px; }
     <details id="logBox"><summary>Log</summary><pre id="log"></pre></details>
   </section>
   <pre id="selftest" class="hidden"></pre>
+  <div id="toast" role="status" aria-live="polite"></div>
 </main>
 
 <!-- the default sets for the simulated module, made by tools/make_default_sets.py; without the file the simulated
@@ -856,7 +861,7 @@ function busy(on) {
 async function guarded(fn) {
   busy(true);
   try { return await fn(); }
-  catch (e) { log(e.message, "err"); setStatus(e.message, "err"); }
+  catch (e) { log(e.message, "err"); setStatus(e.message, "err"); notify("Failed: " + e.message, true); }
   finally { busy(false); syncStop(); }
 }
 
@@ -976,7 +981,7 @@ function renderSets() {
 
 async function removeSet(folder) {
   if (!confirm(`Delete the set ${folder} from the module? This cannot be undone.`)) return;
-  await guarded(async () => { await link.rm("/sets/" + folder); await link.bye(); log("deleted " + folder); });
+  await guarded(async () => { await link.rm("/sets/" + folder); await link.bye(); log("deleted " + folder); notify("Done: the set " + folder + " is deleted from the module."); });
   if (editor && editor.orig === folder) closeEditor();
   await refresh();
 }
@@ -1051,6 +1056,23 @@ async function openSet(folder, copy) {
 }
 
 function setBar(id, frac) { $(id).style.width = (Math.max(0, Math.min(1, frac)) * 100).toFixed(1) + "%"; }
+// A notice that stays in the corner for a few seconds, with a short beep: for "done", also when the tab is behind.
+let toastTimer = null;
+function notify(text, err) {
+  const t = $("toast");
+  t.textContent = text; t.className = (err ? "err " : "") + "show";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = ""; }, 7000);
+  try {                                                    // two short tones; silence if the browser does not allow it
+    audioCtx = audioCtx || new AudioContext();
+    const t0 = audioCtx.currentTime;
+    (err ? [330, 220] : [660, 880]).forEach((f, i) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.frequency.value = f; g.gain.setValueAtTime(0.08, t0 + i * 0.16); g.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.16 + 0.14);
+      o.connect(g); g.connect(audioCtx.destination); o.start(t0 + i * 0.16); o.stop(t0 + i * 0.16 + 0.15);
+    });
+  } catch (e) {}
+}
 // The progress of a transfer (reading or writing a set): what, how much, the speed and the time left.
 let prog = { t0: 0, total: 0 };
 function fmtTime(sec) { sec = Math.round(sec); return sec >= 60 ? Math.floor(sec / 60) + " min " + (sec % 60) + " s" : sec + " s"; }
@@ -1545,6 +1567,7 @@ async function save() {
     for (const s of Object.values(ed.sounds)) s.dirty = false;
     if (lay) lay.forEach((L, i) => { L.file = `layer_${i + 1}.wav`; L.dirty = false; });
     progressSet(total, "Written");
+    notify(`Done: the set ${folder} is written to the module.`);
     setSaveStatus(`Written to the module as ${folder}. Use Test in the list to hear it there.`, "ok");
     $("editTitle").textContent = "Set " + folder;
   });
