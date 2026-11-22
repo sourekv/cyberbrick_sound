@@ -9,10 +9,14 @@ How to put the firmware and the default sound sets on a new module, from nothing
 - **The module:** a Waveshare **ESP32-S3-Zero-N8R8** (8 MB flash, 8 MB PSRAM; with the pin headers, the "-M" version, if it goes into the
   shield sockets). The basic ESP32-S3-Zero with 2 MB PSRAM does **not** work: the firmware says `sets: no PSRAM (an N8R8 Zero is needed)`.
 - **A USB-C data cable** (not a charge-only one) and a computer with a free USB port.
-- **PlatformIO** (the VS Code extension, or the command line `pio`) for the firmware. The first build downloads the ESP32 platform
-  (`espressif32@6.9.0`) and the Arduino framework, so it needs the internet and a few minutes.
+- **PlatformIO** to build and write the firmware: the VS Code extension "PlatformIO IDE" (the easiest), or on the command line
+  `pip install platformio` (then `pio` works in a new terminal). The first build downloads the ESP32 platform (`espressif32@6.9.0`) and the
+  Arduino framework, so it needs the internet and a few minutes.
 - **Python 3 with `numpy`** to make the default sound sets (`pip install numpy`). Nothing else is needed: the spoken names of the
   default sets are in the repository, so you do not need Piper.
+- **Git** to get the repository (or download it as a ZIP from GitHub and unpack it).
+- **A driver for the USB port:** normally none. The Zero shows up as a "USB JTAG/serial debug unit", which Windows 10 and 11, macOS and Linux
+  know; an older Windows may need the driver from Espressif.
 - **Chrome or Edge** for the web page afterwards (not Safari or Firefox).
 
 Get the repository (`git clone`) and open a terminal in it.
