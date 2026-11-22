@@ -1,16 +1,16 @@
 {
-  "name": "V eight",
+  "name": "Petrol, four cylinder",
   "type": "synth",
   "synth": "synth2",
-  "preset": "v8",
+  "preset": "petrol4",
   "eq": "speaker_box",
   "level": 1.0,
   "stop_s": 1.4,
   "gearbox": true,
   "sources": {
     "name": {
-      "text": "Six. V eight.",
-      "voice_prompt": 5
+      "text": "Six. Petrol, four cylinder.",
+      "voice_prompt": 4
     },
     "start": "render:starter",
     "horn": "render:horn",

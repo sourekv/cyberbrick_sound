@@ -263,7 +263,7 @@ details.guide li { margin-bottom: 4px; }
 <script>
 "use strict";
 const RATE = 22050;
-const PAGE_VERSION = "2026-11-22 f (clearer spoken names)";   // shown in the log, to tell a cached old page from a new one
+const PAGE_VERSION = "2026-11-22 g (set numbers without 5, 7, 9)";   // shown in the log, to tell a cached old page from a new one
 const CHUNK = 3072;                       // bytes per @w line (4096 base64 characters, set_link.h)
 const SPEAKER_BOX_EQ = [                  // LAB_EQ (firmware/include/engine_lab_data.h): the 30 ml box, 40 mm speaker
   [1.10869112, -2.21738224, 1.10869112, -1.92739111, 0.928925821],
@@ -993,6 +993,7 @@ function renderSets() {
     if (!idx) note = "no number: the module skips it";
     else if (seen.has(idx)) note = "number used twice: the module skips it";
     else if (!j) note = "set.json missing or broken";
+    else if (!goodIndex(idx)) note = "the spoken number is hard to understand (it has a 5, 7 or 9); better numbers: 01 02 03 04 06 08 10 11 12 ...";
     if (idx) seen.add(idx);
     const layered = j && j.type !== "synth" && Array.isArray(j.layers);
     const type = j ? (j.type === "synth" ? "synth: " + (j.synth === "pulse" ? "old synth" : j.preset || "") : "sample" + (layered ? ", " + j.layers.length + " layers" : "")) : "?";
@@ -1043,9 +1044,12 @@ function usedIndices(exceptFolder) {
   for (const s of sets) if (s.folder !== exceptFolder && indexOf(s.folder)) u.add(indexOf(s.folder));
   return u;
 }
+// The spoken number of a set is only clear on the small speaker when it has no 5, 7 or 9 in it (five and nine rhyme, six and
+// seven begin alike; docs/ble-link.md "Which spoken digits are easy to understand"): sets get the numbers 01 02 03 04 06 08 10 11 12 ...
+const goodIndex = (k) => /^[0123468]{2}$/.test(k);
 function firstFreeIndex() {
   const u = usedIndices(null);
-  for (let i = 1; i < 100; i++) { const k = String(i).padStart(2, "0"); if (!u.has(k)) return k; }
+  for (let i = 1; i < 100; i++) { const k = String(i).padStart(2, "0"); if (!u.has(k) && goodIndex(k)) return k; }
   return null;
 }
 function slug(s) {
@@ -1150,7 +1154,8 @@ function showEditor(title) {
   for (let i = 1; i < 100; i++) {
     const k = String(i).padStart(2, "0");
     if (used.has(k)) continue;
-    const o = document.createElement("option"); o.value = o.textContent = k; sel.appendChild(o);
+    if (!goodIndex(k) && k !== ed.index) continue;               // only numbers that are easy to hear; the number the set has is kept
+    const o = document.createElement("option"); o.value = k; o.textContent = goodIndex(k) ? k : k + " (hard to hear)"; sel.appendChild(o);
   }
   sel.value = ed.index;
   $("fIndexEcho").textContent = ed.index;
@@ -1693,21 +1698,21 @@ async function selftest() {
     check(back && back.length === idle.length && back.every((x, i) => x === idle[i]), "idle.wav reads back the same");
     // edit: a new number and synth type -> folder renamed, idle/loaded removed
     await openSet("03_test_truck", false);
-    $("fIndex").value = "05"; $("fType").value = "synth"; $("fType").onchange(); $("fSynth").value = "synth2:v8";
+    $("fIndex").value = "06"; $("fType").value = "synth"; $("fType").onchange(); $("fSynth").value = "synth2:v8";
     await save();
-    const f2 = (await link.files("05_test_truck")).map((f) => f.name).sort().join(",");
-    check(!sets.some((s) => s.folder === "03_test_truck") && f2 === "horn.wav,name.wav,set.json,shift.wav,start.wav", "renumbered to 05, changed to synth: " + f2);
-    check(sets.find((s) => s.folder === "05_test_truck").json.preset === "v8", "preset v8 in set.json");
+    const f2 = (await link.files("06_test_truck")).map((f) => f.name).sort().join(",");
+    check(!sets.some((s) => s.folder === "03_test_truck") && f2 === "horn.wav,name.wav,set.json,shift.wav,start.wav", "renumbered to 06, changed to synth: " + f2);
+    check(sets.find((s) => s.folder === "06_test_truck").json.preset === "v8", "preset v8 in set.json");
     // a corrupted transfer is refused
-    await link.cmd("@put 4 /sets/05_test_truck/x.wav");
+    await link.cmd("@put 4 /sets/06_test_truck/x.wav");
     await link.cmd("@w " + b64enc(new Uint8Array([1, 2, 3, 4])));
     let refused = false;
     try { await link.cmd("@end 00000000"); } catch (e) { refused = /crc/.test(e.message); }
-    check(refused && !(await link.files("05_test_truck")).some((f) => f.name === "x.wav"), "a wrong CRC is refused, nothing written");
-    await link.select("05_test_truck");
+    check(refused && !(await link.files("06_test_truck")).some((f) => f.name === "x.wav"), "a wrong CRC is refused, nothing written");
+    await link.select("06_test_truck");
     stopPlay();
-    await removeSet("05_test_truck");
-    check(!sets.some((s) => s.folder === "05_test_truck") && sets.length === 2, "delete");
+    await removeSet("06_test_truck");
+    check(!sets.some((s) => s.folder === "06_test_truck") && sets.length === 2, "delete");
     check(/\n$/.test(setJson(editor || newEditor())), "set.json ends with a newline");
 
     // ---- layers by rpm (docs/layers-design.md)

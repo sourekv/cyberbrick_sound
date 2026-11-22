@@ -173,7 +173,7 @@ All WAVs in the format of "Format on the module".
 │   │   └── ... (the same seven files)
 │   ├── 03_pulse_old/        synth set: the same files without idle.wav and loaded.wav
 │   │   └── ...
-│   └── ... 07_v12/
+│   └── ... 10_v12/
 └── state.json        the set the module starts with after power-up (the active set; set by BOOT or by the app's Activate)
 ```
 
@@ -214,9 +214,11 @@ numbers.
 | `02_truck_eq` | sample | "Two. Truck with E Q." | the same loops through the speaker EQ for the 30 ml box | as 01 | as 01 |
 | `03_pulse_old` | synth | "Three. Old synth." | the old grain synth (`engine_pulse`), preset a_diesel6 | as 01 | as 01 |
 | `04_diesel` | synth | "Four. Diesel." | the speaker-tuned synth (`engine_synth2.h`), preset diesel | as 01 | as 01 |
-| `05_petrol4` | synth | "Five. Petrol, four cylinder." | the same synth, preset petrol4 | as 01 | as 01 |
-| `06_v8` | synth | "Six. V eight." | the same synth, preset v8 (cross-plane) | as 01 | as 01 |
-| `07_v12` | synth | "Seven. V twelve." | the same synth, preset v12 | as 01 | as 01 |
+| `06_petrol4` | synth | "Six. Petrol, four cylinder." | the same synth, preset petrol4 | as 01 | as 01 |
+| `08_v8` | synth | "Eight. V eight." | the same synth, preset v8 (cross-plane) | as 01 | as 01 |
+| `10_v12` | synth | "Ten. V twelve." | the same synth, preset v12 | as 01 | as 01 |
+
+**Numbering (decided 2026-11-22):** the spoken number of a set is only clear on the small speaker when it has no 5, 7 or 9 in it (five and nine rhyme, six and seven begin alike; the listening test is in `ble-link.md`). The sets are therefore numbered **01 02 03 04 06 08 10 11 12 13 14 16 18 20 ...**; the default sets are 01, 02, 03, 04, 06, 08 and 10 (not in a row). The page offers and gives only these numbers; the module itself accepts any number from 01 to 99, and a set that has one of the others is listed with a note.
 
 The starter, horn and shift sounds are the same in all seven sets today (stored seven times, see "One kind of
 set"); they can be made to suit each engine later. The spoken names are made with the same text-to-speech as today
@@ -290,7 +292,7 @@ The name is announced once, when the set is chosen, so it only has to be short a
 
 **What makes a good name sample:**
 
-- The number of the set, then one to three words, about 1-2 s: "One. Truck.", "Six. V eight.", "Eight. Detroit
+- The number of the set, then one to three words, about 1-2 s: "One. Truck.", "Eight. V eight.", "Eleven. Detroit
   sixty.". The number is part of the name, so the owner hears where in the order the set is; it is the folder's
   index, and when a set moves to another index its `name.wav` has to be made again. No "set" or "sound" around it.
 - Spoken a little slower and more clearly than normal speech. Consonants carry the words on a small speaker; a deep
@@ -304,7 +306,7 @@ The name is announced once, when the set is chosen, so it only has to be short a
 1. **Text-to-speech with Piper** (how the default sets get their names): the same open voice as today's prompts,
    en_US-ljspeech (trained on LJ Speech, public domain). The user runs piper.exe themselves (it is a downloaded
    binary):
-   `echo "Six. V eight." | piper.exe --model en_US-ljspeech-medium.onnx --output_file name.wav`.
+   `echo "Eight. V eight." | piper.exe --model en_US-ljspeech-medium.onnx --output_file name.wav`.
    `tools/make_default_sets.py` does this for the default sets (it replaces `make_voice_prompts.ps1`; the texts
    are in each set's `set.json`). Piper has voices in other languages too, Czech among them (cs_CZ-jirka); check the
    licence on the voice's model card before a voice goes into the default sets.

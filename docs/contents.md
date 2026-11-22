@@ -36,7 +36,7 @@ A short map of the repository. What each document says is in the table in `READM
 | Path | What is in it |
 |---|---|
 | `samples/` | The original recordings and derived loops, with `LICENSE-SAMPLES.md` |
-| `sets/` | The seven default sets (`01_truck` ... `07_v12`): sounds and `set.json` |
+| `sets/` | The seven default sets (`01_truck` ... `10_v12`, numbered without 5, 7 and 9): sounds and `set.json` |
 | `test_set/` | A test set for the web app (`09_test`) |
 
 ## hardware/

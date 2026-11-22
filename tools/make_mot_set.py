@@ -3,7 +3,7 @@
 
 The recordings are of unknown origin, so they are NOT in the repository: the sources are read from a folder given on
 the command line (work/mot_src, which is git-ignored), and the finished set is written to another git-ignored folder
-(work/mot_set/08_retro). Only this script is committed.
+(work/mot_set/11_retro). Only this script is committed.
 
 What is made of what (all passed through a 150 Hz high-pass, the 40 mm speaker plays nothing useful below it):
   idle.wav    motidle.wav, a steady 4 s stretch cut to a whole number of its repeat period, the end crossfaded into the
@@ -12,13 +12,13 @@ What is made of what (all passed through a 150 Hz high-pass, the 40 mm speaker p
   start.wav   motstar3.wav, the cranking only (2.0 s, 40 ms fade-out)
   shift.wav   motshup2.wav, the first 0.45 s with a 50 ms fade-out
   horn.wav    copied from the default set 01_truck (the recordings have no horn)
-  name.wav    spoken with Piper ("Eight. Retro."), as tools/make_default_sets.py does
+  name.wav    spoken with Piper ("Eleven. Retro."), as tools/make_default_sets.py does
 Loudness: every file gets the RMS of the same file of the default set 01_truck, the peak is kept below -1 dBFS.
 
 With --layered a second set is built from the same recordings, as a layered set (docs/layers-design.md): three loops
 cut at different steady engine speeds (motidle 1.0 s.., motacc1 3.3..4.7 s, motcrui1 4.0..6.2 s) written as layer_1.wav ..
 layer_3.wav, with their "ratio" (firing frequency relative to the first layer, measured from the envelope of the raw
-recording) in set.json. start and horn are as in the set 08, the shift is the one of the default set 01_truck (CC0), the name is made as above (name "Nine. Layers.").
+recording) in set.json. start and horn are as in the set 11, the shift is the one of the default set 01_truck (CC0), the name is made as above (name "Twelve. Layers.").
 
 Usage (from the repo root):
     python tools/make_mot_set.py --src work/mot_src --out work/mot_set [--piper DIR --model ONNX] [--layered]
@@ -118,7 +118,7 @@ LAYER_SOURCES = [("motidle.wav", 1.0, 5.0, 3.0), ("motacc1.wav", 3.3, 4.7, 1.0),
 
 
 def build_layered(a, ref):
-    dst = os.path.join(a.out, "09_layers")
+    dst = os.path.join(a.out, "12_layers")
     os.makedirs(dst, exist_ok=True)
     layers = []
     for name, t0, t1, length in LAYER_SOURCES:
@@ -137,9 +137,9 @@ def build_layered(a, ref):
     shutil.copy(os.path.join(a.ref, "shift.wav"), os.path.join(dst, "shift.wav"))   # the shift of the default set 01_truck (CC0), chosen by the owner
     if a.piper and a.model:
         import make_default_sets as m
-        write16(os.path.join(dst, "name.wav"), m.piper_name("Nine. Layers.", a.piper, a.model).astype(np.float64) / 32768.0)
+        write16(os.path.join(dst, "name.wav"), m.piper_name("Twelve. Layers.", a.piper, a.model).astype(np.float64) / 32768.0)
     with open(os.path.join(dst, "set.json"), "w", encoding="utf8") as fh:
-        json.dump({"name": "9 - layers", "type": "sample", "rate": [1.0, 3.0], "level": 1.0, "stop_s": 1.4,
+        json.dump({"name": "12 - layers", "type": "sample", "rate": [1.0, 3.0], "level": 1.0, "stop_s": 1.4,
                    "gearbox": True, "layers": json_layers, "xfade": 0.36}, fh, indent=1)
     print("written:", dst)
 
@@ -150,7 +150,7 @@ def main():
     ap.add_argument("--out", default=os.path.join(ROOT, "work", "mot_set"))
     ap.add_argument("--piper"); ap.add_argument("--model")
     ap.add_argument("--ref", default=os.path.join(ROOT, "firmware", "data", "sets", "01_truck"))
-    ap.add_argument("--folder", default="08_retro")
+    ap.add_argument("--folder", default="11_retro")
     ap.add_argument("--layered", action="store_true", help="also build the layered variant (needs the set 08 built first or in the same run)")
     a = ap.parse_args()
     dst = os.path.join(a.out, a.folder)
@@ -181,7 +181,7 @@ def main():
 
     if a.piper and a.model:
         import make_default_sets as m
-        write16(os.path.join(dst, "name.wav"), m.piper_name("Eight. Retro.", a.piper, a.model).astype(np.float64) / 32768.0)
+        write16(os.path.join(dst, "name.wav"), m.piper_name("Eleven. Retro.", a.piper, a.model).astype(np.float64) / 32768.0)
         report.append("name: spoken with Piper")
     else:
         report.append("name.wav NOT written (no --piper/--model)")
