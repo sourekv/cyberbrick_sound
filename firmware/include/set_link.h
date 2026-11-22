@@ -27,6 +27,8 @@
 //                                           (the set stays chosen; the engine winds down)
 //   @default <folder>      @ok              the set the module starts with after power-up (/state.json); does not
 //                                           change what is playing. BOOT on the module changes it too.
+//   @volume <0..100>       @ok              the overall volume of the module in percent (60 = the level of before), kept in NVS;
+//                                           takes effect when the session ends (the next Test, or at once after @bye)
 //   @fwput <size> <crc32 hex>   @ok          starts a firmware update: the image goes into the other app slot
 //   @fww <base64>          @ok <bytes so far>   (up to 3072 bytes per line; the first line must be an ESP32-S3 image)
 //   @fwend                 @ok              checks size and CRC, makes the new slot the boot slot and restarts the module
@@ -58,6 +60,7 @@ class SetLink {
     String select;          // @select, @demo: this folder
     bool demo = false;      // @demo: then play the demo
     bool stop = false;      // @stop: silence the name and the demo
+    int volume = -1;        // @volume: the new overall volume in percent, -1 = unchanged
   };
 
   // Before Serial.begin(). Without attach() the link talks over the USB serial port.
@@ -75,6 +78,14 @@ class SetLink {
   // After a firmware update has been written: the main loop restarts the module when this is true (the reply has gone first).
   bool restartDue() const { return restartAt && millis() > restartAt; }
   bool changedSinceStart() const { return everChanged; }   // a set was written, moved or deleted, or the name changed
+
+  // The overall volume in percent (NVS, so that uploadfs does not erase it); 60 = the level the firmware had before it was adjustable.
+  static int moduleVolume() {
+    Preferences pr; pr.begin("cbsound", true);
+    int v = pr.getInt("volume", 60);
+    pr.end();
+    return v < 0 ? 0 : v > 100 ? 100 : v;
+  }
 
   // The name of the module (for several modules): NVS, so that uploadfs does not erase it. Empty = not set.
   static String moduleName() {
@@ -157,6 +168,13 @@ class SetLink {
       everChanged = true;
       return reply("@ok restart the module to advertise the new name");
     }
+    if (cmd == "@volume") {
+      int v = arg.toInt();
+      if (arg.length() == 0 || v < 0 || v > 100) return reply("@err usage: @volume <0..100>");
+      Preferences pr; pr.begin("cbsound", false); pr.putInt("volume", v); pr.end();
+      end.volume = v;
+      return reply("@ok");
+    }
     if (cmd == "@fww") return fwWrite(arg);
     if (cmd == "@fwend") return fwEnd();
     if (fwOn) abortFw();                    // any other command abandons an unfinished firmware transfer
@@ -193,7 +211,7 @@ class SetLink {
     size_t total = LittleFS.totalBytes(), used = LittleFS.usedBytes();
     reply(String("@ok free=") + (unsigned)(total - used) + " total=" + (unsigned)total + " set=" +
           (cur.length() ? cur : String("-")) + " psram=" + (unsigned)ESP.getFreePsram() + " fw=" FW_FULL_VERSION
-          " built=" FW_BUILD " layers=1 fwupdate=1 name=" + moduleName() + " auth=" + (authRequired ? (authed ? "ok" : "need") : "no") + " default=" + (SetLibrary::readState().length() ? SetLibrary::readState() : String("-")));
+          " built=" FW_BUILD " layers=1 fwupdate=1 volume=" + moduleVolume() + " name=" + moduleName() + " auth=" + (authRequired ? (authed ? "ok" : "need") : "no") + " default=" + (SetLibrary::readState().length() ? SetLibrary::readState() : String("-")));
   }
 
   static uint32_t folderBytes(File dir) {

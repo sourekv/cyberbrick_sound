@@ -175,3 +175,9 @@ written into the editor, which was hidden: the update has its own bar under the 
 
 **The risk stays:** there is no automatic return to the old firmware (the Arduino core's bootloader has no rollback). If a new firmware does not start, only USB
 helps (`pio run -e engine_sets -t upload`; the bootloader is in the chip's ROM). The Bluetooth update therefore needs a PIN and the page warns before it writes.
+
+## Overall volume (2026-11-22)
+
+`@volume <0..100>` sets the volume of the whole module in percent, kept in NVS (the key `volume`, default 60 = the old fixed `MASTER_VOLUME` 0.6); `@info` reports
+`volume=`. It scales the engine, starter, horn and shift (`masterVol` in `engine_sets/main.cpp`); the spoken names and the PIN digits are at full level already and follow it only
+downwards (`voiceGain`). It takes effect when the session ends (the next Test). The page has the slider "Volume" above the list of sets.

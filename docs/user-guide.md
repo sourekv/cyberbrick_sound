@@ -42,6 +42,13 @@ While the app is connected the engine on the module is **silent** and the BOOT b
 comes back a few seconds after your last action. The module may restart when the app connects, and then speaks the
 number of the set it starts with: that is normal.
 
+### Volume of the whole module
+
+The slider **Volume** above the list of sets sets the overall loudness of the module (0 to 100 %, steps of 5). It is kept in the module (not in
+the sets; it stays when sets are written), and 60 % is the level the module had before the volume could be set. It acts on the whole sound: engine,
+starter, horn and shift; the spoken names and the PIN are at full level already, so they follow it only downwards. You hear a change with the next
+**Test**. Each set also has its own **Level** in the editor (loudness of that set relative to the others).
+
 ### Update the firmware
 
 The button **Update firmware** (above the list of sets) writes a new firmware to the module, over USB or over Bluetooth, whichever you are connected by. Choose

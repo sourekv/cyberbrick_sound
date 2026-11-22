@@ -158,8 +158,16 @@ static inline void triggerShift() {
   else shiftPlayer.play(&cur.shiftWav);
 }
 
+// The overall volume (@volume, NVS): 60 % is the old fixed MASTER_VOLUME. The spoken names and the PIN are at full level already, so they follow
+// it only downwards.
+static float masterVol = MASTER_VOLUME, voiceGain = 1.0f;
+static void setVolumePercent(int pct) {
+  masterVol = pct / 100.0f;
+  voiceGain = fminf(1.0f, masterVol / MASTER_VOLUME);
+}
+
 static inline int16_t mixOut(float s) {
-  float v = s * duck() * MASTER_VOLUME + namePlayer.next() * 0.9f + beeper.next();
+  float v = s * duck() * masterVol + namePlayer.next() * 0.9f * voiceGain + beeper.next();
   v = fmaxf(-1.0f, fminf(32767.0f / 32768.0f, v)) * 32768.0f;
   return (int16_t)v;
 }
@@ -270,6 +278,7 @@ static bool bootPressed() {
 
 void setup() {
   usbLink.begin();
+  setVolumePercent(SetLink::moduleVolume());
   Serial.begin(115200);
   Serial.println("cyberbrick_sound engine_sets " FW_FULL_VERSION ", built " FW_BUILD);
   statusLed.begin();
@@ -335,6 +344,7 @@ void setup() {
 
 // What a finished session of the web page asks for: rescan and reload, play a set, stop, demo.
 static void applyEnd(const SetLink::End& e) {
+  if (e.volume >= 0) setVolumePercent(e.volume);
     if (e.ended && (e.changed || e.select.length()) && psramFound()) {
       String want = e.select.length() ? e.select : (fallback ? String() : cur.folder);
       if (library.scan() == 0) useFallback();

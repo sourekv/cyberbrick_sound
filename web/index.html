@@ -186,6 +186,12 @@ details.guide li { margin-bottom: 4px; }
         <tbody id="setRows"></tbody>
       </table>
     </div>
+    <div class="row" style="margin-top:12px">
+      <label for="volRange" style="min-width:5em"><strong>Volume</strong></label>
+      <input id="volRange" type="range" min="0" max="100" step="5" style="flex:1;max-width:320px">
+      <strong id="volText" style="min-width:3em">60 %</strong>
+      <span class="hint">of the whole module, kept in it; 60 % is the level before it could be set; heard with the next Test</span>
+    </div>
     <div id="fwProgText" class="progtext"></div>
     <div class="progress hidden" id="fwProg"><div id="fwBar"></div></div>
     <div class="hint" id="spaceText" style="margin-top:10px"></div>
@@ -265,7 +271,7 @@ details.guide li { margin-bottom: 4px; }
 <script>
 "use strict";
 const RATE = 22050;
-const PAGE_VERSION = "2026-11-22 i (firmware update with its own progress bar)";   // shown in the log, to tell a cached old page from a new one
+const PAGE_VERSION = "2026-11-22 j (overall volume)";   // shown in the log, to tell a cached old page from a new one
 const CHUNK = 3072;                       // bytes per @w line (4096 base64 characters, set_link.h)
 const SPEAKER_BOX_EQ = [                  // LAB_EQ (firmware/include/engine_lab_data.h): the 30 ml box, 40 mm speaker
   [1.10869112, -2.21738224, 1.10869112, -1.92739111, 0.928925821],
@@ -742,9 +748,10 @@ class MockTransport {
     }
     this.put = null;
     if (cmd === "@hello") return r("@ok cbsound 1");
-    if (cmd === "@info") return r(`@ok free=${this.total - this.used()} total=${this.total} set=${this.current || "-"} psram=7800000 fw=simulated built=- layers=1 name=${this.name || ""} auth=no default=${this.def || "-"}`);
+    if (cmd === "@info") return r(`@ok free=${this.total - this.used()} total=${this.total} set=${this.current || "-"} psram=7800000 fw=simulated built=- layers=1 volume=${this.volume ?? 60} name=${this.name || ""} auth=no default=${this.def || "-"}`);
     if (cmd === "@name") { this.name = arg; return r("@ok restart the module to advertise the new name"); }
     if (cmd === "@auth") return r("@ok");
+    if (cmd === "@volume") { const v = parseInt(arg, 10); if (!(v >= 0 && v <= 100)) return r("@err usage: @volume <0..100>"); this.volume = v; return r("@ok"); }
     if (cmd === "@default") {
       if (!this.dirs.has("/sets/" + arg)) return r("@err no such set");
       this.def = arg; return r("@ok");
@@ -1055,6 +1062,7 @@ function renderSets() {
     tr.appendChild(td);
     tb.appendChild(tr);
   }
+  { const v = info.volume !== undefined ? +info.volume : 60; $("volRange").value = v; $("volText").textContent = v + " %"; }
   const total = +info.total || 0, free = +info.free || 0;
   $("spaceText").textContent = total ? `${kB(total - free)} of ${kB(total)} used, ${kB(free)} free` +
     (info && info.fw ? ` · firmware ${info.fw}` + (info.built && info.built !== "-" ? `, built ${info.built}` : "") : "") : "";
@@ -1701,6 +1709,14 @@ if (!("bluetooth" in navigator)) $("btnBle").classList.add("hidden");
 $("btnDisconnect").onclick = disconnect;
 $("btnRefresh").onclick = refresh;
 $("btnFw").onclick = () => $("fwFile").click();
+$("volRange").oninput = () => { $("volText").textContent = $("volRange").value + " %"; };
+$("volRange").onchange = () => guarded(async () => {
+  const v = +$("volRange").value;
+  await link.cmd("@volume " + v);
+  info.volume = String(v);
+  log("volume " + v + " %", "ok");
+  setSaveStatus("", "");
+});
 $("fwFile").onchange = () => { const f = $("fwFile").files[0]; $("fwFile").value = ""; if (f) updateFirmware(f); };
 $("btnName").onclick = () => guarded(async () => {
   const name = window.prompt("Name of this module (1 to 8 letters, digits, - or _; empty keeps it):", info.name || "");
@@ -1779,6 +1795,17 @@ async function selftest() {
     await removeSet("06_test_truck");
     check(!sets.some((s) => s.folder === "06_test_truck") && sets.length === 2, "delete");
     check(/\n$/.test(setJson(editor || newEditor())), "set.json ends with a newline");
+
+    // ---- overall volume
+    {
+      check(info.volume === "60" || info.volume === undefined, "the overall volume starts at 60 %: " + info.volume);
+      $("volRange").value = 35; $("volRange").onchange(); await new Promise((r) => setTimeout(r, 300));
+      await refresh();
+      check(info.volume === "35" && $("volText").textContent === "35 %", "the overall volume is set to 35 % and read back: " + info.volume);
+      let badVol = false;
+      try { await link.cmd("@volume 150"); } catch (e) { badVol = /usage/.test(e.message); }
+      check(badVol, "a volume above 100 is refused");
+    }
 
     // ---- firmware update (set_link.h @fwput, @fww, @fwend)
     {
