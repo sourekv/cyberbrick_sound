@@ -181,3 +181,4 @@ helps (`pio run -e engine_sets -t upload`; the bootloader is in the chip's ROM).
 `@volume <0..100>` sets the volume of the whole module in percent, kept in NVS (the key `volume`, default 60 = the old fixed `MASTER_VOLUME` 0.6); `@info` reports
 `volume=`. It scales the engine, starter, horn and shift (`masterVol` in `engine_sets/main.cpp`); the spoken names and the PIN digits are at full level already and follow it only
 downwards (`voiceGain`). It takes effect when the session ends (the next Test). The page has the slider "Volume" above the list of sets.
+Tried on the real module (2026-11-22): the firmware with the volume (`0.1.0+70170d2`) was sent over Bluetooth with the page's Update firmware, the slider then worked. With an older firmware, whose `@info` has no `volume=`, the page greys the slider out.
