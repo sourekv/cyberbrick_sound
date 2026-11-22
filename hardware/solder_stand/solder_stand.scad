@@ -33,8 +33,8 @@ part = "stand";      // "stand", "j1_shelf" (the loose shelf for J1 on the under
 // loose shelf for the first soldering pass (J1 fitted from the UNDERSIDE of the board and turned by 180 degrees, pins pointing into
 // the board; docs/shield-pcb.md): one piece, a block with the shelf on it, that is plugged into a socket in the base and taken out
 // before the pass with J3 and J4 (the Zero hangs there). Print it on its own: part = "j1_shelf"; the foam is not used in that pass.
-shelf_x = 114.5;  shelf_y = 100 + 10.5;     // the centre of the socket: x centre of J1, 10.5 mm from the board edge (KiCad coordinates, by0 = 100)
-peg_w = 6.0;  peg_t = 3.0;  peg_l = 3.0;    // the peg that goes into the socket (the socket is 0.3 mm larger)
+shelf_back = 100 + 15.0;                    // the back of the shelf: 15 mm from the board edge (KiCad coordinates, by0 = 100)
+peg_t = 3.0;  peg_l = 3.0;                  // the peg is as wide as the shelf (j1_x1 - j1_x0), flush with its back, so the back is flat for printing; the socket is 0.3 mm larger
 
 base_t     = 8.0;    // base plate thickness (heavier, so the stand does not tip over; thick enough for the band grooves below it)
 groove_w   = 4.5;    // grooves in the underside of the base for rubber bands (a band of about 3 mm), one set each way
@@ -102,7 +102,7 @@ module stand() {
     for (x = [bx0 + 2.5, cx, bx1 - 2.5]) translate([x - groove_w / 2, cy - base_w / 2 - 1, -0.01]) cube([groove_w, base_w + 2, groove_d + 0.01]);
     for (y = [cy - 12, cy, cy + 12]) translate([cx - base_w / 2 - 1, y - groove_w / 2, -0.01]) cube([base_w + 2, groove_w, groove_d + 0.01]);
     // socket in the base for the loose shelf (part = "j1_shelf")
-    translate([shelf_x - peg_w / 2 - 0.15, shelf_y - peg_t / 2 - 0.15, base_t - peg_l]) cube([peg_w + 0.3, peg_t + 0.3, peg_l + 0.01]);
+    translate([j1_x0 - 0.15, shelf_back - peg_t - 0.15, base_t - peg_l]) cube([j1_x1 - j1_x0 + 0.3, peg_t + 0.3, peg_l + 0.01]);
     // label on the base, so the stand is not taken for something else
     translate([cx, cy + base_w / 2 - 8, base_t - 0.6])
       linear_extrude(1) text("shield solder stand", size = 4, halign = "center", valign = "center");
@@ -160,12 +160,12 @@ module foam() {
 // the loose shelf (the first pass, J1 on the underside turned by 180 degrees): the peg, a block up to the ledge level under the
 // body of J1 and under the pins, a thin tongue that butts on the ledge, and past the body (8.5 mm from the edge) the comb with a slot
 // for each long pin, stopping 1.3 mm under the board (the parts on the board hang at most 1.1 mm). Positions are the stand's own
-// (KiCad coordinates), so it can be shown in place; for printing lay it on its side or stand it on the peg, as it prints better.
+// (KiCad coordinates), so it can be shown in place; for printing lay it on its back: the back face with the peg is flat.
 module j1_shelf() {
   top_z = base_t + post_h - j1_body_t;          // top of the ledge, 2.54 mm under the board
-  y0 = by0 + 6.0;  shelf_end = by0 + 8.5;  pin_end = by0 + 15.0;  shelf_t = 2.0;
+  y0 = by0 + 6.0;  shelf_end = by0 + 8.5;  pin_end = shelf_back;  shelf_t = 2.0;
   x0 = j1_x0;  w = j1_x1 - j1_x0;
-  translate([shelf_x - peg_w / 2, shelf_y - peg_t / 2, base_t - peg_l]) cube([peg_w, peg_t, peg_l + 0.5]);
+  translate([x0, shelf_back - peg_t, base_t - peg_l]) cube([w, peg_t, peg_l + 0.5]);
   difference() {
     union() {
       translate([x0, y0, base_t]) cube([w, shelf_end - y0, top_z - base_t]);                          // block under the body
