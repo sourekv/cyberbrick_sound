@@ -178,7 +178,7 @@ details.guide li { margin-bottom: 4px; }
   <section id="secSets" class="hidden">
     <div class="row" style="justify-content:space-between">
       <h2 style="margin:0">On the module</h2>
-      <div class="row"><button id="btnRefresh" class="small">Refresh</button><button id="btnName" class="small" title="the name of this module (for several modules); kept in the module, shown when connecting over Bluetooth">Module name</button><button id="btnNew" class="small">New empty set</button></div>
+      <div class="row"><button id="btnRefresh" class="small">Refresh</button><button id="btnFw" class="small" title="write a new firmware (the .bin of engine_sets) to the module, over the link you are connected by; the module restarts with it">Update firmware</button><input id="fwFile" type="file" accept=".bin" class="hidden"><button id="btnName" class="small" title="the name of this module (for several modules); kept in the module, shown when connecting over Bluetooth">Module name</button><button id="btnNew" class="small">New empty set</button></div>
     </div>
     <div class="tablewrap" style="margin-top:8px">
       <table>
@@ -263,7 +263,7 @@ details.guide li { margin-bottom: 4px; }
 <script>
 "use strict";
 const RATE = 22050;
-const PAGE_VERSION = "2026-11-22 g (set numbers without 5, 7, 9)";   // shown in the log, to tell a cached old page from a new one
+const PAGE_VERSION = "2026-11-22 h (firmware update)";   // shown in the log, to tell a cached old page from a new one
 const CHUNK = 3072;                       // bytes per @w line (4096 base64 characters, set_link.h)
 const SPEAKER_BOX_EQ = [                  // LAB_EQ (firmware/include/engine_lab_data.h): the 30 ml box, 40 mm speaker
   [1.10869112, -2.21738224, 1.10869112, -1.92739111, 0.928925821],
@@ -704,6 +704,25 @@ class MockTransport {
     if (!l.startsWith("@")) return;
     const sp = l.indexOf(" "), cmd = sp < 0 ? l : l.slice(0, sp), arg = sp < 0 ? "" : l.slice(sp + 1);
     const r = (s) => out.push(s);
+    if (cmd === "@fwput") {
+      const sp = arg.indexOf(" "), size = parseInt(arg.slice(0, sp), 10), crc = parseInt(arg.slice(sp + 1), 16) >>> 0;
+      if (!(size >= 100000 && size <= 0x180000)) return r("@err firmware size (100 kB to 1.5 MB)");
+      this.fw = { size, crc, parts: [], first: true }; return r("@ok");
+    }
+    if (cmd === "@fww") {
+      if (!this.fw) return r("@err no @fwput");
+      const b = b64dec(arg);
+      if (this.fw.first && !(b.length >= 16 && b[0] === 0xE9 && b[12] === 9 && b[13] === 0)) { this.fw = null; return r("@err not an ESP32-S3 firmware image"); }
+      this.fw.first = false; this.fw.parts.push(b);
+      return r("@ok " + this.fw.parts.reduce((a, x) => a + x.length, 0));
+    }
+    if (cmd === "@fwend") {
+      if (!this.fw) return r("@err no @fwput");
+      const data = concat(this.fw.parts), f = this.fw; this.fw = null;
+      if (data.length !== f.size) return r("@err short image");
+      if (crc32(data) !== f.crc) return r("@err crc mismatch");
+      this.fwWritten = data; return r("@ok restarting with the new firmware");
+    }
     if (cmd === "@w") {
       if (!this.put) return r("@err no @put");
       let b; try { b = b64dec(arg); } catch (e) { this.put = null; return r("@err bad data"); }
@@ -891,6 +910,16 @@ class Link {
   stop() { return this.cmd("@stop"); }
   setDefault(folder) { return this.cmd("@default " + folder); }
   bye() { return this.cmd("@bye"); }
+  // Firmware update (set_link.h @fwput, @fww, @fwend): the module checks the size and the CRC, writes the other app slot and
+  // restarts with it. progress(done) is called after every block.
+  async fwUpdate(bytes, progress) {
+    await this.cmd(`@fwput ${bytes.length} ${hex8(crc32(bytes))}`);
+    for (let i = 0; i < bytes.length; i += CHUNK) {
+      await this.cmd("@fww " + b64enc(bytes.subarray(i, i + CHUNK)), 15000);
+      if (progress) progress(Math.min(bytes.length, i + CHUNK));
+    }
+    return this.cmd("@fwend", 30000);
+  }
 }
 
 // ------------------------------------------------------------------ page state
@@ -1036,6 +1065,33 @@ async function removeSet(folder) {
   await guarded(async () => { await link.rm("/sets/" + folder); await link.bye(); log("deleted " + folder); notify("Done: the set " + folder + " is deleted from the module."); });
   if (editor && editor.orig === folder) closeEditor();
   await refresh();
+}
+
+// ------------------------------------------------------------------ firmware update
+// The .bin of the firmware (pio run -e engine_sets; .pio/build/engine_sets/firmware.bin). The page checks that it is an ESP32-S3 image of
+// a size that fits the app slot, asks, and sends it over the link in use; the module checks again and restarts. If the new firmware
+// does not start, only USB helps (pio run -e engine_sets -t upload): the question says so.
+function firmwareProblem(bytes) {
+  if (bytes.length < 100000 || bytes.length > 0x180000) return "the file is " + kB(bytes.length) + ": a firmware image of engine_sets is about 1.1 MB (up to 1.5 MB fits)";
+  if (bytes[0] !== 0xE9 || bytes[12] !== 9 || bytes[13] !== 0) return "this is not an image for the ESP32-S3 (use .pio/build/engine_sets/firmware.bin)";
+  return "";
+}
+async function updateFirmware(file) {
+  const bytes = new Uint8Array(await file.arrayBuffer()), bad = firmwareProblem(bytes);
+  if (bad) { notify("Not written: " + bad, true); log("firmware " + file.name + ": " + bad, "err"); return; }
+  const ble = transport instanceof BleTransport, secs = Math.round(bytes.length / (ble ? 12000 : 40000));
+  const ok = window.confirm(`Write the firmware ${file.name} (${kB(bytes.length)}, CRC ${hex8(crc32(bytes))}) to the module over ${ble ? "Bluetooth" : "USB"}?` + String.fromCharCode(10, 10) +
+    `It takes about ${fmtTime(secs)}. Do not switch the module off meanwhile. The module restarts with the new firmware` + (ble ? " and Bluetooth stays off until the receiver is switched off and on again" : "") + "." +
+    String.fromCharCode(10, 10) + "If the new firmware does not start, the module can only be fixed over USB (pio run -e engine_sets -t upload).");
+  if (!ok) return;
+  await guarded(async () => {
+    progressStart(bytes.length);
+    progressSet(0, "Firmware");
+    const r = await link.fwUpdate(bytes, (n) => progressSet(n, "Writing the firmware"));
+    progressSet(bytes.length, "Firmware written");
+    log("firmware " + file.name + " written: " + r.ok, "ok");
+    notify("Done: the firmware is written, the module restarts with it.");
+  });
 }
 
 // ------------------------------------------------------------------ editor
@@ -1637,6 +1693,8 @@ $("btnBle").onclick = () => connect(false, true);
 if (!("bluetooth" in navigator)) $("btnBle").classList.add("hidden");
 $("btnDisconnect").onclick = disconnect;
 $("btnRefresh").onclick = refresh;
+$("btnFw").onclick = () => $("fwFile").click();
+$("fwFile").onchange = () => { const f = $("fwFile").files[0]; $("fwFile").value = ""; if (f) updateFirmware(f); };
 $("btnName").onclick = () => guarded(async () => {
   const name = window.prompt("Name of this module (1 to 8 letters, digits, - or _; empty keeps it):", info.name || "");
   if (!name) return;
@@ -1714,6 +1772,23 @@ async function selftest() {
     await removeSet("06_test_truck");
     check(!sets.some((s) => s.folder === "06_test_truck") && sets.length === 2, "delete");
     check(/\n$/.test(setJson(editor || newEditor())), "set.json ends with a newline");
+
+    // ---- firmware update (set_link.h @fwput, @fww, @fwend)
+    {
+      const img = new Uint8Array(120000);
+      for (let i = 0; i < img.length; i++) img[i] = (i * 7 + 3) & 255;
+      img[0] = 0xE9; img[12] = 9; img[13] = 0;
+      check(firmwareProblem(img) === "" && firmwareProblem(img.subarray(0, 5000)) !== "" && firmwareProblem(Uint8Array.from(img, (x, i) => i === 12 ? 5 : x)) !== "", "the page checks the firmware image (size, ESP32-S3 header)");
+      const r = await link.fwUpdate(img, null);
+      check(/restarting/.test(r.ok) && transport.fwWritten && transport.fwWritten.length === img.length && crc32(transport.fwWritten) === crc32(img), "a firmware image goes to the module in blocks and checks out: " + r.ok);
+      let refusedFw = false;
+      try { await link.cmd("@fwput " + img.length + " 00000000"); await link.cmd("@fww " + b64enc(img.subarray(0, 3072))); for (let i = 3072; i < img.length; i += CHUNK) await link.cmd("@fww " + b64enc(img.subarray(i, i + CHUNK))); await link.cmd("@fwend"); }
+      catch (e) { refusedFw = /crc/.test(e.message); }
+      check(refusedFw, "a firmware with a wrong CRC is refused");
+      let refusedHdr = false;
+      try { const bad = Uint8Array.from(img, (x, i) => i === 0 ? 0 : x); await link.fwUpdate(bad, null); } catch (e) { refusedHdr = /ESP32-S3/.test(e.message); }
+      check(refusedHdr, "a file that is not an ESP32-S3 image is refused by the module");
+    }
 
     // ---- layers by rpm (docs/layers-design.md)
     const pulses = (hz, secs) => {                       // noise bursts at `hz`: a made-up engine, firing frequency hz

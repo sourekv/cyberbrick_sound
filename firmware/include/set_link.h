@@ -27,6 +27,10 @@
 //                                           (the set stays chosen; the engine winds down)
 //   @default <folder>      @ok              the set the module starts with after power-up (/state.json); does not
 //                                           change what is playing. BOOT on the module changes it too.
+//   @fwput <size> <crc32 hex>   @ok          starts a firmware update: the image goes into the other app slot
+//   @fww <base64>          @ok <bytes so far>   (up to 3072 bytes per line; the first line must be an ESP32-S3 image)
+//   @fwend                 @ok              checks size and CRC, makes the new slot the boot slot and restarts the module
+//                                           (@err ... and the running firmware stays when anything is wrong)
 //   @bye                   @ok              ends the session
 //
 // Paths are under /sets/. While the page talks to the module (a session: from the first command until @bye,
@@ -37,6 +41,7 @@
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <Preferences.h>
+#include <Update.h>
 #include <vector>
 
 class SetLink {
@@ -67,6 +72,8 @@ class SetLink {
   void resetAuth() { authed = false; badPins = 0; }
   bool isAuthed() const { return !authRequired || authed; }
   bool isLocked() const { return locked; }
+  // After a firmware update has been written: the main loop restarts the module when this is true (the reply has gone first).
+  bool restartDue() const { return restartAt && millis() > restartAt; }
   bool changedSinceStart() const { return everChanged; }   // a set was written, moved or deleted, or the name changed
 
   // The name of the module (for several modules): NVS, so that uploadfs does not erase it. Empty = not set.
@@ -104,6 +111,8 @@ class SetLink {
  private:
   Stream* io = &Serial;
   bool authRequired = false, authed = false, locked = false, everChanged = false;
+  bool fwOn = false, fwFirst = true;
+  uint32_t fwSize = 0, fwDone = 0, fwCrc = 0, fwWant = 0, restartAt = 0;
   int badPins = 0;
   String pin;
   String line, cur;
@@ -117,6 +126,7 @@ class SetLink {
 
   void finish() {
     abortPut();
+    abortFw();
     active = false;
     end.ended = true;
   }
@@ -147,6 +157,10 @@ class SetLink {
       everChanged = true;
       return reply("@ok restart the module to advertise the new name");
     }
+    if (cmd == "@fww") return fwWrite(arg);
+    if (cmd == "@fwend") return fwEnd();
+    if (fwOn) abortFw();                    // any other command abandons an unfinished firmware transfer
+    if (cmd == "@fwput") return fwPut(arg);
     if (cmd == "@w") return write(arg);
     if (cmd == "@end") return endPut(arg);
     if (wf) abortPut();                    // any other command abandons an unfinished @put
@@ -179,7 +193,7 @@ class SetLink {
     size_t total = LittleFS.totalBytes(), used = LittleFS.usedBytes();
     reply(String("@ok free=") + (unsigned)(total - used) + " total=" + (unsigned)total + " set=" +
           (cur.length() ? cur : String("-")) + " psram=" + (unsigned)ESP.getFreePsram() + " fw=" FW_FULL_VERSION
-          " built=" FW_BUILD " layers=1 name=" + moduleName() + " auth=" + (authRequired ? (authed ? "ok" : "need") : "no") + " default=" + (SetLibrary::readState().length() ? SetLibrary::readState() : String("-")));
+          " built=" FW_BUILD " layers=1 fwupdate=1 name=" + moduleName() + " auth=" + (authRequired ? (authed ? "ok" : "need") : "no") + " default=" + (SetLibrary::readState().length() ? SetLibrary::readState() : String("-")));
   }
 
   static uint32_t folderBytes(File dir) {
@@ -283,6 +297,51 @@ class SetLink {
     if (!LittleFS.rename(wTmp, wPath)) { LittleFS.remove(wTmp); return reply("@err rename failed"); }
     end.changed = true; everChanged = true;
     reply("@ok");
+  }
+
+  // ---- firmware update over the link (docs/ble-link.md): the image is written into the other app slot by the Update library,
+  // and the slot becomes the boot slot only when the size and the CRC are right. A running firmware is never touched.
+  void fwPut(const String& arg) {
+    int sp = arg.indexOf(' ');
+    if (sp < 0) return reply("@err usage: @fwput <size> <crc32 hex>");
+    uint32_t size = (uint32_t)arg.substring(0, sp).toInt();
+    uint32_t want = (uint32_t)strtoul(arg.substring(sp + 1).c_str(), nullptr, 16);
+    if (size < 100000 || size > 0x180000) return reply("@err firmware size (100 kB to 1.5 MB)");
+    if (!Update.begin(size, U_FLASH)) return reply(String("@err cannot start the update: ") + Update.errorString());
+    fwOn = true; fwFirst = true; fwSize = size; fwDone = 0; fwCrc = 0; fwWant = want;
+    reply("@ok");
+  }
+
+  void fwWrite(const String& b64) {
+    if (!fwOn) return reply("@err no @fwput");
+    static uint8_t buf[3200];
+    int n = b64dec(b64, buf, sizeof(buf));
+    if (n < 0 || fwDone + n > fwSize) { abortFw(); return reply("@err bad data"); }
+    if (fwFirst) {                           // an ESP32 image starts with 0xE9, the chip id (9 = ESP32-S3) is at offset 12
+      if (n < 16 || buf[0] != 0xE9 || buf[12] != 0x09 || buf[13] != 0x00) { abortFw(); return reply("@err not an ESP32-S3 firmware image"); }
+      fwFirst = false;
+    }
+    if (Update.write(buf, n) != (size_t)n) { abortFw(); return reply("@err write failed"); }
+    fwCrc = crc32(fwCrc, buf, n);
+    fwDone += n;
+    reply(String("@ok ") + (unsigned)fwDone);
+  }
+
+  void fwEnd() {
+    if (!fwOn) return reply("@err no @fwput");
+    if (fwDone != fwSize) { abortFw(); return reply("@err short image"); }
+    if (fwCrc != fwWant) { abortFw(); return reply("@err crc mismatch"); }
+    bool ok = Update.end();
+    fwOn = false;
+    if (!ok) return reply(String("@err ") + Update.errorString());
+    reply("@ok restarting with the new firmware");
+    restartAt = millis() + 1200;             // after the reply has been sent
+  }
+
+  void abortFw() {
+    if (!fwOn) return;
+    Update.abort();
+    fwOn = false;
   }
 
   void abortPut() {

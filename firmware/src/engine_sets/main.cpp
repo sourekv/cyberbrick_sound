@@ -376,6 +376,15 @@ void loop() {
     if (bleUart.isAdvertising() && millis() > bleWindowMs) { bleUart.advertise(false); bleActive = false; Serial.println("ble: nobody came in the 3 minutes, advertising off"); }
   }
 #endif
+  if (usbLink.restartDue()
+#if BLE_LINK_ENABLED
+      || bleLink.restartDue()
+#endif
+  ) {                                      // a firmware update has been written (@fwend)
+    Serial.println("firmware updated: restarting");
+    delay(100);
+    ESP.restart();
+  }
   if (talking) {
     vTaskDelay(1);
     return;
