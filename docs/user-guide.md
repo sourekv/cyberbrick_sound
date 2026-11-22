@@ -22,7 +22,7 @@ make your own. 5. **Write** it to the module.
 
 ![Start of the app](guide/02-start.png)
 
-Press **Connect module** and choose the module's USB port in the browser's list (on Windows it is named like
+Press **Connect over USB** and choose the module's USB port in the browser's list (on Windows it is named like
 "USB Serial Device (COM5)"). When it works the line next to the button reads "Connected, firmware 0.1.0+..., built
 ..." and the list of sets appears. The firmware version is also under the list.
 
@@ -101,7 +101,7 @@ original: press **Number only** (or make a new name) so that it says its own num
 |---|---|
 | "This app needs Chrome or Edge on a computer." | Open the app in Chrome or Edge on a computer. |
 | The module is not in the list of ports | Check the cable (some are charge-only) and try another USB port. |
-| "No port chosen." | You closed the list without choosing; press Connect module again. |
+| "No port chosen." | You closed the list without choosing; press Connect over USB again. |
 | The port cannot be opened | Another program or browser tab holds it (a serial monitor, an upload from PlatformIO, a second copy of the app). Close it, then connect again. The same applies the other way: flashing the firmware from the computer fails while the app is connected, so press Disconnect first. |
 | "the module does not answer (is the engine_sets firmware on it?)" | The module has another firmware. Flash `engine_sets` (`pio run -e engine_sets -t upload`, and `-t uploadfs` for the default sets), see `user-sounds.md`, "Trying it". |
 | "Not enough room" | Delete a set you do not need, or use shorter sounds. A set takes about 0.2-0.6 MB. |

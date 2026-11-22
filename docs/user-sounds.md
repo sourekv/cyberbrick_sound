@@ -330,12 +330,12 @@ to them; their licence is the user's responsibility. The default sets that come 
 ## The web app
 
 `web/index.html` is one file without a build step or a server: open it in Chrome or Edge (from disk works, Web
-Serial runs on `file:` pages), press "Connect module" and choose the module's USB port. It needs `engine_sets` on
+Serial runs on `file:` pages), press "Connect over USB" and choose the module's USB port. It needs `engine_sets` on
 the module.
 
 **What the user needs** (for the user guide): a computer (Windows, macOS, Linux or ChromeOS) with **Chrome or Edge**
 (version 89 or newer), and a USB-C cable. Only Chromium browsers have Web Serial. Safari and Firefox do not, and
-neither does any browser on an iPhone or iPad; there the app says so and "Connect module" stays off. On a Mac,
+neither does any browser on an iPhone or iPad; there the app says so and "Connect over USB" stays off. On a Mac,
 installing Chrome is enough. Tested so far only in Edge on Windows.
 
 - **User guide (2026-11-15):** `user-guide.md`, with pictures made by `tools/make_guide_images.py` (always the light
