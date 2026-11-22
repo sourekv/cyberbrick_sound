@@ -263,7 +263,7 @@ details.guide li { margin-bottom: 4px; }
 <script>
 "use strict";
 const RATE = 22050;
-const PAGE_VERSION = "2026-11-22 d (reconnect within the window)";   // shown in the log, to tell a cached old page from a new one
+const PAGE_VERSION = "2026-11-22 e (no error when the module closes the link)";   // shown in the log, to tell a cached old page from a new one
 const CHUNK = 3072;                       // bytes per @w line (4096 base64 characters, set_link.h)
 const SPEAKER_BOX_EQ = [                  // LAB_EQ (firmware/include/engine_lab_data.h): the 30 ml box, 40 mm speaker
   [1.10869112, -2.21738224, 1.10869112, -1.92739111, 0.928925821],
@@ -876,7 +876,10 @@ function busy(on) {
 async function guarded(fn) {
   busy(true);
   try { return await fn(); }
-  catch (e) { log(e.message, "err"); setStatus(e.message, "err"); notify("Failed: " + e.message, true); }
+  catch (e) {
+    if (!link) { log("the link closed during the action (" + e.message + ")", "muted"); return; }   // the module closed it (restart after a change, Bluetooth gone)
+    log(e.message, "err"); setStatus(e.message, "err"); notify("Failed: " + e.message, true);
+  }
   finally { busy(false); syncStop(); }
 }
 
@@ -944,7 +947,7 @@ async function refresh() {
     list.sort((a, b) => a.folder.localeCompare(b.folder));
     for (const s of list) s.json = await readSetJson(s.folder);
     sets = list;
-    await link.bye();
+    if (link) await link.bye();
     renderSets();
   });
 }
