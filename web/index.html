@@ -186,6 +186,8 @@ details.guide li { margin-bottom: 4px; }
         <tbody id="setRows"></tbody>
       </table>
     </div>
+    <div id="fwProgText" class="progtext"></div>
+    <div class="progress hidden" id="fwProg"><div id="fwBar"></div></div>
     <div class="hint" id="spaceText" style="margin-top:10px"></div>
     <div class="bar"><div id="spaceBar"></div></div>
   </section>
@@ -263,7 +265,7 @@ details.guide li { margin-bottom: 4px; }
 <script>
 "use strict";
 const RATE = 22050;
-const PAGE_VERSION = "2026-11-22 h (firmware update)";   // shown in the log, to tell a cached old page from a new one
+const PAGE_VERSION = "2026-11-22 i (firmware update with its own progress bar)";   // shown in the log, to tell a cached old page from a new one
 const CHUNK = 3072;                       // bytes per @w line (4096 base64 characters, set_link.h)
 const SPEAKER_BOX_EQ = [                  // LAB_EQ (firmware/include/engine_lab_data.h): the 30 ml box, 40 mm speaker
   [1.10869112, -2.21738224, 1.10869112, -1.92739111, 0.928925821],
@@ -1085,8 +1087,8 @@ async function updateFirmware(file) {
     String.fromCharCode(10, 10) + "If the new firmware does not start, the module can only be fixed over USB (pio run -e engine_sets -t upload).");
   if (!ok) return;
   await guarded(async () => {
-    progressStart(bytes.length);
-    progressSet(0, "Firmware");
+    progressStart(bytes.length, { t: "fwProgText", b: "fwBar", box: "fwProg" });
+    $("fwProgText").textContent = "Preparing the module (it erases the other app slot, a few seconds)...";
     const r = await link.fwUpdate(bytes, (n) => progressSet(n, "Writing the firmware"));
     progressSet(bytes.length, "Firmware written");
     log("firmware " + file.name + " written: " + r.ok, "ok");
@@ -1187,7 +1189,12 @@ function notify(text, err) {
 // The progress of a transfer (reading or writing a set): what, how much, the speed and the time left.
 let prog = { t0: 0, total: 0 };
 function fmtTime(sec) { sec = Math.round(sec); return sec >= 60 ? Math.floor(sec / 60) + " min " + (sec % 60) + " s" : sec + " s"; }
-function progressStart(total) { prog = { t0: performance.now(), total }; $("saveProgText").textContent = ""; setBar("saveBar", 0); }
+// ids: the elements to show it in (the editor's by default, the firmware update has its own under the list of sets).
+function progressStart(total, ids) {
+  prog = { t0: performance.now(), total, t: (ids && ids.t) || "saveProgText", b: (ids && ids.b) || "saveBar", box: ids && ids.box };
+  $(prog.t).textContent = ""; setBar(prog.b, 0);
+  if (prog.box) $(prog.box).classList.remove("hidden");
+}
 function progressSet(done, label) {
   const frac = prog.total ? Math.min(1, done / prog.total) : 0, el = (performance.now() - prog.t0) / 1000;
   let t = `${label}: ${Math.round(frac * 100)} % (${kB(done)} of ${kB(prog.total)})`;
@@ -1197,8 +1204,8 @@ function progressSet(done, label) {
     if (frac < 1) t += ` · about ${fmtTime((prog.total - done) / rate)} left`;
     else t += ` · ${fmtTime(el)} in all`;
   }
-  $("saveProgText").textContent = t;
-  setBar("saveBar", frac);
+  $(prog.t).textContent = t;
+  setBar(prog.b, frac);
 }
 function setSaveStatus(t, cls) { const s = $("saveStatus"); s.textContent = t; s.className = "status " + (cls || ""); }
 
