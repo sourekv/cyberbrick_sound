@@ -19,7 +19,8 @@
 // The Zero's stack height (socket 8.5 mm + its header + its own parts) was not measured; the foam takes up the
 // difference, so only post_h has to be larger than the stack (about 14-15 mm).
 //
-// Print: PLA or PETG, flat on the base, no supports, 0.2 mm layers are fine.
+// Print: PLA or PETG, flat on the base, 0.2 mm layers are fine. Slicer setting (Bambu Studio, Advanced): Bridge direction 45 degrees
+// (not automatic). Whatever the shape of the shelf for J1 turns out to be, the stand has to be printed with it.
 // Export (OpenSCAD 2021.01):
 //   openscad -o solder_stand.stl solder_stand.scad
 //   openscad -o solder_stand_preview.png -D 'part="preview"' solder_stand.scad   (with the board, not for printing)
