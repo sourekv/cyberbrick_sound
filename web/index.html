@@ -271,7 +271,7 @@ details.guide li { margin-bottom: 4px; }
 <script>
 "use strict";
 const RATE = 22050;
-const PAGE_VERSION = "2026-11-22 j (overall volume)";   // shown in the log, to tell a cached old page from a new one
+const PAGE_VERSION = "2026-11-22 k (volume slider only with a firmware that has it)";   // shown in the log, to tell a cached old page from a new one
 const CHUNK = 3072;                       // bytes per @w line (4096 base64 characters, set_link.h)
 const SPEAKER_BOX_EQ = [                  // LAB_EQ (firmware/include/engine_lab_data.h): the 30 ml box, 40 mm speaker
   [1.10869112, -2.21738224, 1.10869112, -1.92739111, 0.928925821],
@@ -1062,7 +1062,10 @@ function renderSets() {
     tr.appendChild(td);
     tb.appendChild(tr);
   }
-  { const v = info.volume !== undefined ? +info.volume : 60; $("volRange").value = v; $("volText").textContent = v + " %"; }
+  { const known = info.volume !== undefined, v = known ? +info.volume : 60;
+    $("volRange").value = v; $("volText").textContent = known ? v + " %" : "-";
+    $("volRange").disabled = !known;                                   // an older firmware does not know @volume
+    $("volRange").title = known ? "" : "this firmware has no overall volume: update the firmware (Update firmware)"; }
   const total = +info.total || 0, free = +info.free || 0;
   $("spaceText").textContent = total ? `${kB(total - free)} of ${kB(total)} used, ${kB(free)} free` +
     (info && info.fw ? ` · firmware ${info.fw}` + (info.built && info.built !== "-" ? `, built ${info.built}` : "") : "") : "";
