@@ -16,7 +16,8 @@ Sources:
   "header:shift_sound"   the CC0 shift sound of include/shift_sound.h
   name: {"text", "voice_prompt"}
                          with --piper and --model: the text spoken by Piper (the user runs this script, piper.exe is
-                         a downloaded binary); without them the prompt of the same number is taken from
+                         a downloaded binary), and the result is kept as assets/sets/NN_x/name.wav (in git); without
+                         them that kept file is used, and only when it is missing the prompt of the same number is taken from
                          include/voice_prompts.h (still with the number in front, "One. Truck.") and a note says so
 
 The starter and the horn go through the speaker EQ (LAB_EQ) as in the firmware today, so they sound the same.
@@ -239,11 +240,15 @@ def main():
         files = {}
         for key, s in src["sources"].items():
             if key == "name":
+                kept = os.path.join(SRC, folder, "name.wav")       # the spoken name made earlier with Piper, kept in git
                 if a.piper and a.model:
                     files["name"] = piper_name(s["text"], a.piper, a.model)
+                    write_wav(kept, files["name"])                   # an install without Piper then speaks the same name
+                elif os.path.exists(kept):
+                    files["name"] = read_wav(kept)
                 else:
                     files["name"] = voice_prompt(s["voice_prompt"])
-                    print("  %s: name from voice_prompts.h (with its number); use --piper/--model for the plain name"
+                    print("  %s: name from voice_prompts.h (with its old number); use --piper/--model for the plain name"
                           % folder)
             elif s in cache:
                 files[key] = cache[s]

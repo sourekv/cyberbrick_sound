@@ -100,7 +100,7 @@ A short map of every directory: `docs/contents.md`.
 
 ## Firmware
 
-Open `firmware/` in VS Code with the PlatformIO extension, or run `pio run -e <env> -t upload`:
+Open `firmware/` in VS Code with the PlatformIO extension, or run `pio run -e <env> -t upload`. **A new module, step by step (the firmware, the default sets, the check): `docs/first-install.md`.**
 
 **Firmware version**: `FW_VERSION` in `firmware/include/version.h` (now 0.1.0), raised by hand for every release,
 which gets the git tag `v<version>`. At build time `firmware/version.py` adds the short hash of the commit (with

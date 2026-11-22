@@ -8,7 +8,8 @@ can be remade after any change of the app. How the sets and the protocol work in
 
 - A computer with **Chrome or Edge** (version 89 or newer; Windows, macOS, Linux or ChromeOS). Safari, Firefox and
   browsers on phones and tablets have no Web Serial, so the app cannot reach the module there.
-- The module with the **`engine_sets` firmware**, connected to the computer with a USB-C cable.
+- The module with the **`engine_sets` firmware**, connected to the computer with a USB-C cable. A new module gets the firmware and the
+  default sets first: `first-install.md`.
 - Open `web/index.html` in the browser (from disk, or from a web server when the project publishes it).
 
 ## The steps

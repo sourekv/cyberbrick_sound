@@ -98,3 +98,5 @@ Author: craigsmith (uploaded 2018-08-26; a digitised copy of Hollywood optical a
 License: CC0 1.0 (public domain dedication), checked on the Freesound page on 2026-11-08; the file was downloaded by the project owner.
 Original: 72.3 s, 48 kHz 24 bit mono: an old car sputtering, many starts and stops, grinding and clanking, a voice in the background, some noise and hum. The original is not stored here.
 Derived file: `shift_grind.wav` (0.35 s, 22.05 kHz mono), one grinding event without voice (event 21 of the 24 loud events, at 62.79 s, picked by ear by the project owner), high-passed at 200 Hz, faded and normalised, with `python tools/make_shift_sound.py <original>`; the same tool writes `firmware/include/shift_sound.h`.
+
+**Spoken names of the default sets (`assets/sets/*/name.wav`, kept in git since 2026-11-22):** made with Piper and the LJ Speech voice (the same as `voice_prompts.h`) by `tools/make_default_sets.py --piper`, and then processed for the small speaker by `tools/voice_clarify.py`; so that an install without Piper speaks the same names. The licence is that of the voice and of Piper as described above.
