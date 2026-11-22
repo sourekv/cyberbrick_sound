@@ -109,3 +109,10 @@ So over Bluetooth: a default-size set of 0.2 to 0.6 MB takes about 17 to 50 s to
 - **The page leaves after a change** (a set written, moved or deleted, or the name changed): advertising off and, after 1.5 s,
   a restart that loads the changes; Bluetooth stays off after it until the next real power-up of the receiver.
 - Three wrong PINs lock the link until the next power-up, in both cases.
+
+## How the PIN is spoken (2026-11-22, tried)
+
+"Pin." (`/voice/pin.wav`), the four digits in a row with gaps of about 160 ms (`/voice/d0.wav .. d9.wav`), a pause of 0.7 s, and
+the four digits once more. Spoken once after power-up; again (every 40 s) only while a page has connected and not yet
+entered the PIN. Until the PIN is entered, a Bluetooth session does not silence the engine output (it had cut the
+spoken PIN into pieces before). Heard whole and without a break by the project owner after these changes.
