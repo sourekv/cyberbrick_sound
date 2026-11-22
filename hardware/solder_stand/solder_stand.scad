@@ -100,12 +100,13 @@ module stand() {
           for (x = [111.96, 114.50, 117.04])
             translate([x - j1_x0 - slot_w / 2, -1, top_z + 0.85]) cube([slot_w, pin_end - shelf_end + 2, 5]);
         }
-        // a thin support under the end of the comb, to be BROKEN OFF after printing (the Zero hangs there in the pass with J3 and J4):
-        // 3 x 1.2 mm at the foot, tapering to a 1.0 x 0.4 mm tip that touches the slab
+        // a support under the end of the comb, to be BROKEN OFF after printing (the Zero hangs there in the pass with J3 and J4):
+        // a straight post 4 x 1.6 mm that stops 1 mm short of the slab and a neck 1 mm tall (1.2 x 0.5 mm at the top) that touches it
         sy = by0 + 13.5;  sx = (j1_x0 + j1_x1) / 2;  sz = top_z - shelf_t;
+        translate([sx - 2.0, sy - 0.8, base_t - 0.01]) cube([4.0, 1.6, sz - 1.0 - base_t + 0.01]);
         hull() {
-          translate([sx - 1.5, sy - 0.6, base_t - 0.01]) cube([3.0, 1.2, 0.01]);
-          translate([sx - 0.5, sy - 0.2, sz - 0.01]) cube([1.0, 0.4, 0.01]);
+          translate([sx - 2.0, sy - 0.8, sz - 1.0 - 0.01]) cube([4.0, 1.6, 0.01]);
+          translate([sx - 0.6, sy - 0.25, sz - 0.01]) cube([1.2, 0.5, 0.01]);
         }
       }
       // side guides at both ends of the J1 body, so it cannot turn or slide along the edge
