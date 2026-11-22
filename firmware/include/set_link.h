@@ -36,6 +36,7 @@
 #include "sound_sets.h"
 #include <Arduino.h>
 #include <LittleFS.h>
+#include <Preferences.h>
 #include <vector>
 
 class SetLink {
@@ -59,6 +60,21 @@ class SetLink {
 
   // The same protocol over another byte stream (the Bluetooth link of docs/ble-link.md).
   void attach(Stream* s) { io = s; }
+
+  // Bluetooth prototype (docs/ble-link.md): until `@auth <pin>` only @hello and @info are answered. After 3 wrong PINs
+  // the link is locked for good (until restart). The USB link never calls this.
+  void requireAuth(const String& p) { authRequired = true; authed = false; pin = p; badPins = 0; locked = false; }
+  void resetAuth() { authed = false; badPins = 0; }
+  bool isAuthed() const { return !authRequired || authed; }
+  bool isLocked() const { return locked; }
+
+  // The name of the module (for several modules): NVS, so that uploadfs does not erase it. Empty = not set.
+  static String moduleName() {
+    Preferences pr; pr.begin("cbsound", true);
+    String n = pr.getString("name", "");
+    pr.end();
+    return n;
+  }
 
   // Reads and runs the commands that have arrived. Returns true while a session is active.
   bool poll(const String& currentSet) {
@@ -86,6 +102,9 @@ class SetLink {
 
  private:
   Stream* io = &Serial;
+  bool authRequired = false, authed = false, locked = false;
+  int badPins = 0;
+  String pin;
   String line, cur;
   bool overflow = false, active = false;
   uint32_t lastMs = 0;
@@ -112,6 +131,20 @@ class SetLink {
     int sp = l.indexOf(' ');
     String cmd = sp < 0 ? l : l.substring(0, sp);
     String arg = sp < 0 ? String() : l.substring(sp + 1);
+    if (locked) return reply("@err locked");
+    if (authRequired && !authed && cmd != "@hello" && cmd != "@info" && cmd != "@auth") return reply("@err auth");
+    if (cmd == "@auth") {
+      if (!authRequired || arg == pin) { authed = true; return reply("@ok"); }
+      if (++badPins >= 3) locked = true;
+      return reply("@err wrong pin");
+    }
+    if (cmd == "@name") {
+      bool ok = arg.length() >= 1 && arg.length() <= 8;
+      for (size_t i = 0; ok && i < arg.length(); i++) { char c = arg[i]; ok = isAlphaNumeric(c) || c == '_' || c == '-'; }
+      if (!ok) return reply("@err name: 1 to 8 letters, digits, - or _");
+      Preferences pr; pr.begin("cbsound", false); pr.putString("name", arg); pr.end();
+      return reply("@ok restart the module to advertise the new name");
+    }
     if (cmd == "@w") return write(arg);
     if (cmd == "@end") return endPut(arg);
     if (wf) abortPut();                    // any other command abandons an unfinished @put
@@ -144,7 +177,7 @@ class SetLink {
     size_t total = LittleFS.totalBytes(), used = LittleFS.usedBytes();
     reply(String("@ok free=") + (unsigned)(total - used) + " total=" + (unsigned)total + " set=" +
           (cur.length() ? cur : String("-")) + " psram=" + (unsigned)ESP.getFreePsram() + " fw=" FW_FULL_VERSION
-          " built=" FW_BUILD " layers=1 default=" + (SetLibrary::readState().length() ? SetLibrary::readState() : String("-")));
+          " built=" FW_BUILD " layers=1 name=" + moduleName() + " auth=" + (authRequired ? (authed ? "ok" : "need") : "no") + " default=" + (SetLibrary::readState().length() ? SetLibrary::readState() : String("-")));
   }
 
   static uint32_t folderBytes(File dir) {

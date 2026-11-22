@@ -117,6 +117,11 @@ static SetLink usbLink;
 static SetLink bleLink;
 static BleUart bleUart;
 static uint32_t bleWindowMs = 180000;   // prototype: advertising only this long after power-up
+static Clip digitClip[10];              // /voice/d0.wav .. d9.wav (tools/make_voice_digits.py), speak the PIN
+static String blePin;                   // random for every power-up, spoken by the module
+static std::vector<int> pinQueue;       // the digits still to speak
+static uint32_t pinNextMs = 0;          // when the PIN is spoken again
+static bool bleWasConnected = false;
 #endif
 static SoundSet cur;                 // the loaded set
 static int curIndex = -1;            // index in library.folders; -1 = fallback
@@ -262,12 +267,6 @@ static bool bootPressed() {
 void setup() {
   usbLink.begin();
   Serial.begin(115200);
-#if BLE_LINK_ENABLED
-  bleUart.begin("CBSound");
-  bleLink.attach(&bleUart);
-  bleUart.advertise(true);
-  Serial.println("ble: advertising as CBSound for 180 s");
-#endif
   Serial.println("cyberbrick_sound engine_sets " FW_FULL_VERSION ", built " FW_BUILD);
   statusLed.begin();
   pinMode(PIN_THROTTLE_IN, INPUT);
@@ -308,6 +307,18 @@ void setup() {
   if (library.scan() == 0) { useFallback(); return; }
   int i = library.find(SetLibrary::readState());
   selectSet(i < 0 ? 0 : i);
+#if BLE_LINK_ENABLED
+  // Bluetooth prototype: the name of the module in the advertising, a random PIN spoken with the digit clips
+  for (int d = 0; d < 10; d++) { String err; loadWav("/voice/d" + String(d) + ".wav", digitClip[d], err); }
+  String nm = SetLink::moduleName(), adv = nm.length() ? "CBSound-" + nm : String("CBSound");
+  bleUart.begin(adv.c_str());
+  bleLink.attach(&bleUart);
+  blePin = String(1000 + esp_random() % 9000);
+  bleLink.requireAuth(blePin);
+  bleUart.advertise(true);
+  pinNextMs = millis() + 6000;            // after the name of the set
+  Serial.println("ble: advertising as " + adv + " for 180 s, PIN " + blePin + " (spoken by the module)");
+#endif
 }
 
 // What a finished session of the web page asks for: rescan and reload, play a set, stop, demo.
@@ -357,6 +368,25 @@ void loop() {
   applyEnd(usbLink.takeEnd());
 #if BLE_LINK_ENABLED
   applyEnd(bleLink.takeEnd());
+  {
+    // the PIN: spoken when the advertising starts and again every 40 s until the page has authenticated
+    const bool needPin = bleUart.isAdvertising() || (bleUart.isConnected() && !bleLink.isAuthed());
+    if (needPin && pinQueue.empty() && millis() > pinNextMs && !namePlayer.active() && !demoOn && !bleLink.isLocked())
+      for (char c : blePin) pinQueue.push_back(c - '0');
+    if (!pinQueue.empty() && !namePlayer.active()) {
+      int d = pinQueue.front();
+      pinQueue.erase(pinQueue.begin());
+      if (digitClip[d].ok()) namePlayer.play(&digitClip[d]);
+      if (pinQueue.empty()) pinNextMs = millis() + 40000;
+    }
+    bool c = bleUart.isConnected();
+    if (bleWasConnected && !c) {          // the page left: the PIN again, and advertise for another window
+      bleLink.resetAuth(); pinNextMs = millis() + 3000;
+      if (!bleLink.isLocked()) { bleWindowMs = millis() + 180000; bleUart.advertise(true); }
+    }
+    bleWasConnected = c;
+    if (bleLink.isLocked() && bleUart.isAdvertising()) { bleUart.advertise(false); Serial.println("ble: locked after 3 wrong PINs"); }
+  }
 #endif
   if (bootPressed()) {
     demoOn = false;

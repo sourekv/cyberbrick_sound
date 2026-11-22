@@ -168,7 +168,7 @@ details.guide li { margin-bottom: 4px; }
   <section id="secSets" class="hidden">
     <div class="row" style="justify-content:space-between">
       <h2 style="margin:0">On the module</h2>
-      <div class="row"><button id="btnRefresh" class="small">Refresh</button><button id="btnNew" class="small">New empty set</button></div>
+      <div class="row"><button id="btnRefresh" class="small">Refresh</button><button id="btnName" class="small" title="the name of this module (for several modules); kept in the module, shown when connecting over Bluetooth">Module name</button><button id="btnNew" class="small">New empty set</button></div>
     </div>
     <div class="tablewrap" style="margin-top:8px">
       <table>
@@ -668,7 +668,9 @@ class MockTransport {
     }
     this.put = null;
     if (cmd === "@hello") return r("@ok cbsound 1");
-    if (cmd === "@info") return r(`@ok free=${this.total - this.used()} total=${this.total} set=${this.current || "-"} psram=7800000 fw=simulated built=- layers=1 default=${this.def || "-"}`);
+    if (cmd === "@info") return r(`@ok free=${this.total - this.used()} total=${this.total} set=${this.current || "-"} psram=7800000 fw=simulated built=- layers=1 name=${this.name || ""} auth=no default=${this.def || "-"}`);
+    if (cmd === "@name") { this.name = arg; return r("@ok restart the module to advertise the new name"); }
+    if (cmd === "@auth") return r("@ok");
     if (cmd === "@default") {
       if (!this.dirs.has("/sets/" + arg)) return r("@err no such set");
       this.def = arg; return r("@ok");
@@ -861,11 +863,23 @@ async function connect(sim, ble) {
     transport.onClose = () => { if (transport) { log("disconnected", "warn"); disconnected(); } };
     const v = await link.hello();
     log("connected: " + v + (sim ? " (simulated)" : ble ? " (Bluetooth)" : ""), "ok");
+    if (!sim) {                                              // Bluetooth: the module asks for the PIN it speaks (docs/ble-link.md)
+      const inf = await link.info();
+      if (inf.auth === "need") {
+        let ok = false;
+        for (let tries = 0; tries < 3 && !ok; tries++) {
+          const pin = window.prompt("The module " + (inf.name ? inf.name + " " : "") + "speaks a PIN (4 digits). Enter it:");
+          if (pin === null) break;
+          try { await link.cmd("@auth " + pin.trim()); ok = true; } catch (e) { log("PIN: " + e.message, "err"); if (/locked/.test(e.message)) break; }
+        }
+        if (!ok) throw new Error("PIN missing or wrong (the module locks the Bluetooth service after 3 wrong ones; restart it)");
+      }
+    }
     setStatus(sim ? "Simulated module (nothing is written to a real module)." : ble ? "Connected over Bluetooth (prototype)." : "Connected.", "ok");
     $("btnConnect").classList.add("hidden"); $("btnSim").classList.add("hidden"); $("btnBle").classList.add("hidden"); $("btnDisconnect").classList.remove("hidden");
     $("secSets").classList.remove("hidden");
     await refresh();
-    if (!sim && info && info.fw) setStatus("Connected, firmware " + info.fw + (info.built && info.built !== "-" ? ", built " + info.built : "") + ".", "ok");
+    if (!sim && info && info.fw) setStatus((ble ? "Connected over Bluetooth" : "Connected") + (info.name ? " to " + info.name : "") + ", firmware " + info.fw + (info.built && info.built !== "-" ? ", built " + info.built : "") + ".", "ok");
   } catch (e) {
     if (e.name === "NotFoundError") { setStatus("No port chosen.", "muted"); return; }
     log(e.message, "err"); setStatus(e.message, "err");
@@ -1518,6 +1532,13 @@ $("btnBle").onclick = () => connect(false, true);
 if (!("bluetooth" in navigator)) $("btnBle").classList.add("hidden");
 $("btnDisconnect").onclick = disconnect;
 $("btnRefresh").onclick = refresh;
+$("btnName").onclick = () => guarded(async () => {
+  const name = window.prompt("Name of this module (1 to 8 letters, digits, - or _; empty keeps it):", info.name || "");
+  if (!name) return;
+  const r = await link.cmd("@name " + name.trim());
+  log("module name: " + name.trim() + " (" + r.ok + ")", "ok");
+  info.name = name.trim();
+});
 $("btnNew").onclick = () => { editor = newEditor(); showEditor("New set"); autoNumber(); setSaveStatus("Choose the sounds; a copy of an existing set is often the easier start.", "muted"); setBar("saveBar", 0); };
 $("btnCancel").onclick = closeEditor;
 $("btnSave").onclick = save;

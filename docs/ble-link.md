@@ -58,3 +58,17 @@ and what it showed.
   the same, as short clips in the firmware or as spoken numbers), the length of the PIN (4 digits is enough against
   someone passing by, the service is up for minutes only), a limit on wrong PINs (for example 3, then the service
   closes), and what happens when the module is mute.
+
+## USB stays (decided 2026-11-22)
+
+USB remains the basic and the backup way: the same protocol, no PIN, `pio` as before. It is also the way to the first
+flash and the rescue when a firmware does not start (the bootloader is in the chip's ROM), and the way back after a
+firmware update over Bluetooth into the other app slot. The normal `engine_sets` does not contain Bluetooth.
+
+## The prototype with name and PIN (2026-11-22)
+
+`engine_sets_ble` has `@name` (NVS), `@auth <pin>` and `auth=`, `name=` in `@info`; a random 4 digit PIN per power-up,
+spoken with digit clips from `/voice/d0.wav .. d9.wav` (`tools/make_voice_digits.py`, written by `uploadfs`) when the
+advertising starts and every 40 s until the page has authenticated; 3 wrong PINs lock the Bluetooth link until restart;
+after a disconnect the PIN is spoken again and the advertising window is renewed. The page asks for the PIN after
+connecting over Bluetooth and has a "Module name" button. The PIN is also printed to the USB serial log.
