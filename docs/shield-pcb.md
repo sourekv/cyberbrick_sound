@@ -275,7 +275,7 @@ To connect the finished board in the model, whichever service makes it:
 | J1: right-angle male pin header 1x3, 2.54 mm | 5 | Sullins PRPC003SBAN-M71RC, or cut from a 1x40 right-angle strip; soldered by hand |
 | J3, J4: female socket strip 1x9, 2.54 mm, 8.5 mm tall | 10 | Sullins PPTC091LFBN-RC; soldered by hand (plug them onto the Zero first so they stay straight) |
 | Servo cable, flat, JR female to female | 5 | J1 to the receiver's S4; length to suit the model |
-| Speaker cable Bambu Lab IC007 (SH1.0-2P, 200 mm) | 1 pack of 5 | one plug cut off, or better **cut in the middle: two pieces** (see the note below) |
+| Speaker cable Bambu Lab IC007 (SH1.0-2P, 200 mm) | 1 pack of 5 | one plug cut off, or better **cut in the middle: two pieces** (see the note below). **All lengths exist** in the same store: IC005 50 mm, IC004 100 mm, IC007 200 mm (5 pcs each) and XC014 300 mm (2 pcs); the 200 and 300 mm ones suit cutting in the middle |
 | Speaker, 4 Ohm | up to 5 | the type is still open (`roadmap.md`) |
 | Waveshare ESP32-S3-Zero-N8R8-M | up to 5 | one is in the prototype; the "-M" variant has its pin headers fitted, so it plugs into J3/J4 |
 
