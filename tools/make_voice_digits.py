@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Speaks the digits 0 to 9 with Piper (the same voice as the set names) and writes firmware/data/voice/d0.wav ..
 d9.wav and pin.wav (a short beep before the digits), 22 050 Hz, 16 bit, mono, silence trimmed. The module speaks its Bluetooth PIN with them (docs/ble-link.md).
-firmware/data/ is generated and git-ignored; `pio run -e engine_sets_ble -t uploadfs` writes it to the data partition.
+firmware/data/ is generated and git-ignored; `pio run -e engine_sets -t uploadfs` writes it to the data partition.
 
     python tools/make_voice_digits.py --piper DIR --model ONNX
 """

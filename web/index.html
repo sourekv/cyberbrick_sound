@@ -94,14 +94,14 @@ details.guide li { margin-bottom: 4px; }
   <section>
     <div class="row">
       <button id="btnConnect" class="choice">Connect over USB</button>
-      <button id="btnBle" class="choice" title="the same as over USB, but over Bluetooth; needs a firmware with Bluetooth (docs/ble-link.md)">Connect over Bluetooth</button>
+      <button id="btnBle" class="choice" title="the same as over USB, but over Bluetooth, for 3 minutes after the power-up of the receiver (docs/ble-link.md)">Connect over Bluetooth</button>
       <button id="btnSim" class="choice">Simulated module</button>
       <button id="btnDisconnect" class="hidden">Disconnect</button>
       <span id="connStatus" class="status muted">Not connected.</span>
     </div>
     <div class="hint" style="margin-top:8px">While the app talks to the module, the engine on the module is silent; it
       comes back a few seconds after the last action.</div>
-    <div class="hint" id="bleHint" style="margin-top:4px"><strong>Bluetooth</strong> (needs a firmware with Bluetooth): switch the
+    <div class="hint" id="bleHint" style="margin-top:4px"><strong>Bluetooth</strong>: switch the
       receiver on; the module says its PIN once, and you can connect (also again and again) for 3 minutes after the power-up. If you changed something (wrote, deleted, renamed), the module restarts when you leave and Bluetooth stays off until the receiver is switched off and on again. USB works at any time.</div>
   </section>
 

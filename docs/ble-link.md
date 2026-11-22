@@ -1,23 +1,31 @@
-# Bluetooth link (prototype)
+# Bluetooth link
 
-Status: prototype, 2026-11-22. It works, but it is not part of the normal firmware and has no security yet. The idea and
-the arguments are in `roadmap.md` ("Sound sets and firmware update over Bluetooth Low Energy"); this is what was built
-and what it showed.
+Status: 2026-11-22. Part of the one firmware `engine_sets` (decided the same day: no alternative variants, nothing from
+the older firmware is out in the world). It started as a prototype; the idea and the arguments are in `roadmap.md`
+("Sound sets and firmware update over Bluetooth Low Energy"); this is what is built, how it behaves and what it showed.
+USB stays as the basic and the backup way, see below.
+
+## How it works for the user
+
+Switch the receiver on. The module says a beep and a four digit PIN (twice) and for **3 minutes** it can be reached over
+Bluetooth. On the page choose **Connect over Bluetooth**, pick `CBSound` (or `CBSound-<name of the module>`) and enter the
+PIN. It does everything the USB link does (list, test, read, write, delete the sets). If something was written, deleted or
+renamed, the module restarts after the page has left and Bluetooth stays off until the next power-up of the receiver;
+otherwise the page may connect again within the 3 minutes.
 
 ## What was built
 
-- **Firmware environment `engine_sets_ble`** (`pio run -e engine_sets_ble -t upload`): the `engine_sets` firmware with
-  `-DBLE_LINK_ENABLED=1`. The normal `engine_sets` is unchanged and does not contain the Bluetooth code.
+- **One firmware, `engine_sets`** (`pio run -e engine_sets -t upload`): Bluetooth is in it (`-DBLE_LINK_ENABLED=1` in
+  `platformio.ini`; `=0` leaves it out). The firmware grows from 0.46 MB to 1.1 MB of the 1.5 MB app slot.
 - **`firmware/include/ble_link.h`**: `BleUart`, a `Stream` over a Nordic-UART-like GATT service
   (service `6E400001-B5A0-F393-E0A9-E50E24DCCA9E`, RX write `...0002...`, TX notify `...0003...`). The Arduino core's own
-  BLE library (Bluedroid), no download. The firmware grows from 0.46 MB to 1.09 MB (of the 1.5 MB app slot).
+  BLE library (Bluedroid), no download.
 - **`SetLink` runs unchanged over it** (`SetLink::attach(Stream*)` in `set_link.h`): the same `@` commands as over USB.
   The end of a session (`@select`, `@demo`, `@stop`, changed files) is handled by one function, `applyEnd()`, for the
   USB and the Bluetooth link.
-- **Advertising window:** the module advertises as `CBSound` for 180 s after power-up (the prototype's stand-in for a
-  real trigger), and stays connected as long as the page is.
+- **Advertising window:** the module advertises for 180 s after power-up and stays connected as long as the page is.
 - **Page:** a `BleTransport` next to `SerialTransport` and the simulated module (`web/index.html`), a button "Connect
-  over Bluetooth (prototype)" (only shown where the browser has Web Bluetooth). The rest of the page is unchanged.
+  over Bluetooth" (only shown where the browser has Web Bluetooth). The rest of the page is unchanged.
 
 ## What it showed
 
@@ -66,7 +74,7 @@ firmware update over Bluetooth into the other app slot. The normal `engine_sets`
 
 ## The prototype with name and PIN (2026-11-22)
 
-`engine_sets_ble` has `@name` (NVS), `@auth <pin>` and `auth=`, `name=` in `@info`; a random 4 digit PIN per power-up,
+`engine_sets` has `@name` (NVS), `@auth <pin>` and `auth=`, `name=` in `@info`; a random 4 digit PIN per power-up,
 spoken with digit clips from `/voice/d0.wav .. d9.wav` (`tools/make_voice_digits.py`, written by `uploadfs`) when the
 advertising starts and every 40 s until the page has authenticated; 3 wrong PINs lock the Bluetooth link until restart;
 after a disconnect the PIN is spoken again and the advertising window is renewed. The page asks for the PIN after

@@ -1,8 +1,8 @@
 #pragma once
-// PROTOTYPE of the Bluetooth Low Energy link (docs/ble-link.md): the protocol of set_link.h over a Nordic-UART-like
+// The Bluetooth Low Energy link (docs/ble-link.md): the protocol of set_link.h over a Nordic-UART-like
 // GATT service, so that the web page can reach the module through Web Bluetooth. Only built in the environment
-// engine_sets_ble (-DBLE_LINK_ENABLED=1). No pairing or PIN yet: in this prototype anyone in range can connect while
-// the service is advertising, which is only during a window after power-up.
+// engine_sets (-DBLE_LINK_ENABLED=1, the default there). Access is protected by the PIN of SetLink (@auth); the service is
+// advertising only during a window after power-up.
 //
 //   service  6E400001-B5A0-F393-E0A9-E50E24DCCA9E
 //   RX       6E400002-...   the page writes the protocol lines here (write, write without response)

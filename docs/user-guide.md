@@ -26,6 +26,11 @@ Press **Connect over USB** and choose the module's USB port in the browser's lis
 "USB Serial Device (COM5)"). When it works the line next to the button reads "Connected, firmware 0.1.0+..., built
 ..." and the list of sets appears. The firmware version is also under the list.
 
+**Over Bluetooth** (without a cable, with the module in the model): switch the receiver on and listen: the module says a beep and
+a four digit PIN, twice. Press **Connect over Bluetooth**, choose `CBSound` and enter the PIN. You can connect for 3
+minutes after the power-up. After you have written or deleted a set the module restarts and Bluetooth stays off until you
+switch the receiver off and on again. Needs Chrome or Edge with Bluetooth in the computer. USB works at any time.
+
 **Simulated module** lets you try the whole app without hardware: it holds the default sets, everything works, and
 nothing is written anywhere. Changes are gone when you close the app.
 
