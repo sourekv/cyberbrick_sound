@@ -2,7 +2,7 @@
 
 Status: 2026-11-22. The one place for everything that is still open: decisions, checks on hardware and the plans for
 later. What has been done is in the short list at the end ("Done"), with a pointer to the document that describes it. The
-other documents describe what exists and link here for what is missing. Ideas that were dropped, with the reasons, are in
+other documents describe what exists and link here for what is missing. Ideas that were dropped, with the reasons (among them Wi-Fi for the sets and the firmware, in favour of Bluetooth), are in
 `rejected-ideas.md`.
 
 ## Next
@@ -56,25 +56,6 @@ Not started; recorded so the design does not block them.
   bands, no revision letters yet): the speaker box, its cap and the solder stand (`hardware/speaker_box/`, `hardware/solder_stand/`) could get revision
   letters like the shield (rev A, ..., git tags `hw-speaker_box-revA` and so on) once printed copies need telling apart, perhaps with the revision
   embossed in the part (a small text in the OpenSCAD model). Until then git alone tracks them.
-- **Firmware updates over Wi-Fi (OTA)** (**low priority** since 2026-11-18), with Wi-Fi switched on only in an update mode (for example BOOT held at
-  power-up). The 8 MB partition table already has two 1.5 MB app slots, which the update over USB and Bluetooth uses already. Bluetooth does the same job
-  (`ble-link.md`), so Wi-Fi is not needed for it.
-- **Sound sets over Wi-Fi** (considered 2026-11-17, **low priority** since 2026-11-18: a web server on the module is judged too much for what it brings;
-  USB, Bluetooth and the page opened from disk or from GitHub Pages are enough). The same job as the web app does over USB, without a cable, in the same
-  service mode as the OTA update above (Wi-Fi only on request, for example BOOT held at power-up, because the 2.4 GHz radio would disturb the receiver's link
-  while driving). A page from https cannot call an http device on the home network (mixed content), so the module would serve the page itself (from flash:
-  about 200 kB plus `number_names.js` 355 kB) and speak the same `@` commands over a WebSocket; or the page is opened from disk (`file://`) and uses a
-  WebSocket. Connection: the module as a hotspot with a password (nothing to store, but the computer loses its internet meanwhile), or as a client of the home
-  network (the password has to be entered and kept). Gain: no USB cable with the module in the model, and Safari, Firefox and phones could use the app,
-  because Web Serial and Web Bluetooth are not needed. Cost: a bigger firmware, a server to secure (without a password anyone nearby could change the sounds
-  or the firmware), and the page to serve. The Web Serial and Bluetooth ways stay.
-  Memory (estimate, nothing built): the data partition is 4.66 MB for sounds today (2.25 MB with the seven default sets, so about 2.4 MB free; a set is
-  0.2-0.6 MB). `engine_sets` is 0.47 MB of a 1.5 MB app slot without Bluetooth (1.1 MB with it); with Wi-Fi and a server it would be about 1.0-1.2 MB. The
-  page (`index.html` 78 kB + `number_names.js` 355 kB, about 0.43 MB) would not fit in the slot, so it goes to the data partition and takes that much from
-  the sounds (about 2.0 MB free with the default sets); it could be made smaller (minified page, fewer spoken numbers).
-  Decided as the likely way (2026-11-17): the page served by the module has no Speak (the computer has no internet while it is joined to the module's
-  network), so the spoken name of a set is limited to its **index**, the spoken number from `number_names.js`. A name from a file or the microphone could
-  stay in the module's page if it is wanted, but it is not needed for this variant. The USB page keeps all three ways.
 - **USB audio** (the Zero as a USB speaker for the PC, to compare the same sound from the PC and from the module): tried on 2026-11-08, does not work with
   the current Arduino core; parked until a move to core 3.x (`rejected-ideas.md`).
 - **Spare inputs** on the shield (IO10..IO12 on a cable connector), only if a use turns up (`shield-pcb.md`).
