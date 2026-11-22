@@ -13,7 +13,7 @@ other documents describe what exists and link here for what is missing. Ideas th
 | Enclosure for the model | - | designed from scratch around the chosen speaker; the printed box is a test fixture only |
 | Long power test with the motor running | `bringup.md` | does the servo-port 5 V hold with the module and the motor together |
 | The other four rev A boards | `shield-pcb.md` | solder J1, J3 and J4 and check them like the first one (the first board plays, see "Done") |
-| Try the printed solder stand with rubber bands | `shield-pcb.md`, `hardware/solder_stand/` | a thicker base (8 mm) and grooves for the bands are in the model (2026-11-22), not printed or tried yet |
+| Try the printed solder stand with rubber bands | `shield-pcb.md`, `hardware/solder_stand/` | a thicker base (8 mm) and grooves for the bands are in the model (2026-11-22), and so is the shelf in the air with slots for J1 fitted on the underside (the cantilever part may need a support); none of it printed or tried yet |
 
 ## To check on hardware
 
