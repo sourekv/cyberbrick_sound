@@ -93,7 +93,7 @@ class SetLink {
       if (c == '\r') continue;
       if (c == '\n') {
         if (overflow) reply("@err line too long");
-        else if (line.length() && line[0] == '@') { lastMs = millis(); active = true; run(line); }
+        else if (line.length() && line[0] == '@') { lastMs = millis(); active = true; run(line); lastMs = millis(); }   // after a slow command (erasing the app slot takes seconds) the session has not timed out
         line = "";
         overflow = false;
         continue;

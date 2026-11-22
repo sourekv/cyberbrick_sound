@@ -34,20 +34,17 @@ otherwise the page may connect again within the 3 minutes.
   sets (the seven default sets are 2 MB, a layered set 0.5 MB). Writing was not timed yet.
 - The firmware of 0.5 to 1 MB would be about 20 to 40 s at this speed, if it ever went over this link.
 
-## Not done (what a real version needs)
+## What is open (state 2026-11-22)
 
-- **A trigger** that is not "just after power-up". Planned: the free transmitter stick R3 held to its end for about
-  3 s with the ignition off and the throttle at rest (the module already reads all channels), with a spoken
-  "Bluetooth". BLE must not run while driving (the 2.4 GHz radio disturbs the receiver's link).
-- **Pairing and a PIN.** Today anyone in range can connect during the window and rewrite or delete the sets.
-- ~~Writing was not tried~~ Done 2026-11-22, see below.
-- **Leaving the service mode:** after the page disconnects, after about 5 minutes of idle, or at power-off.
-- **Firmware update over Bluetooth** into the other app slot (no way back if the new firmware does not start, without
-  USB): after the sets work well.
-- The firmware without the Bluetooth code stays the default; the Bluetooth build is 0.63 MB bigger. Deciding whether the
-  Bluetooth service goes into the one normal firmware is open.
+Everything the first prototype lacked is done or decided: the PIN, the name, the window of 3 minutes after the power-up, leaving the
+session (restart after a change), writing sets and the firmware update. What stays open:
 
-## Several modules: name and PIN (decided to design this way, 2026-11-22, not built)
+- **Firmware update over Bluetooth and USB: tried on the real module** (see the last sections); until then it has the risk that a
+  new firmware that does not start can only be rescued over USB.
+- **No trigger from the transmitter**: tried to think through and dropped as overkill (see "Decision: no trigger from the transmitter").
+- **The firmware is one**: Bluetooth is part of `engine_sets`; there is no variant without it (it can be left out with `-DBLE_LINK_ENABLED=0`).
+
+## Several modules: name and PIN (decided 2026-11-22, built)
 
 - **Name of the module** (for example `Truck`, up to about 8 characters, because it goes into the BLE advertising
   of 31 bytes: `CBSound-Truck`). Kept in **NVS** (`Preferences`), not in the file system: `uploadfs` rewrites the whole data
@@ -100,7 +97,7 @@ is written or deleted.
 
 So over Bluetooth: a default-size set of 0.2 to 0.6 MB takes about 17 to 50 s to write.
 
-## Behaviour agreed after the first trials (2026-11-22, built, not yet tried)
+## Behaviour agreed after the first trials (2026-11-22, built and tried)
 
 - **Window of 3 minutes after a real power-up**: advertising and the PIN, spoken **once** after the name of the set
   (no repeating while nobody connects). If nobody connects in the 3 minutes, Bluetooth is switched off.
@@ -109,7 +106,7 @@ So over Bluetooth: a default-size set of 0.2 to 0.6 MB takes about 17 to 50 s to
   After this restart Bluetooth stays **off** (the reset reason is a software reset), so it does not speak the PIN again
   after every session. It starts again at the next real power-up of the receiver.
 
-## Reconnecting within the window (2026-11-22, built, not yet tried)
+## Reconnecting within the window (2026-11-22, built and tried)
 
 - **The page leaves and nothing was changed** (only looked, read sets, or the link broke): no restart, the module advertises
   again until the 3 minutes after power-up are over; the page may connect again and again. The PIN is spoken again only
