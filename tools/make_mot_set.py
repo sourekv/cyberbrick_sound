@@ -18,7 +18,7 @@ Loudness: every file gets the RMS of the same file of the default set 01_truck, 
 With --layered a second set is built from the same recordings, as a layered set (docs/layers-design.md): three loops
 cut at different steady engine speeds (motidle 1.0 s.., motacc1 3.3..4.7 s, motcrui1 4.0..6.2 s) written as layer_1.wav ..
 layer_3.wav, with their "ratio" (firing frequency relative to the first layer, measured from the envelope of the raw
-recording) in set.json. start, shift, horn and the name are made as above (name "Nine. Layers.").
+recording) in set.json. start and horn are as in the set 08, the shift is the one of the default set 01_truck (CC0), the name is made as above (name "Nine. Layers.").
 
 Usage (from the repo root):
     python tools/make_mot_set.py --src work/mot_src --out work/mot_set [--piper DIR --model ONNX] [--layered]
@@ -132,8 +132,9 @@ def build_layered(a, ref):
         write16(os.path.join(dst, "layer_%d.wav" % i), level_to(loop, base_rms))
         json_layers.append({"file": "layer_%d.wav" % i, "ratio": round(f / layers[0][1], 3)})
         print("layer %d: %.1f Hz, ratio %.3f, %.2f s" % (i, f, f / layers[0][1], len(loop) / RATE))
-    for f in ("start.wav", "shift.wav", "horn.wav"):
+    for f in ("start.wav", "horn.wav"):
         shutil.copy(os.path.join(a.out, a.folder, f), os.path.join(dst, f))     # as in the set 08
+    shutil.copy(os.path.join(a.ref, "shift.wav"), os.path.join(dst, "shift.wav"))   # the shift of the default set 01_truck (CC0), chosen by the owner
     if a.piper and a.model:
         import make_default_sets as m
         write16(os.path.join(dst, "name.wav"), m.piper_name("Nine. Layers.", a.piper, a.model).astype(np.float64) / 32768.0)
