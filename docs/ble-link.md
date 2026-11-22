@@ -139,3 +139,20 @@ restart after a change (see above). The rejected idea and its reasons: `rejected
 **Digits of the PIN (2026-11-22, "much better"):** a PIN with five, six, seven and nine (5679) was hard to hear on the small speaker (five
 and nine rhyme, six and seven begin alike). The PIN is now drawn only from the digits 0, 1, 2, 3, 4, 6 and 8 (2401 PINs, enough
 for three tries before the lock), and the spoken digits are brought to a similar level (`equalise` in `tools/make_voice_digits.py`).
+
+## Which spoken digits are easy to understand (2026-11-22)
+
+Tried on the 40 mm speaker in its box (the owner, listening), English Piper voice, after the clarifying filter of
+`tools/voice_clarify.py`:
+
+| Digit | Heard | Why | Use |
+|---|---|---|---|
+| 0, 1, 2, 3, 4, 6, 8 | clear | different vowels and consonants | **recommended**, the PIN is made of these |
+| 5 (five) | hard | rhymes with nine; the quiet fricative "f" is lost on the small speaker | **not recommended** |
+| 7 (seven) | hard | begins like six, the two syllables run together | **not recommended** |
+| 9 (nine) | hard | rhymes with five | **not recommended** |
+
+The PIN never contains 5, 7 or 9. The same holds for any other thing that is only spoken: the spoken number at the start of
+the name of a set ("Five.", "Seven.", "Nine.") is announced less clearly than the others, so a number given to a set by its
+name text (for example "Seven. V twelve.") is the weaker way to tell sets apart; the name of the set that follows the number
+is what makes it recognisable. The PIN was 5679 when this was found: "much worse", and 0, 1, 2, 3, 4, 6, 8 "much better".

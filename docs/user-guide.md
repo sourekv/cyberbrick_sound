@@ -31,6 +31,10 @@ a four digit PIN, twice. Press **Connect over Bluetooth**, choose `CBSound` and 
 minutes after the power-up. After you have written or deleted a set the module restarts and Bluetooth stays off until you
 switch the receiver off and on again. Needs Chrome or Edge with Bluetooth in the computer. USB works at any time.
 
+The PIN is made only of the digits 0, 1, 2, 3, 4, 6 and 8: the digits 5, 7 and 9 are hard to tell apart on the small speaker
+(five and nine rhyme, six and seven begin alike) and are therefore not used. If you do not catch the PIN, switch the
+receiver off and on again, or connect from the page and the module says it again.
+
 **Simulated module** lets you try the whole app without hardware: it holds the default sets, everything works, and
 nothing is written anywhere. Changes are gone when you close the app.
 
