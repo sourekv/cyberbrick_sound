@@ -28,7 +28,9 @@
 
 part = "stand";      // "stand" or "preview" (stand with the board and the Zero as ghosts)
 
-base_t     = 4.0;    // base plate thickness (heavier, so the stand does not tip over)
+base_t     = 8.0;    // base plate thickness (heavier, so the stand does not tip over; thick enough for the band grooves below it)
+groove_w   = 4.5;    // grooves in the underside of the base for rubber bands (a band of about 3 mm), one set each way
+groove_d   = 3.0;    // groove depth (the base keeps 5 mm above it)
 base_w     = 80.0;   // base plate, square, centred under the board (the stand is about 25 mm tall)
 post_h     = 18.0;   // base top to the board's top side (must clear the Zero stack, foam fills the rest)
 post_d     = 4.0;    // post diameter; the copper ring is 6.0 mm, J3 starts 2.6 mm and the Zero corner about 2.5 mm from the hole centre
@@ -86,6 +88,11 @@ module stand() {
           translate([x - j1_x0 - slot_w / 2, -1, base_t + post_h - 1.27 - 0.32 - 0.1]) cube([slot_w, comb_l + 2, 5]);
       }
     }
+    // grooves in the underside, both ways, for a rubber band that holds the board down (docs/shield-pcb.md): along the long axis
+    // (y) at the two strips beside the board, 2.5 mm from its long edges over the copper rings, and across it (x) at the rows of
+    // the mounting holes; the bands run round the whole base and sit in the grooves, so they cannot slip off and the base lies flat
+    for (x = [bx0 + 2.5, bx1 - 2.5]) translate([x - groove_w / 2, cy - base_w / 2 - 1, -0.01]) cube([groove_w, base_w + 2, groove_d + 0.01]);
+    for (y = [cy - 12, cy + 12]) translate([cx - base_w / 2 - 1, y - groove_w / 2, -0.01]) cube([base_w + 2, groove_w, groove_d + 0.01]);
     // label on the base, so the stand is not taken for something else
     translate([cx, cy + base_w / 2 - 8, base_t - 0.6])
       linear_extrude(1) text("shield solder stand", size = 4, halign = "center", valign = "center");
