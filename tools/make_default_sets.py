@@ -161,7 +161,7 @@ def voice_prompt(i):
     return header_array(path, "VOICE_%d" % i)
 
 
-def piper_name(text, piper, model):
+def piper_name(text, piper, model, clarify=True):
     fd, tmp = tempfile.mkstemp(suffix=".wav"); os.close(fd)
     try:
         subprocess.run([os.path.join(piper, "piper.exe"), "--model", model, "--output_file", tmp],
@@ -182,7 +182,11 @@ def piper_name(text, piper, model):
     f = min(220, len(d) // 2)
     d[:f] *= np.linspace(0, 1, f); d[-f:] *= np.linspace(1, 0, f)
     d *= 0.89 * 32767 / max(1.0, np.max(np.abs(d)))   # -1 dBFS
-    return d.astype(np.int16)
+    pcm = d.astype(np.int16)
+    if clarify:                                       # clearer on the 40 mm speaker (tools/voice_clarify.py)
+        import voice_clarify
+        pcm = voice_clarify.clarify(pcm)
+    return pcm
 
 
 # ---------------------------------------------------------------- main

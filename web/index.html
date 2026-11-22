@@ -263,7 +263,7 @@ details.guide li { margin-bottom: 4px; }
 <script>
 "use strict";
 const RATE = 22050;
-const PAGE_VERSION = "2026-11-22 e (no error when the module closes the link)";   // shown in the log, to tell a cached old page from a new one
+const PAGE_VERSION = "2026-11-22 f (clearer spoken names)";   // shown in the log, to tell a cached old page from a new one
 const CHUNK = 3072;                       // bytes per @w line (4096 base64 characters, set_link.h)
 const SPEAKER_BOX_EQ = [                  // LAB_EQ (firmware/include/engine_lab_data.h): the 30 ml box, 40 mm speaker
   [1.10869112, -2.21738224, 1.10869112, -1.92739111, 0.928925821],
@@ -370,6 +370,34 @@ function toPcm(f) {
   for (let i = 0; i < f.length; i++) pcm[i] = Math.max(-32768, Math.min(32767, Math.round(f[i] * 32768)));
   return pcm;
 }
+// Clearer on the 40 mm speaker: high-pass at 250 Hz, +7 dB presence around 2.5 kHz, soft compression, peak at -1 dBFS. The same
+// chain as tools/voice_clarify.py (which makes the default names and the spoken numbers): keep them in step.
+function biquad(x, b0, b1, b2, a1, a2) {
+  const y = new Float32Array(x.length);
+  let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+  for (let i = 0; i < x.length; i++) {
+    const v = b0 * x[i] + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2;
+    x2 = x1; x1 = x[i]; y2 = y1; y1 = v; y[i] = v;
+  }
+  return y;
+}
+function clarifyPcm(f) {
+  let w0 = 2 * Math.PI * 250 / RATE, al = Math.sin(w0) / (2 * Math.SQRT1_2), c = Math.cos(w0), a0 = 1 + al;
+  let x = biquad(f, (1 + c) / 2 / a0, -(1 + c) / a0, (1 + c) / 2 / a0, -2 * c / a0, (1 - al) / a0);      // high-pass, Butterworth
+  const A = Math.pow(10, 7 / 40);
+  w0 = 2 * Math.PI * 2500 / RATE; al = Math.sin(w0) / (2 * 0.9); c = Math.cos(w0);
+  const pa0 = 1 + al / A;
+  x = biquad(x, (1 + al * A) / pa0, -2 * c / pa0, (1 - al * A) / pa0, -2 * c / pa0, (1 - al / A) / pa0);   // presence
+  let peak = 0;
+  for (const v of x) peak = Math.max(peak, Math.abs(v));
+  const g = 3, k = peak > 0 ? 1 / peak : 1, th = Math.tanh(g);
+  const y = new Float32Array(x.length);
+  let p2 = 0;
+  for (let i = 0; i < x.length; i++) { y[i] = Math.tanh(g * x[i] * k) / th; p2 = Math.max(p2, Math.abs(y[i])); }
+  const out = p2 > 0 ? 0.891 / p2 : 1;
+  for (let i = 0; i < y.length; i++) y[i] *= out;
+  return y;
+}
 // For the name: cut the silence at both ends, 10 ms fades, peak at -1 dBFS (docs/user-sounds.md).
 function prepareName(f) {
   let peak = 0;
@@ -388,7 +416,7 @@ function prepareName(f) {
     if (out.length - 1 - i < fade) e = Math.min(e, (out.length - 1 - i) / fade);
     out[i] *= g * e;
   }
-  return out;
+  return clarifyPcm(out);
 }
 function peakDb(pcm) {
   let p = 0;
