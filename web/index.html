@@ -38,6 +38,7 @@ button, select, input { font: inherit; color: inherit; }
 button { background: var(--chip); border: 1px solid var(--line); border-radius: 7px; padding: 5px 11px; cursor: pointer; }
 button:hover:not(:disabled) { border-color: var(--muted); }
 button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button.choice:hover:not(:disabled) { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }   /* the way to connect: red only under the mouse */
 button:disabled { opacity: .45; cursor: default; }
 button.small { padding: 2px 8px; font-size: 13px; }
 input[type=text], input[type=number], select { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 4px 7px; }
@@ -85,9 +86,9 @@ details.guide li { margin-bottom: 4px; }
 
   <section>
     <div class="row">
-      <button id="btnConnect" class="primary">Connect over USB</button>
-      <button id="btnBle" title="PROTOTYPE: the same over Bluetooth, only with the firmware environment engine_sets_ble (docs/ble-link.md)">Connect over Bluetooth (prototype)</button>
-      <button id="btnSim">Simulated module</button>
+      <button id="btnConnect" class="choice">Connect over USB</button>
+      <button id="btnBle" class="choice" title="PROTOTYPE: the same over Bluetooth, only with the firmware environment engine_sets_ble (docs/ble-link.md)">Connect over Bluetooth (prototype)</button>
+      <button id="btnSim" class="choice">Simulated module</button>
       <button id="btnDisconnect" class="hidden">Disconnect</button>
       <span id="connStatus" class="status muted">Not connected.</span>
     </div>
@@ -1526,16 +1527,9 @@ async function save() {
 }
 
 // ------------------------------------------------------------------ wiring
-// The highlighted button is the way that was chosen last (kept in this browser; USB the first time).
-const CHOICES = ["btnConnect", "btnBle", "btnSim"];
-function markChoice(id) {
-  for (const b of CHOICES) $(b).classList.toggle("primary", b === id);
-  try { localStorage.setItem("connectChoice", id); } catch (e) {}
-}
-try { const c = localStorage.getItem("connectChoice"); if (CHOICES.includes(c)) markChoice(c); } catch (e) {}
-$("btnConnect").onclick = () => { markChoice("btnConnect"); connect(false); };
-$("btnSim").onclick = () => { markChoice("btnSim"); connect(true); };
-$("btnBle").onclick = () => { markChoice("btnBle"); connect(false, true); };
+$("btnConnect").onclick = () => connect(false);
+$("btnSim").onclick = () => connect(true);
+$("btnBle").onclick = () => connect(false, true);
 if (!("bluetooth" in navigator)) $("btnBle").classList.add("hidden");
 $("btnDisconnect").onclick = disconnect;
 $("btnRefresh").onclick = refresh;
