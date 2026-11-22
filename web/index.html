@@ -85,8 +85,8 @@ details.guide li { margin-bottom: 4px; }
 
   <section>
     <div class="row">
-      <button id="btnConnect">Connect over USB</button>
-      <button id="btnBle" class="primary" title="PROTOTYPE: the same over Bluetooth, only with the firmware environment engine_sets_ble (docs/ble-link.md)">Connect over Bluetooth (prototype)</button>
+      <button id="btnConnect" class="primary">Connect over USB</button>
+      <button id="btnBle" title="PROTOTYPE: the same over Bluetooth, only with the firmware environment engine_sets_ble (docs/ble-link.md)">Connect over Bluetooth (prototype)</button>
       <button id="btnSim">Simulated module</button>
       <button id="btnDisconnect" class="hidden">Disconnect</button>
       <span id="connStatus" class="status muted">Not connected.</span>
@@ -1526,9 +1526,16 @@ async function save() {
 }
 
 // ------------------------------------------------------------------ wiring
-$("btnConnect").onclick = () => connect(false);
-$("btnSim").onclick = () => connect(true);
-$("btnBle").onclick = () => connect(false, true);
+// The highlighted button is the way that was chosen last (kept in this browser; USB the first time).
+const CHOICES = ["btnConnect", "btnBle", "btnSim"];
+function markChoice(id) {
+  for (const b of CHOICES) $(b).classList.toggle("primary", b === id);
+  try { localStorage.setItem("connectChoice", id); } catch (e) {}
+}
+try { const c = localStorage.getItem("connectChoice"); if (CHOICES.includes(c)) markChoice(c); } catch (e) {}
+$("btnConnect").onclick = () => { markChoice("btnConnect"); connect(false); };
+$("btnSim").onclick = () => { markChoice("btnSim"); connect(true); };
+$("btnBle").onclick = () => { markChoice("btnBle"); connect(false, true); };
 if (!("bluetooth" in navigator)) $("btnBle").classList.add("hidden");
 $("btnDisconnect").onclick = disconnect;
 $("btnRefresh").onclick = refresh;
