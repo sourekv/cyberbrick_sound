@@ -55,7 +55,10 @@ Not started; recorded so the design does not block them.
   - *Check*: the firmware reports its version and build date in the reply to `@info` (done 2026-11-14, see
     "Firmware version" in the README) and the page shows it (**done**, seen on the real module 2026-11-21); still to do: say when the one it carries is newer ("on the module 1.2, available 1.3"). After an update the page checks
     that the module answers `@hello` with the new version.
-  - *Update, preferred way*: esptool-js (Espressif's library for flashing from the browser, the one ESP Web Tools
+  - **Done 2026-11-22, in another way**: the page's own protocol (`@fwput`, `@fww`, `@fwend`) into the other app slot, over USB or Bluetooth, with a file the user chooses
+    (button "Update firmware"); tried on the real module, `ble-link.md`. What is still open is where the page gets the file from (online, see below), and "say when the
+    firmware on the module is older". The esptool-js idea below is not needed for it.
+  - *Update, preferred way (the older idea)*: esptool-js (Espressif's library for flashing from the browser, the one ESP Web Tools
     uses) over the same Web Serial port. The page puts the Zero into its ROM bootloader through the chip's own USB
     (no buttons) and writes only the app: never the data partition with the user's sets. Works even when the
     firmware on the module is broken, because the bootloader is in ROM. With the two app slots of

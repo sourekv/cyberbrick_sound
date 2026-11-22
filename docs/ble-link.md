@@ -157,3 +157,21 @@ is what makes it recognisable. The PIN was 5679 when this was found: "much worse
 **No same digit twice in a row (2026-11-22):** "two two" or "eight eight" runs together on the small speaker. The PIN is drawn from 0, 1, 2, 3, 4, 6, 8 so
 that a digit is never the same as the one before it: 7 x 6 x 6 x 6 = 1512 PINs. With three tries before the lock and only the 3 minutes
 after the power-up, the chance of a guess is 3/1512 (0.2 %), which is enough against someone passing by.
+
+## Firmware update over the link (2026-11-22, built and tried)
+
+The page's button **Update firmware** sends a firmware image over the link in use, USB or Bluetooth, with the protocol commands `@fwput <size> <crc>`,
+`@fww <base64>` and `@fwend` (`set_link.h`). The module writes the image into the **other app slot** with the `Update` library (the running
+firmware is never touched), checks the ESP32-S3 image header in the first block, the size and the CRC, makes the new slot the boot slot only at `@fwend`
+and restarts 1.2 s after the reply. The page checks the file too (size 100 kB to 1.5 MB, header) and asks before it writes.
+
+**Tried on the real module:** over USB (the image went at about 74 kB/s) and over Bluetooth with the spoken PIN (1.05 MB in 59 s, 18 kB/s): the module
+restarted and came up as `0.1.0+32e540d`, the clean image, from `0.1.0+35d5699-dirty`. The file to choose is
+`firmware/.pio/build/engine_sets/firmware.bin` (`pio run -e engine_sets`).
+
+What the trials found: `@fwput` erases the other slot, which takes seconds, and the session timed out (3 s without a command) right after it, so the next block
+was answered with "no @fwput". The time of the last command is now taken after the command has run. The page's progress bar for the update had first been
+written into the editor, which was hidden: the update has its own bar under the list of sets.
+
+**The risk stays:** there is no automatic return to the old firmware (the Arduino core's bootloader has no rollback). If a new firmware does not start, only USB
+helps (`pio run -e engine_sets -t upload`; the bootloader is in the chip's ROM). The Bluetooth update therefore needs a PIN and the page warns before it writes.

@@ -42,6 +42,13 @@ While the app is connected the engine on the module is **silent** and the BOOT b
 comes back a few seconds after your last action. The module may restart when the app connects, and then speaks the
 number of the set it starts with: that is normal.
 
+### Update the firmware
+
+The button **Update firmware** (above the list of sets) writes a new firmware to the module, over USB or over Bluetooth, whichever you are connected by. Choose
+the file `firmware.bin` that `pio run -e engine_sets` makes (`firmware/.pio/build/engine_sets/firmware.bin`). The page checks it, asks, shows the progress (about
+30 s over USB, about a minute over Bluetooth) and the module restarts with it. The sets in the module stay. If a new firmware does not start, the module can only
+be fixed over USB: `pio run -e engine_sets -t upload`.
+
 ## 2. The list of sets
 
 ![The sets on the module](guide/03-list.png)
