@@ -31,8 +31,8 @@ otherwise the page may connect again within the 3 minutes.
 
 - Chrome/Edge on Windows connected to the module, listed the sets and read one (2026-11-22, the project owner).
 - **Reading a set of about 0.5 MB (08 Retro, the Edit button) took about 20 s**, so about 25 kB/s. That is usable for
-  sets (the seven default sets are 2 MB, a layered set 0.5 MB). Writing was not timed yet.
-- The firmware of 0.5 to 1 MB would be about 20 to 40 s at this speed, if it ever went over this link.
+  sets (the seven default sets are 2 MB, a layered set 0.5 MB). Writing and the firmware update were timed later: see below.
+- The firmware of 1.1 MB went over this link in 59 s (18 kB/s), see "Firmware update over the link".
 
 ## What is open (state 2026-11-22)
 

@@ -1,7 +1,7 @@
 # Project overview: what we built and why
 
-Status: 2026-11-08. The prototype works in the truck with the `engine_lab` firmware; the shield PCB is designed and
-prepared for ordering, not made yet. This page describes the current state; what is open is in `roadmap.md`.
+Status: 2026-11-22. The prototype works in the truck with the `engine_lab` firmware; the first rev A shield board (JLCPCB, delivered 2026-11-20) works with the `engine_sets` firmware:
+sound sets, a web page that manages them over USB or Bluetooth, the firmware update and the volume from the page. This page describes the current state; what is open is in `roadmap.md`.
 
 ## Goal
 
