@@ -1,4 +1,4 @@
-"""Run from the repo root after `"C:\Program Files\KiCad\bin\python.exe" tools/extract_board_for_trial.py` (writes work/board_full.json):
+"""Run from the repo root after `"C:/Program Files/KiCad/bin/python.exe" tools/extract_board_for_trial.py` (writes work/board_full.json):
     python tools/trial_place_j1.py <YJ in mm> <seed> <iterations> [check]
 (check: only the overlaps of the present layout, the calibration).
 
