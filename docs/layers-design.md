@@ -1,6 +1,6 @@
 # Design: sample layers by rpm
 
-Status: design, 2026-11-22. Nothing is built in the firmware, the page or the tools yet. The idea and the prototype
+Status: 2026-11-22. **The firmware is built and was tried on the module**: layers.h, the loader and the playback (commit b7ecc77); all eight old sets load and play as before, and the test set `09_layers` (three layers, `tools/make_mot_set.py --layered`) was judged "very good" by ear against the same recordings played faster. **Not done yet: the page and the PC tools** (they do not know layers: do not edit a layered set with the page). The idea and the prototype
 result are in `roadmap.md` ("Sample layers by rpm"); this is the plan to build it. Set format today:
 `user-sounds.md`; playback today: `firmware/src/engine_sets/main.cpp` (the block that mixes `idleWav` and `loadedWav`).
 
