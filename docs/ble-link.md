@@ -135,3 +135,7 @@ by the beep. The same treatment may help the spoken names of the sets (`name.wav
 Starting Bluetooth from the transmitter (the free stick R3 held, an extra button) is judged overkill and is **dropped**. The way is
 the window of 3 minutes after the power-up of the receiver, with the spoken PIN, the reconnecting within the window and the
 restart after a change (see above). The rejected idea and its reasons: `rejected-ideas.md`.
+
+**Digits of the PIN (2026-11-22, "much better"):** a PIN with five, six, seven and nine (5679) was hard to hear on the small speaker (five
+and nine rhyme, six and seven begin alike). The PIN is now drawn only from the digits 0, 1, 2, 3, 4, 6 and 8 (2401 PINs, enough
+for three tries before the lock), and the spoken digits are brought to a similar level (`equalise` in `tools/make_voice_digits.py`).
