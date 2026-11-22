@@ -40,7 +40,8 @@ row_y  = 104.15;                            // the row of J1's holes (KiCad coor
 ins_u0 = row_y - 102.71;                    // the insert starts at the far edge of the body (distance from the row)
 ins_uc = row_y - 98.5;                      // the comb starts here, 1.5 mm past the board edge (as before)
 ins_ue = row_y - 92.5;                      // the back of the insert, flush with the peg
-peg_t = 3.0;  peg_l = 3.0;                  // the peg is as wide as the insert and flush with its back; the socket is 0.3 mm larger
+peg_t = 3.0;  peg_l = 3.0;                  // the peg is as wide as the insert and flush with its back
+peg_gap = 0.1;                              // clearance of the socket around the peg, on each side
 
 base_t     = 8.0;    // base plate thickness (heavier, so the stand does not tip over; thick enough for the band grooves below it)
 groove_w   = 4.5;    // grooves in the underside of the base for rubber bands (a band of about 3 mm), one set each way
@@ -95,7 +96,7 @@ module stand() {
     // two sockets for the loose insert of J1 (part = "j1_insert"): A outside the board edge (J1 on the top side, pins out), B on the
     // inner side (J1 on the underside, turned by 180 degrees, pins in); the same insert, turned by 180 degrees about J1's row of holes
     for (y = [row_y - ins_ue, row_y + ins_ue - peg_t])
-      translate([j1_x0 - guide_w - 0.15, y - 0.15, base_t - peg_l]) cube([j1_x1 - j1_x0 + 2 * guide_w + 0.3, peg_t + 0.3, peg_l + 0.01]);
+      translate([j1_x0 - guide_w - peg_gap, y - peg_gap, base_t - peg_l]) cube([j1_x1 - j1_x0 + 2 * guide_w + 2 * peg_gap, peg_t + 2 * peg_gap, peg_l + 0.01]);
     // label on the base, so the stand is not taken for something else
     translate([cx, cy + base_w / 2 - 8, base_t - 0.6])
       linear_extrude(1) text("shield solder stand", size = 4, halign = "center", valign = "center");
