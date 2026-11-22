@@ -625,9 +625,21 @@ class BleTransport {
     });
     await this.tx.startNotifications();
   }
+  // Writes without response (no round trip per block, about 25 times faster than with it). The blocks are as large as the
+  // connection allows (MTU minus 3): it starts at 240 and halves when the stack refuses, down to 20; the page sends the
+  // next command only after the module's reply, so the module's 8 kB receive buffer cannot overflow.
   async write(s) {
-    const bytes = this.enc.encode(s), CH = 200;                  // below the usual MTU 247..517 minus 3
-    for (let i = 0; i < bytes.length; i += CH) await this.rx.writeValueWithResponse(bytes.subarray(i, i + CH));
+    const bytes = this.enc.encode(s);
+    let ch = this.chunk || 240;
+    for (let i = 0; i < bytes.length;) {
+      const part = bytes.subarray(i, i + ch);
+      try { await this.rx.writeValueWithoutResponse(part); i += part.length; }
+      catch (e) {
+        if (ch > 20) { ch = Math.max(20, ch >> 1); log("Bluetooth: blocks of " + ch + " bytes (" + e.message + ")", "warn"); continue; }
+        throw e;
+      }
+    }
+    this.chunk = ch;
   }
   rate() { return this.t0 ? this.bytes / ((performance.now() - this.t0) / 1000) : 0; }
   async close() { try { if (this.device.gatt.connected) this.device.gatt.disconnect(); } catch (e) {} }
