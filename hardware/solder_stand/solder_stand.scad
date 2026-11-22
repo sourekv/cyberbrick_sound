@@ -28,7 +28,13 @@
 //   solder_stand_steps.png: three renders with -D 'part="assembly"' -D explode=45 / 18 / 0 (Tomorrow colour scheme),
 //   joined with ImageMagick montage
 
-part = "stand";      // "stand" or "preview" (stand with the board and the Zero as ghosts)
+part = "stand";      // "stand", "j1_post" (the loose post) or "preview" (stand with the board and the Zero as ghosts)
+
+// loose post for the first soldering pass (J1 turned on the underside): it stands in a socket in the base under the end of the
+// comb of the shelf, taken out before the pass with J3 and J4 (the Zero hangs there). Print it on its own: part = "j1_post".
+post_x = 114.5;  post_y = 100 + 13.5;   // x centre of J1, 13.5 mm from the board edge (KiCad coordinates, by0 = 100)
+post_peg_w = 4.0;  post_peg_t = 1.6;  post_peg_l = 3.0;    // the peg that goes into the socket
+post_w = 5.0;  post_t = 2.4;                                // the post above the base
 
 base_t     = 8.0;    // base plate thickness (heavier, so the stand does not tip over; thick enough for the band grooves below it)
 groove_w   = 4.5;    // grooves in the underside of the base for rubber bands (a band of about 3 mm), one set each way
@@ -95,20 +101,12 @@ module stand() {
         // the long pins of the turned header run on from the body (8.4 mm from the edge) to about 15 mm: the shelf goes on as a thin
         // slab with a slot for each pin, as the comb outside the edge does; the ribs stop 1.3 mm under the board, so the parts on
         // the board (they hang at most 1.1 mm in the face-down pass) clear them. Nothing supports this part from below (the Zero
-        // hangs there in the other pass), so it is a short cantilever: the thin support under its end is broken off after printing.
+        // hangs there in the other pass), so it is a short cantilever; the loose post `part = "j1_post"` stands under its end in the first pass (J1) and is taken out before the second.
         pin_end = by0 + 15.0;
         translate([j1_x0, shelf_end - 0.01, 0]) difference() {
           translate([0, 0, top_z - shelf_t]) cube([j1_x1 - j1_x0, pin_end - shelf_end + 0.01, shelf_t + 1.24]);
           for (x = [111.96, 114.50, 117.04])
             translate([x - j1_x0 - slot_w / 2, -1, top_z + 0.85]) cube([slot_w, pin_end - shelf_end + 2, 5]);
-        }
-        // a support under the end of the comb, to be BROKEN OFF after printing (the Zero hangs there in the pass with J3 and J4):
-        // a straight post 4 x 1.6 mm that stops 1 mm short of the slab and a neck 1 mm tall (1.2 x 0.5 mm at the top) that touches it
-        sy = by0 + 13.5;  sx = (j1_x0 + j1_x1) / 2;  sz = top_z - shelf_t;
-        translate([sx - 2.0, sy - 0.8, base_t - 0.01]) cube([4.0, 1.6, sz - 1.0 - base_t + 0.01]);
-        hull() {
-          translate([sx - 2.0, sy - 0.8, sz - 1.0 - 0.01]) cube([4.0, 1.6, 0.01]);
-          translate([sx - 0.6, sy - 0.25, sz - 0.01]) cube([1.2, 0.5, 0.01]);
         }
       }
       // side guides at both ends of the J1 body, so it cannot turn or slide along the edge
@@ -126,6 +124,8 @@ module stand() {
     // the mounting holes; the bands run round the whole base and sit in the grooves, so they cannot slip off and the base lies flat
     for (x = [bx0 + 2.5, cx, bx1 - 2.5]) translate([x - groove_w / 2, cy - base_w / 2 - 1, -0.01]) cube([groove_w, base_w + 2, groove_d + 0.01]);
     for (y = [cy - 12, cy, cy + 12]) translate([cx - base_w / 2 - 1, y - groove_w / 2, -0.01]) cube([base_w + 2, groove_w, groove_d + 0.01]);
+    // socket in the base for the loose post under the end of the shelf's comb (part = "j1_post")
+    translate([post_x - post_peg_w / 2 - 0.15, post_y - post_peg_t / 2 - 0.15, base_t - post_peg_l]) cube([post_peg_w + 0.3, post_peg_t + 0.3, post_peg_l + 0.01]);
     // label on the base, so the stand is not taken for something else
     translate([cx, cy + base_w / 2 - 8, base_t - 0.6])
       linear_extrude(1) text("shield solder stand", size = 4, halign = "center", valign = "center");
@@ -180,10 +180,19 @@ module foam() {
   color([0.95, 0.75, 0.8]) translate([cx - 9, cy - 11, base_t]) cube([18, 22, foam_t]);
 }
 
+// the loose post: the peg, then the post up to the underside of the shelf's comb (2 mm under the ledge level)
+module j1_post() {
+  h = post_h - j1_body_t - 2.0;          // base top to the underside of the comb
+  translate([-post_peg_w / 2, -post_peg_t / 2, 0]) cube([post_peg_w, post_peg_t, post_peg_l + 0.5]);
+  translate([-post_w / 2, -post_t / 2, post_peg_l]) cube([post_w, post_t, h]);
+}
+
 if (part == "assembly") {
   color("orange") stand();
   translate([0, 0, explode / 2]) foam();
   translate([0, 0, explode]) board_assembly();
+} else if (part == "j1_post") {
+  j1_post();
 } else {
   stand();
   if (part == "preview") ghosts();
