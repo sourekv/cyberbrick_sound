@@ -18,7 +18,7 @@ Loudness: every file gets the RMS of the same file of the default set 01_truck, 
 With --layered a second set is built from the same recordings, as a layered set (docs/layers-design.md): three loops
 cut at different steady engine speeds (motidle 1.0 s.., motacc1 3.3..4.7 s, motcrui1 4.0..6.2 s) written as layer_1.wav ..
 layer_3.wav, with their "ratio" (firing frequency relative to the first layer, measured from the envelope of the raw
-recording) in set.json. start, shift, horn and the name are made as above (name "Nine. Retro layers.").
+recording) in set.json. start, shift, horn and the name are made as above (name "Nine. Layers.").
 
 Usage (from the repo root):
     python tools/make_mot_set.py --src work/mot_src --out work/mot_set [--piper DIR --model ONNX] [--layered]
@@ -118,7 +118,7 @@ LAYER_SOURCES = [("motidle.wav", 1.0, 5.0, 3.0), ("motacc1.wav", 3.3, 4.7, 1.0),
 
 
 def build_layered(a, ref):
-    dst = os.path.join(a.out, "09_retro_layers")
+    dst = os.path.join(a.out, "09_layers")
     os.makedirs(dst, exist_ok=True)
     layers = []
     for name, t0, t1, length in LAYER_SOURCES:
@@ -136,9 +136,9 @@ def build_layered(a, ref):
         shutil.copy(os.path.join(a.out, a.folder, f), os.path.join(dst, f))     # as in the set 08
     if a.piper and a.model:
         import make_default_sets as m
-        write16(os.path.join(dst, "name.wav"), m.piper_name("Nine. Retro layers.", a.piper, a.model).astype(np.float64) / 32768.0)
+        write16(os.path.join(dst, "name.wav"), m.piper_name("Nine. Layers.", a.piper, a.model).astype(np.float64) / 32768.0)
     with open(os.path.join(dst, "set.json"), "w", encoding="utf8") as fh:
-        json.dump({"name": "Retro layers", "type": "sample", "rate": [1.0, 3.0], "level": 1.0, "stop_s": 1.4,
+        json.dump({"name": "9 - layers", "type": "sample", "rate": [1.0, 3.0], "level": 1.0, "stop_s": 1.4,
                    "gearbox": True, "layers": json_layers, "xfade": 0.36}, fh, indent=1)
     print("written:", dst)
 
