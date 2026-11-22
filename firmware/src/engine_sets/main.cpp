@@ -117,7 +117,8 @@ static SetLink usbLink;
 static SetLink bleLink;
 static BleUart bleUart;
 static uint32_t bleWindowMs = 180000;   // prototype: advertising only this long after power-up
-static Clip digitClip[10];              // /voice/d0.wav .. d9.wav (tools/make_voice_digits.py), speak the PIN
+static Clip digitClip[10], pinWordClip;     // /voice/d0.wav .. d9.wav and pin.wav (tools/make_voice_digits.py)
+static uint32_t pinGapUntil = 0;        // the next clip of the PIN is not started before this (clip length + a short gap)              // /voice/d0.wav .. d9.wav (tools/make_voice_digits.py), speak the PIN
 static String blePin;                   // random for every power-up, spoken by the module
 static std::vector<int> pinQueue;       // the digits still to speak
 static uint32_t pinNextMs = 0;          // when the PIN is spoken again
@@ -317,6 +318,7 @@ void setup() {
   else {
   bleActive = true;
   for (int d = 0; d < 10; d++) { String err; loadWav("/voice/d" + String(d) + ".wav", digitClip[d], err); }
+  { String err; loadWav("/voice/pin.wav", pinWordClip, err); }
   String nm = SetLink::moduleName(), adv = nm.length() ? "CBSound-" + nm : String("CBSound");
   bleUart.begin(adv.c_str());
   bleLink.attach(&bleUart);
@@ -385,14 +387,25 @@ void loop() {
     // the PIN: once after power-up, and again (every 40 s) only while a page is connected and has not entered it
     const bool needPin = (bleUart.isAdvertising() && !pinSpokenAtStart) || (bleUart.isConnected() && !bleLink.isAuthed());
     if (needPin && pinQueue.empty() && millis() > pinNextMs && !namePlayer.active() && !demoOn && !bleLink.isLocked()) {
-      for (char c : blePin) pinQueue.push_back(c - '0');
+      pinQueue.push_back(-1);                                   // "Pin."
+      for (char c : blePin) pinQueue.push_back(c - '0');        // the digits in a row
+      pinQueue.push_back(-2);                                   // a pause
+      for (char c : blePin) pinQueue.push_back(c - '0');        // and once more: a digit that is missed the first time is heard again
       pinSpokenAtStart = true;
+      Serial.println("ble: speaking the PIN");
     }
-    if (!pinQueue.empty() && !namePlayer.active()) {
+    if (!pinQueue.empty() && !namePlayer.active() && millis() >= pinGapUntil) {
       int d = pinQueue.front();
       pinQueue.erase(pinQueue.begin());
-      if (digitClip[d].ok()) namePlayer.play(&digitClip[d]);
-      if (pinQueue.empty()) pinNextMs = millis() + 40000;
+      if (d == -2) pinGapUntil = millis() + 700;
+      else {
+        const Clip& cl = d == -1 ? pinWordClip : digitClip[d];
+        if (cl.ok()) {
+          namePlayer.play(&cl);
+          pinGapUntil = millis() + (uint32_t)(cl.len * 1000ULL / AUDIO_RATE) + 160;   // the clip and a short gap
+        }
+      }
+      if (pinQueue.empty()) { pinNextMs = millis() + 40000; Serial.println("ble: PIN spoken"); }
     }
     bool c = bleUart.isConnected();
     if (c && !bleWasConnected) pinNextMs = millis() + 500;      // a page has connected: the PIN now
