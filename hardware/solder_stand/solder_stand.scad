@@ -26,7 +26,7 @@
 //   solder_stand_steps.png: three renders with -D 'part="assembly"' -D explode=45 / 18 / 0 (Tomorrow colour scheme),
 //   joined with ImageMagick montage
 
-part = "stand";      // "stand" or "preview" (stand with the board and the Zero as ghosts)
+part = "stand";      // "stand", "preview" (stand with the board and the Zero as ghosts) or "j1_support" (the loose block below)
 
 base_t     = 8.0;    // base plate thickness (heavier, so the stand does not tip over; thick enough for the band grooves below it)
 groove_w   = 4.5;    // grooves in the underside of the base for rubber bands (a band of about 3 mm), one set each way
@@ -147,7 +147,23 @@ module foam() {
   color([0.95, 0.75, 0.8]) translate([cx - 9, cy - 11, base_t]) cube([18, 22, foam_t]);
 }
 
-if (part == "assembly") {
+// J1 fitted from the UNDERSIDE of the board (docs/shield-pcb.md "The servo connector on the underside"), soldered in a separate pass before the
+// sockets, with the board lying top side up on the four posts (its underside is then the side that rests on the stand):
+//   - pins pointing out (a): the body lies on the ledge and the pins in the comb, as they do for the other way round; nothing to add;
+//   - turned by 180 degrees, pins pointing in (b): the body (y 5.7 to 8.4 mm from the edge) has no ledge under it, so it needs this
+//     loose block: a column under the body, 2.54 mm below the board, on a foot. Stand it on the base under the body, solder J1, take it
+//     away before the pass with J3 and J4 (there it would hit the USB-C connector of the Zero). A piece of foam of the same height does as well.
+module j1_support() {
+  col_w = 8.4; col_d = 3.4;
+  col_h = post_h - j1_body_t;                 // from the top of the base to 2.54 mm under the board
+  foot_w = 20; foot_d = 12; foot_t = 2;
+  translate([-foot_w / 2, -foot_d / 2, 0]) cube([foot_w, foot_d, foot_t]);
+  translate([-col_w / 2, -col_d / 2, 0]) cube([col_w, col_d, col_h]);
+}
+
+if (part == "j1_support") {
+  j1_support();
+} else if (part == "assembly") {
   color("orange") stand();
   translate([0, 0, explode / 2]) foam();
   translate([0, 0, explode]) board_assembly();
