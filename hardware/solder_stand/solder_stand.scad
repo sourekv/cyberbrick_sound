@@ -93,12 +93,19 @@ module stand() {
         // the long pins of the turned header run on from the body (8.4 mm from the edge) to about 15 mm: the shelf goes on as a thin
         // slab with a slot for each pin, as the comb outside the edge does; the ribs stop 1.3 mm under the board, so the parts on
         // the board (they hang at most 1.1 mm in the face-down pass) clear them. Nothing supports this part from below (the Zero
-        // hangs there in the other pass), so it is a short cantilever: print with a support under it or accept a rough underside.
+        // hangs there in the other pass), so it is a short cantilever: the thin support under its end is broken off after printing.
         pin_end = by0 + 15.0;
         translate([j1_x0, shelf_end - 0.01, 0]) difference() {
           translate([0, 0, top_z - shelf_t]) cube([j1_x1 - j1_x0, pin_end - shelf_end + 0.01, shelf_t + 1.24]);
           for (x = [111.96, 114.50, 117.04])
             translate([x - j1_x0 - slot_w / 2, -1, top_z + 0.85]) cube([slot_w, pin_end - shelf_end + 2, 5]);
+        }
+        // a thin support under the end of the comb, to be BROKEN OFF after printing (the Zero hangs there in the pass with J3 and J4):
+        // 3 x 1.2 mm at the foot, tapering to a 1.0 x 0.4 mm tip that touches the slab
+        sy = by0 + 13.5;  sx = (j1_x0 + j1_x1) / 2;  sz = top_z - shelf_t;
+        hull() {
+          translate([sx - 1.5, sy - 0.6, base_t - 0.01]) cube([3.0, 1.2, 0.01]);
+          translate([sx - 0.5, sy - 0.2, sz - 0.01]) cube([1.0, 0.4, 0.01]);
         }
       }
       // side guides at both ends of the J1 body, so it cannot turn or slide along the edge
