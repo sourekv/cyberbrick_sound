@@ -5,6 +5,8 @@
 //     set.json              parameters (name, type, synth/preset or rate..., eq, level, stop_s, gearbox)
 //     name.wav start.wav horn.wav shift.wav          every set
 //     idle.wav loaded.wav                            sample sets only
+//     layer files named in set.json "layers"         layered sample sets instead of idle.wav and loaded.wav
+//                                                    (docs/layers-design.md)
 //   /state.json             {"set": "<folder>"}: the set chosen last
 //
 // All WAVs PCM 22 050 Hz, 16 bit, mono. A set is loaded completely into PSRAM when it is chosen (about 0.2-0.6 MB),
@@ -15,6 +17,7 @@
 #include <algorithm>
 #include "config.h"
 #include "engine_lab_data.h"   // LAB_PRESET_NAMES
+#include "layers.h"             // LAYERS_MAX, layersXfade
 
 // ---------------------------------------------------------------- a small JSON reader
 // Enough for set.json and state.json: objects, arrays, numbers, strings (no \u escapes), true, false, null.
@@ -181,10 +184,18 @@ struct SoundSet {
   float rateLo = 1.0f, rateHi = 3.0f, loadedRateScale = LOADED_RATE_SCALE, loadedGain = LOADED_GAIN;
   bool gearbox = true;
   Clip nameWav, startWav, hornWav, shiftWav, idleWav, loadedWav;
+  // Layered sample set (set.json "layers"): loops recorded at different steady engine speeds, docs/layers-design.md.
+  // layerCount = 0: the set has none and plays idleWav / loadedWav as before.
+  int layerCount = 0;
+  Clip layerClip[LAYERS_MAX];
+  float layerRatio[LAYERS_MAX];         // pitch relative to the first layer, rising
+  float xfade = 0.36f;                  // crossfade width (natural-log units), already limited by layersXfade()
 
   void release() {
     nameWav.release(); startWav.release(); hornWav.release(); shiftWav.release(); idleWav.release();
     loadedWav.release();
+    for (int k = 0; k < LAYERS_MAX; k++) layerClip[k].release();
+    layerCount = 0;
   }
 };
 
@@ -261,10 +272,36 @@ class SetLibrary {
     s.loadedRateScale = j.numOr("loaded_rate_scale", LOADED_RATE_SCALE);
     s.loadedGain = j.numOr("loaded_gain", LOADED_GAIN);
 
+    // layers: 2..LAYERS_MAX entries {"file": ..., "ratio": ...}, ratio positive and rising (sample sets only)
+    const Json* layers = j.get("layers");
+    if (layers) {
+      if (s.type != SoundSet::SAMPLE) { err = dir + "set.json: layers belong to a sample set"; return false; }
+      size_t n = layers->kind == Json::ARR ? layers->size() : 0;
+      if (n < 2 || n > (size_t)LAYERS_MAX) { err = dir + "set.json: layers must be 2 to " + String(LAYERS_MAX) + " entries"; return false; }
+      for (size_t k = 0; k < n; k++) {
+        const Json& e = layers->at(k);
+        float ratio = e.numOr("ratio", 0.0f);
+        if (e.kind != Json::OBJ || !e.get("file") || ratio <= 0.0f || (k > 0 && ratio <= s.layerRatio[k - 1])) {
+          err = dir + "set.json: layer " + String((int)k + 1) + " needs a file and a ratio above the one before";
+          return false;
+        }
+        s.layerRatio[k] = ratio;
+      }
+      s.layerCount = (int)n;
+      s.xfade = layersXfade(s.layerRatio, s.layerCount, j.numOr("xfade", 0.36f));
+    }
+
     bool ok = loadWav(dir + "name.wav", s.nameWav, err) && loadWav(dir + "start.wav", s.startWav, err) &&
               loadWav(dir + "horn.wav", s.hornWav, err) && loadWav(dir + "shift.wav", s.shiftWav, err);
-    if (ok && s.type == SoundSet::SAMPLE)
+    if (ok && s.layerCount > 0) {
+      for (int k = 0; k < s.layerCount && ok; k++) {
+        String f = layers->at(k).strOr("file", "");
+        ok = f.length() > 0 && f.indexOf('/') < 0 && loadWav(dir + f, s.layerClip[k], err);
+        if (f.length() == 0 || f.indexOf('/') >= 0) err = dir + "set.json: layer " + String(k + 1) + " has no valid file name";
+      }
+    } else if (ok && s.type == SoundSet::SAMPLE) {
       ok = loadWav(dir + "idle.wav", s.idleWav, err) && loadWav(dir + "loaded.wav", s.loadedWav, err);
+    }
     if (!ok) s.release();
     return ok;
   }

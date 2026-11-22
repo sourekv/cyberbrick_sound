@@ -15,10 +15,15 @@ What is made of what (all passed through a 150 Hz high-pass, the 40 mm speaker p
   name.wav    spoken with Piper ("Eight. Retro."), as tools/make_default_sets.py does
 Loudness: every file gets the RMS of the same file of the default set 01_truck, the peak is kept below -1 dBFS.
 
+With --layered a second set is built from the same recordings, as a layered set (docs/layers-design.md): three loops
+cut at different steady engine speeds (motidle 1.0 s.., motacc1 3.3..4.7 s, motcrui1 4.0..6.2 s) written as layer_1.wav ..
+layer_3.wav, with their "ratio" (firing frequency relative to the first layer, measured from the envelope of the raw
+recording) in set.json. start, shift, horn and the name are made as above (name "Nine. Retro layers.").
+
 Usage (from the repo root):
-    python tools/make_mot_set.py --src work/mot_src --out work/mot_set [--piper DIR --model ONNX]
+    python tools/make_mot_set.py --src work/mot_src --out work/mot_set [--piper DIR --model ONNX] [--layered]
 """
-import argparse, json, os, sys, wave
+import argparse, json, os, shutil, sys, wave
 import numpy as np
 from scipy.signal import butter, sosfilt
 
@@ -69,6 +74,22 @@ def repeat_period(x, lo=0.02, hi=0.5):
     return (a + int(np.argmax(ac[a:b]))) / RATE
 
 
+def firing_frequency(x, win=0.4, hop=0.2, fmin=10.0, fmax=80.0):
+    """Median repeat frequency (Hz) of the amplitude envelope of the raw signal, by autocorrelation per window."""
+    n = int(win * RATE)
+    out = []
+    for s0 in range(0, len(x) - n, int(hop * RATE)):
+        e = np.abs(x[s0:s0 + n] - x[s0:s0 + n].mean())
+        e = e - e.mean()
+        n2 = 1 << (2 * len(e)).bit_length()
+        F = np.fft.rfft(e, n2)
+        ac = np.fft.irfft(F * np.conj(F))[:len(e)]
+        ac /= ac[0]
+        a, b = int(RATE / fmax), int(RATE / fmin)
+        out.append(RATE / (a + int(np.argmax(ac[a:b]))))
+    return float(np.median(out))
+
+
 def make_loop(x, start_s, length_s, period_s, fade_s=0.15):
     k = max(1, round(length_s / period_s))
     L = int(round(k * period_s * RATE))
@@ -93,6 +114,35 @@ def level_to(x, target_rms, peak=0.89):
     return y * (peak / p) if p > peak else y
 
 
+LAYER_SOURCES = [("motidle.wav", 1.0, 5.0, 3.0), ("motacc1.wav", 3.3, 4.7, 1.0), ("motcrui1.wav", 4.0, 6.2, 1.8)]
+
+
+def build_layered(a, ref):
+    dst = os.path.join(a.out, "09_retro_layers")
+    os.makedirs(dst, exist_ok=True)
+    layers = []
+    for name, t0, t1, length in LAYER_SOURCES:
+        raw = load8(os.path.join(a.src, name))
+        f = firing_frequency(raw[int(t0 * RATE):int(t1 * RATE)])
+        loop, k = make_loop(highpass(raw), t0, length, 1.0 / f, fade_s=0.12)
+        layers.append((loop, f))
+    base_rms = ref("idle.wav")
+    json_layers = []
+    for i, (loop, f) in enumerate(layers, 1):
+        write16(os.path.join(dst, "layer_%d.wav" % i), level_to(loop, base_rms))
+        json_layers.append({"file": "layer_%d.wav" % i, "ratio": round(f / layers[0][1], 3)})
+        print("layer %d: %.1f Hz, ratio %.3f, %.2f s" % (i, f, f / layers[0][1], len(loop) / RATE))
+    for f in ("start.wav", "shift.wav", "horn.wav"):
+        shutil.copy(os.path.join(a.out, a.folder, f), os.path.join(dst, f))     # as in the set 08
+    if a.piper and a.model:
+        import make_default_sets as m
+        write16(os.path.join(dst, "name.wav"), m.piper_name("Nine. Retro layers.", a.piper, a.model).astype(np.float64) / 32768.0)
+    with open(os.path.join(dst, "set.json"), "w", encoding="utf8") as fh:
+        json.dump({"name": "Retro layers", "type": "sample", "rate": [1.0, 3.0], "level": 1.0, "stop_s": 1.4,
+                   "gearbox": True, "layers": json_layers, "xfade": 0.36}, fh, indent=1)
+    print("written:", dst)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", default=os.path.join(ROOT, "work", "mot_src"))
@@ -100,6 +150,7 @@ def main():
     ap.add_argument("--piper"); ap.add_argument("--model")
     ap.add_argument("--ref", default=os.path.join(ROOT, "firmware", "data", "sets", "01_truck"))
     ap.add_argument("--folder", default="08_retro")
+    ap.add_argument("--layered", action="store_true", help="also build the layered variant (needs the set 08 built first or in the same run)")
     a = ap.parse_args()
     dst = os.path.join(a.out, a.folder)
     os.makedirs(dst, exist_ok=True)
@@ -139,6 +190,8 @@ def main():
                    "loaded_gain": 0.8, "level": 1.0, "stop_s": 1.4, "gearbox": True}, f, indent=1)
     print("\n".join(report))
     print("written:", dst)
+    if a.layered:
+        build_layered(a, ref)
 
 
 if __name__ == "__main__":

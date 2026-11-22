@@ -187,9 +187,10 @@ static void selectSet(int i, bool announce = true, bool persist = true) {
     engineState.stopS = fmaxf(0.1f, cur.stopS);
     if (announce) namePlayer.play(&cur.nameWav);
     if (persist) SetLibrary::writeState(cur.folder);   // the page's Play and Demo do not change the start set
+    String kind = cur.type == SoundSet::SAMPLE ? "sample" : "synth";
+    if (cur.layerCount > 0) kind += ", " + String(cur.layerCount) + " layers";
     Serial.printf("set %s: \"%s\", %s, loaded in %lu ms, %u kB PSRAM free\n", cur.folder.c_str(), cur.name.c_str(),
-                  cur.type == SoundSet::SAMPLE ? "sample" : "synth", (unsigned long)(millis() - t0),
-                  (unsigned)(ESP.getFreePsram() / 1024));
+                  kind.c_str(), (unsigned long)(millis() - t0), (unsigned)(ESP.getFreePsram() / 1024));
     return;
   }
   useFallback();
@@ -390,7 +391,21 @@ void loop() {
   const float rpm = gearbox.rpm, gain = gearbox.gain;
   const float level = fallback ? 1.0f : cur.level;
 
-  if (!fallback && cur.type == SoundSet::SAMPLE) {
+  if (!fallback && cur.type == SoundSet::SAMPLE && cur.layerCount > 0) {
+    // layered set (docs/layers-design.md): at most two neighbouring layers, each played at the rate that brings it to
+    // the pitch of the sets without layers, crossfaded with equal power; no loaded blend in this version
+    static float layerPos[LAYERS_MAX] = {0};
+    const float r = fmaxf(0.1f, cur.rateLo + (cur.rateHi - cur.rateLo) * rpm);
+    const LayerMix m = layerMix(cur.layerRatio, cur.layerCount, r, cur.xfade);
+    const float vol = 0.55f + 0.45f * rpm;
+    for (int i = 0; i < N; i++) {
+      float s = m.wa * playLoop(cur.layerClip[m.a], layerPos[m.a], m.ra);
+      if (m.b >= 0) s += m.wb * playLoop(cur.layerClip[m.b], layerPos[m.b], m.rb);
+      float g = prevGain + (gain - prevGain) * ((float)(i + 1) / N);
+      s = setEq.run(s * vol * g * (1.0f / 32768.0f)) * level;
+      buf[2 * i] = buf[2 * i + 1] = outSample(s, i, N);
+    }
+  } else if (!fallback && cur.type == SoundSet::SAMPLE) {
     float rate = fmaxf(0.1f, cur.rateLo + (cur.rateHi - cur.rateLo) * rpm);
     float vol = 0.55f + 0.45f * rpm;
     load += (target - load) * 0.04f;
