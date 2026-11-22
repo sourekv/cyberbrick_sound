@@ -409,10 +409,10 @@ installing Chrome is enough. Tested so far only in Edge on Windows.
 
 Not on the app yet: help with the loop points, the user guide. Hosting on GitHub Pages needs the repo public or a paid plan; until then the file is opened from disk.
 
-### The USB protocol
+### The protocol (USB and Bluetooth)
 
-`firmware/include/set_link.h`, version 1. Text lines both ways over the USB serial port (115200 Bd, the rate does
-not matter on USB), binary data as base64, so the firmware's log lines can share the port: the app reads only
+`firmware/include/set_link.h`, version 1. The same text lines over the USB serial port (115200 Bd, the rate does
+not matter on USB) and over Bluetooth Low Energy (`ble-link.md`), binary data as base64, so the firmware's log lines can share the port: the app reads only
 lines starting with `@`. Every command ends with one line `@ok ...` or `@err <why>`, and the app sends the next
 command only after it; that is the flow control (the ESP32-S3 USB driver drops bytes when its 8 kB receive buffer is
 full).
@@ -420,7 +420,11 @@ full).
 | Command | Answer |
 |---|---|
 | `@hello` | `@ok cbsound 1` |
-| `@info` | `@ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date> default=<folder or ->`; the app shows the firmware version under the list and marks the active set |
+| `@info` | `@ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date> layers=1 fwupdate=1 volume=<0..100> name=<name> auth=<no, need, ok> default=<folder or ->`; the app shows the firmware version under the list and marks the active set; `layers=1` the firmware plays layered sets, `fwupdate=1` it takes a firmware update, `volume` the overall volume in percent, `name` the name of the module, `auth` whether a PIN is needed (Bluetooth only) |
+| `@auth <pin>` | `@ok`, or `@err wrong pin`; over Bluetooth the first command of a link, until then only `@hello` and `@info` are answered; three wrong PINs give `@err locked` until the next power-up. Over USB it is not needed |
+| `@name <text>` | `@ok restart ...`; the name of the module (1 to 8 letters, digits, `-`, `_`), kept in NVS, used in the Bluetooth name `CBSound-<name>` after the next start |
+| `@volume <0..100>` | `@ok`; the overall volume in percent (60 = the level before it could be set), kept in NVS, heard when the session ends |
+| `@fwput <size> <crc32>` | `@ok`; starts a firmware update (erases the other app slot, takes a few seconds); then `@fww <base64>` (up to 3072 bytes) -> `@ok <bytes so far>`, the first line must be an ESP32-S3 image; `@fwend` checks size and CRC, makes the new slot the boot slot and restarts the module (`@err ...` and the running firmware stays when anything is wrong) |
 | `@default <folder>` | `@ok`; the set the module starts with after power-up (written 2026-11-15, checked on the module); it does not change what is playing, and `@select` and `@demo` do not change it |
 | `@ls` | `@set <bytes> <folder>` per folder in `/sets`, then `@ok <count>` |
 | `@files <folder>` | `@file <bytes> <name>` per file, then `@ok <count>` |
