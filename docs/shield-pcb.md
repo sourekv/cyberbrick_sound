@@ -264,6 +264,7 @@ To connect the finished board in the model, whichever service makes it:
 - **Waveshare ESP32-S3-Zero-N8R8-M**, plugged into the sockets J3/J4.
 - **Servo cable** to the receiver's S4 header: flat servo cable with a female JR connector on both ends (see "Input").
 - **Speaker** with an SH 1.0 mm 2-pin cable to J2: Bambu Lab IC007, 200 mm, one plug cut off (see "Connectors used
+  **Tip (2026-11-22): do not snip the plug off at the end, cut the cable in the middle instead.** The IC007 has a plug on both ends, so cut in the middle you get **two usable speaker cables** (about 100 mm each, one SH plug and the free wires to solder to the speaker) from one cable, ten from the pack of five. 100 mm may be short for a speaker far from the shield in the model: then cut off the plug at one end, as before.
   by CyberBrick").
 
 **Shopping list for the 5 boards of the 2026-11-13 order** (JLCPCB fits only the SMD parts):
@@ -273,7 +274,7 @@ To connect the finished board in the model, whichever service makes it:
 | J1: right-angle male pin header 1x3, 2.54 mm | 5 | Sullins PRPC003SBAN-M71RC, or cut from a 1x40 right-angle strip; soldered by hand |
 | J3, J4: female socket strip 1x9, 2.54 mm, 8.5 mm tall | 10 | Sullins PPTC091LFBN-RC; soldered by hand (plug them onto the Zero first so they stay straight) |
 | Servo cable, flat, JR female to female | 5 | J1 to the receiver's S4; length to suit the model |
-| Speaker cable Bambu Lab IC007 (SH1.0-2P, 200 mm) | 1 pack of 5 | one plug cut off |
+| Speaker cable Bambu Lab IC007 (SH1.0-2P, 200 mm) | 1 pack of 5 | one plug cut off, or better **cut in the middle: two pieces** (see the note below) |
 | Speaker, 4 Ohm | up to 5 | the type is still open (`roadmap.md`) |
 | Waveshare ESP32-S3-Zero-N8R8-M | up to 5 | one is in the prototype; the "-M" variant has its pin headers fitted, so it plugs into J3/J4 |
 
