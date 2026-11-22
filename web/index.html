@@ -102,8 +102,7 @@ details.guide li { margin-bottom: 4px; }
     <div class="hint" style="margin-top:8px">While the app talks to the module, the engine on the module is silent; it
       comes back a few seconds after the last action.</div>
     <div class="hint" id="bleHint" style="margin-top:4px"><strong>Bluetooth</strong> (needs a firmware with Bluetooth): switch the
-      receiver on; the module says its PIN once, and you can connect for 3 minutes after the power-up. When you leave, the
-      module restarts and Bluetooth stays off until the receiver is switched off and on again. USB works at any time.</div>
+      receiver on; the module says its PIN once, and you can connect (also again and again) for 3 minutes after the power-up. If you changed something (wrote, deleted, renamed), the module restarts when you leave and Bluetooth stays off until the receiver is switched off and on again. USB works at any time.</div>
   </section>
 
   <section>
@@ -264,7 +263,7 @@ details.guide li { margin-bottom: 4px; }
 <script>
 "use strict";
 const RATE = 22050;
-const PAGE_VERSION = "2026-11-22 c (Bluetooth session notes)";   // shown in the log, to tell a cached old page from a new one
+const PAGE_VERSION = "2026-11-22 d (reconnect within the window)";   // shown in the log, to tell a cached old page from a new one
 const CHUNK = 3072;                       // bytes per @w line (4096 base64 characters, set_link.h)
 const SPEAKER_BOX_EQ = [                  // LAB_EQ (firmware/include/engine_lab_data.h): the 30 ml box, 40 mm speaker
   [1.10869112, -2.21738224, 1.10869112, -1.92739111, 0.928925821],
@@ -919,8 +918,8 @@ function disconnected(bleEnded) {
   if ("bluetooth" in navigator) $("btnBle").classList.remove("hidden");
   $("secSets").classList.add("hidden"); $("secEdit").classList.add("hidden");
   if (bleEnded) {
-    setStatus("Bluetooth session over: the module restarts, and Bluetooth stays off until the receiver is switched off and on again.", "muted");
-    notify("The module restarts; Bluetooth is off until the next power-up.");
+    setStatus("Bluetooth session over. After a change the module restarts and Bluetooth stays off until the receiver is switched off and on again; otherwise you can connect again within the 3 minutes.", "muted");
+    notify("Bluetooth session over (after a change the module restarts and Bluetooth is off until the next power-up).");
   } else setStatus("Not connected.");
 }
 async function disconnect() {

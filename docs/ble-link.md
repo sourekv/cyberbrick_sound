@@ -100,3 +100,12 @@ So over Bluetooth: a default-size set of 0.2 to 0.6 MB takes about 17 to 50 s to
 - **The page leaves**: advertising off, and after 1.5 s the module **restarts** (loads the new sets, frees the memory).
   After this restart Bluetooth stays **off** (the reset reason is a software reset), so it does not speak the PIN again
   after every session. It starts again at the next real power-up of the receiver.
+
+## Reconnecting within the window (2026-11-22, built, not yet tried)
+
+- **The page leaves and nothing was changed** (only looked, read sets, or the link broke): no restart, the module advertises
+  again until the 3 minutes after power-up are over; the page may connect again and again. The PIN is spoken again only
+  when a page has connected and not yet entered it.
+- **The page leaves after a change** (a set written, moved or deleted, or the name changed): advertising off and, after 1.5 s,
+  a restart that loads the changes; Bluetooth stays off after it until the next real power-up of the receiver.
+- Three wrong PINs lock the link until the next power-up, in both cases.

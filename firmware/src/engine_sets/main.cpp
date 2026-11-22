@@ -396,10 +396,15 @@ void loop() {
     }
     bool c = bleUart.isConnected();
     if (c && !bleWasConnected) pinNextMs = millis() + 500;      // a page has connected: the PIN now
-    if (bleWasConnected && !c) {          // the page left: advertising off and a restart, which loads the new sets
-      bleLink.resetAuth(); pinQueue.clear(); bleUart.advertise(false);
-      bleActive = false; bleRestartAt = millis() + 1500;
-      Serial.println("ble: the page left, restarting in 1.5 s (Bluetooth stays off after it)");
+    if (bleWasConnected && !c) {          // the page left
+      bleLink.resetAuth(); pinQueue.clear();
+      if (bleLink.changedSinceStart()) {  // something was written, deleted or renamed: a restart loads it, Bluetooth stays off
+        bleUart.advertise(false); bleActive = false; bleRestartAt = millis() + 1500;
+        Serial.println("ble: the page left after a change, restarting in 1.5 s (Bluetooth stays off after it)");
+      } else if (millis() < bleWindowMs) {   // nothing changed: the page may connect again until the 3 minutes are over
+        bleUart.advertise(true);
+        Serial.println("ble: the page left, nothing changed, advertising goes on until the window is over");
+      } else { bleUart.advertise(false); bleActive = false; Serial.println("ble: the page left, the window is over, advertising off"); }
     }
     bleWasConnected = c;
     if (bleLink.isLocked() && bleUart.isAdvertising()) { bleUart.advertise(false); Serial.println("ble: locked after 3 wrong PINs"); }

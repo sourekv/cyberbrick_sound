@@ -67,6 +67,7 @@ class SetLink {
   void resetAuth() { authed = false; badPins = 0; }
   bool isAuthed() const { return !authRequired || authed; }
   bool isLocked() const { return locked; }
+  bool changedSinceStart() const { return everChanged; }   // a set was written, moved or deleted, or the name changed
 
   // The name of the module (for several modules): NVS, so that uploadfs does not erase it. Empty = not set.
   static String moduleName() {
@@ -102,7 +103,7 @@ class SetLink {
 
  private:
   Stream* io = &Serial;
-  bool authRequired = false, authed = false, locked = false;
+  bool authRequired = false, authed = false, locked = false, everChanged = false;
   int badPins = 0;
   String pin;
   String line, cur;
@@ -143,6 +144,7 @@ class SetLink {
       for (size_t i = 0; ok && i < arg.length(); i++) { char c = arg[i]; ok = isAlphaNumeric(c) || c == '_' || c == '-'; }
       if (!ok) return reply("@err name: 1 to 8 letters, digits, - or _");
       Preferences pr; pr.begin("cbsound", false); pr.putString("name", arg); pr.end();
+      everChanged = true;
       return reply("@ok restart the module to advertise the new name");
     }
     if (cmd == "@w") return write(arg);
@@ -279,7 +281,7 @@ class SetLink {
     }
     if (LittleFS.exists(wPath)) LittleFS.remove(wPath);
     if (!LittleFS.rename(wTmp, wPath)) { LittleFS.remove(wTmp); return reply("@err rename failed"); }
-    end.changed = true;
+    end.changed = true; everChanged = true;
     reply("@ok");
   }
 
@@ -303,7 +305,7 @@ class SetLink {
       f.close();
       if (!LittleFS.remove(path)) return reply("@err cannot remove");
     }
-    end.changed = true;
+    end.changed = true; everChanged = true;
     reply("@ok");
   }
 
@@ -314,7 +316,7 @@ class SetLink {
     if (!LittleFS.exists(from)) return reply("@err missing");
     if (LittleFS.exists(to)) return reply("@err target exists");
     if (!LittleFS.rename(from, to)) return reply("@err rename failed");
-    end.changed = true;
+    end.changed = true; everChanged = true;
     reply("@ok");
   }
 
