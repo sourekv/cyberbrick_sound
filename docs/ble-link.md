@@ -121,3 +121,9 @@ spoken PIN into pieces before). Heard whole and without a break by the project o
 `tools/make_voice_digits.py` (`clarify`): high-pass at 250 Hz (the speaker plays nothing useful below), +7 dB presence around
 2.5 kHz for the consonants, soft compression, peak at -1 dBFS; about 5 to 6 dB louder at the same peak. The word "Pin" was replaced
 by the beep. The same treatment may help the spoken names of the sets (`name.wav`), which are not processed yet.
+
+## Decision: no trigger from the transmitter (2026-11-22)
+
+Starting Bluetooth from the transmitter (the free stick R3 held, an extra button) is judged overkill and is **dropped**. The way is
+the window of 3 minutes after the power-up of the receiver, with the spoken PIN, the reconnecting within the window and the
+restart after a change (see above). The rejected idea and its reasons: `rejected-ideas.md`.
