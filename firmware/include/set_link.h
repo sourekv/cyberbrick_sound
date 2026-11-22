@@ -9,9 +9,10 @@
 // bytes when its receive buffer is full).
 //
 //   @hello                 @ok cbsound <protocol version>
-//   @info                  @ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date>
+//   @info                  @ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date> layers=1
 //                                           default=<folder the module starts with, or ->
 //                                           (fw: include/version.h, for example 0.1.0+8cc34fd)
+//                          (layers=1: the firmware plays layered sets, docs/layers-design.md; absent in older firmware)
 //   @ls                    @set <bytes> <folder>   (every folder in /sets)          @ok <count>
 //   @files <folder>        @file <bytes> <name>    (every file of /sets/<folder>)   @ok <count>
 //   @get <path>            @d <base64>  (up to 3072 bytes per line)                 @ok <size> <crc32 hex>
@@ -139,7 +140,7 @@ class SetLink {
     size_t total = LittleFS.totalBytes(), used = LittleFS.usedBytes();
     reply(String("@ok free=") + (unsigned)(total - used) + " total=" + (unsigned)total + " set=" +
           (cur.length() ? cur : String("-")) + " psram=" + (unsigned)ESP.getFreePsram() + " fw=" FW_FULL_VERSION
-          " built=" FW_BUILD " default=" + (SetLibrary::readState().length() ? SetLibrary::readState() : String("-")));
+          " built=" FW_BUILD " layers=1 default=" + (SetLibrary::readState().length() ? SetLibrary::readState() : String("-")));
   }
 
   static uint32_t folderBytes(File dir) {

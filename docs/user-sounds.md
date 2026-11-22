@@ -152,6 +152,8 @@ Every file is required (decided 2026-11-14: every set is complete), except that 
 `loaded.wav`. The PC tool refuses a set with a file missing.
 All WAVs in the format of "Format on the module".
 
+**Layered sample sets (2026-11-22, firmware and page):** instead of `idle.wav` and `loaded.wav` a sample set may name 2 to 8 loops recorded at different steady engine speeds in `set.json` (`layers`: file and `ratio` each, `xfade`); the module plays the layer nearest the rpm near its own speed and blends neighbours. Sets without `layers` are unchanged. Format, rules and the reasons: `layers-design.md`. The page edits them (Engine: layers by rpm); `@info` of the module says `layers=1` when its firmware plays them.
+
 ## Directory structure
 
 **On the module** (the data partition, LittleFS; the `spiffs` partition of `default_8MB.csv` today, 1.5 MB):

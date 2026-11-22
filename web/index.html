@@ -145,6 +145,13 @@ details.guide li { margin-bottom: 4px; }
       <li><strong>Loops</strong> (idle, loaded, horn) play over and over: steady rpm, no revving, gear change, voice or
         wind. Cut both ends at the same point of the engine cycle (ideally whole firing cycles), near a zero crossing,
         without fades, at an even level, so no click or pumping is heard on each lap.</li>
+      <li><strong>Layers by rpm</strong> (an alternative to the idle and loaded loops): instead of one loop played up to 3x
+        faster, give 2 to 8 loops of the same engine recorded at different steady speeds, the idle one first, each a
+        loop as described here. The module plays the layer nearest the rpm, only a little faster or slower than it was
+        recorded, and blends neighbours, so the sound stays closer to the recording. Each layer has a <em>ratio</em>:
+        its firing frequency divided by that of the first layer (the app can measure it as a guess; check it with
+        Preview). Choose <em>Engine: layers by rpm</em> in the editor. There is no loaded loop in such a set. It needs a
+        firmware that reports layers=1; an older one skips the set.</li>
       <li><strong>Idle and low rpm:</strong> the module plays the loop up to 3x faster with the throttle, so record the
         engine idling; a loop recorded at high rpm sounds wrong at both ends.</li>
       <li><strong>Mid range, not bass:</strong> the 40 mm speaker plays nothing useful below about 200 Hz. The firing
@@ -189,6 +196,11 @@ details.guide li { margin-bottom: 4px; }
           <option value="synth2:v8">V8</option><option value="synth2:v12">V12</option><option value="pulse:">old synth</option>
         </select>
       </div>
+      <label class="sampleOnly" for="fEngine">Engine</label>
+      <div class="row sampleOnly">
+        <select id="fEngine"><option value="loops">idle and loaded loop (one loop played faster)</option><option value="layers">layers by rpm (several loops, each played near its own speed)</option></select>
+        <span class="hint">layers need the firmware that reports layers=1; older firmware skips such a set</span>
+      </div>
     </div>
 
     <h2 style="margin-top:18px">Sounds</h2>
@@ -207,9 +219,11 @@ details.guide li { margin-bottom: 4px; }
       <label class="sampleOnly" for="pRateLo">Playback rate</label>
       <div class="row sampleOnly"><input id="pRateLo" type="number" step="0.05" min="0.3" max="2"> to
         <input id="pRateHi" type="number" step="0.05" min="1" max="5"><span class="hint">loop speed at idle and at full rpm</span></div>
-      <label class="sampleOnly" for="pLrs">Loaded loop</label>
-      <div class="row sampleOnly">rate x <input id="pLrs" type="number" step="0.01" min="0.5" max="2">
+      <label class="sampleOnly loopsOnly" for="pLrs">Loaded loop</label>
+      <div class="row sampleOnly loopsOnly">rate x <input id="pLrs" type="number" step="0.01" min="0.5" max="2">
         gain <input id="pLg" type="number" step="0.05" min="0" max="2"><span class="hint">against the idle loop</span></div>
+      <label class="sampleOnly layersOnly" for="pXfade">Crossfade</label>
+      <div class="row sampleOnly layersOnly"><input id="pXfade" type="number" step="0.02" min="0.05" max="1"><span class="hint">width of the blend between two layers (0.36: about plus or minus 19 % of the pitch); narrower for layers that are close</span></div>
       <label for="pEq">Speaker EQ</label>
       <div class="row"><select id="pEq"><option value="none">none</option><option value="box">30 ml box, 40 mm speaker</option><option value="keep">as in the set</option></select>
         gain <input id="pEqGain" type="number" step="0.1" min="0.1" max="4"><span class="hint">EQ after the engine; gain lifts the whole set</span></div>
@@ -422,6 +436,11 @@ function renderDemo(files, j) {
     return x;
   };
   const crankS = Math.max(0.1, start.length / RATE - 0.12);
+  // layered set: the layers in the order of their ratios
+  const layerSet = Array.isArray(files.layers) && files.layers.length >= 2 && files.layers.every((l) => l.pcm);
+  const ls = layerSet ? [...files.layers].sort((a, b) => a.ratio - b.ratio) : [];
+  const layerRatio = ls.map((l) => l.ratio), layerPcm = ls.map((l) => Float32Array.from(l.pcm, (x) => x / 32768));
+  const layerPos = ls.map(() => 0), layerXf = layerSet ? layersXfade(layerRatio, j.xfade ?? 0.36) : 0.36;
   const N = 128, dt = N / RATE, IGN_OFF = 21.5, HORN = [17.0, 17.8];
   const total = name.length + Math.ceil((IGN_OFF + stopS + 0.8) * RATE);
   const out = new Float32Array(total);
@@ -487,11 +506,22 @@ function renderDemo(files, j) {
     const rate = Math.max(0.1, rateLo + (rateHi - rateLo) * rpm), vol = 0.55 + 0.45 * rpm;
     load += (gbIn - load) * 0.04;
     const wI = Math.cos(load * Math.PI / 2), wL = Math.sin(load * Math.PI / 2);
+    const mix = layerSet ? layerMix(layerRatio, rate, layerXf) : null;
     for (let i = 0; i < N && s0 + i < total; i++) {
       const g = prevGain + (gbGain - prevGain) * ((i + 1) / N), eg = gainPrev + (gain - gainPrev) * ((i + 1) / N);
-      let e = wI * loopAt(idle, pos) + wL * lg * loopAt(loaded, posL);
-      pos += rate; while (pos >= idle.length) pos -= idle.length;
-      posL += rate * lrs; while (posL >= loaded.length) posL -= loaded.length;
+      let e;
+      if (mix) {                                  // layered set: at most two layers, no loaded blend (firmware/include/layers.h)
+        e = mix.wa * loopAt(layerPcm[mix.a], layerPos[mix.a]);
+        layerPos[mix.a] += mix.ra; while (layerPos[mix.a] >= layerPcm[mix.a].length) layerPos[mix.a] -= layerPcm[mix.a].length;
+        if (mix.b >= 0) {
+          e += mix.wb * loopAt(layerPcm[mix.b], layerPos[mix.b]);
+          layerPos[mix.b] += mix.rb; while (layerPos[mix.b] >= layerPcm[mix.b].length) layerPos[mix.b] -= layerPcm[mix.b].length;
+        }
+      } else {
+        e = wI * loopAt(idle, pos) + wL * lg * loopAt(loaded, posL);
+        pos += rate; while (pos >= idle.length) pos -= idle.length;
+        posL += rate * lrs; while (posL >= loaded.length) posL -= loaded.length;
+      }
       e = runEq(e * vol * g) * level * eg;
       let st = 0;
       if (starterPos >= 0) { st = start[starterPos]; if (++starterPos >= start.length) starterPos = -1; }
@@ -603,7 +633,7 @@ class MockTransport {
     }
     this.put = null;
     if (cmd === "@hello") return r("@ok cbsound 1");
-    if (cmd === "@info") return r(`@ok free=${this.total - this.used()} total=${this.total} set=${this.current || "-"} psram=7800000 fw=simulated built=- default=${this.def || "-"}`);
+    if (cmd === "@info") return r(`@ok free=${this.total - this.used()} total=${this.total} set=${this.current || "-"} psram=7800000 fw=simulated built=- layers=1 default=${this.def || "-"}`);
     if (cmd === "@default") {
       if (!this.dirs.has("/sets/" + arg)) return r("@err no such set");
       this.def = arg; return r("@ok");
@@ -668,6 +698,7 @@ class MockTransport {
       if (cmd === "@demo" && j.type !== "synth") {
         const files = {};
         for (const k of ["name", "start", "horn", "shift", "idle", "loaded"]) files[k] = wav(k);
+        if (Array.isArray(j.layers)) files.layers = j.layers.map((l) => ({ pcm: wav(l.file.replace(/[.]wav$/, "")), ratio: +l.ratio }));
         playPcm(renderDemo(files, j), { owner: "set:" + arg });
         out.push("demo: start (rendered in the browser)");
       } else if (wav("name")) playPcm(wav("name"), { owner: "set:" + arg });
@@ -852,7 +883,9 @@ function renderSets() {
     else if (seen.has(idx)) note = "number used twice: the module skips it";
     else if (!j) note = "set.json missing or broken";
     if (idx) seen.add(idx);
-    const type = j ? (j.type === "synth" ? "synth: " + (j.synth === "pulse" ? "old synth" : j.preset || "") : "sample") : "?";
+    const layered = j && j.type !== "synth" && Array.isArray(j.layers);
+    const type = j ? (j.type === "synth" ? "synth: " + (j.synth === "pulse" ? "old synth" : j.preset || "") : "sample" + (layered ? ", " + j.layers.length + " layers" : "")) : "?";
+    if (layered && info.layers !== "1") note = "this firmware does not play layers: it skips the set (update the firmware)";
     const cells = [idx || "-", j ? j.name || "" : "", type, kB(s.bytes), s.folder];
     for (const c of cells) { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); }
     const isDef = s.folder === info.default;
@@ -913,6 +946,7 @@ function newEditor() {
     orig: null, index: firstFreeIndex(), desc: "", name: "", type: "sample", synth: "synth2", preset: "diesel",
     level: 1.0, stop_s: 1.4, gearbox: true, rateLo: 1.0, rateHi: 3.0, lrs: 1.18, lg: 0.8,
     eqMode: "none", eqGain: 1.0, eqKeep: null, sounds: {}, origFiles: [], descTouched: false,
+    layered: false, layers: [], xfade: 0.36,   // layers: [{ pcm, ratio, src, dirty }], docs/layers-design.md
   };
 }
 
@@ -929,6 +963,14 @@ async function openSet(folder, copy) {
       const pcm = parseModuleWav(await link.get(`/sets/${folder}/${f.name}`));
       if (pcm) ed.sounds[m[1]] = { pcm, src: "from the module", dirty: copy };
       setBar("saveBar", ++done / files.length);
+    }
+    if (j.type !== "synth" && Array.isArray(j.layers)) {          // a layered set: its loops, in the order of the list
+      ed.layered = true; ed.xfade = j.xfade ?? 0.36;
+      for (const l of j.layers) {
+        const pcm = parseModuleWav(await link.get(`/sets/${folder}/${l.file}`));
+        if (!pcm) throw new Error(`${l.file}: not a WAV in the module's format`);
+        ed.layers.push({ pcm, ratio: +l.ratio, src: "from the module", dirty: copy, file: l.file });
+      }
     }
     await link.bye();
     ed.name = j.name || "";
@@ -969,6 +1011,7 @@ function showEditor(title) {
   $("fSynth").value = ed.synth === "pulse" ? "pulse:" : "synth2:" + ed.preset;
   $("pLevel").value = ed.level; $("pStop").value = ed.stop_s; $("pGearbox").checked = ed.gearbox;
   $("pRateLo").value = ed.rateLo; $("pRateHi").value = ed.rateHi; $("pLrs").value = ed.lrs; $("pLg").value = ed.lg;
+  $("fEngine").value = ed.layered ? "layers" : "loops"; $("pXfade").value = ed.xfade;
   $("pEq").querySelector('option[value="keep"]').disabled = !ed.eqKeep;
   $("pEq").value = ed.eqMode; $("pEqGain").value = ed.eqGain;
   $("secEdit").classList.remove("hidden");
@@ -982,6 +1025,8 @@ function updateTypeVisibility() {
   const sample = editor.type === "sample";
   $("fSynth").classList.toggle("hidden", sample);
   for (const el of document.querySelectorAll(".sampleOnly")) el.classList.toggle("hidden", !sample);
+  for (const el of document.querySelectorAll(".loopsOnly")) if (sample) el.classList.toggle("hidden", editor.layered);
+  for (const el of document.querySelectorAll(".layersOnly")) if (sample) el.classList.toggle("hidden", !editor.layered);
   $("pEqGain").disabled = editor.eqMode === "none";
 }
 
@@ -1003,6 +1048,7 @@ function renderSounds() {
   box.textContent = "";
   for (const def of SOUNDS) {
     if (def.sampleOnly && editor.type !== "sample") continue;
+    if (def.sampleOnly && editor.layered) continue;      // a layered set has layers instead of the idle and loaded loops
     const snd = editor.sounds[def.key];
     const row = document.createElement("div"); row.className = "sound";
     const head = document.createElement("div");
@@ -1038,7 +1084,149 @@ function renderSounds() {
     row.addEventListener("drop", (e) => { e.preventDefault(); row.classList.remove("drag"); const f = e.dataTransfer.files[0]; if (f) loadFile(def, f); });
     box.appendChild(row);
   }
+  if (editor.type === "sample" && editor.layered) renderLayers(box);
   syncStop();
+}
+
+// ---------------------------------------------------------------- layers by rpm (docs/layers-design.md)
+// Loops recorded at different steady engine speeds; `ratio` is a layer's pitch (firing frequency) relative to the first
+// one. layersXfade and layerMix are ports of firmware/include/layers.h (keep them in step); the preview and the
+// simulated module's demo play a layered set with them like the module does.
+const LAYERS_MAX = 8;
+const LAYER_DEF = { min: 0.5, max: 6 };
+function layersXfade(ratio, xfade) {
+  let w = xfade;
+  for (let k = 0; k + 2 < ratio.length; k++) w = Math.min(w, 0.5 * (Math.log(ratio[k + 2]) - Math.log(ratio[k])));
+  return Math.max(w, 0.02);
+}
+function layerMix(ratio, r, xfade) {
+  const n = ratio.length, lr = Math.log(r);
+  for (let k = 0; k + 1 < n; k++) {
+    const lc = 0.5 * (Math.log(ratio[k]) + Math.log(ratio[k + 1])), t = (lr - lc) / xfade + 0.5;
+    if (t <= 0) return { a: k, b: -1, wa: 1, wb: 0, ra: r / ratio[k], rb: 1 };
+    if (t < 1) return { a: k, b: k + 1, wa: Math.cos(t * Math.PI / 2), wb: Math.sin(t * Math.PI / 2), ra: r / ratio[k], rb: r / ratio[k + 1] };
+  }
+  return { a: n - 1, b: -1, wa: 1, wb: 0, ra: r / ratio[n - 1], rb: 1 };
+}
+// The repeat frequency (Hz) of a loop's amplitude envelope, the firing frequency of an engine: median over windows
+// of 0.4 s of the strongest autocorrelation peak between 10 and 80 Hz. A guess: check it by ear with the preview.
+function firingFreq(pcm) {
+  const B = 8, rate = RATE / B, win = Math.round(0.4 * rate), hop = Math.round(0.2 * rate);
+  const env = new Float32Array(Math.floor(pcm.length / B));
+  for (let i = 0; i < env.length; i++) { let s = 0; for (let k = 0; k < B; k++) s += Math.abs(pcm[i * B + k]); env[i] = s / B; }
+  const lagLo = Math.floor(rate / 80), lagHi = Math.ceil(rate / 10), found = [];
+  for (let s0 = 0; s0 + win <= env.length; s0 += hop) {
+    let mean = 0;
+    for (let i = 0; i < win; i++) mean += env[s0 + i];
+    mean /= win;
+    const x = new Float32Array(win);
+    for (let i = 0; i < win; i++) x[i] = env[s0 + i] - mean;
+    const ac = (lag) => { let a = 0; for (let i = 0; i + lag < win; i++) a += x[i] * x[i + lag]; return a; };
+    let best = -Infinity, bl = lagLo;
+    const vals = [];
+    for (let lag = lagLo - 1; lag <= lagHi + 1; lag++) vals[lag] = ac(lag);
+    for (let lag = lagLo; lag <= lagHi; lag++) if (vals[lag] > best) { best = vals[lag]; bl = lag; }
+    const y0 = vals[bl - 1], y1 = vals[bl], y2 = vals[bl + 1], den = y0 - 2 * y1 + y2;
+    const off = den !== 0 ? 0.5 * (y0 - y2) / den : 0;           // parabola through the peak
+    found.push(rate / (bl + Math.max(-0.5, Math.min(0.5, off))));
+  }
+  if (!found.length) return 0;
+  found.sort((a, b) => a - b);
+  return found[found.length >> 1];
+}
+// The sweep of the preview: idle, up to full rpm in 5 s, held, down in 5 s, idle (the same rpm to pitch as the module).
+function renderSweep(ed) {
+  const order = ed.layers.map((L, i) => i).sort((a, b) => ed.layers[a].ratio - ed.layers[b].ratio);
+  const ls = order.map((i) => ed.layers[i]), ratio = ls.map((L) => L.ratio), xf = layersXfade(ratio, ed.xfade);
+  const pcms = ls.map((L) => Float32Array.from(L.pcm, (x) => x / 32768)), pos = ls.map(() => 0);
+  const segs = [[1.5, 0, 0], [5, 0, 1], [1.5, 1, 1], [5, 1, 0], [1.5, 0, 0]];
+  const total = Math.round(segs.reduce((a, s) => a + s[0], 0) * RATE), out = new Float32Array(total);
+  const at = (c, p) => { const i = Math.floor(p), fr = p - i, n = i + 1 < c.length ? i + 1 : 0; return c[i] + (c[n] - c[i]) * fr; };
+  let o = 0;
+  for (const [secs, u0, u1] of segs) {
+    const n = Math.round(secs * RATE);
+    for (let i = 0; i < n && o < total; i++, o++) {
+      const u = u0 + (u1 - u0) * (i / n), r = Math.max(0.1, ed.rateLo + (ed.rateHi - ed.rateLo) * u), m = layerMix(ratio, r, xf);
+      let s = m.wa * at(pcms[m.a], pos[m.a]);
+      pos[m.a] += m.ra; while (pos[m.a] >= pcms[m.a].length) pos[m.a] -= pcms[m.a].length;
+      if (m.b >= 0) { s += m.wb * at(pcms[m.b], pos[m.b]); pos[m.b] += m.rb; while (pos[m.b] >= pcms[m.b].length) pos[m.b] -= pcms[m.b].length; }
+      out[o] = s * (0.55 + 0.45 * u);
+    }
+  }
+  let peak = 0;
+  for (const x of out) peak = Math.max(peak, Math.abs(x));
+  const k = peak > 0 ? 0.89 / peak : 1;
+  return toPcm(out.map((x) => x * k));
+}
+async function layerFromBuffer(i, arrayBuffer, src) {
+  let pcm = parseModuleWav(new Uint8Array(arrayBuffer));
+  if (!pcm) pcm = toPcm(await decodeToMono(arrayBuffer));
+  const L = editor.layers[i];
+  L.pcm = pcm; L.src = src; L.dirty = true;
+  if (i > 0 && editor.layers[0].pcm) suggestRatio(i);
+  renderSounds();
+}
+async function loadLayerFile(i, file) {
+  try { await layerFromBuffer(i, await file.arrayBuffer(), file.name); log(`layer ${i + 1} from ${file.name}`); }
+  catch (e) { log(`${file.name}: cannot be read as sound (${e.message})`, "err"); setSaveStatus(file.name + ": not a sound the browser can read", "err"); }
+}
+// Sets the ratio of layer i from the firing frequencies of the loops against the first layer.
+function suggestRatio(i) {
+  const f0 = firingFreq(editor.layers[0].pcm), fi = firingFreq(editor.layers[i].pcm);
+  if (f0 > 0 && fi > 0) { editor.layers[i].ratio = +(fi / f0).toFixed(3); log(`layer ${i + 1}: ${fi.toFixed(1)} Hz against ${f0.toFixed(1)} Hz of layer 1, ratio ${editor.layers[i].ratio} (a guess: check it by ear)`); }
+}
+function addLayer() {
+  if (editor.layers.length >= LAYERS_MAX) return;
+  const last = editor.layers.length ? editor.layers[editor.layers.length - 1].ratio : 1;
+  editor.layers.push({ pcm: null, ratio: editor.layers.length ? +(last * 1.3).toFixed(3) : 1, src: "", dirty: true });
+  renderSounds();
+}
+function renderLayers(box) {
+  const ed = editor;
+  const intro = document.createElement("div"); intro.className = "hint"; intro.style.margin = "10px 0 4px";
+  intro.innerHTML = "<strong>Layers by rpm.</strong> Loops of the same engine recorded at different steady speeds, the " +
+    "idle one first. <strong>Ratio</strong> is how much higher a layer's firing frequency is than the first one's " +
+    "(first layer: 1). The module plays the layer nearest the rpm, near its own speed, and blends neighbours. 2 to " + LAYERS_MAX + " layers. " +
+    "There is no loaded loop in this kind of set. <strong>Preview</strong> plays idle, up and down as the module would.";
+  box.appendChild(intro);
+  ed.layers.forEach((L, i) => {
+    const row = document.createElement("div"); row.className = "sound";
+    const head = document.createElement("div");
+    head.innerHTML = `<strong>Layer ${i + 1}</strong><div class="hint">layer_${i + 1}.wav</div>`;
+    const body = document.createElement("div");
+    const inf = L.pcm ? soundInfo(LAYER_DEF, L) : { text: "no sound yet", cls: "warn" };
+    const infoEl = document.createElement("div"); infoEl.className = "info " + inf.cls; infoEl.textContent = inf.text;
+    const ctl = document.createElement("div"); ctl.className = "row"; ctl.style.marginTop = "4px";
+    const file = document.createElement("input"); file.type = "file"; file.accept = "audio/*,.wav,.mp3,.ogg,.flac,.m4a"; file.className = "hidden";
+    file.onchange = () => file.files[0] && loadLayerFile(i, file.files[0]);
+    const b = (label, fn, dis, title) => { const x = document.createElement("button"); x.className = "small"; x.textContent = label; x.onclick = fn; x.disabled = !!dis; if (title) x.title = title; ctl.appendChild(x); return x; };
+    b("Choose file", () => file.click());
+    b("Play loop", () => playPcm(L.pcm, { loop: true, owner: "layer" + i }), !L.pcm);
+    b("Stop", () => stopPlay()).dataset.owner = "layer" + i;
+    const lab = document.createElement("label"); lab.className = "hint"; lab.textContent = " ratio ";
+    const ratio = document.createElement("input"); ratio.type = "number"; ratio.step = "0.01"; ratio.min = "0.1"; ratio.style.width = "5.5em";
+    ratio.value = i === 0 ? 1 : L.ratio; ratio.disabled = i === 0;
+    ratio.onchange = () => { L.ratio = +ratio.value; };
+    lab.appendChild(ratio); ctl.appendChild(lab);
+    if (i > 0) b("Measure", () => { suggestRatio(i); renderSounds(); }, !L.pcm || !ed.layers[0].pcm, "guess the ratio from the firing frequency of this loop and of the first layer");
+    b("Remove", () => { ed.layers.splice(i, 1); if (ed.layers.length) ed.layers[0].ratio = 1; renderSounds(); }, false);
+    ctl.appendChild(file);
+    body.appendChild(infoEl); body.appendChild(ctl);
+    row.appendChild(head); row.appendChild(body);
+    row.addEventListener("dragover", (e) => { e.preventDefault(); row.classList.add("drag"); });
+    row.addEventListener("dragleave", () => row.classList.remove("drag"));
+    row.addEventListener("drop", (e) => { e.preventDefault(); row.classList.remove("drag"); const f = e.dataTransfer.files[0]; if (f) loadLayerFile(i, f); });
+    box.appendChild(row);
+  });
+  const bar = document.createElement("div"); bar.className = "row"; bar.style.margin = "8px 0";
+  const add = document.createElement("button"); add.className = "small"; add.textContent = "Add a layer"; add.onclick = addLayer; add.disabled = ed.layers.length >= LAYERS_MAX;
+  const ready = ed.layers.length >= 2 && ed.layers.every((L) => L.pcm && L.ratio > 0);
+  const pv = document.createElement("button"); pv.className = "small"; pv.textContent = "Preview"; pv.disabled = !ready;
+  pv.title = "idle, up to full rpm and down, rendered here with the rate and the crossfade of this set";
+  pv.onclick = () => { readFields(); playPcm(renderSweep(ed), { owner: "layerpreview" }); };
+  const ps = document.createElement("button"); ps.className = "small"; ps.textContent = "Stop"; ps.dataset.owner = "layerpreview"; ps.onclick = () => stopPlay();
+  bar.appendChild(add); bar.appendChild(pv); bar.appendChild(ps);
+  box.appendChild(bar);
 }
 
 // ---------------------------------------------------------------- the name spoken by Piper, in the browser
@@ -1202,12 +1390,19 @@ function readFields() {
   ed.level = +$("pLevel").value || 1; ed.stop_s = +$("pStop").value || 1.4; ed.gearbox = $("pGearbox").checked;
   ed.rateLo = +$("pRateLo").value || 1; ed.rateHi = +$("pRateHi").value || 3; ed.lrs = +$("pLrs").value || 1.18;
   ed.lg = +$("pLg").value; ed.eqMode = $("pEq").value; ed.eqGain = +$("pEqGain").value || 1;
+  ed.layered = ed.type === "sample" && $("fEngine").value === "layers"; ed.xfade = +$("pXfade").value || 0.36;
 }
+
+function sortedLayers(ed) { return [...ed.layers].sort((a, b) => a.ratio - b.ratio); }
 
 function setJson(ed) {
   const j = { name: ed.name, type: ed.type };
   if (ed.type === "synth") { j.synth = ed.synth; if (ed.synth === "synth2") j.preset = ed.preset; }
-  else { j.rate = [ed.rateLo, ed.rateHi]; j.loaded_rate_scale = ed.lrs; j.loaded_gain = ed.lg; }
+  else {
+    j.rate = [ed.rateLo, ed.rateHi];
+    if (ed.layered) { j.layers = sortedLayers(ed).map((L, i) => ({ file: `layer_${i + 1}.wav`, ratio: L.ratio })); j.xfade = ed.xfade; }
+    else { j.loaded_rate_scale = ed.lrs; j.loaded_gain = ed.lg; }
+  }
   let eq = ed.eqMode === "box" ? SPEAKER_BOX_EQ : ed.eqMode === "keep" ? ed.eqKeep : null;
   if (eq) {
     eq = eq.map((c) => c.slice());
@@ -1222,10 +1417,22 @@ function setJson(ed) {
 async function save() {
   readFields();
   const ed = editor;
-  const need = SOUNDS.filter((s) => !s.sampleOnly || ed.type === "sample");
+  const layered = ed.type === "sample" && ed.layered;
+  const need = SOUNDS.filter((s) => !s.sampleOnly || (ed.type === "sample" && !layered));
   if (!ed.sounds.name) await autoNumber();   // no name sound: its number
   const missing = need.filter((s) => !ed.sounds[s.key]).map((s) => s.label);
   if (!ed.name) return setSaveStatus("The set needs a name.", "err");
+  let lay = null;
+  if (layered) {
+    lay = sortedLayers(ed);
+    if (lay.length < 2 || lay.length > LAYERS_MAX) return setSaveStatus("A layered set needs 2 to " + LAYERS_MAX + " layers.", "err");
+    if (lay.some((L) => !L.pcm)) return setSaveStatus("A layer has no sound yet.", "err");
+    if (lay.some((L) => !(L.ratio > 0))) return setSaveStatus("Every layer needs a ratio above 0.", "err");
+    const r0 = lay[0].ratio;
+    for (const L of lay) L.ratio = +(L.ratio / r0).toFixed(4);    // the lowest layer is 1 by definition
+    for (let k = 1; k < lay.length; k++) if (lay[k].ratio <= lay[k - 1].ratio + 0.001) return setSaveStatus("Two layers have the same ratio.", "err");
+    ed.layers = lay;
+  }
   if (!ed.desc) ed.desc = slug(ed.name) || "set";
   if (missing.length) return setSaveStatus("Missing: " + missing.join(", ") + ".", "err");
   if (!/^\d\d$/.test(ed.index)) return setSaveStatus("Choose a number.", "err");
@@ -1233,6 +1440,10 @@ async function save() {
   if (sets.some((s) => s.folder === folder && s.folder !== ed.orig)) return setSaveStatus(folder + " exists already.", "err");
 
   const writes = need.filter((s) => ed.sounds[s.key].dirty || !ed.orig).map((s) => ({ name: s.key + ".wav", bytes: wavBytes(ed.sounds[s.key].pcm) }));
+  if (lay) lay.forEach((L, i) => {
+    const nm = `layer_${i + 1}.wav`;
+    if (L.dirty || L.file !== nm || !ed.orig) writes.push({ name: nm, bytes: wavBytes(L.pcm) });
+  });
   writes.push({ name: "set.json", bytes: new TextEncoder().encode(setJson(ed)) });
   const total = writes.reduce((a, w) => a + w.bytes.length, 0);
   const own = ed.orig ? (sets.find((s) => s.folder === ed.orig) || { bytes: 0 }).bytes : 0;
@@ -1251,11 +1462,12 @@ async function save() {
       sent += w.bytes.length;
       log(`wrote ${dir}/${w.name} (${kB(w.bytes.length)})`);
     }
-    const keep = new Set(need.map((s) => s.key + ".wav").concat(["set.json"]));
+    const keep = new Set(need.map((s) => s.key + ".wav").concat(["set.json"], lay ? lay.map((L, i) => `layer_${i + 1}.wav`) : []));
     for (const f of ed.origFiles) if (!keep.has(f) && /\.wav$/.test(f)) { await link.rm(`${dir}/${f}`); log("removed " + f); }
     await link.bye();
     ed.orig = folder; ed.origFiles = [...keep];
     for (const s of Object.values(ed.sounds)) s.dirty = false;
+    if (lay) lay.forEach((L, i) => { L.file = `layer_${i + 1}.wav`; L.dirty = false; });
     setBar("saveBar", 1);
     setSaveStatus(`Written to the module as ${folder}. Use Test in the list to hear it there.`, "ok");
     $("editTitle").textContent = "Set " + folder;
@@ -1275,6 +1487,12 @@ $("fIndex").onchange = () => { $("fIndexEcho").textContent = $("fIndex").value; 
 $("fName").oninput = () => { if (editor && !editor.descTouched) $("fDesc").value = slug($("fName").value); syncSpeakText(); };
 $("fDesc").oninput = () => { if (editor) editor.descTouched = true; };
 $("fType").onchange = () => { editor.type = $("fType").value; updateTypeVisibility(); renderSounds(); };
+$("fEngine").onchange = () => {
+  readFields();
+  if (editor.layered && !editor.layers.length) { addLayer(); addLayer(); }   // start with two empty rows
+  updateTypeVisibility(); renderSounds();
+};
+$("pXfade").onchange = () => readFields();
 $("pEq").onchange = () => { editor.eqMode = $("pEq").value; updateTypeVisibility(); };
 for (const id of ["pRateLo", "pRateHi"]) $(id).onchange = () => { readFields(); renderSounds(); };
 if (!("serial" in navigator)) { $("noSerial").classList.remove("hidden"); $("btnConnect").disabled = true; }
@@ -1332,6 +1550,59 @@ async function selftest() {
     await removeSet("05_test_truck");
     check(!sets.some((s) => s.folder === "05_test_truck") && sets.length === 2, "delete");
     check(/\n$/.test(setJson(editor || newEditor())), "set.json ends with a newline");
+
+    // ---- layers by rpm (docs/layers-design.md)
+    const pulses = (hz, secs) => {                       // noise bursts at `hz`: a made-up engine, firing frequency hz
+      const m = Math.round(secs * RATE), f = new Float32Array(m), per = RATE / hz;
+      let seed = 12345;
+      for (let i = 0; i < m; i++) { seed = (seed * 1103515245 + 12345) & 0x7fffffff; const ph = (i % per) / per; f[i] = 0.5 * ((seed / 0x7fffffff) * 2 - 1) * Math.exp(-ph * 9); }
+      return toPcm(f);
+    };
+    const ff = firingFreq(pulses(20, 3));
+    check(Math.abs(ff - 20) < 1.2, "firing frequency of a 20 Hz pulse train: " + ff.toFixed(2) + " Hz");
+    const mixR = [1, 2, 2.3], xfT = layersXfade(mixR, 0.36);
+    let powerOk = true, nbOk = true;
+    for (let u = 0; u <= 1.0001; u += 0.01) {
+      const m = layerMix(mixR, 1 + 2 * u, xfT);
+      if (Math.abs(m.wa * m.wa + m.wb * m.wb - 1) > 1e-9) powerOk = false;
+      if (m.b >= 0 && m.b !== m.a + 1) nbOk = false;
+    }
+    check(powerOk && nbOk && layerMix(mixR, 1, xfT).a === 0 && layerMix(mixR, 3, xfT).a === 2, "layer mix: equal power, neighbours only, idle is layer 1, full is the last");
+    await openSet("01_demo_diesel", true);
+    $("fType").value = "sample"; $("fType").onchange();
+    $("fEngine").value = "layers"; $("fEngine").onchange();
+    check(editor.layered && editor.layers.length === 2, "switching to layers starts with two rows");
+    addLayer();
+    const bytesOf = (pcm) => wavBytes(pcm).buffer;
+    await layerFromBuffer(0, bytesOf(pulses(10, 3)), "synthetic 10 Hz");
+    await layerFromBuffer(1, bytesOf(pulses(20, 3)), "synthetic 20 Hz");
+    await layerFromBuffer(2, bytesOf(pulses(25, 3)), "synthetic 25 Hz");
+    const rs = editor.layers.map((L) => L.ratio);
+    check(Math.abs(rs[1] - 2) < 0.15 && Math.abs(rs[2] - 2.5) < 0.2, "ratios measured from the loops: " + rs.join(", "));
+    editor.layers[2].ratio = 2.5;
+    editor.layers.reverse();                                // saved sorted by ratio, the lowest becomes layer 1
+    $("fName").value = "Layered test"; $("fDesc").value = "layered_test";
+    await save();
+    const ls = sets.find((s) => s.folder === "03_layered_test");
+    check(!!ls && ls.json.type === "sample" && Array.isArray(ls.json.layers) && ls.json.layers.length === 3 && ls.json.layers[0].ratio === 1 &&
+          ls.json.layers[0].file === "layer_1.wav" && ls.json.layers[2].ratio > ls.json.layers[1].ratio && ls.json.layers[1].ratio > 1 && !("loaded_rate_scale" in ls.json), "layered set written: layers sorted, the first is 1: " + JSON.stringify(ls && ls.json.layers));
+    const lf = (await link.files("03_layered_test")).map((f) => f.name).sort().join(",");
+    check(lf === "horn.wav,layer_1.wav,layer_2.wav,layer_3.wav,name.wav,set.json,shift.wav,start.wav", "its files: " + lf);
+    const l1 = parseModuleWav(await link.get("/sets/03_layered_test/layer_1.wav"));
+    const p10 = pulses(10, 3);
+    check(l1 && l1.length === p10.length && l1.every((x, i) => x === p10[i]), "layer_1.wav is the 10 Hz loop, read back the same");
+    check(sets.find((s) => s.folder === "03_layered_test").json.layers.length === 3 && (await (async () => { await openSet("03_layered_test", false); return editor.layered && editor.layers.length === 3 && editor.layers[1].ratio === ls.json.layers[1].ratio; })()),
+          "the layered set opens again with its layers and ratios");
+    const demoPcm = renderDemo({ name: editor.sounds.name.pcm, start: editor.sounds.start.pcm, horn: editor.sounds.horn.pcm, shift: editor.sounds.shift.pcm,
+                                 layers: editor.layers.map((L) => ({ pcm: L.pcm, ratio: L.ratio })) }, ls.json);
+    check(demoPcm.length > 20 * RATE && peakDb(demoPcm) > -3, "the demo of a layered set renders (" + (demoPcm.length / RATE).toFixed(1) + " s)");
+    check(renderSweep(editor).length === Math.round(14.5 * RATE), "the preview sweep renders (14.5 s)");
+    // back to one loop: layers removed
+    $("fEngine").value = "loops"; $("fEngine").onchange();
+    check(!editor.layered, "back to idle and loaded loops");
+    stopPlay();
+    await removeSet("03_layered_test");
+    check(!sets.some((s) => s.folder === "03_layered_test") && sets.length === 2, "layered test set deleted");
   } catch (e) {
     check(false, "exception: " + e.message);
   }
