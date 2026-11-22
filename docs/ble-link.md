@@ -39,3 +39,22 @@ and what it showed.
   USB): after the sets work well.
 - The firmware without the Bluetooth code stays the default; the Bluetooth build is 0.63 MB bigger. Deciding whether the
   Bluetooth service goes into the one normal firmware is open.
+
+## Several modules: name and PIN (decided to design this way, 2026-11-22, not built)
+
+- **Name of the module** (for example `Truck`, up to about 8 characters, because it goes into the BLE advertising
+  of 31 bytes: `CBSound-Truck`). Kept in **NVS** (`Preferences`), not in the file system: `uploadfs` rewrites the whole data
+  partition and would erase it. Set with a new command `@name <text>` from the page, reported in `@info`
+  (`name=...`); the page shows it in the device list and in its status line. The module may speak it on entry.
+- **PIN at the level of the protocol**, not the operating system's pairing: the first command of a session must be
+  `@auth <pin>`, otherwise every command except `@hello` and `@info` answers `@err auth`. It works the same over Bluetooth
+  and USB; over USB it is not needed (a cable is physical access) and stays off. Chosen over BLE passkey pairing because
+  it needs no handling in the operating system and no stored bond, and it is easy to test.
+- **The PIN is random for every service session and spoken by the module** when the service starts: "Bluetooth. Truck.
+  PIN four two seven one." Nothing to remember or to write down, only someone standing at the model hears it, and with
+  several modules each says its own name and PIN. The page asks for it after connecting. (A fixed PIN set over USB
+  could be a fallback.)
+- **Open:** how the spoken digits are made (the numbers of the sets are spoken from `number_names.js`; digits would need
+  the same, as short clips in the firmware or as spoken numbers), the length of the PIN (4 digits is enough against
+  someone passing by, the service is up for minutes only), a limit on wrong PINs (for example 3, then the service
+  closes), and what happens when the module is mute.
