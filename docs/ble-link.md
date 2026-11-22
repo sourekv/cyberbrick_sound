@@ -72,3 +72,11 @@ spoken with digit clips from `/voice/d0.wav .. d9.wav` (`tools/make_voice_digits
 advertising starts and every 40 s until the page has authenticated; 3 wrong PINs lock the Bluetooth link until restart;
 after a disconnect the PIN is spoken again and the advertising window is renewed. The page asks for the PIN after
 connecting over Bluetooth and has a "Module name" button. The PIN is also printed to the USB serial log.
+
+## Tried without USB (2026-11-22)
+
+The module powered only from the receiver (no USB), the spoken PIN, the page connected over Bluetooth and showed
+"Connected over Bluetooth to Truck, firmware 0.1.0+f5d134c-dirty". The name (set over USB with `@name`, shown as
+`CBSound-Truck`) and the PIN work. Windows may keep the old name of a device that was paired before (it showed
+"CBSound" until the name was set). The advertising window of 3 minutes after power-up ended once before the page was
+opened: the module must be restarted then (a real version needs a trigger from the transmitter instead).
