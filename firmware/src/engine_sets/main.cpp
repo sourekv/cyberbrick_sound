@@ -30,6 +30,9 @@
 #include "shift_sound.h"           // CC0 shift sound for the fallback
 #include "sound_sets.h"
 #include "set_link.h"
+#if BLE_LINK_ENABLED
+#include "ble_link.h"   // prototype, docs/ble-link.md: the protocol of set_link.h over Bluetooth Low Energy
+#endif
 
 #define PIN_BOOT_BUTTON 0
 
@@ -110,6 +113,11 @@ static float engGain = 1.0f, engGainPrev = 1.0f;
 
 static SetLibrary library;
 static SetLink usbLink;
+#if BLE_LINK_ENABLED
+static SetLink bleLink;
+static BleUart bleUart;
+static uint32_t bleWindowMs = 180000;   // prototype: advertising only this long after power-up
+#endif
 static SoundSet cur;                 // the loaded set
 static int curIndex = -1;            // index in library.folders; -1 = fallback
 static bool fallback = true;
@@ -254,6 +262,12 @@ static bool bootPressed() {
 void setup() {
   usbLink.begin();
   Serial.begin(115200);
+#if BLE_LINK_ENABLED
+  bleUart.begin("CBSound");
+  bleLink.attach(&bleUart);
+  bleUart.advertise(true);
+  Serial.println("ble: advertising as CBSound for 180 s");
+#endif
   Serial.println("cyberbrick_sound engine_sets " FW_FULL_VERSION ", built " FW_BUILD);
   statusLed.begin();
   pinMode(PIN_THROTTLE_IN, INPUT);
@@ -296,18 +310,8 @@ void setup() {
   selectSet(i < 0 ? 0 : i);
 }
 
-void loop() {
-  static float pos = 0.0f, posLoaded = 0.0f, load = 0.0f, prevGain = 1.0f, plainRpm = 0.0f;
-  static uint32_t lastPrint = 0;
-  const int N = 128;
-  int16_t buf[N * 2];
-
-  if (usbLink.poll(fallback ? String() : cur.folder)) {   // the web page is talking to the module: silent
-    vTaskDelay(1);
-    return;
-  }
-  {
-    SetLink::End e = usbLink.takeEnd();
+// What a finished session of the web page asks for: rescan and reload, play a set, stop, demo.
+static void applyEnd(const SetLink::End& e) {
     if (e.ended && (e.changed || e.select.length()) && psramFound()) {
       String want = e.select.length() ? e.select : (fallback ? String() : cur.folder);
       if (library.scan() == 0) useFallback();
@@ -333,7 +337,27 @@ void loop() {
       demoT = 0.0f;
       Serial.println("demo: start");
     }
+}
+
+void loop() {
+  static float pos = 0.0f, posLoaded = 0.0f, load = 0.0f, prevGain = 1.0f, plainRpm = 0.0f;
+  static uint32_t lastPrint = 0;
+  const int N = 128;
+  int16_t buf[N * 2];
+
+  bool talking = usbLink.poll(fallback ? String() : cur.folder);   // the web page is talking to the module: silent
+#if BLE_LINK_ENABLED
+  talking = bleLink.poll(fallback ? String() : cur.folder) || talking;
+  if (bleUart.isAdvertising() && millis() > bleWindowMs) { bleUart.advertise(false); Serial.println("ble: advertising window over"); }
+#endif
+  if (talking) {
+    vTaskDelay(1);
+    return;
   }
+  applyEnd(usbLink.takeEnd());
+#if BLE_LINK_ENABLED
+  applyEnd(bleLink.takeEnd());
+#endif
   if (bootPressed()) {
     demoOn = false;
     if (!library.folders.empty()) selectSet(fallback ? 0 : curIndex + 1);

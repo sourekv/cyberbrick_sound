@@ -86,6 +86,7 @@ details.guide li { margin-bottom: 4px; }
   <section>
     <div class="row">
       <button id="btnConnect" class="primary">Connect module</button>
+      <button id="btnBle" title="PROTOTYPE: the same over Bluetooth, only with the firmware environment engine_sets_ble (docs/ble-link.md)">Connect over Bluetooth (prototype)</button>
       <button id="btnSim">Simulated module</button>
       <button id="btnDisconnect" class="hidden">Disconnect</button>
       <span id="connStatus" class="status muted">Not connected.</span>
@@ -588,6 +589,40 @@ class SerialTransport {
   }
 }
 
+// Web Bluetooth (PROTOTYPE, docs/ble-link.md): the same text lines over a Nordic-UART-like GATT service. The module cuts
+// a reply into notifications, which are put together here until the newline; a line to the module is cut into writes.
+const BLE_SERVICE = "6e400001-b5a0-f393-e0a9-e50e24dcca9e", BLE_RX = "6e400002-b5a0-f393-e0a9-e50e24dcca9e", BLE_TX = "6e400003-b5a0-f393-e0a9-e50e24dcca9e";
+class BleTransport {
+  constructor() { this.onLine = () => {}; this.onClose = () => {}; this.enc = new TextEncoder(); this.dec = new TextDecoder(); this.buf = ""; this.bytes = 0; this.t0 = 0; }
+  async open() {
+    this.device = await navigator.bluetooth.requestDevice({ filters: [{ services: [BLE_SERVICE] }] });
+    this.device.addEventListener("gattserverdisconnected", () => this.onClose());
+    const server = await this.device.gatt.connect();
+    const svc = await server.getPrimaryService(BLE_SERVICE);
+    this.rx = await svc.getCharacteristic(BLE_RX);
+    this.tx = await svc.getCharacteristic(BLE_TX);
+    this.tx.addEventListener("characteristicvaluechanged", (e) => {
+      const v = new Uint8Array(e.target.value.buffer, e.target.value.byteOffset, e.target.value.byteLength);
+      if (!this.t0) this.t0 = performance.now();
+      this.bytes += v.length;
+      this.buf += this.dec.decode(v, { stream: true });
+      let k;
+      while ((k = this.buf.indexOf(String.fromCharCode(10))) >= 0) {
+        const line = this.buf.slice(0, k).replace(/\r$/, "");
+        this.buf = this.buf.slice(k + 1);
+        this.onLine(line);
+      }
+    });
+    await this.tx.startNotifications();
+  }
+  async write(s) {
+    const bytes = this.enc.encode(s), CH = 200;                  // below the usual MTU 247..517 minus 3
+    for (let i = 0; i < bytes.length; i += CH) await this.rx.writeValueWithResponse(bytes.subarray(i, i + CH));
+  }
+  rate() { return this.t0 ? this.bytes / ((performance.now() - this.t0) / 1000) : 0; }
+  async close() { try { if (this.device.gatt.connected) this.device.gatt.disconnect(); } catch (e) {} }
+}
+
 // The simulated module: the protocol of set_link.h over an in-memory file system.
 class MockTransport {
   constructor() {
@@ -818,16 +853,16 @@ async function guarded(fn) {
   finally { busy(false); syncStop(); }
 }
 
-async function connect(sim) {
+async function connect(sim, ble) {
   try {
-    transport = sim ? new MockTransport() : new SerialTransport();
+    transport = sim ? new MockTransport() : ble ? new BleTransport() : new SerialTransport();
     await transport.open();
     link = new Link(transport);
     transport.onClose = () => { if (transport) { log("disconnected", "warn"); disconnected(); } };
     const v = await link.hello();
-    log("connected: " + v + (sim ? " (simulated)" : ""), "ok");
-    setStatus(sim ? "Simulated module (nothing is written to a real module)." : "Connected.", "ok");
-    $("btnConnect").classList.add("hidden"); $("btnSim").classList.add("hidden"); $("btnDisconnect").classList.remove("hidden");
+    log("connected: " + v + (sim ? " (simulated)" : ble ? " (Bluetooth)" : ""), "ok");
+    setStatus(sim ? "Simulated module (nothing is written to a real module)." : ble ? "Connected over Bluetooth (prototype)." : "Connected.", "ok");
+    $("btnConnect").classList.add("hidden"); $("btnSim").classList.add("hidden"); $("btnBle").classList.add("hidden"); $("btnDisconnect").classList.remove("hidden");
     $("secSets").classList.remove("hidden");
     await refresh();
     if (!sim && info && info.fw) setStatus("Connected, firmware " + info.fw + (info.built && info.built !== "-" ? ", built " + info.built : "") + ".", "ok");
@@ -840,6 +875,7 @@ async function connect(sim) {
 function disconnected() {
   transport = null; link = null;
   $("btnConnect").classList.remove("hidden"); $("btnSim").classList.remove("hidden"); $("btnDisconnect").classList.add("hidden");
+  if ("bluetooth" in navigator) $("btnBle").classList.remove("hidden");
   $("secSets").classList.add("hidden"); $("secEdit").classList.add("hidden");
   setStatus("Not connected.");
 }
@@ -1478,6 +1514,8 @@ async function save() {
 // ------------------------------------------------------------------ wiring
 $("btnConnect").onclick = () => connect(false);
 $("btnSim").onclick = () => connect(true);
+$("btnBle").onclick = () => connect(false, true);
+if (!("bluetooth" in navigator)) $("btnBle").classList.add("hidden");
 $("btnDisconnect").onclick = disconnect;
 $("btnRefresh").onclick = refresh;
 $("btnNew").onclick = () => { editor = newEditor(); showEditor("New set"); autoNumber(); setSaveStatus("Choose the sounds; a copy of an existing set is often the easier start.", "muted"); setBar("saveBar", 0); };

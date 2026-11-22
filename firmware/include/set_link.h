@@ -54,14 +54,17 @@ class SetLink {
     bool stop = false;      // @stop: silence the name and the demo
   };
 
-  // Before Serial.begin().
-  void begin() { Serial.setRxBufferSize(RX_BUFFER); }
+  // Before Serial.begin(). Without attach() the link talks over the USB serial port.
+  void begin() { if (io == &Serial) Serial.setRxBufferSize(RX_BUFFER); }
+
+  // The same protocol over another byte stream (the Bluetooth link of docs/ble-link.md).
+  void attach(Stream* s) { io = s; }
 
   // Reads and runs the commands that have arrived. Returns true while a session is active.
   bool poll(const String& currentSet) {
     cur = currentSet;
-    while (Serial.available()) {
-      int c = Serial.read();
+    while (io->available()) {
+      int c = io->read();
       if (c < 0) break;
       if (c == '\r') continue;
       if (c == '\n') {
@@ -82,6 +85,7 @@ class SetLink {
   End takeEnd() { End e = end; end = End(); return e; }
 
  private:
+  Stream* io = &Serial;
   String line, cur;
   bool overflow = false, active = false;
   uint32_t lastMs = 0;
@@ -97,7 +101,7 @@ class SetLink {
     end.ended = true;
   }
 
-  void reply(const String& s) { Serial.print(s); Serial.print('\n'); }
+  void reply(const String& s) { io->print(s); io->print('\n'); }
 
   static bool pathOk(const String& p) {
     return p.startsWith("/sets/") && p.length() > 6 && p.length() < 80 && p.indexOf("..") < 0 && p.indexOf("//") < 0 &&
