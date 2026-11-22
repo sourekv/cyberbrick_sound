@@ -32,8 +32,7 @@ and what it showed.
   3 s with the ignition off and the throttle at rest (the module already reads all channels), with a spoken
   "Bluetooth". BLE must not run while driving (the 2.4 GHz radio disturbs the receiver's link).
 - **Pairing and a PIN.** Today anyone in range can connect during the window and rewrite or delete the sets.
-- **Writing** to the module over Bluetooth was not tried (the page cuts lines into 200-byte writes with response, which
-  is probably slower than reading).
+- ~~Writing was not tried~~ Done 2026-11-22, see below.
 - **Leaving the service mode:** after the page disconnects, after about 5 minutes of idle, or at power-off.
 - **Firmware update over Bluetooth** into the other app slot (no way back if the new firmware does not start, without
   USB): after the sets work well.
@@ -80,3 +79,15 @@ The module powered only from the receiver (no USB), the spoken PIN, the page con
 `CBSound-Truck`) and the PIN work. Windows may keep the old name of a device that was paired before (it showed
 "CBSound" until the name was set). The advertising window of 3 minutes after power-up ended once before the page was
 opened: the module must be restarted then (a real version needs a trigger from the transmitter instead).
+
+## Writing a set over Bluetooth (2026-11-22)
+
+A copy of the set 04 diesel (205 kB) was written to the module over Bluetooth, no USB: **12 kB/s, 17 s in all**. The first
+try, with blocks of 200 bytes written with response, ran at only 1 kB/s (every write waited for its acknowledgement,
+hundreds of ms): about 3 minutes for the same set, and an interrupted write left an empty folder (the module creates
+it at the first `@put`; the files appear only when each transfer has ended with a right CRC). The page now writes
+without response in blocks of 240 bytes (halved when the stack refuses), which gave the 12 kB/s. Reading was 25 kB/s
+before. The page also got a progress bar with percentage, size, speed and time left, and a notice with a beep when a set
+is written or deleted.
+
+So over Bluetooth: a default-size set of 0.2 to 0.6 MB takes about 17 to 50 s to write.
