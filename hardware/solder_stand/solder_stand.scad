@@ -26,7 +26,7 @@
 //   solder_stand_steps.png: three renders with -D 'part="assembly"' -D explode=45 / 18 / 0 (Tomorrow colour scheme),
 //   joined with ImageMagick montage
 
-part = "stand";      // "stand", "preview" (stand with the board and the Zero as ghosts) or "j1_support" (the loose block below)
+part = "stand";      // "stand" or "preview" (stand with the board and the Zero as ghosts)
 
 base_t     = 8.0;    // base plate thickness (heavier, so the stand does not tip over; thick enough for the band grooves below it)
 groove_w   = 4.5;    // grooves in the underside of the base for rubber bands (a band of about 3 mm), one set each way
@@ -78,6 +78,29 @@ module stand() {
       // ledge under the J1 plastic body (the pins over the edge stay 0.9 mm above it)
       translate([j1_x0, j1_y_out, 0])
         cube([j1_x1 - j1_x0, j1_y_in - j1_y_out, base_t + post_h - j1_body_t]);
+      // shelf in the air under the body of J1 when it is fitted from the UNDERSIDE of the board and turned by 180 degrees (pins pointing
+      // into the board, docs/shield-pcb.md "The servo connector on the underside"; soldered in a separate pass, the board lying top side
+      // up): it continues the ledge past y_in as a slab at the height of the ledge (2.54 mm under the board), over the body at
+      // 5.7 to 8.4 mm from the edge, with a 45 degree wedge under it, so that it prints without supports. With the board face down
+      // (the pass with J3 and J4) it clears everything: the Zero hangs 11 mm below the board and its pocket starts at y 103.2, the
+      // parts on the board hang at most 1.1 mm.
+      {
+        top_z = base_t + post_h - j1_body_t;          // top of the ledge
+        shelf_end = by0 + 8.5;  shelf_t = 2.0;  L = shelf_end - j1_y_in;
+        translate([j1_x0, j1_y_in, top_z - shelf_t]) cube([j1_x1 - j1_x0, L, shelf_t]);
+        translate([j1_x0, 0, 0]) rotate([90, 0, 90]) linear_extrude(j1_x1 - j1_x0)
+          polygon([[j1_y_in, top_z - shelf_t - L], [shelf_end, top_z - shelf_t], [j1_y_in, top_z - shelf_t]]);
+        // the long pins of the turned header run on from the body (8.4 mm from the edge) to about 15 mm: the shelf goes on as a thin
+        // slab with a slot for each pin, as the comb outside the edge does; the ribs stop 1.3 mm under the board, so the parts on
+        // the board (they hang at most 1.1 mm in the face-down pass) clear them. Nothing supports this part from below (the Zero
+        // hangs there in the other pass), so it is a short cantilever: print with a support under it or accept a rough underside.
+        pin_end = by0 + 15.0;
+        translate([j1_x0, shelf_end - 0.01, 0]) difference() {
+          translate([0, 0, top_z - shelf_t]) cube([j1_x1 - j1_x0, pin_end - shelf_end + 0.01, shelf_t + 1.24]);
+          for (x = [111.96, 114.50, 117.04])
+            translate([x - j1_x0 - slot_w / 2, -1, top_z + 0.85]) cube([slot_w, pin_end - shelf_end + 2, 5]);
+        }
+      }
       // side guides at both ends of the J1 body, so it cannot turn or slide along the edge
       for (x = [j1_x0 - guide_w, j1_x1]) translate([x, j1_y_out, 0])
         cube([guide_w, j1_y_in - j1_y_out, base_t + post_h - 0.3]);
@@ -147,23 +170,7 @@ module foam() {
   color([0.95, 0.75, 0.8]) translate([cx - 9, cy - 11, base_t]) cube([18, 22, foam_t]);
 }
 
-// J1 fitted from the UNDERSIDE of the board (docs/shield-pcb.md "The servo connector on the underside"), soldered in a separate pass before the
-// sockets, with the board lying top side up on the four posts (its underside is then the side that rests on the stand):
-//   - pins pointing out (a): the body lies on the ledge and the pins in the comb, as they do for the other way round; nothing to add;
-//   - turned by 180 degrees, pins pointing in (b): the body (y 5.7 to 8.4 mm from the edge) has no ledge under it, so it needs this
-//     loose block: a column under the body, 2.54 mm below the board, on a foot. Stand it on the base under the body, solder J1, take it
-//     away before the pass with J3 and J4 (there it would hit the USB-C connector of the Zero). A piece of foam of the same height does as well.
-module j1_support() {
-  col_w = 8.4; col_d = 3.4;
-  col_h = post_h - j1_body_t;                 // from the top of the base to 2.54 mm under the board
-  foot_w = 20; foot_d = 12; foot_t = 2;
-  translate([-foot_w / 2, -foot_d / 2, 0]) cube([foot_w, foot_d, foot_t]);
-  translate([-col_w / 2, -col_d / 2, 0]) cube([col_w, col_d, col_h]);
-}
-
-if (part == "j1_support") {
-  j1_support();
-} else if (part == "assembly") {
+if (part == "assembly") {
   color("orange") stand();
   translate([0, 0, explode / 2]) foam();
   translate([0, 0, explode]) board_assembly();
