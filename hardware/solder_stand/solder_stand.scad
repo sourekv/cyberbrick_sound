@@ -20,7 +20,8 @@
 // difference, so only post_h has to be larger than the stack (about 14-15 mm).
 //
 // Print: PLA or PETG, flat on the base, 0.2 mm layers are fine. Slicer setting (Bambu Studio, Advanced): Bridge direction 45 degrees
-// (not automatic). Whatever the shape of the shelf for J1 turns out to be, the stand has to be printed with it.
+// (not automatic), because of the rubber band grooves in the underside: the first layer bridges over grooves that run both
+// ways, and 45 degrees crosses both. Whatever the shape of the shelf for J1 turns out to be, the stand has to be printed with it.
 // Export (OpenSCAD 2021.01):
 //   openscad -o solder_stand.stl solder_stand.scad
 //   openscad -o solder_stand_preview.png -D 'part="preview"' solder_stand.scad   (with the board, not for printing)
