@@ -89,7 +89,7 @@ module stand() {
         shelf_end = by0 + 8.5;  shelf_t = 2.0;  L = shelf_end - j1_y_in;
         translate([j1_x0, j1_y_in, top_z - shelf_t]) cube([j1_x1 - j1_x0, L, shelf_t]);
         translate([j1_x0, 0, 0]) rotate([90, 0, 90]) linear_extrude(j1_x1 - j1_x0)
-          polygon([[j1_y_in, top_z - shelf_t - L], [shelf_end, top_z - shelf_t], [j1_y_in, top_z - shelf_t]]);
+          polygon([[j1_y_in, top_z - shelf_t - L], [shelf_end - 0.3, top_z - shelf_t - 0.3], [shelf_end - 0.3, top_z - shelf_t + 0.5], [j1_y_in, top_z - shelf_t + 0.5]]);
         // the long pins of the turned header run on from the body (8.4 mm from the edge) to about 15 mm: the shelf goes on as a thin
         // slab with a slot for each pin, as the comb outside the edge does; the ribs stop 1.3 mm under the board, so the parts on
         // the board (they hang at most 1.1 mm in the face-down pass) clear them. Nothing supports this part from below (the Zero
