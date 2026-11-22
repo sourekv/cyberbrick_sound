@@ -156,3 +156,7 @@ The PIN never contains 5, 7 or 9. The same holds for any other thing that is onl
 the name of a set ("Five.", "Seven.", "Nine.") is announced less clearly than the others, so a number given to a set by its
 name text (for example "Seven. V twelve.") is the weaker way to tell sets apart; the name of the set that follows the number
 is what makes it recognisable. The PIN was 5679 when this was found: "much worse", and 0, 1, 2, 3, 4, 6, 8 "much better".
+
+**No same digit twice in a row (2026-11-22):** "two two" or "eight eight" runs together on the small speaker. The PIN is drawn from 0, 1, 2, 3, 4, 6, 8 so
+that a digit is never the same as the one before it: 7 x 6 x 6 x 6 = 1512 PINs. With three tries before the lock and only the 3 minutes
+after the power-up, the chance of a guess is 3/1512 (0.2 %), which is enough against someone passing by.
