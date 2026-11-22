@@ -265,6 +265,7 @@ To connect the finished board in the model, whichever service makes it:
 - **Servo cable** to the receiver's S4 header: flat servo cable with a female JR connector on both ends (see "Input").
 - **Speaker** with an SH 1.0 mm 2-pin cable to J2: Bambu Lab IC007, 200 mm, one plug cut off (see "Connectors used
   **Tip (2026-11-22): do not snip the plug off at the end, cut the cable in the middle instead.** The IC007 has a plug on both ends, so cut in the middle you get **two usable speaker cables** (about 100 mm each, one SH plug and the free wires to solder to the speaker) from one cable, ten from the pack of five. 100 mm may be short for a speaker far from the shield in the model: then cut off the plug at one end, as before.
+  The same wire pair with an SH1.0 plug on both ends is sold in four lengths in the Bambu Lab store (screenshot of 2026-11-22): **IC005 50 mm** (5 pcs), **IC004 100 mm** (5 pcs), **IC007 200 mm** (5 pcs, the one ordered) and **XC014 300 mm** (2 pcs). Cut in the middle they give pieces of 25, 50, 100 and 150 mm: for a speaker farther from J2 than 100 mm the 300 mm cable (two pieces of 150 mm per cable) is the one to take.
   by CyberBrick").
 
 **Shopping list for the 5 boards of the 2026-11-13 order** (JLCPCB fits only the SMD parts):
