@@ -56,6 +56,9 @@ td.actions { white-space: nowrap; text-align: right; }
 .tablewrap { overflow-x: auto; }
 .bar { height: 8px; background: var(--chip); border-radius: 4px; overflow: hidden; margin-top: 8px; }
 .bar > div { height: 100%; background: var(--accent); width: 0; }
+.progress { height: 24px; background: var(--chip); border: 1px solid var(--line); border-radius: 7px; overflow: hidden; margin-top: 4px; }
+.progress > div { height: 100%; background: var(--accent); width: 0; transition: width .2s; }
+.progtext { margin-top: 12px; font-weight: 600; min-height: 1.4em; }
 .grid { display: grid; grid-template-columns: 150px 1fr; gap: 8px 12px; align-items: center; }
 @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
 .sound { border-top: 1px solid var(--line); padding: 10px 0; display: grid; grid-template-columns: 150px 1fr; gap: 6px 12px; }
@@ -236,7 +239,8 @@ details.guide li { margin-bottom: 4px; }
       <button id="btnCancel">Close</button>
       <span id="saveStatus" class="status"></span>
     </div>
-    <div class="bar"><div id="saveBar"></div></div>
+    <div id="saveProgText" class="progtext"></div>
+    <div class="progress"><div id="saveBar"></div></div>
   </section>
 
   <section>
@@ -1007,19 +1011,22 @@ async function openSet(folder, copy) {
     const j = (await readSetJson(folder)) || {};
     const files = await link.files(folder);
     setSaveStatus("Reading " + folder + "...", "muted");
-    let done = 0;
+    const wavFiles = files.filter((f) => /[.]wav$/.test(f.name));
+    progressStart(wavFiles.reduce((a, f) => a + f.bytes, 0));
+    let doneBytes = 0;
     for (const f of files) {
       const m = /^(\w+)\.wav$/.exec(f.name);
       if (!m || !SOUNDS.some((s) => s.key === m[1])) continue;
       const pcm = parseModuleWav(await link.get(`/sets/${folder}/${f.name}`));
       if (pcm) ed.sounds[m[1]] = { pcm, src: "from the module", dirty: copy };
-      setBar("saveBar", ++done / files.length);
+      doneBytes += f.bytes; progressSet(doneBytes, "Reading " + f.name);
     }
     if (j.type !== "synth" && Array.isArray(j.layers)) {          // a layered set: its loops, in the order of the list
       ed.layered = true; ed.xfade = j.xfade ?? 0.36;
       for (const l of j.layers) {
         const pcm = parseModuleWav(await link.get(`/sets/${folder}/${l.file}`));
         if (!pcm) throw new Error(`${l.file}: not a WAV in the module's format`);
+        doneBytes += (files.find((f) => f.name === l.file) || { bytes: 0 }).bytes; progressSet(doneBytes, "Reading " + l.file);
         ed.layers.push({ pcm, ratio: +l.ratio, src: "from the module", dirty: copy, file: l.file });
       }
     }
@@ -1044,6 +1051,22 @@ async function openSet(folder, copy) {
 }
 
 function setBar(id, frac) { $(id).style.width = (Math.max(0, Math.min(1, frac)) * 100).toFixed(1) + "%"; }
+// The progress of a transfer (reading or writing a set): what, how much, the speed and the time left.
+let prog = { t0: 0, total: 0 };
+function fmtTime(sec) { sec = Math.round(sec); return sec >= 60 ? Math.floor(sec / 60) + " min " + (sec % 60) + " s" : sec + " s"; }
+function progressStart(total) { prog = { t0: performance.now(), total }; $("saveProgText").textContent = ""; setBar("saveBar", 0); }
+function progressSet(done, label) {
+  const frac = prog.total ? Math.min(1, done / prog.total) : 0, el = (performance.now() - prog.t0) / 1000;
+  let t = `${label}: ${Math.round(frac * 100)} % (${kB(done)} of ${kB(prog.total)})`;
+  if (done > 0 && el > 1.5) {
+    const rate = done / el;
+    t += ` · ${kB(rate)}/s`;
+    if (frac < 1) t += ` · about ${fmtTime((prog.total - done) / rate)} left`;
+    else t += ` · ${fmtTime(el)} in all`;
+  }
+  $("saveProgText").textContent = t;
+  setBar("saveBar", frac);
+}
 function setSaveStatus(t, cls) { const s = $("saveStatus"); s.textContent = t; s.className = "status " + (cls || ""); }
 
 function showEditor(title) {
@@ -1507,9 +1530,11 @@ async function save() {
       if (wasDefault) { await link.setDefault(folder); info.default = folder; }   // the start set follows the rename
     }
     let sent = 0;
+    progressStart(total);
     for (const w of writes) {
       setSaveStatus(`Writing ${w.name}...`, "muted");
-      await link.put(`${dir}/${w.name}`, w.bytes, (n) => setBar("saveBar", (sent + n) / total));
+      progressSet(sent, "Writing " + w.name);
+      await link.put(`${dir}/${w.name}`, w.bytes, (n) => progressSet(sent + n, "Writing " + w.name));
       sent += w.bytes.length;
       log(`wrote ${dir}/${w.name} (${kB(w.bytes.length)})`);
     }
@@ -1519,7 +1544,7 @@ async function save() {
     ed.orig = folder; ed.origFiles = [...keep];
     for (const s of Object.values(ed.sounds)) s.dirty = false;
     if (lay) lay.forEach((L, i) => { L.file = `layer_${i + 1}.wav`; L.dirty = false; });
-    setBar("saveBar", 1);
+    progressSet(total, "Written");
     setSaveStatus(`Written to the module as ${folder}. Use Test in the list to hear it there.`, "ok");
     $("editTitle").textContent = "Set " + folder;
   });
