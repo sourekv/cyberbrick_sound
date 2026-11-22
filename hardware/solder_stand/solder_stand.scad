@@ -7,8 +7,8 @@
 //   2. Put a piece of soft foam (anti-static foam or sponge, about 5-8 mm thick) into the pocket.
 //   3. Push the socket strips with the Zero into the board from the top side, put J1 in, and lay the board upside
 //      down on the stand: the four pins go into the mounting holes, the Zero sinks into the pocket and the foam
-//      presses it (and so the sockets) up against the board. The J1 plastic body lies on the ledge at the edge,
-//      flat against the board.
+//      presses it (and so the sockets) up against the board. The J1 plastic body lies on the ledge of the loose insert
+//      (in socket A), flat against the board.
 //   4. Solder one pin at each end of every strip, check that everything sits flat, then solder the rest.
 // The board rests on the four posts by the copper rings around the mounting holes; nothing else on the top side
 // touches the stand (the parts under the Zero and C1/J2/LED1 beside it are all in the open pocket).
@@ -28,13 +28,19 @@
 //   solder_stand_steps.png: three renders with -D 'part="assembly"' -D explode=45 / 18 / 0 (Tomorrow colour scheme),
 //   joined with ImageMagick montage
 
-part = "stand";      // "stand", "j1_shelf" (the loose shelf for J1 on the underside) or "preview" (stand with the board and the Zero as ghosts)
+part = "stand";      // "stand", "j1_insert" (the loose insert for J1) or "preview" (stand with the board and the Zero as ghosts)
 
-// loose shelf for the first soldering pass (J1 fitted from the UNDERSIDE of the board and turned by 180 degrees, pins pointing into
-// the board; docs/shield-pcb.md): one piece, a block with the shelf on it, that is plugged into a socket in the base and taken out
-// before the pass with J3 and J4 (the Zero hangs there). Print it on its own: part = "j1_shelf"; the foam is not used in that pass.
-shelf_back = 100 + 15.0;                    // the back of the shelf: 15 mm from the board edge (KiCad coordinates, by0 = 100)
-peg_t = 3.0;  peg_l = 3.0;                  // the peg is as wide as the shelf (j1_x1 - j1_x0), flush with its back, so the back is flat for printing; the socket is 0.3 mm larger
+// The loose insert for J1 (part = "j1_insert", printed on its own, lying on its back): one piece that carries the body of J1 on a
+// ledge, has guides at both ends of the body and a comb with a slot for each long pin. It is plugged into one of two sockets in the
+// base, which are mirror images about the row of J1's holes (y 104.15): in socket A (outside the board edge) it serves J1 on the top
+// side or on the underside with the pins out, in socket B (the insert turned by 180 degrees) J1 on the underside turned by 180 degrees,
+// pins in (docs/shield-pcb.md). For J1 on the underside it is used in the first pass only (the board top side up, without foam) and
+// taken out before the pass with J3 and J4, because the Zero hangs in its place.
+row_y  = 104.15;                            // the row of J1's holes (KiCad coordinates)
+ins_u0 = row_y - 102.71;                    // the insert starts at the far edge of the body (distance from the row)
+ins_uc = row_y - 98.5;                      // the comb starts here, 1.5 mm past the board edge (as before)
+ins_ue = row_y - 92.5;                      // the back of the insert, flush with the peg
+peg_t = 3.0;  peg_l = 3.0;                  // the peg is as wide as the insert and flush with its back; the socket is 0.3 mm larger
 
 base_t     = 8.0;    // base plate thickness (heavier, so the stand does not tip over; thick enough for the band grooves below it)
 groove_w   = 4.5;    // grooves in the underside of the base for rubber bands (a band of about 3 mm), one set each way
@@ -56,10 +62,7 @@ holes = [[cx - 11.5, cy - 12], [cx + 11.5, cy - 12], [cx - 11.5, cy + 12], [cx +
 // pins stick out over the top edge to y 94.05.
 j1_x0 = 111.96 - 1.6;  j1_x1 = 117.04 + 1.6;
 j1_body_t = 2.54;
-j1_y_in   = 101.8;   // ledge stops here, short of the Zero's USB-C end (Zero about y 103.2..126.8)
-j1_y_out  = by0 - 7.5;
 guide_w   = 1.6;     // side guides beside the body
-comb_l    = 6.0;     // comb under the long pins (from j1_y_out to 1.5 mm short of the board edge)
 slot_w    = 0.9;     // slot for a 0.64 mm square pin
 
 $fn = 48;
@@ -83,26 +86,16 @@ module stand() {
           translate([0, 0, pin_h - 0.5]) cylinder(d1 = pin_d, d2 = pin_d - 0.8, h = 0.5);
         }
       }
-      // ledge under the J1 plastic body (the pins over the edge stay 0.9 mm above it)
-      translate([j1_x0, j1_y_out, 0])
-        cube([j1_x1 - j1_x0, j1_y_in - j1_y_out, base_t + post_h - j1_body_t]);
-      // side guides at both ends of the J1 body, so it cannot turn or slide along the edge
-      for (x = [j1_x0 - guide_w, j1_x1]) translate([x, j1_y_out, 0])
-        cube([guide_w, j1_y_in - j1_y_out, base_t + post_h - 0.3]);
-      // comb past the board edge: one slot per pin keeps the long pins straight and square to the edge
-      translate([j1_x0, j1_y_out, 0]) difference() {
-        cube([j1_x1 - j1_x0, comb_l, base_t + post_h - 0.3]);
-        for (x = [111.96, 114.50, 117.04])
-          translate([x - j1_x0 - slot_w / 2, -1, base_t + post_h - 1.27 - 0.32 - 0.1]) cube([slot_w, comb_l + 2, 5]);
-      }
     }
     // grooves in the underside, both ways (three each: the two named below and one in the middle between them), for a rubber band that holds the board down (docs/shield-pcb.md): along the long axis
     // (y) at the two strips beside the board, 2.5 mm from its long edges over the copper rings, and across it (x) at the rows of
     // the mounting holes; the bands run round the whole base and sit in the grooves, so they cannot slip off and the base lies flat
     for (x = [bx0 + 2.5, cx, bx1 - 2.5]) translate([x - groove_w / 2, cy - base_w / 2 - 1, -0.01]) cube([groove_w, base_w + 2, groove_d + 0.01]);
     for (y = [cy - 12, cy, cy + 12]) translate([cx - base_w / 2 - 1, y - groove_w / 2, -0.01]) cube([base_w + 2, groove_w, groove_d + 0.01]);
-    // socket in the base for the loose shelf (part = "j1_shelf")
-    translate([j1_x0 - 0.15, shelf_back - peg_t - 0.15, base_t - peg_l]) cube([j1_x1 - j1_x0 + 0.3, peg_t + 0.3, peg_l + 0.01]);
+    // two sockets for the loose insert of J1 (part = "j1_insert"): A outside the board edge (J1 on the top side, pins out), B on the
+    // inner side (J1 on the underside, turned by 180 degrees, pins in); the same insert, turned by 180 degrees about J1's row of holes
+    for (y = [row_y - ins_ue, row_y + ins_ue - peg_t])
+      translate([j1_x0 - guide_w - 0.15, y - 0.15, base_t - peg_l]) cube([j1_x1 - j1_x0 + 2 * guide_w + 0.3, peg_t + 0.3, peg_l + 0.01]);
     // label on the base, so the stand is not taken for something else
     translate([cx, cy + base_w / 2 - 8, base_t - 0.6])
       linear_extrude(1) text("shield solder stand", size = 4, halign = "center", valign = "center");
@@ -157,33 +150,31 @@ module foam() {
   color([0.95, 0.75, 0.8]) translate([cx - 9, cy - 11, base_t]) cube([18, 22, foam_t]);
 }
 
-// the loose shelf (the first pass, J1 on the underside turned by 180 degrees): the peg, a block up to the ledge level under the
-// body of J1 and under the pins, a thin tongue that butts on the ledge, and past the body (8.5 mm from the edge) the comb with a slot
-// for each long pin, stopping 1.3 mm under the board (the parts on the board hang at most 1.1 mm). Positions are the stand's own
-// (KiCad coordinates), so it can be shown in place; for printing lay it on its back: the back face with the peg is flat.
-module j1_shelf() {
-  top_z = base_t + post_h - j1_body_t;          // top of the ledge, 2.54 mm under the board
-  y0 = by0 + 6.0;  shelf_end = by0 + 8.5;  pin_end = shelf_back;  shelf_t = 2.0;
-  x0 = j1_x0;  w = j1_x1 - j1_x0;
-  translate([x0, shelf_back - peg_t, base_t - peg_l]) cube([w, peg_t, peg_l + 0.5]);
+// the loose insert, shown in socket A (outside the board edge, y = row_y - u); for socket B turn it by 180 degrees about (cx, row_y).
+// Printed lying on its back (the face at u = ins_ue with the peg), which is flat.
+module j1_insert() {
+  zt = base_t + post_h;
+  x0 = j1_x0 - guide_w;  w = j1_x1 - j1_x0 + 2 * guide_w;
+  translate([x0, row_y - ins_ue, base_t - peg_l]) cube([w, peg_t, peg_l + 0.5]);                       // the peg
   difference() {
     union() {
-      translate([x0, y0, base_t]) cube([w, shelf_end - y0, top_z - base_t]);                          // block under the body
-      translate([x0, shelf_end - 0.01, base_t]) cube([w, pin_end - shelf_end + 0.01, top_z + 1.24 - base_t]); // block under the comb
-      translate([x0, j1_y_in, top_z - shelf_t]) cube([w, y0 - j1_y_in + 0.01, shelf_t]);               // tongue to the ledge
+      translate([j1_x0, row_y - ins_uc, base_t]) cube([j1_x1 - j1_x0, ins_uc - ins_u0, zt - j1_body_t - base_t]);   // ledge under the body of J1
+      translate([j1_x0, row_y - ins_ue, base_t]) cube([j1_x1 - j1_x0, ins_ue - ins_uc + 0.01, zt - 0.3 - base_t]);  // comb block
+      for (x = [x0, j1_x1]) translate([x, row_y - ins_ue, base_t]) cube([guide_w, ins_ue - ins_u0, zt - 0.3 - base_t]); // guides
     }
     for (x = [111.96, 114.50, 117.04])
-      translate([x - slot_w / 2, shelf_end - 1, top_z + 0.85]) cube([slot_w, pin_end - shelf_end + 2, 5]);
+      translate([x - slot_w / 2, row_y - ins_ue - 1, zt - 1.27 - 0.32 - 0.1]) cube([slot_w, ins_ue - ins_uc + 2, 5]);
   }
 }
 
 if (part == "assembly") {
   color("orange") stand();
+  color("orange") j1_insert();
   translate([0, 0, explode / 2]) foam();
   translate([0, 0, explode]) board_assembly();
-} else if (part == "j1_shelf") {
-  j1_shelf();
+} else if (part == "j1_insert") {
+  j1_insert();
 } else {
   stand();
-  if (part == "preview") ghosts();
+  if (part == "preview") { ghosts(); j1_insert(); }
 }
