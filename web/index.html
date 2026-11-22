@@ -94,13 +94,16 @@ details.guide li { margin-bottom: 4px; }
   <section>
     <div class="row">
       <button id="btnConnect" class="choice">Connect over USB</button>
-      <button id="btnBle" class="choice" title="PROTOTYPE: the same over Bluetooth, only with the firmware environment engine_sets_ble (docs/ble-link.md)">Connect over Bluetooth (prototype)</button>
+      <button id="btnBle" class="choice" title="the same as over USB, but over Bluetooth; needs a firmware with Bluetooth (docs/ble-link.md)">Connect over Bluetooth</button>
       <button id="btnSim" class="choice">Simulated module</button>
       <button id="btnDisconnect" class="hidden">Disconnect</button>
       <span id="connStatus" class="status muted">Not connected.</span>
     </div>
     <div class="hint" style="margin-top:8px">While the app talks to the module, the engine on the module is silent; it
       comes back a few seconds after the last action.</div>
+    <div class="hint" id="bleHint" style="margin-top:4px"><strong>Bluetooth</strong> (needs a firmware with Bluetooth): switch the
+      receiver on; the module says its PIN once, and you can connect for 3 minutes after the power-up. When you leave, the
+      module restarts and Bluetooth stays off until the receiver is switched off and on again. USB works at any time.</div>
   </section>
 
   <section>
@@ -261,7 +264,7 @@ details.guide li { margin-bottom: 4px; }
 <script>
 "use strict";
 const RATE = 22050;
-const PAGE_VERSION = "2026-11-22 b (Bluetooth writes without response)";   // shown in the log, to tell a cached old page from a new one
+const PAGE_VERSION = "2026-11-22 c (Bluetooth session notes)";   // shown in the log, to tell a cached old page from a new one
 const CHUNK = 3072;                       // bytes per @w line (4096 base64 characters, set_link.h)
 const SPEAKER_BOX_EQ = [                  // LAB_EQ (firmware/include/engine_lab_data.h): the 30 ml box, 40 mm speaker
   [1.10869112, -2.21738224, 1.10869112, -1.92739111, 0.928925821],
@@ -883,7 +886,7 @@ async function connect(sim, ble) {
     transport = sim ? new MockTransport() : ble ? new BleTransport() : new SerialTransport();
     await transport.open();
     link = new Link(transport);
-    transport.onClose = () => { if (transport) { log("disconnected", "warn"); disconnected(); } };
+    transport.onClose = () => { if (transport) { log("disconnected", "warn"); disconnected(transport instanceof BleTransport); } };
     const v = await link.hello();
     log("connected: " + v + (sim ? " (simulated)" : ble ? " (Bluetooth)" : ""), "ok");
     log("page version " + PAGE_VERSION, "muted");
@@ -892,14 +895,14 @@ async function connect(sim, ble) {
       if (inf.auth === "need") {
         let ok = false;
         for (let tries = 0; tries < 3 && !ok; tries++) {
-          const pin = window.prompt("The module " + (inf.name ? inf.name + " " : "") + "speaks a PIN (4 digits). Enter it:");
+          const pin = window.prompt("The module " + (inf.name ? inf.name + " " : "") + "is saying its PIN now (4 digits, all of them in a row, repeated every 40 s). Enter it:");
           if (pin === null) break;
           try { await link.cmd("@auth " + pin.trim()); ok = true; } catch (e) { log("PIN: " + e.message, "err"); if (/locked/.test(e.message)) break; }
         }
         if (!ok) throw new Error("PIN missing or wrong (the module locks the Bluetooth service after 3 wrong ones; restart it)");
       }
     }
-    setStatus(sim ? "Simulated module (nothing is written to a real module)." : ble ? "Connected over Bluetooth (prototype)." : "Connected.", "ok");
+    setStatus(sim ? "Simulated module (nothing is written to a real module)." : ble ? "Connected over Bluetooth." : "Connected.", "ok");
     $("btnConnect").classList.add("hidden"); $("btnSim").classList.add("hidden"); $("btnBle").classList.add("hidden"); $("btnDisconnect").classList.remove("hidden");
     $("secSets").classList.remove("hidden");
     await refresh();
@@ -910,20 +913,24 @@ async function connect(sim, ble) {
     if (transport) { const t = transport; transport = null; await t.close(); }
   }
 }
-function disconnected() {
+function disconnected(bleEnded) {
   transport = null; link = null;
   $("btnConnect").classList.remove("hidden"); $("btnSim").classList.remove("hidden"); $("btnDisconnect").classList.add("hidden");
   if ("bluetooth" in navigator) $("btnBle").classList.remove("hidden");
   $("secSets").classList.add("hidden"); $("secEdit").classList.add("hidden");
-  setStatus("Not connected.");
+  if (bleEnded) {
+    setStatus("Bluetooth session over: the module restarts, and Bluetooth stays off until the receiver is switched off and on again.", "muted");
+    notify("The module restarts; Bluetooth is off until the next power-up.");
+  } else setStatus("Not connected.");
 }
 async function disconnect() {
   const t = transport;
   if (!t) return;
+  const ble = t instanceof BleTransport;
   try { await link.bye(); } catch (e) {}
   transport = null;
   await t.close();
-  disconnected();
+  disconnected(ble);
 }
 
 async function readSetJson(folder) {

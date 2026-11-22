@@ -367,7 +367,9 @@ void loop() {
   bool talking = usbLink.poll(fallback ? String() : cur.folder);   // the web page is talking to the module: silent
 #if BLE_LINK_ENABLED
   if (bleActive) {
-    talking = bleLink.poll(fallback ? String() : cur.folder) || talking;
+    // before the PIN has been entered the link does not silence the engine: the spoken PIN would be cut into pieces
+    const bool bleSession = bleLink.poll(fallback ? String() : cur.folder);
+    talking = (bleSession && bleLink.isAuthed()) || talking;
     if (bleUart.isAdvertising() && millis() > bleWindowMs) { bleUart.advertise(false); bleActive = false; Serial.println("ble: nobody came in the 3 minutes, advertising off"); }
   }
 #endif
