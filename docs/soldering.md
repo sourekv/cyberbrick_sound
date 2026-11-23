@@ -50,33 +50,22 @@ separately is not recorded.
 
 ## Procedure
 
-Two passes: J1 first, then J3 and J4. The second pass is the same for both variants; the first one differs in where the insert
-goes and which way J1 points. Each variant has its own section with its own pictures.
+The two variants are soldered differently. Variant a) is **one pass**: the insert stays in socket A, it does not obstruct fitting the
+Zero with the strips, and J1, J3 and J4 are soldered together. Variant b) takes **two passes**: J1 first with the insert in socket B,
+then J3 and J4 without the insert.
 
-The second pass (J3 and J4, with the Zero, the foam and the rubber band) is described in full under variant a); in variant b) it
-is the same, only the insert is not in the stand.
+### Variant a): the pins out (insert in socket A), one pass
 
-### Variant a): the pins out (insert in socket A)
-
-First pass, J1:
-
-1. Put the insert into socket A, outside the board edge.
-2. Lay J1 on the insert: the body on the ledge, the long pins in the slots of the comb, the short pins pointing up.
-3. **Hold the pins of J1 in place by hand**, and only then put the board on the posts, top side up (no foam). The short pins
-   go through the holes of J1.
-4. Solder J1 from the top side. The insert **stays in socket A**.
-
-Second pass, J3 and J4:
-
-1. Plug both 1x9 socket strips onto the pins of the ESP32-S3-Zero-N8R8-M. The Zero keeps them parallel and at the right spacing
+1. Put the insert into socket A, outside the board edge. It stays there.
+2. Plug both 1x9 socket strips onto the pins of the ESP32-S3-Zero-N8R8-M. The Zero keeps them parallel and at the right spacing
    (15.24 mm).
-2. Put a piece of soft foam (about 5 to 8 mm thick) into the pocket of the stand.
-3. Push the strips with the Zero through the board from the top side and lay the board upside down on the stand: the locating
-   pins go into the mounting holes, the Zero sinks into the pocket and the foam presses it, and so the sockets, against the
-   board.
-4. Secure the board with a **rubber band** round the whole stand: it runs from the edge of the base over the board between the pins
+3. Put a piece of soft foam (about 5 to 8 mm thick) into the pocket of the stand.
+4. Push the strips with the Zero through the board from the top side and J1 from the underside, and lay the board upside down
+   on the stand: the locating pins go into the mounting holes, the Zero sinks into the pocket and the foam presses it, and so
+   the sockets, against the board.
+5. Secure the board with a **rubber band** round the whole stand: it runs from the edge of the base over the board between the pins
    of J1 and over the top of its collar, straight to the far edge of the board, and back under the base through the middle groove.
-5. Solder one pin at each end of every strip, check that everything sits flat, then solder the rest.
+6. Solder one pin at each end of every strip, check that everything sits flat, then solder the rest and J1.
 
 ![The steps of the variant a), the pins out](../hardware/solder_stand/solder_stand_steps.png)
 
@@ -90,7 +79,7 @@ First pass, J1:
 3. **Hold the pins of J1 in place by hand**, and only then put the board on the posts, top side up (no foam).
 4. Solder J1 from the top side. Then **take the insert out** of socket B.
 
-Second pass, J3 and J4: as in variant a), with the insert out of the stand.
+Second pass, J3 and J4: as in variant a) (steps 2 to 6, without the insert and without J1).
 
 ![The steps of the variant b), the pins in](../hardware/solder_stand/solder_stand_steps_b.png)
 

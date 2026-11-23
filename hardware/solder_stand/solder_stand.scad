@@ -2,16 +2,17 @@
 // are soldered (J3/J4 female socket strips 1x9, J1 right-angle servo header 1x3).
 //
 // How it is used (J1 is always on the underside of the board, in one of two variants: the pins out or the pins in):
-//   First pass, J1: the board lies top side up on the four posts, no foam. Put the loose insert (part "j1_insert") into
-//      socket A (the pins of J1 point out of the board: variant a) or, turned by 180 degrees, into socket B (the pins point
-//      into the board: variant b). Hold the pins of J1 in place by hand, put the board on, solder J1 from the top side.
-//      Variant a): the insert stays in socket A. Variant b): take the insert out of socket B.
-//   Second pass, J3/J4: plug both 1x9 socket strips onto the pins of the ESP32-S3-Zero-N8R8-M (the Zero keeps them parallel
-//      and at the right spacing, 15.24 mm), put a piece of soft foam (about 5-8 mm thick) into the pocket, push the strips
-//      with the Zero into the board from the top side and lay the board upside down on the stand: the four pins go into the
-//      mounting holes, the Zero sinks into the pocket and the foam presses it (and so the sockets) up against the board.
-//      Secure the board with a rubber band round the whole stand (it sits in the grooves in the underside of the base),
-//      solder one pin at each end of every strip, check that everything sits flat, then solder the rest.
+//   Variant a), the pins out: ONE pass. The loose insert (part "j1_insert") sits in socket A, outside the board edge, and stays there;
+//      it does not obstruct fitting the Zero with the strips. Plug both 1x9 socket strips onto the pins of the
+//      ESP32-S3-Zero-N8R8-M (the Zero keeps them parallel and at the right spacing, 15.24 mm), put a piece of soft foam (about 5-8 mm
+//      thick) into the pocket, push the strips with the Zero into the board from the top side and J1 from the underside, and lay the
+//      board upside down on the stand: the four pins go into the mounting holes, the Zero sinks into the pocket and the foam presses it
+//      (and so the sockets) up against the board. Secure the board with a rubber band round the whole stand (it sits in the grooves in
+//      the underside of the base), solder one pin at each end of every strip, check that everything sits flat, then solder the rest
+//      and J1.
+//   Variant b), the pins in: TWO passes. First pass, J1: put the insert, turned by 180 degrees, into socket B, hold the pins of J1 in
+//      place by hand, put the board on the four posts top side up (no foam), solder J1 from the top side and take the insert out.
+//      Second pass, J3/J4: as variant a), without the insert.
 // The board rests on the four posts by the copper rings around the mounting holes; nothing else on the top side
 // touches the stand (the parts under the Zero and C1/J2/LED1 beside it are all in the open pocket).
 //
@@ -29,7 +30,7 @@
 //   solder_stand_variants.png: -D 'part="use_a"' and 'part="use_b"' (the stand with the insert and J1, without the board), camera
 //   114.5,106,22,55,0,160,170, joined with montage and labels
 //   solder_stand_steps.png: six renders (-D 'part="assembly"' -D pass_no=1 or 2 -D explode=40 / 15 / 0, Tomorrow colour scheme, camera
-//   114.5,108,38,60,0,200,250; the top row the first pass, the bottom row the second), joined with ImageMagick montage; the last picture with -D band=true (the rubber bands), a caption on top; solder_stand_steps_b.png is the same with -D variant=\"b\" (variant a is the default)
+//   114.5,108,38,60,0,200,250; variant a): one row (the second-pass renders), variant b): the top row the first pass, the bottom row the second), joined with ImageMagick montage; the last picture with -D band=true (the rubber bands), a caption on top; solder_stand_steps_b.png is the same with -D variant=\"b\" (variant a is the default)
 
 part = "stand";      // "stand", "j1_insert" (the loose insert for J1) or "preview" (stand with the board and the Zero as ghosts)
 
@@ -37,8 +38,8 @@ part = "stand";      // "stand", "j1_insert" (the loose insert for J1) or "previ
 // ledge, has guides at both ends of the body and a comb with a slot for each long pin. It is plugged into one of two sockets in the
 // base, which are mirror images about the row of J1's holes (y 104.15): in socket A (outside the board edge) it serves J1 with the
 // pins out (variant a), in socket B (the insert turned by 180 degrees) J1 turned by 180 degrees, pins in (variant b; docs/shield-pcb.md).
-// J1 is always on the underside. In variant a) the insert stays in socket A in both passes; in variant b) it is taken out of
-// socket B after the first pass, before the pass with J3 and J4.
+// J1 is always on the underside. In variant a) the insert stays in socket A and everything is soldered in one pass; in variant b) it is used in the
+// first pass only and taken out of socket B before the pass with J3 and J4.
 row_y  = 104.15;                            // the row of J1's holes (KiCad coordinates)
 ins_u0 = row_y - 102.71;                    // the insert starts at the far edge of the body (distance from the row)
 ins_uc = row_y - 98.5;                      // the comb starts here, 1.5 mm past the board edge (as before)
