@@ -10,7 +10,9 @@
 //      and at the right spacing, 15.24 mm), put a piece of soft foam (about 5-8 mm thick) into the pocket, push the strips
 //      with the Zero into the board from the top side and lay the board upside down on the stand: the four pins go into the
 //      mounting holes, the Zero sinks into the pocket and the foam presses it (and so the sockets) up against the board.
-//      Solder one pin at each end of every strip, check that everything sits flat, then solder the rest.
+//      The insert is not used in this pass. Secure the board with a rubber band round the whole stand (it sits in the
+//      grooves in the underside of the base), solder one pin at each end of every strip, check that everything sits flat,
+//      then solder the rest.
 // The board rests on the four posts by the copper rings around the mounting holes; nothing else on the top side
 // touches the stand (the parts under the Zero and C1/J2/LED1 beside it are all in the open pocket).
 //
