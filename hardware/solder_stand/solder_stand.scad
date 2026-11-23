@@ -197,16 +197,19 @@ module j1_header() {
   }
 }
 
-// rubber bands round the stand (second pass): two loops along the long axis, over the board (the Zero side) and through the grooves in the base
-module bands() {
-  zt = base_t + post_h + board_t;
-  y0 = cy - base_w / 2 - 1;  y1 = cy + base_w / 2 + 1;
-  for (x = [bx0 + 2.5, bx1 - 2.5]) color("red") translate([x - 1.5, 0, 0]) {
-    translate([0, y0, zt]) cube([3, y1 - y0, 0.8]);
-    translate([0, y0, 0.3]) cube([3, y1 - y0, 0.8]);
-    for (y = [y0, y1 - 0.8]) translate([0, y, 0.3]) cube([3, 0.8, zt + 0.5]);
-  }
+// rubber bands round the stand (second pass): one loop along the long axis, in the middle groove. Under tension a band does not run straight up and down
+// but straight from the edge of the board to the edge of the base (over the top), then down the side and back through the groove
+module band_seg(a, b) {   // a, b = [y, z]; a strip 3 mm wide (x) and 0.8 mm thick
+  hull() for (q = [a, b]) translate([-1.5, q[0] - 0.4, q[1] - 0.4]) cube([3, 0.8, 0.8]);
 }
+module bands() {
+  zt = base_t + post_h + board_t + 0.4;
+  ya = cy - base_w / 2;  yb = cy + base_w / 2;
+  path = [[ya, 0.4], [ya, base_t], [by0, zt], [by1, zt], [yb, base_t], [yb, 0.4], [ya, 0.4]];
+  for (x = [cx]) color("red") translate([x, 0, 0])
+    for (k = [0 : len(path) - 2]) band_seg(path[k], path[k + 1]);
+}
+
 // the two ways of use, without the board: a = the pins out (insert in socket A), b = the pins in (insert and J1 turned by 180 degrees, socket B)
 if (part == "use_a" || part == "use_b") {
   color("orange") stand();
