@@ -242,9 +242,7 @@ To connect the finished board in the model, whichever service makes it:
 | Speaker, 4 Ohm | up to 5 | the type is still open (`roadmap.md`) |
 | Waveshare ESP32-S3-Zero-N8R8-M | up to 5 | one is in the prototype; the "-M" variant has its pin headers fitted, so it plugs into J3/J4 |
 
-**Soldering J1/J3/J4:** a printed stand holds the board upside down, with the Zero (which keeps the two socket
-strips straight) in a pocket on a piece of foam and the J1 body on a ledge: `hardware/solder_stand/` (OpenSCAD, the
-steps are in the header of `solder_stand.scad`).
+**Soldering J1/J3/J4:** with the printed stand, in two variants of fitting J1; the procedure and the pictures are in `soldering.md`.
 
 The solder jumpers JP1/JP2 need no work for the default setting (9 dB gain, JP2 bridged in copper). If a quieter speaker is used (an 8 Ohm one plays about 3 dB quieter than a 4 Ohm one), bridge JP1 with a blob of solder for 15 dB (6 dB more); the picture and the steps are in `speaker-measurement.md`, "Speaker impedance: 4 Ohm or 8 Ohm".
 
