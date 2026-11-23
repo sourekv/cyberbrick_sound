@@ -60,6 +60,10 @@ The amplifier (MAX98357A) is made for 4 to 8 Ohm, so a 4 Ohm and an 8 Ohm speake
 
 **The jumper JP1 is the way to get the level back without changing a part:** open (as delivered on rev A) the GAIN pin floats and the gain is 9 dB; bridged with a blob of solder it is 15 dB, 6 dB more, which is more than the 3 dB lost with an 8 Ohm speaker (`shield-pcb.md`, "GAIN and SD_MODE configuration"). JP2 stays bridged (it keeps the amplifier on). The other way is `MASTER_VOLUME` in `firmware/include/config.h` (0.6 at the moment, "raise gradually"); use it first, because it changes nothing on the board, and JP1 if the volume is still not enough.
 
+![The solder jumper JP1 (gain) and JP2 on rev A](shield-jp1-gain.png)
+
+**Example, an 8 Ohm speaker:** it plays about 3 dB quieter than the 4 Ohm one. Step 1: raise `MASTER_VOLUME` from 0.6 to about 0.85 (3 dB is a factor of 1.41 in amplitude, 0.6 x 1.41), flash the firmware and listen. Step 2, only if that is still too quiet or the volume is already at 1.0: bridge JP1 with a small blob of solder (the pair of pads in the picture, bottom left of J2), which adds 6 dB; then lower `MASTER_VOLUME` again to about 0.6 to 0.7, because 6 dB is a factor of 2 and the old value would be much too loud and may distort. Do not bridge JP2 or open it: it keeps the amplifier switched on.
+
 Measured so far: only the 4 Ohm 40 mm speaker (below). An 8 Ohm speaker has not been measured.
 
 ## Results
