@@ -54,6 +54,14 @@ with noise and clock drift) before the first real measurement.
   are not reliable.
 - The distortion values are for the signal level of the sweep (0.25 of full scale); the engine sound may be louder.
 
+## Speaker impedance: 4 Ohm or 8 Ohm (2026-11-23)
+
+The amplifier (MAX98357A) is made for 4 to 8 Ohm, so a 4 Ohm and an 8 Ohm speaker both work on the shield without any change of the board or the firmware. At the same drive voltage an 8 Ohm speaker gets half the power of a 4 Ohm one, so it plays about 3 dB quieter (for the same sensitivity); it also draws less current from the servo-port supply.
+
+**The jumper JP1 is the way to get the level back without changing a part:** open (as delivered on rev A) the GAIN pin floats and the gain is 9 dB; bridged with a blob of solder it is 15 dB, 6 dB more, which is more than the 3 dB lost with an 8 Ohm speaker (`shield-pcb.md`, "GAIN and SD_MODE configuration"). JP2 stays bridged (it keeps the amplifier on). The other way is `MASTER_VOLUME` in `firmware/include/config.h` (0.6 at the moment, "raise gradually"); use it first, because it changes nothing on the board, and JP1 if the volume is still not enough.
+
+Measured so far: only the 4 Ohm 40 mm speaker (below). An 8 Ohm speaker has not been measured.
+
 ## Results
 
 ### 2026-11-01: bare speaker (the 40 mm prototype speaker), phone 5 cm in front, quiet room
