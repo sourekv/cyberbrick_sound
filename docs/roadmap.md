@@ -65,7 +65,7 @@ Not started; recorded so the design does not block them.
 
 The detail is in the document named at the end of each line.
 
-- **Solder stand, third iteration** (2026-11-23): the base with the grooves for rubber bands, two sockets and one loose insert for J1 (top side or underside), printed and works; the J1 pins have to be held in place by hand first and then the board is put into the stand (`shield-pcb.md`, `hardware/solder_stand/`).
+- **Solder stand, third iteration** (2026-11-23): the base with the grooves for rubber bands, two sockets and one loose insert for J1 (top side or underside), printed and works, tried with J1 on the underside; the J1 pins have to be held in place by hand first and then the board is put into the stand (`shield-pcb.md`, `hardware/solder_stand/`).
 - **Choose the engine sound** (2026-11-14): the choice is left to the user; the candidates became the default sets of the sets app, with the shift sound in all
   of them (`user-sounds.md`, `sound-research.md`).
 - **Shield: approve and receive, first power-up** (ordered 2026-11-13, delivered 2026-11-20, the first rev A board works since 2026-11-21): J1, J3 and J4
