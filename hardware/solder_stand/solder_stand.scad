@@ -26,7 +26,6 @@
 // ways, and 45 degrees crosses both.
 // Export (OpenSCAD 2021.01):
 //   openscad -o solder_stand.stl solder_stand.scad
-//   openscad -o solder_stand_preview.png -D 'part="preview"' solder_stand.scad   (with the board, not for printing)
 //   solder_stand_variants.png: -D 'part="use_a"' and 'part="use_b"' (the stand with the insert and J1, without the board), camera
 //   114.5,106,22,55,0,160,170, joined with montage and labels
 //   solder_stand_steps.png: six renders (-D 'part="assembly"' -D pass_no=1 or 2 -D explode=40 / 15 / 0, Tomorrow colour scheme, camera
