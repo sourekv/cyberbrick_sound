@@ -30,7 +30,7 @@
 //   solder_stand_variants.png: -D 'part="use_a"' and 'part="use_b"' (the stand with the insert and J1, without the board), camera
 //   114.5,106,22,55,0,160,170, joined with montage and labels
 //   solder_stand_steps.png: six renders (-D 'part="assembly"' -D pass_no=1 or 2 -D explode=40 / 15 / 0, Tomorrow colour scheme, camera
-//   114.5,108,38,60,0,200,250; the top row the first pass, the bottom row the second), joined with ImageMagick montage
+//   114.5,108,38,60,0,200,250; the top row the first pass, the bottom row the second), joined with ImageMagick montage; the last picture with -D band=true (the rubber bands), a caption on top naming variant a
 
 part = "stand";      // "stand", "j1_insert" (the loose insert for J1) or "preview" (stand with the board and the Zero as ghosts)
 
@@ -122,6 +122,7 @@ module ghosts() {
 // Coloured assembly for the how-to pictures (part="assembly"): the board with the Zero, the socket strips and J1,
 // upside down, lifted by `explode` mm above its place; the foam lifted by explode / 2.
 explode = 0;
+band = false;   // draw the rubber bands (second pass, explode = 0)
 pass_no = 2;   // 1: first pass (J1, board top side up, the loose insert, no foam), 2: second pass (J3/J4 with the Zero and the foam, the insert stays)
 foam_t  = 6;
 
@@ -192,6 +193,16 @@ module j1_header() {
   }
 }
 
+// rubber bands round the stand (second pass): two loops along the long axis, over the board (the Zero side) and through the grooves in the base
+module bands() {
+  zt = base_t + post_h + board_t;
+  y0 = cy - base_w / 2 - 1;  y1 = cy + base_w / 2 + 1;
+  for (x = [bx0 + 2.5, bx1 - 2.5]) color("red") translate([x - 1.5, 0, 0]) {
+    translate([0, y0, zt]) cube([3, y1 - y0, 0.8]);
+    translate([0, y0, 0.3]) cube([3, y1 - y0, 0.8]);
+    for (y = [y0, y1 - 0.8]) translate([0, y, 0.3]) cube([3, 0.8, zt + 0.5]);
+  }
+}
 // the two ways of use, without the board: a = the pins out (insert in socket A), b = the pins in (insert and J1 turned by 180 degrees, socket B)
 if (part == "use_a" || part == "use_b") {
   color("orange") stand();
@@ -202,6 +213,7 @@ if (part == "use_a" || part == "use_b") {
   color("orange") j1_insert();
   if (pass_no == 2) translate([0, 0, explode / 2]) foam();
   translate([0, 0, explode]) board_assembly();
+  if (band) bands();
 } else if (part == "j1_insert") {
   j1_insert();
 } else {
