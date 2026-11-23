@@ -6,6 +6,8 @@ decisions). Rev B and the ideas below can be out of date against rev A and again
 
 ## Rev B (prepared 2026-11-14, not ordered)
 
+![Rev B board, top side: S V G, J3 and J4, "CB SND rev B" (rendered from the rev B files, not a photo of a board)](shield-pcb-rev-b-top.png)
+
 Made by `tools/make_shield_rev_b.py` from the rev A board; nothing electrical changes (no part, pad, track or zone
 moves). Checked: the BOM, the placement files (`fab/jlcpcb*`, `fab/pcbway`, `shield_positions.csv`) come out the same
 as for rev A, the copper, mask, paste and drill gerbers are the same as rev A's plotted by the same KiCad, KiCad's DRC
