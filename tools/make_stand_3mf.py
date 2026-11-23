@@ -1,7 +1,7 @@
 """Build hardware/solder_stand/solder_stand.3mf from the two STL files of the solder stand.
 
 The stand lies on its base, the loose insert (part "j1_insert") lies on its back (the flat face with the peg).
-Plain 3MF: geometry and placement only; the print profile (Bridge direction 45 degrees, docs/shield-pcb.md) is set in the slicer.
+Plain 3MF: geometry and placement only; the print profile (Bridge direction 45 degrees, docs/soldering.md) is set in the slicer.
 Run from the repository root after exporting both STL files with OpenSCAD (see hardware/solder_stand/solder_stand.scad).
 """
 import re, sys, zipfile
