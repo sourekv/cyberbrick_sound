@@ -9,17 +9,15 @@ The other parts of the board come assembled (JLCPCB). Three parts are fitted by 
 
 | Part | What it is | Where |
 |---|---|---|
-| J3, J4 | two female socket strips 1x9, 8.5 mm body (for the ESP32-S3-Zero) | top side of the board |
-| J1 | right-angle servo header 1x3 | **always the underside** of the board |
+| J3, J4 | two female socket strips 1x9, 8.5 mm body (for the ESP32-S3-Zero) | top side of the board (the Zero side) |
+| J1 | right-angle servo header 1x3 | the top side (variant a) or the underside (variant b) |
 
-J1 is on the underside in both ways of fitting it, because the top side is full of parts. The two ways:
+The two ways of fitting J1 (both tried 2026-11-23):
 
-- **Variant a): the pins out.** The body of J1 is at the edge of the board and the long pins (the servo plug) stick out
-  beyond the edge.
-- **Variant b): the pins in.** J1 is turned by 180 degrees: the body is on the inner side of the row of holes and the plug
-  is entirely under the board.
-
-J1 on the top side is not tried in the stand and in practice it is excluded (the parts are there).
+- **Variant a): the pins out.** J1 is on the **same side as the Zero**. The body of J1 is at the edge of the board and the long pins
+  (the servo plug) stick out beyond the edge.
+- **Variant b): the pins in.** J1 is on the **opposite side** and turned by 180 degrees: the body is on the inner side of the row of holes
+  and the plug is entirely under the board. That is why the board is turned over between the two passes.
 
 ## The stand
 
@@ -42,9 +40,8 @@ One printed base with four posts, one loose insert for J1 and rubber bands.
   and 45 degrees bridges across both.
 - **Rubber bands:** one band of about 3 mm round the stand; it sits in the middle groove of the base.
 
-The third iteration (the base with the two sockets and the loose insert) was printed and works (2026-11-23), tried with J1
-on the underside of the board. Variant b) has been drawn and checked in the model, but the physical trial of each variant
-separately is not recorded.
+The third iteration (the base with the two sockets and the loose insert) was printed and works (2026-11-23); both variants were
+tried and photographed.
 
 ![The two ways of use, without the board](../hardware/solder_stand/solder_stand_variants.png)
 

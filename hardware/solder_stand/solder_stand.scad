@@ -1,7 +1,7 @@
 // Soldering stand for the shield PCB (hardware/shield/): holds the board upside down while the hand-fitted parts
 // are soldered (J3/J4 female socket strips 1x9, J1 right-angle servo header 1x3).
 //
-// How it is used (J1 always lies below the board, between the board and the stand, in one of two variants: the pins out or the pins in):
+// How it is used (J1 lies between the board and the stand in the first pass, in one of two variants: the pins out (J1 on the Zero side) or the pins in (J1 on the opposite side)):
 //   Variant a), the pins out: ONE pass (tried 2026-11-23). The loose insert (part "j1_insert") sits in socket A, outside the board edge, and
 //      stays there; it does not obstruct fitting the Zero. J1 lies on the insert (body on the ledge, the long pins in the slots, pointing
 //      out), both 1x9 socket strips are plugged onto the Zero, a piece of soft foam (about 5-8 mm thick) goes into the pocket, and the board
