@@ -89,8 +89,9 @@ Second pass, J3 and J4:
 
 The same steps with the stand, the board and the foam semi-transparent, so that the parts hidden behind them show (J1 and the insert under the board, the Zero under the foam). They are an addition to the pictures above, not a replacement:
 
-- [variant a), the pins out](../hardware/solder_stand/xray/solder_stand_steps.png)
-- [variant b), the pins in](../hardware/solder_stand/xray/solder_stand_steps_b.png)
+![X-ray, variant a), the pins out](../hardware/solder_stand/xray/solder_stand_steps.png)
+
+![X-ray, variant b), the pins in](../hardware/solder_stand/xray/solder_stand_steps_b.png)
 
 ## Notes
 
