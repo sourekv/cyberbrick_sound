@@ -123,8 +123,7 @@ def panel(vid, title, sub, tx_px=None):
             o.append(rect(x0, y0, x1, y1, fill="#222", stroke="#000", stroke_width=1))
             for px in L.J1_X:
                 o.append(f'<circle cx="{X(px):.1f}" cy="{Y(L.J1_Y):.1f}" r="{0.45 * S:.1f}" fill="#d8b04a"/>')
-            for px, nm in zip(L.J1_X, "SVG"):
-                o.append(text(px, -0.9, nm, 13, "middle", 700))
+            # no S V G letters: rev A has none on the board (they are only on rev B)
         elif k == "jst_side":
             o.append(rect(x0, y0, x1, y1, fill="#ece6d6", stroke="#7a7466", stroke_width=1.2))
             o.append(rect(x0 + 0.5, y0 + 1.7, x1 - 0.5, y1, fill="#cfc8b4", stroke="none"))

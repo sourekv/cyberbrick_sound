@@ -6,7 +6,7 @@ decisions). Rev B and the ideas below can be out of date against rev A and again
 
 ## Rev B (prepared 2026-11-14, not ordered)
 
-![Rev B as intended, top side: S V G, J3 and J4, "CB SND rev B", the plus at C1 (3D render of the current rev B files, not a photo; nothing of it is ordered or built)](shield-pcb-rev-b-top.png)
+![Rev B as intended, top side: S V G, J3 and J4, "CB SND rev B", the plus at C1, and the intended "USB-C" label at the Zero's USB-C end (3D render of the current rev B files with the label added to the picture only: the label is not in the board files yet; nothing of it is ordered or built)](shield-pcb-rev-b-top.png)
 
 Made by `tools/make_shield_rev_b.py` from the rev A board; nothing electrical changes (no part, pad, track or zone
 moves). Checked: the BOM, the placement files (`fab/jlcpcb*`, `fab/pcbway`, `shield_positions.csv`) come out the same
@@ -47,6 +47,6 @@ Collected for the version after rev B (the silkscreen of rev B is done, see "Rev
 
 ## Ideas and open points for a later revision
 
-- **Marking the USB side of the Zero (2026-11-22, an idea for the silkscreen):** instead of J3 and J4 (the names of the socket strips, which tell nothing to the user) write **USB** on the board at the end where the Zero's USB-C connector is, so that the Zero is fitted the right way round without counting pins. The square pad of pin 1 stays. Not done on rev B yet.
+- **Marking the USB side of the Zero (2026-11-22, an idea for the silkscreen):** instead of J3 and J4 (the names of the socket strips, which tell nothing to the user) write **USB** on the board at the end where the Zero's USB-C connector is, so that the Zero is fitted the right way round without counting pins. The square pad of pin 1 stays. Shown in the picture of rev B as "USB-C" at the Zero's USB-C end (added to the picture only); not in the board files yet.
 
 - **Open (noted 2026-11-15): fitting J1/J3/J4 at JLCPCB for a large series.** Not decided, only looked at. JLCPCB offers through-hole assembly (wave/selective or hand soldering); the fee figures found are second-hand and from 2024-25 (roughly 3.50 USD fixed plus about 0.02 USD per joint), so take the real number from the order quote. LCSC has 1x9, 8.5 mm female strips: C2897372 (HCTL PM254-1-09-Z-8.5, about 8000 in stock, looks like the best match), C22373895 (Hong Cheng, gold), C7509520 (CONNFLY DS1023-1x9SF11, gold), C225506 (CJT A2541HWV-9P); price and pin length not checked. Risk: with the Zero plugged in the two strips are held parallel, the service has no Zero to do that, so they may stand a little crooked; try a few boards first. The small run (5 boards) keeps the hand-cut GME strips. Other strips looked at and not chosen: Preci-Dip 801-87-007-10-001101 (7 positions, 7 mm, precision contacts) and an eBay lot of 24 PPTC091LFBN-RC from Canada (about 815 CZK with shipping).
