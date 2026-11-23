@@ -202,12 +202,13 @@ module j1_header() {
 module band_seg(a, b) {   // a, b = [x, y, z]; a strip 1.5 mm wide (x) and 0.8 mm thick
   hull() for (q = [a, b]) translate([q[0] - 0.75, q[1] - 0.4, q[2] - 0.4]) cube([1.5, 0.8, 0.8]);
 }
-// over the board the band comes in beside the collar (body) of J1 (x = 120.5, the body ends at 118.64) and runs slanted across the board
-// to the middle (x = cx) at the far edge; under the base it sits in the middle groove (x = cx)
+// over the board the band runs between the first and the second pin of J1 (x = 113.23) and over the top of its collar (the body, 2.54 mm
+// tall, y 100 to 102.7), then down to the board and slanted to the middle (x = cx) at the far edge; under the base it sits in the middle groove
 module bands() {
   zt = base_t + post_h + board_t + 0.4;
-  ya = cy - base_w / 2;  yb = cy + base_w / 2;  xb = 120.5;
-  path = [[cx, ya, 0.4], [cx, ya, base_t], [xb, by0, zt], [cx, by1, zt], [cx, yb, base_t], [cx, yb, 0.4], [cx, ya, 0.4]];
+  zc = zt + j1_body_t;
+  ya = cy - base_w / 2;  yb = cy + base_w / 2;  xb = 113.23;
+  path = [[cx, ya, 0.4], [cx, ya, base_t], [xb, by0 - 1, zc], [xb, 103.5, zc], [xb, 106, zt], [cx, by1, zt], [cx, yb, base_t], [cx, yb, 0.4], [cx, ya, 0.4]];
   color("red") for (k = [0 : len(path) - 2]) band_seg(path[k], path[k + 1]);
 }
 
