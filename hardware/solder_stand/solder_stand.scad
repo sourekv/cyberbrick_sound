@@ -1,15 +1,15 @@
 // Soldering stand for the shield PCB (hardware/shield/): holds the board upside down while the hand-fitted parts
 // are soldered (J3/J4 female socket strips 1x9, J1 right-angle servo header 1x3).
 //
-// How it is used (J1 is always on the underside of the board, in one of two variants: the pins out or the pins in):
-//   Variant a), the pins out: ONE pass. The loose insert (part "j1_insert") sits in socket A, outside the board edge, and stays there;
-//      it does not obstruct fitting the Zero with the strips. Plug both 1x9 socket strips onto the pins of the
-//      ESP32-S3-Zero-N8R8-M (the Zero keeps them parallel and at the right spacing, 15.24 mm), put a piece of soft foam (about 5-8 mm
-//      thick) into the pocket, push the strips with the Zero into the board from the top side and J1 from the underside, and lay the
-//      board upside down on the stand: the four pins go into the mounting holes, the Zero sinks into the pocket and the foam presses it
-//      (and so the sockets) up against the board. Secure the board with a rubber band round the whole stand (it sits in the grooves in
-//      the underside of the base), solder one pin at each end of every strip, check that everything sits flat, then solder the rest
-//      of the strips; then move the band away from J1 (it lies over the collar of J1) and solder J1.
+// How it is used (J1 always lies below the board, between the board and the stand, in one of two variants: the pins out or the pins in):
+//   Variant a), the pins out: ONE pass (tried 2026-11-23). The loose insert (part "j1_insert") sits in socket A, outside the board edge, and
+//      stays there; it does not obstruct fitting the Zero. J1 lies on the insert (body on the ledge, the long pins in the slots, pointing
+//      out), both 1x9 socket strips are plugged onto the Zero, a piece of soft foam (about 5-8 mm thick) goes into the pocket, and the board
+//      with the Zero is put on the four posts: the locating pins go into the mounting holes, the pins of J1 through its holes, the Zero
+//      sinks into the pocket and the foam presses it (and so the sockets) up against the board. J1, J3, J4 and the Zero are all on the
+//      same side of the board, facing the stand; everything is soldered from the visible side. A rubber band lengthwise round the whole
+//      stand (it sits in the grooves in the underside of the base) holds the board while the strips (J3, J4) are soldered, then it is moved
+//      across the board and the pins of J1 are soldered.
 //   Variant b), the pins in: TWO passes. First pass, J1: put the insert, turned by 180 degrees, into socket B, hold the pins of J1 in
 //      place by hand, put the board on the four posts top side up (no foam), solder J1 from the top side and take the insert out.
 //      Second pass, J3/J4: as variant a), without the insert.
@@ -30,7 +30,7 @@
 //   solder_stand_variants.png: -D 'part="use_a"' and 'part="use_b"' (the stand with the insert and J1, without the board), camera
 //   114.5,106,22,55,0,160,170, joined with montage and labels
 //   solder_stand_steps.png: six renders (-D 'part="assembly"' -D pass_no=1 or 2 -D explode=40 / 15 / 0, Tomorrow colour scheme, camera
-//   114.5,108,38,60,0,200,250; variant a): one row (the second-pass renders), variant b): the top row the first pass, the bottom row the second), joined with ImageMagick montage; the last picture with -D band=true (the rubber bands), a caption on top; solder_stand_steps_b.png is the same with -D variant=\"b\" (variant a is the default)
+//   114.5,108,38,60,0,200,250; variant a): pass_no=3 and -D band=true / 'band="across"', four pictures; variant b): the top row the first pass, the bottom row the second), joined with ImageMagick montage; the last picture with -D band=true (the rubber bands), a caption on top; solder_stand_steps_b.png is the same with -D variant=\"b\" (variant a is the default)
 
 part = "stand";      // "stand", "j1_insert" (the loose insert for J1) or "preview" (stand with the board and the Zero as ghosts)
 
@@ -124,7 +124,8 @@ module ghosts() {
 explode = 0;
 variant = "a";   // "a": J1 pins out (insert in socket A), "b": pins in (insert and J1 turned by 180 degrees, socket B); for the assembly pictures
 band = false;   // draw the rubber bands (second pass, explode = 0)
-pass_no = 2;   // 1: first pass (J1, board top side up, the loose insert, no foam), 2: second pass (J3/J4 with the Zero and the foam; the insert only in variant a)
+pass_no = 2;   // 3: variant a), ONE pass: J1 on the insert, the Zero with the strips and the foam, all together (as photographed 2026-11-23)
+// (pass_no 1 and 2 are the two passes of variant b)   // 1: first pass (J1, board top side up, the loose insert, no foam), 2: second pass (J3/J4 with the Zero and the foam; the insert only in variant a)
 foam_t  = 6;
 
 module j1_on_board(top) {
@@ -144,7 +145,7 @@ module board_assembly() {
   }
   for (h = holes) color("gold") translate([h[0], h[1], top + board_t - 0.01])
     difference() { cylinder(d = 6, h = 0.05); cylinder(d = 2.7, h = 1, center = true); }
-  if (pass_no == 2) {
+  if (pass_no >= 2) {
   // socket strips with their pins through the board
   for (x = [106.88, 122.12]) {
     color([0.1, 0.1, 0.1]) translate([x - 1.27, 104.84 - 1.27, top - 8.5]) cube([2.54, 9 * 2.54, 8.5]);
@@ -215,6 +216,23 @@ module bands() {
   color("red") for (k = [0 : len(path) - 2]) band_seg(path[k], path[k + 1]);
 }
 
+// variant a), one pass, the band for soldering the strips: lengthwise, from the edge of the base over the near edge of the board (the J1
+// side, above the comb of the insert, between the pins of J1) to the far edge of the board and down; the pads of the strips stay free
+module bands_along() {
+  zt = base_t + post_h + board_t + 0.4;
+  ya = cy - base_w / 2;  yb = cy + base_w / 2;  xb = 113.23;
+  path = [[cx, ya, 0.4], [cx, ya, base_t], [xb, by0, zt], [cx, by1, zt], [cx, yb, base_t], [cx, yb, 0.4], [cx, ya, 0.4]];
+  color("red") for (k = [0 : len(path) - 2]) band_seg(path[k], path[k + 1]);
+}
+// the same band moved across the board (for soldering J1): in the groove across the base at y = cy, over the middle of the board
+module bands_across() {
+  zt = base_t + post_h + board_t + 0.4;
+  xa = cx - base_w / 2;  xb = cx + base_w / 2;
+  path = [[xa, cy, 0.4], [xa, cy, base_t], [bx0, cy, zt], [bx1, cy, zt], [xb, cy, base_t], [xb, cy, 0.4], [xa, cy, 0.4]];
+  color("red") for (k = [0 : len(path) - 2])
+    hull() for (q = [path[k], path[k + 1]]) translate([q[0] - 0.4, q[1] - 0.75, q[2] - 0.4]) cube([0.8, 1.5, 0.8]);
+}
+
 // the two ways of use, without the board: a = the pins out (insert in socket A), b = the pins in (insert and J1 turned by 180 degrees, socket B)
 if (part == "use_a" || part == "use_b") {
   color("orange") stand();
@@ -224,10 +242,12 @@ if (part == "use_a" || part == "use_b") {
   color("orange") stand();
   if (pass_no == 1 || variant == "a") translate([cx, row_y, 0]) rotate([0, 0, variant == "b" ? 180 : 0]) translate([-cx, -row_y, 0]) color("orange") j1_insert();
   // first pass: J1 lies on the insert (the board comes over its short pins and ends up above it)
-  if (pass_no == 1) translate([cx, row_y, 0]) rotate([0, 0, variant == "b" ? 180 : 0]) translate([-cx, -row_y, 0]) j1_header();
-  if (pass_no == 2) translate([0, 0, explode / 2]) foam();
+  if (pass_no == 1 || pass_no == 3) translate([cx, row_y, 0]) rotate([0, 0, variant == "b" ? 180 : 0]) translate([-cx, -row_y, 0]) j1_header();
+  if (pass_no >= 2) translate([0, 0, explode / 2]) foam();
   translate([0, 0, explode]) board_assembly();
-  if (band) bands();
+  if (pass_no == 3 && band == true) bands_along();
+  else if (pass_no == 3 && band == "across") bands_across();
+  else if (band) bands();
 } else if (part == "j1_insert") {
   j1_insert();
 } else {

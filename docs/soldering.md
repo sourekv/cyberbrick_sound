@@ -50,23 +50,22 @@ separately is not recorded.
 
 ## Procedure
 
-The two variants are soldered differently. Variant a) is **one pass**: the insert stays in socket A, it does not obstruct fitting the
-Zero with the strips, and J1, J3 and J4 are soldered in one go, with the rubber band moved between the strips and J1. Variant b) takes **two passes**: J1 first with the insert in socket B,
-then J3 and J4 without the insert.
+Variant a) is **one pass** and was tried on the printed stand (2026-11-23, photos from the soldering). J1, J3, J4 and the Zero are all on
+the same side of the board, the one facing the stand, and everything is soldered from the visible side. Variant b) is still described as
+two passes; it has not been checked against photos yet.
 
 ### Variant a): the pins out (insert in socket A), one pass
 
-1. Put the insert into socket A, outside the board edge. It stays there.
-2. Plug both 1x9 socket strips onto the pins of the ESP32-S3-Zero-N8R8-M. The Zero keeps them parallel and at the right spacing
-   (15.24 mm).
-3. Put a piece of soft foam (about 5 to 8 mm thick) into the pocket of the stand.
-4. Push the strips with the Zero through the board from the top side and J1 from the underside, and lay the board upside down
-   on the stand: the locating pins go into the mounting holes, the Zero sinks into the pocket and the foam presses it, and so
-   the sockets, against the board.
-5. Secure the board with a **rubber band** round the whole stand: it runs from the edge of the base over the board between the pins
-   of J1 and over the top of its collar, straight to the far edge of the board, and back under the base through the middle groove.
-6. Solder one pin at each end of every strip, check that everything sits flat, then solder the rest of the strips (J3, J4).
-7. **Move the rubber band** away from J1 (it lies over its collar and would be in the way), and solder the pins of J1.
+1. Put the insert into socket A, outside the board edge. It stays there for the whole soldering and does not obstruct fitting the Zero.
+2. Lay J1 on the insert: the body on the ledge, the long pins (the servo plug) in the slots of the comb, pointing out, the short pins up.
+3. Plug both 1x9 socket strips onto the pins of the ESP32-S3-Zero-N8R8-M. The Zero keeps them parallel and at the right spacing
+   (15.24 mm). Put a piece of soft foam into the pocket of the stand.
+4. Put the board with the Zero on the posts: the locating pins go into the mounting holes, the pins of J1 come through its holes, the
+   Zero sinks into the pocket and the foam presses it, and so the sockets, against the board.
+5. Put the **rubber band** lengthwise: from the edge of the base over the board between the pins of J1 and over the comb of the insert,
+   along the board between the two rows of the strips, and back under the base through the middle groove. Hold the board with it
+   and solder one pin at each end of every strip, check that everything sits flat, then solder the rest of J3 and J4.
+6. **Move the rubber band** across the board (lengthwise it lies over the pads of J1), and solder the three pins of J1.
 
 ![The steps of the variant a), the pins out](../hardware/solder_stand/solder_stand_steps.png)
 
@@ -80,7 +79,7 @@ First pass, J1:
 3. **Hold the pins of J1 in place by hand**, and only then put the board on the posts, top side up (no foam).
 4. Solder J1 from the top side. Then **take the insert out** of socket B.
 
-Second pass, J3 and J4: as in variant a) (steps 2 to 6, without the insert and without J1).
+Second pass, J3 and J4: as in variant a), without the insert and without J1 (steps 3 to 5).
 
 ![The steps of the variant b), the pins in](../hardware/solder_stand/solder_stand_steps_b.png)
 
