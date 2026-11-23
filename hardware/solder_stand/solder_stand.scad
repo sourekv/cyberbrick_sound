@@ -207,7 +207,11 @@ module bands() {
   zt = base_t + post_h + board_t + 0.4;
   zc = zt + j1_body_t;
   ya = cy - base_w / 2;  yb = cy + base_w / 2;  xb = 113.23;
-  path = [[cx, ya, 0.4], [cx, ya, base_t], [xb, by0 + 0.05, zc], [xb, 102.7, zc], [cx, by1, zt], [cx, yb, base_t], [cx, yb, 0.4], [cx, ya, 0.4]];
+  // variant b): J1 is turned by 180 degrees, its collar is on the inner side of the row of holes (y 105.6 to 108.3): the band first
+  // touches the near edge of the board, then rises onto the collar
+  path = variant == "b"
+    ? [[cx, ya, 0.4], [cx, ya, base_t], [cx, by0, zt], [xb, 2 * row_y - 102.7, zc], [xb, 2 * row_y - by0 - 0.05, zc], [cx, by1, zt], [cx, yb, base_t], [cx, yb, 0.4], [cx, ya, 0.4]]
+    : [[cx, ya, 0.4], [cx, ya, base_t], [xb, by0 + 0.05, zc], [xb, 102.7, zc], [cx, by1, zt], [cx, yb, base_t], [cx, yb, 0.4], [cx, ya, 0.4]];
   color("red") for (k = [0 : len(path) - 2]) band_seg(path[k], path[k + 1]);
 }
 
