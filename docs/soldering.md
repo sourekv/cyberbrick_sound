@@ -50,18 +50,23 @@ separately is not recorded.
 
 ## Procedure
 
-Two passes: J1 first, then J3 and J4.
+Two passes: J1 first, then J3 and J4. The second pass is the same for both variants; the first one differs in where the insert
+goes and which way J1 points. Each variant has its own section with its own pictures.
 
-### First pass: J1
+The second pass (J3 and J4, with the Zero, the foam and the rubber band) is described in full under variant a); in variant b) it
+is the same, only the insert is not in the stand.
 
-1. Put the insert into socket A (variant a) or, turned by 180 degrees, into socket B (variant b).
+### Variant a): the pins out (insert in socket A)
+
+First pass, J1:
+
+1. Put the insert into socket A, outside the board edge.
 2. Lay J1 on the insert: the body on the ledge, the long pins in the slots of the comb, the short pins pointing up.
 3. **Hold the pins of J1 in place by hand**, and only then put the board on the posts, top side up (no foam). The short pins
    go through the holes of J1.
-4. Solder J1 from the top side.
-5. Variant a): the insert stays in socket A. Variant b): take the insert out of socket B.
+4. Solder J1 from the top side. The insert **stays in socket A**.
 
-### Second pass: J3 and J4
+Second pass, J3 and J4:
 
 1. Plug both 1x9 socket strips onto the pins of the ESP32-S3-Zero-N8R8-M. The Zero keeps them parallel and at the right spacing
    (15.24 mm).
@@ -74,6 +79,18 @@ Two passes: J1 first, then J3 and J4.
 5. Solder one pin at each end of every strip, check that everything sits flat, then solder the rest.
 
 ![The steps of the variant a), the pins out](../hardware/solder_stand/solder_stand_steps.png)
+
+### Variant b): the pins in (insert in socket B, turned by 180 degrees)
+
+First pass, J1:
+
+1. Put the insert into socket B, turned by 180 degrees, under the board.
+2. Lay J1 on the insert, turned by 180 degrees as well: the body on the ledge, the long pins in the slots of the comb, the short
+   pins pointing up.
+3. **Hold the pins of J1 in place by hand**, and only then put the board on the posts, top side up (no foam).
+4. Solder J1 from the top side. Then **take the insert out** of socket B.
+
+Second pass, J3 and J4: as in variant a), with the insert out of the stand.
 
 ![The steps of the variant b), the pins in](../hardware/solder_stand/solder_stand_steps_b.png)
 
