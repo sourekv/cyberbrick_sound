@@ -26,6 +26,8 @@
 // Export (OpenSCAD 2021.01):
 //   openscad -o solder_stand.stl solder_stand.scad
 //   openscad -o solder_stand_preview.png -D 'part="preview"' solder_stand.scad   (with the board, not for printing)
+//   solder_stand_variants.png: -D 'part="use_a"' and 'part="use_b"' (the stand with the insert and J1, without the board), camera
+//   114.5,106,22,55,0,160,170, joined with montage and labels
 //   solder_stand_steps.png: six renders (-D 'part="assembly"' -D pass_no=1 or 2 -D explode=40 / 15 / 0, Tomorrow colour scheme, camera
 //   114.5,108,38,60,0,200,250; the top row the first pass, the bottom row the second), joined with ImageMagick montage
 
@@ -178,7 +180,23 @@ module j1_insert() {
   }
 }
 
-if (part == "assembly") {
+// J1 as it lies in the stand in the first pass (the right-angle header with the long pins out, in the position of socket A): the body on the
+// ledge, the long pins in the slots, the short pins pointing up (through the board, which is not drawn)
+module j1_header() {
+  top = base_t + post_h;
+  color([0.1, 0.1, 0.1]) translate([j1_x0 + 0.3, by0 + 0.05, top - j1_body_t]) cube([j1_x1 - j1_x0 - 0.6, 2.66, j1_body_t]);
+  for (x = [111.96, 114.50, 117.04]) color("gold") {
+    translate([x - 0.32, 94.05, top - 1.27 - 0.32]) cube([0.64, 104.15 - 94.05 + 0.32, 0.64]);
+    translate([x - 0.32, 104.15 - 0.32, top - 1.27 - 0.32]) cube([0.64, 0.64, 1.27 + 0.32 + board_t + 1.5]);
+  }
+}
+
+// the two ways of use, without the board: a = the pins out (insert in socket A), b = the pins in (insert and J1 turned by 180 degrees, socket B)
+if (part == "use_a" || part == "use_b") {
+  color("orange") stand();
+  turn = part == "use_b" ? 180 : 0;
+  translate([cx, row_y, 0]) rotate([0, 0, turn]) translate([-cx, -row_y, 0]) { color("orange") j1_insert(); j1_header(); }
+} else if (part == "assembly") {
   color("orange") stand();
   if (pass_no == 1) color("orange") j1_insert();
   if (pass_no == 2) translate([0, 0, explode / 2]) foam();
