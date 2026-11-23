@@ -38,7 +38,7 @@ part = "stand";      // "stand", "j1_insert" (the loose insert for J1) or "previ
 // ledge, has guides at both ends of the body and a comb with a slot for each long pin. It is plugged into one of two sockets in the
 // base, which are mirror images about the row of J1's holes (y 104.15): in socket A (outside the board edge) it serves J1 with the
 // pins out (variant a), in socket B (the insert turned by 180 degrees) J1 turned by 180 degrees, pins in (variant b; docs/shield-pcb.md).
-// J1 is always on the underside. In variant a) the insert stays in socket A and everything is soldered in one pass; in variant b) it is used in the
+// In variant a) J1 is on the Zero side, in variant b) on the opposite side. In variant a) the insert stays in socket A and everything is soldered in one pass; in variant b) it is used in the
 // first pass only and taken out of socket B before the pass with J3 and J4.
 row_y  = 104.15;                            // the row of J1's holes (KiCad coordinates)
 ins_u0 = row_y - 102.71;                    // the insert starts at the far edge of the body (distance from the row)
@@ -158,7 +158,7 @@ module board_assembly() {
   color("silver") translate([cx - 4.5, cy - 11.75 - 0.5, zt - 1.0 - 3.2]) cube([9, 7.4, 3.2]);   // USB-C
   color([0.2, 0.2, 0.2]) translate([cx - 3.5, cy - 1, zt - 1.0 - 0.9]) cube([7, 7, 0.9]);         // chip
   }
-  // J1 (always on the underside of the board): in the first pass it lies on the insert (drawn separately), in the second it is on the far side
+  // J1 (variant b: on the underside of the board): in the first pass it lies on the insert (drawn separately), in the second it is on the far side
   turn_b = variant == "b" ? 180 : 0;
   translate([cx, row_y, 0]) rotate([0, 0, turn_b]) translate([-cx, -row_y, 0]) {
     if (pass_no == 2) translate([0, 0, 2 * top + board_t]) mirror([0, 0, 1]) j1_on_board(top);
