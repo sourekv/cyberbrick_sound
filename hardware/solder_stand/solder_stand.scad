@@ -30,7 +30,7 @@
 //   solder_stand_variants.png: -D 'part="use_a"' and 'part="use_b"' (the stand with the insert and J1, without the board), camera
 //   114.5,106,22,55,0,160,170, joined with montage and labels
 //   solder_stand_steps.png: six renders (-D 'part="assembly"' -D pass_no=1 or 2 -D explode=40 / 15 / 0, Tomorrow colour scheme, camera
-//   114.5,108,38,60,0,200,250; the top row the first pass, the bottom row the second), joined with ImageMagick montage; the last picture with -D band=true (the rubber bands), a caption on top naming variant a
+//   114.5,108,38,60,0,200,250; the top row the first pass, the bottom row the second), joined with ImageMagick montage; the last picture with -D band=true (the rubber bands), a caption on top; solder_stand_steps_b.png is the same with -D variant=\"b\" (variant a is the default)
 
 part = "stand";      // "stand", "j1_insert" (the loose insert for J1) or "preview" (stand with the board and the Zero as ghosts)
 
@@ -122,6 +122,7 @@ module ghosts() {
 // Coloured assembly for the how-to pictures (part="assembly"): the board with the Zero, the socket strips and J1,
 // upside down, lifted by `explode` mm above its place; the foam lifted by explode / 2.
 explode = 0;
+variant = "a";   // "a": J1 pins out (insert in socket A), "b": pins in (insert and J1 turned by 180 degrees, socket B); for the assembly pictures
 band = false;   // draw the rubber bands (second pass, explode = 0)
 pass_no = 2;   // 1: first pass (J1, board top side up, the loose insert, no foam), 2: second pass (J3/J4 with the Zero and the foam, the insert stays)
 foam_t  = 6;
@@ -157,8 +158,11 @@ module board_assembly() {
   color([0.2, 0.2, 0.2]) translate([cx - 3.5, cy - 1, zt - 1.0 - 0.9]) cube([7, 7, 0.9]);         // chip
   }
   // J1 (always on the underside of the board): in the first pass it hangs on the stand side, in the second it is on the far side
-  if (pass_no == 1) j1_on_board(top);
-  else translate([0, 0, 2 * top + board_t]) mirror([0, 0, 1]) j1_on_board(top);
+  turn_b = variant == "b" ? 180 : 0;
+  translate([cx, row_y, 0]) rotate([0, 0, turn_b]) translate([-cx, -row_y, 0]) {
+    if (pass_no == 1) j1_on_board(top);
+    else translate([0, 0, 2 * top + board_t]) mirror([0, 0, 1]) j1_on_board(top);
+  }
 }
 
 module foam() {
@@ -210,7 +214,7 @@ if (part == "use_a" || part == "use_b") {
   translate([cx, row_y, 0]) rotate([0, 0, turn]) translate([-cx, -row_y, 0]) { color("orange") j1_insert(); j1_header(); }
 } else if (part == "assembly") {
   color("orange") stand();
-  color("orange") j1_insert();
+  translate([cx, row_y, 0]) rotate([0, 0, variant == "b" ? 180 : 0]) translate([-cx, -row_y, 0]) color("orange") j1_insert();
   if (pass_no == 2) translate([0, 0, explode / 2]) foam();
   translate([0, 0, explode]) board_assembly();
   if (band) bands();
