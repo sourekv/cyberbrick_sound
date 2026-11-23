@@ -47,9 +47,9 @@ tried and photographed.
 
 ## Procedure
 
-Variant a) is **one pass** and was tried on the printed stand (2026-11-23, photos from the soldering). J1, J3, J4 and the Zero are all on
-the same side of the board, the one facing the stand, and everything is soldered from the visible side. Variant b) is still described as
-two passes; it has not been checked against photos yet.
+Both variants were tried on the printed stand (2026-11-23, photos from the soldering). Variant a) is **one pass**: J1, J3, J4 and the Zero
+are all on the same side of the board, the one facing the stand, and everything is soldered from the visible side. Variant b) takes
+**two passes**, with the board turned over between them.
 
 ### Variant a): the pins out (insert in socket A), one pass
 
