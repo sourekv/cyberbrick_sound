@@ -51,7 +51,7 @@ separately is not recorded.
 ## Procedure
 
 The two variants are soldered differently. Variant a) is **one pass**: the insert stays in socket A, it does not obstruct fitting the
-Zero with the strips, and J1, J3 and J4 are soldered together. Variant b) takes **two passes**: J1 first with the insert in socket B,
+Zero with the strips, and J1, J3 and J4 are soldered in one go, with the rubber band moved between the strips and J1. Variant b) takes **two passes**: J1 first with the insert in socket B,
 then J3 and J4 without the insert.
 
 ### Variant a): the pins out (insert in socket A), one pass
@@ -65,7 +65,9 @@ then J3 and J4 without the insert.
    the sockets, against the board.
 5. Secure the board with a **rubber band** round the whole stand: it runs from the edge of the base over the board between the pins
    of J1 and over the top of its collar, straight to the far edge of the board, and back under the base through the middle groove.
-6. Solder one pin at each end of every strip, check that everything sits flat, then solder the rest and J1.
+   It also presses J1 against the board.
+6. Solder one pin at each end of every strip, check that everything sits flat, then solder the rest of the strips (J3, J4).
+7. **Move the rubber band** away from J1 (it lies over its collar and would be in the way), and solder the pins of J1.
 
 ![The steps of the variant a), the pins out](../hardware/solder_stand/solder_stand_steps.png)
 
@@ -79,7 +81,8 @@ First pass, J1:
 3. **Hold the pins of J1 in place by hand**, and only then put the board on the posts, top side up (no foam).
 4. Solder J1 from the top side. Then **take the insert out** of socket B.
 
-Second pass, J3 and J4: as in variant a) (steps 2 to 6, without the insert and without J1).
+Second pass, J3 and J4: as in variant a) (steps 2 to 6, without the insert and without J1; the rubber band then runs straight
+over the board).
 
 ![The steps of the variant b), the pins in](../hardware/solder_stand/solder_stand_steps_b.png)
 

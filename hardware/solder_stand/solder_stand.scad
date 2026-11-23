@@ -9,7 +9,7 @@
 //      board upside down on the stand: the four pins go into the mounting holes, the Zero sinks into the pocket and the foam presses it
 //      (and so the sockets) up against the board. Secure the board with a rubber band round the whole stand (it sits in the grooves in
 //      the underside of the base), solder one pin at each end of every strip, check that everything sits flat, then solder the rest
-//      and J1.
+//      of the strips; then move the band away from J1 (it lies over the collar of J1) and solder J1.
 //   Variant b), the pins in: TWO passes. First pass, J1: put the insert, turned by 180 degrees, into socket B, hold the pins of J1 in
 //      place by hand, put the board on the four posts top side up (no foam), solder J1 from the top side and take the insert out.
 //      Second pass, J3/J4: as variant a), without the insert.
