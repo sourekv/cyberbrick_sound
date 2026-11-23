@@ -5,7 +5,7 @@
 //   First pass, J1: the board lies top side up on the four posts, no foam. Put the loose insert (part "j1_insert") into
 //      socket A (the pins of J1 point out of the board: variant a) or, turned by 180 degrees, into socket B (the pins point
 //      into the board: variant b). Hold the pins of J1 in place by hand, put the board on, solder J1 from the top side.
-//      The insert stays in its socket.
+//      Variant a): the insert stays in socket A. Variant b): take the insert out of socket B.
 //   Second pass, J3/J4: plug both 1x9 socket strips onto the pins of the ESP32-S3-Zero-N8R8-M (the Zero keeps them parallel
 //      and at the right spacing, 15.24 mm), put a piece of soft foam (about 5-8 mm thick) into the pocket, push the strips
 //      with the Zero into the board from the top side and lay the board upside down on the stand: the four pins go into the
@@ -38,8 +38,8 @@ part = "stand";      // "stand", "j1_insert" (the loose insert for J1) or "previ
 // ledge, has guides at both ends of the body and a comb with a slot for each long pin. It is plugged into one of two sockets in the
 // base, which are mirror images about the row of J1's holes (y 104.15): in socket A (outside the board edge) it serves J1 with the
 // pins out (variant a), in socket B (the insert turned by 180 degrees) J1 turned by 180 degrees, pins in (variant b; docs/shield-pcb.md).
-// J1 is always on the underside. The insert stays in its socket in both passes (first the board top side up, without foam, then the
-// pass with J3 and J4).
+// J1 is always on the underside. In variant a) the insert stays in socket A in both passes; in variant b) it is taken out of
+// socket B after the first pass, before the pass with J3 and J4.
 row_y  = 104.15;                            // the row of J1's holes (KiCad coordinates)
 ins_u0 = row_y - 102.71;                    // the insert starts at the far edge of the body (distance from the row)
 ins_uc = row_y - 98.5;                      // the comb starts here, 1.5 mm past the board edge (as before)
@@ -124,7 +124,7 @@ module ghosts() {
 explode = 0;
 variant = "a";   // "a": J1 pins out (insert in socket A), "b": pins in (insert and J1 turned by 180 degrees, socket B); for the assembly pictures
 band = false;   // draw the rubber bands (second pass, explode = 0)
-pass_no = 2;   // 1: first pass (J1, board top side up, the loose insert, no foam), 2: second pass (J3/J4 with the Zero and the foam, the insert stays)
+pass_no = 2;   // 1: first pass (J1, board top side up, the loose insert, no foam), 2: second pass (J3/J4 with the Zero and the foam; the insert only in variant a)
 foam_t  = 6;
 
 module j1_on_board(top) {
@@ -214,7 +214,7 @@ if (part == "use_a" || part == "use_b") {
   translate([cx, row_y, 0]) rotate([0, 0, turn]) translate([-cx, -row_y, 0]) { color("orange") j1_insert(); j1_header(); }
 } else if (part == "assembly") {
   color("orange") stand();
-  translate([cx, row_y, 0]) rotate([0, 0, variant == "b" ? 180 : 0]) translate([-cx, -row_y, 0]) color("orange") j1_insert();
+  if (pass_no == 1 || variant == "a") translate([cx, row_y, 0]) rotate([0, 0, variant == "b" ? 180 : 0]) translate([-cx, -row_y, 0]) color("orange") j1_insert();
   if (pass_no == 2) translate([0, 0, explode / 2]) foam();
   translate([0, 0, explode]) board_assembly();
   if (band) bands();
