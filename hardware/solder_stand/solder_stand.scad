@@ -1,15 +1,16 @@
 // Soldering stand for the shield PCB (hardware/shield/): holds the board upside down while the hand-fitted parts
 // are soldered (J3/J4 female socket strips 1x9, J1 right-angle servo header 1x3).
 //
-// How it is used:
-//   1. Plug both 1x9 socket strips onto the pins of the ESP32-S3-Zero-N8R8-M; the Zero keeps them parallel and at
-//      the right spacing (15.24 mm), so no other jig is needed for that.
-//   2. Put a piece of soft foam (anti-static foam or sponge, about 5-8 mm thick) into the pocket.
-//   3. Push the socket strips with the Zero into the board from the top side, put J1 in, and lay the board upside
-//      down on the stand: the four pins go into the mounting holes, the Zero sinks into the pocket and the foam
-//      presses it (and so the sockets) up against the board. The J1 plastic body lies on the ledge of the loose insert
-//      (in socket A), flat against the board.
-//   4. Solder one pin at each end of every strip, check that everything sits flat, then solder the rest.
+// How it is used (J1 is always on the underside of the board, in one of two variants: the pins out or the pins in):
+//   First pass, J1: the board lies top side up on the four posts, no foam. Put the loose insert (part "j1_insert") into
+//      socket A (the pins of J1 point out of the board: variant a) or, turned by 180 degrees, into socket B (the pins point
+//      into the board: variant b). Hold the pins of J1 in place by hand, put the board on, solder J1 from the top side,
+//      take the insert out.
+//   Second pass, J3/J4: plug both 1x9 socket strips onto the pins of the ESP32-S3-Zero-N8R8-M (the Zero keeps them parallel
+//      and at the right spacing, 15.24 mm), put a piece of soft foam (about 5-8 mm thick) into the pocket, push the strips
+//      with the Zero into the board from the top side and lay the board upside down on the stand: the four pins go into the
+//      mounting holes, the Zero sinks into the pocket and the foam presses it (and so the sockets) up against the board.
+//      Solder one pin at each end of every strip, check that everything sits flat, then solder the rest.
 // The board rests on the four posts by the copper rings around the mounting holes; nothing else on the top side
 // touches the stand (the parts under the Zero and C1/J2/LED1 beside it are all in the open pocket).
 //
@@ -32,10 +33,10 @@ part = "stand";      // "stand", "j1_insert" (the loose insert for J1) or "previ
 
 // The loose insert for J1 (part = "j1_insert", printed on its own, lying on its back): one piece that carries the body of J1 on a
 // ledge, has guides at both ends of the body and a comb with a slot for each long pin. It is plugged into one of two sockets in the
-// base, which are mirror images about the row of J1's holes (y 104.15): in socket A (outside the board edge) it serves J1 on the top
-// side or on the underside with the pins out, in socket B (the insert turned by 180 degrees) J1 on the underside turned by 180 degrees,
-// pins in (docs/shield-pcb.md). For J1 on the underside it is used in the first pass only (the board top side up, without foam) and
-// taken out before the pass with J3 and J4, because the Zero hangs in its place.
+// base, which are mirror images about the row of J1's holes (y 104.15): in socket A (outside the board edge) it serves J1 with the
+// pins out (variant a), in socket B (the insert turned by 180 degrees) J1 turned by 180 degrees, pins in (variant b; docs/shield-pcb.md).
+// J1 is always on the underside. The insert is used in the first pass only (the board top side up, without foam) and taken out
+// before the pass with J3 and J4, because the Zero hangs in its place.
 row_y  = 104.15;                            // the row of J1's holes (KiCad coordinates)
 ins_u0 = row_y - 102.71;                    // the insert starts at the far edge of the body (distance from the row)
 ins_uc = row_y - 98.5;                      // the comb starts here, 1.5 mm past the board edge (as before)
@@ -93,8 +94,8 @@ module stand() {
     // the mounting holes; the bands run round the whole base and sit in the grooves, so they cannot slip off and the base lies flat
     for (x = [bx0 + 2.5, cx, bx1 - 2.5]) translate([x - groove_w / 2, cy - base_w / 2 - 1, -0.01]) cube([groove_w, base_w + 2, groove_d + 0.01]);
     for (y = [cy - 12, cy, cy + 12]) translate([cx - base_w / 2 - 1, y - groove_w / 2, -0.01]) cube([base_w + 2, groove_w, groove_d + 0.01]);
-    // two sockets for the loose insert of J1 (part = "j1_insert"): A outside the board edge (J1 on the top side, pins out), B on the
-    // inner side (J1 on the underside, turned by 180 degrees, pins in); the same insert, turned by 180 degrees about J1's row of holes
+    // two sockets for the loose insert of J1 (part = "j1_insert"): A outside the board edge (J1 with the pins out), B on the
+    // inner side (J1 turned by 180 degrees, pins in); the same insert, turned by 180 degrees about J1's row of holes
     for (y = [row_y - ins_ue, row_y + ins_ue - peg_t])
       translate([j1_x0 - guide_w - peg_gap, y - peg_gap, base_t - peg_l]) cube([j1_x1 - j1_x0 + 2 * guide_w + 2 * peg_gap, peg_t + 2 * peg_gap, peg_l + 0.01]);
     // label on the base, so the stand is not taken for something else
