@@ -59,7 +59,7 @@ Start with `docs/project-overview.md` (the whole project on one page) and `docs/
 | File | What it covers |
 |---|---|
 | `docs/shield-pcb.md` | the shield PCB rev A (the board that exists): scope, schematic, routed board, mounting holes, connectors, ordering at JLCPCB, first power-up, decided and open points |
-| `docs/shield-pcb-rev-b.md` | the planned next revisions (rev B prepared, not ordered; ideas such as the servo connector deeper under the Zero): future state, may be out of date |
+| `docs/shield-pcb-rev-b.md` | the planned next revisions (rev B prepared, not ordered; ideas such as marking the USB side of the Zero): future state, may be out of date |
 | `docs/soldering.md` | soldering the hand-fitted parts of the shield (J1, J3, J4): the two ways of fitting J1, the printed stand with its insert, the procedure (one pass for J1 pins out, two for pins in) |
 | `docs/shield-cost-comparison.md` | price of 5 assembled boards: PCBWay, JLCPCB with the original parts, JLCPCB with basic parts |
 | `docs/speaker-measurement.md` | how the speaker response is measured (`speaker_sweep`), results bare and in the boxes, the speaker EQ |
