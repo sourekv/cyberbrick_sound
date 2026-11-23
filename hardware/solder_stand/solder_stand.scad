@@ -26,8 +26,8 @@
 // Export (OpenSCAD 2021.01):
 //   openscad -o solder_stand.stl solder_stand.scad
 //   openscad -o solder_stand_preview.png -D 'part="preview"' solder_stand.scad   (with the board, not for printing)
-//   solder_stand_steps.png: three renders with -D 'part="assembly"' -D explode=45 / 18 / 0 (Tomorrow colour scheme),
-//   joined with ImageMagick montage
+//   solder_stand_steps.png: six renders (-D 'part="assembly"' -D pass_no=1 or 2 -D explode=40 / 15 / 0, Tomorrow colour scheme, camera
+//   114.5,108,38,60,0,200,250; the top row the first pass, the bottom row the second), joined with ImageMagick montage (tools/make_stand_steps.ps1 is not kept; see the git history of this line for the command)
 
 part = "stand";      // "stand", "j1_insert" (the loose insert for J1) or "preview" (stand with the board and the Zero as ghosts)
 
@@ -119,7 +119,17 @@ module ghosts() {
 // Coloured assembly for the how-to pictures (part="assembly"): the board with the Zero, the socket strips and J1,
 // upside down, lifted by `explode` mm above its place; the foam lifted by explode / 2.
 explode = 0;
+pass_no = 2;   // 1: first pass (J1, board top side up, the loose insert, no foam), 2: second pass (J3/J4 with the Zero and the foam, no insert)
 foam_t  = 6;
+
+module j1_on_board(top) {
+  // J1: body on the board, long pins over the edge, short pins through the board
+  color([0.1, 0.1, 0.1]) translate([j1_x0 + 0.3, by0 + 0.05, top - j1_body_t]) cube([j1_x1 - j1_x0 - 0.6, 2.66, j1_body_t]);
+  for (x = [111.96, 114.50, 117.04]) color("gold") {
+    translate([x - 0.32, 94.05, top - 1.27 - 0.32]) cube([0.64, 104.15 - 94.05 + 0.32, 0.64]);
+    translate([x - 0.32, 104.15 - 0.32, top - 1.27 - 0.32]) cube([0.64, 0.64, 1.27 + 0.32 + board_t + 1.5]);
+  }
+}
 
 module board_assembly() {
   top = base_t + post_h;
@@ -129,6 +139,7 @@ module board_assembly() {
   }
   for (h = holes) color("gold") translate([h[0], h[1], top + board_t - 0.01])
     difference() { cylinder(d = 6, h = 0.05); cylinder(d = 2.7, h = 1, center = true); }
+  if (pass_no == 2) {
   // socket strips with their pins through the board
   for (x = [106.88, 122.12]) {
     color([0.1, 0.1, 0.1]) translate([x - 1.27, 104.84 - 1.27, top - 8.5]) cube([2.54, 9 * 2.54, 8.5]);
@@ -140,12 +151,10 @@ module board_assembly() {
   color("royalblue") translate([cx - 9, cy - 11.75, zt - 1.0]) cube([18, 23.5, 1.0]);
   color("silver") translate([cx - 4.5, cy - 11.75 - 0.5, zt - 1.0 - 3.2]) cube([9, 7.4, 3.2]);   // USB-C
   color([0.2, 0.2, 0.2]) translate([cx - 3.5, cy - 1, zt - 1.0 - 0.9]) cube([7, 7, 0.9]);         // chip
-  // J1: body on the board, long pins over the edge, short pins through the board
-  color([0.1, 0.1, 0.1]) translate([j1_x0 + 0.3, by0 + 0.05, top - j1_body_t]) cube([j1_x1 - j1_x0 - 0.6, 2.66, j1_body_t]);
-  for (x = [111.96, 114.50, 117.04]) color("gold") {
-    translate([x - 0.32, 94.05, top - 1.27 - 0.32]) cube([0.64, 104.15 - 94.05 + 0.32, 0.64]);
-    translate([x - 0.32, 104.15 - 0.32, top - 1.27 - 0.32]) cube([0.64, 0.64, 1.27 + 0.32 + board_t + 1.5]);
   }
+  // J1 (always on the underside of the board): in the first pass it hangs on the stand side, in the second it is on the far side
+  if (pass_no == 1) j1_on_board(top);
+  else translate([0, 0, 2 * top + board_t]) mirror([0, 0, 1]) j1_on_board(top);
 }
 
 module foam() {
@@ -171,8 +180,8 @@ module j1_insert() {
 
 if (part == "assembly") {
   color("orange") stand();
-  color("orange") j1_insert();
-  translate([0, 0, explode / 2]) foam();
+  if (pass_no == 1) color("orange") j1_insert();
+  if (pass_no == 2) translate([0, 0, explode / 2]) foam();
   translate([0, 0, explode]) board_assembly();
 } else if (part == "j1_insert") {
   j1_insert();
