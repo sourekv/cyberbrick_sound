@@ -27,7 +27,7 @@
 //   openscad -o solder_stand.stl solder_stand.scad
 //   openscad -o solder_stand_preview.png -D 'part="preview"' solder_stand.scad   (with the board, not for printing)
 //   solder_stand_steps.png: six renders (-D 'part="assembly"' -D pass_no=1 or 2 -D explode=40 / 15 / 0, Tomorrow colour scheme, camera
-//   114.5,108,38,60,0,200,250; the top row the first pass, the bottom row the second), joined with ImageMagick montage (tools/make_stand_steps.ps1 is not kept; see the git history of this line for the command)
+//   114.5,108,38,60,0,200,250; the top row the first pass, the bottom row the second), joined with ImageMagick montage
 
 part = "stand";      // "stand", "j1_insert" (the loose insert for J1) or "preview" (stand with the board and the Zero as ghosts)
 
