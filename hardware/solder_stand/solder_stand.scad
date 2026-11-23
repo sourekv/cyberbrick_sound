@@ -30,7 +30,7 @@
 //   solder_stand_variants.png: -D 'part="use_a"' and 'part="use_b"' (the stand with the insert and J1, without the board), camera
 //   114.5,106,22,55,0,160,170, joined with montage and labels
 //   solder_stand_steps.png: six renders (-D 'part="assembly"' -D pass_no=1 or 2 -D explode=40 / 15 / 0, Tomorrow colour scheme, camera
-//   114.5,108,38,60,0,200,250; variant a): pass_no=3 and -D band=true / 'band="across"', four pictures; variant b): the top row the first pass, the bottom row the second), joined with ImageMagick montage; the last picture with -D band=true (the rubber bands), a caption on top; solder_stand_steps_b.png is the same with -D variant=\"b\" (variant a is the default)
+//   114.5,108,38,60,0,200,250; variant a): pass_no=3 and -D band=true / 'band="across"', four pictures; variant b): the top row the first pass, the bottom row the second), joined with ImageMagick montage; the last picture with -D band=true (the rubber bands), black frames and captions under the pictures; solder_stand_steps_b.png is the same with -D variant=\"b\" (variant a is the default)
 
 part = "stand";      // "stand", "j1_insert" (the loose insert for J1) or "preview" (stand with the board and the Zero as ghosts)
 
