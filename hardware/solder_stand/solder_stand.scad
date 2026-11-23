@@ -157,11 +157,10 @@ module board_assembly() {
   color("silver") translate([cx - 4.5, cy - 11.75 - 0.5, zt - 1.0 - 3.2]) cube([9, 7.4, 3.2]);   // USB-C
   color([0.2, 0.2, 0.2]) translate([cx - 3.5, cy - 1, zt - 1.0 - 0.9]) cube([7, 7, 0.9]);         // chip
   }
-  // J1 (always on the underside of the board): in the first pass it hangs on the stand side, in the second it is on the far side
+  // J1 (always on the underside of the board): in the first pass it lies on the insert (drawn separately), in the second it is on the far side
   turn_b = variant == "b" ? 180 : 0;
   translate([cx, row_y, 0]) rotate([0, 0, turn_b]) translate([-cx, -row_y, 0]) {
-    if (pass_no == 1) j1_on_board(top);
-    else translate([0, 0, 2 * top + board_t]) mirror([0, 0, 1]) j1_on_board(top);
+    if (pass_no == 2) translate([0, 0, 2 * top + board_t]) mirror([0, 0, 1]) j1_on_board(top);
   }
 }
 
@@ -220,6 +219,8 @@ if (part == "use_a" || part == "use_b") {
 } else if (part == "assembly") {
   color("orange") stand();
   if (pass_no == 1 || variant == "a") translate([cx, row_y, 0]) rotate([0, 0, variant == "b" ? 180 : 0]) translate([-cx, -row_y, 0]) color("orange") j1_insert();
+  // first pass: J1 lies on the insert (the board comes over its short pins and ends up above it)
+  if (pass_no == 1) translate([cx, row_y, 0]) rotate([0, 0, variant == "b" ? 180 : 0]) translate([-cx, -row_y, 0]) j1_header();
   if (pass_no == 2) translate([0, 0, explode / 2]) foam();
   translate([0, 0, explode]) board_assembly();
   if (band) bands();
