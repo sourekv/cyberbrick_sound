@@ -69,17 +69,22 @@ two passes; it has not been checked against photos yet.
 
 ![The steps of the variant a), the pins out](../hardware/solder_stand/solder_stand_steps.png)
 
-### Variant b): the pins in (insert in socket B, turned by 180 degrees)
+### Variant b): the pins in (insert in socket B, turned by 180 degrees), two passes
+
+Checked against photos of the soldering (2026-11-23). J1 is on the opposite side of the board from the strips and the Zero, so the board is turned over between the passes.
 
 First pass, J1:
 
 1. Put the insert into socket B, turned by 180 degrees, under the board.
-2. Lay J1 on the insert, turned by 180 degrees as well: the body on the ledge, the long pins in the slots of the comb, the short
-   pins pointing up.
-3. **Hold the pins of J1 in place by hand**, and only then put the board on the posts, top side up (no foam).
-4. Solder J1 from the top side. Then **take the insert out** of socket B.
+2. Lay J1 on the insert, turned by 180 degrees as well: the body on the ledge, the long pins in the slots of the comb (they point into the board), the short pins up.
+3. **Hold the pins of J1 in place by hand**, and only then put the board on the posts with the **side with the components up** (no Zero, no foam). The short pins go through the holes of J1.
+4. Put the rubber band across the board, and solder J1 from the visible side. Then **take the insert out** of socket B.
 
-Second pass, J3 and J4: as in variant a), without the insert and without J1 (steps 3 to 5).
+Second pass, J3 and J4:
+
+1. Plug both 1x9 socket strips onto the pins of the Zero, and put the foam into the pocket.
+2. Put the board on the posts **turned over** (the soldered side with the J1 body up, the Zero and the strips below it).
+3. Put the rubber band lengthwise, over the body of J1 between its pins. Solder one pin at each end of every strip, check that everything sits flat, then solder the rest of J3 and J4.
 
 ![The steps of the variant b), the pins in](../hardware/solder_stand/solder_stand_steps_b.png)
 

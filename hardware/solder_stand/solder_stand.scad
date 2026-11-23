@@ -245,8 +245,8 @@ if (part == "use_a" || part == "use_b") {
   if (pass_no == 1 || pass_no == 3) translate([cx, row_y, 0]) rotate([0, 0, variant == "b" ? 180 : 0]) translate([-cx, -row_y, 0]) j1_header();
   if (pass_no >= 2) translate([0, 0, explode / 2]) foam();
   translate([0, 0, explode]) board_assembly();
-  if (pass_no == 3 && band == true) bands_along();
-  else if (pass_no == 3 && band == "across") bands_across();
+  if (band == "across") bands_across();
+  else if (pass_no == 3 && band == true) bands_along();
   else if (band) bands();
 } else if (part == "j1_insert") {
   j1_insert();
