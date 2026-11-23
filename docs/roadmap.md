@@ -13,7 +13,6 @@ other documents describe what exists and link here for what is missing. Ideas th
 | Enclosure for the model | - | designed from scratch around the chosen speaker; the printed box is a test fixture only |
 | Long power test with the motor running | `bringup.md` | does the servo-port 5 V hold with the module and the motor together |
 | The other four rev A boards | `shield-pcb.md` | solder J1, J3 and J4 and check them like the first one (the first board plays, see "Done") |
-| Try the printed solder stand with rubber bands | `shield-pcb.md`, `hardware/solder_stand/` (print with Bridge direction 45 degrees, because of the band grooves) | a thicker base (8 mm) and grooves for the bands are in the model (2026-11-22), and so is one loose insert for J1 (ledge, guides, comb; two sockets, `part = "j1_insert"`; for the underside in the first pass only); none of it printed or tried yet |
 
 ## To check on hardware
 
@@ -66,6 +65,7 @@ Not started; recorded so the design does not block them.
 
 The detail is in the document named at the end of each line.
 
+- **Solder stand, third iteration** (2026-11-23): the base with the grooves for rubber bands, two sockets and one loose insert for J1 (top side or underside), printed and works; the J1 pins have to be held in place by hand first and then the board is put into the stand (`shield-pcb.md`, `hardware/solder_stand/`).
 - **Choose the engine sound** (2026-11-14): the choice is left to the user; the candidates became the default sets of the sets app, with the shift sound in all
   of them (`user-sounds.md`, `sound-research.md`).
 - **Shield: approve and receive, first power-up** (ordered 2026-11-13, delivered 2026-11-20, the first rev A board works since 2026-11-21): J1, J3 and J4
