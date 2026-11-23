@@ -82,4 +82,3 @@ Two passes: J1 first, then J3 and J4.
 - The stack height of the Zero (the socket 8.5 mm, its header and its own parts) was not measured; the foam takes up the
   difference, and the posts only have to be taller than the stack.
 - The stand is symmetric about the long axis of the board, so it does not matter that the board lies mirrored.
-- Lower sockets (3.5 mm, LaskaKit `LA217087H`) would need a new pocket depth; see `docs/shield-pcb.md`.

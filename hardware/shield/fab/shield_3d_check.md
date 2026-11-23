@@ -66,7 +66,4 @@ Parts under (or partly under) the Zero, tallest first: J2 2.96, J1 2.54, D1 1.26
 | Socket strip | Zero underside (mm) | Tallest part under it | Room left (mm) |
 |---|---|---|---|
 | 8.5 mm | 11.00 | 2.96 (J2) | 8.04 |
-| 3.5 mm (LaskaKit low strip) | 6.00 | 2.96 (J2) | 3.04 |
-
-The Zero's pins are probably longer than the 3.5 mm body: then they bottom out in the socket and the plastic does not seat, so the real underside is higher than listed, never lower.
 

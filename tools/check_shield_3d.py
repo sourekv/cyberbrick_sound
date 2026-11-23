@@ -8,7 +8,7 @@ Zero is not on the board; it is added as a plate of 18 x 23.5 x 1.6 mm over the 
     "C:\\Program Files\\KiCad\\bin\\python.exe" tools/check_shield_3d.py            report on the console
     "C:\\Program Files\\KiCad\\bin\\python.exe" tools/check_shield_3d.py --md hardware/shield/fab/shield_3d_check.md
 
-Options: --socket-h 8.5 (height of the socket strips; the report also gives 3.5 for the low LaskaKit strip),
+Options: --socket-h 8.5 (height of the socket strips),
 --male-body 2.5 (thickness of the black plastic of the Zero's own pin header, which sits on the socket).
 Not a CAD collision check of the whole assembly: the shapes are boxes, and the Zero's pins and chips are not modelled.
 """
@@ -222,11 +222,9 @@ def main():
     out("| Socket strip | Zero underside (mm) | Tallest part under it | Room left (mm) |")
     out("|---|---|---|---|")
     top_h = under[0][1] if under else 0.0
-    for name, h in (("8.5 mm", args.socket_h), ("3.5 mm (LaskaKit low strip)", 3.5)):
+    for name, h in (("8.5 mm", args.socket_h),):
         u = h + args.male_body
         out(f"| {name} | {u:.2f} | {top_h:.2f} ({under[0][0] if under else '-'}) | {u - top_h:.2f} |")
-    out("")
-    out("The Zero's pins are probably longer than the 3.5 mm body: then they bottom out in the socket and the plastic does not seat, so the real underside is higher than listed, never lower.")
     out("")
 
     text = "\n".join(lines)
