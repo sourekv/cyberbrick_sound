@@ -85,6 +85,13 @@ Second pass, J3 and J4:
 
 ![The steps of the variant b), the pins in](../hardware/solder_stand/solder_stand_steps_b.png)
 
+## X-ray pictures
+
+The same steps with the stand, the board and the foam semi-transparent, so that the parts hidden behind them show (J1 and the insert under the board, the Zero under the foam). They are an addition to the pictures above, not a replacement:
+
+- [variant a), the pins out](../hardware/solder_stand/xray/solder_stand_steps.png)
+- [variant b), the pins in](../hardware/solder_stand/xray/solder_stand_steps_b.png)
+
 ## Notes
 
 - The stack height of the Zero (the socket 8.5 mm, its header and its own parts) was not measured; the foam takes up the

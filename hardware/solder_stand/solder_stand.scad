@@ -30,7 +30,7 @@
 //   solder_stand_variants.png: -D 'part="use_a"' and 'part="use_b"' (the stand with the insert and J1, without the board), camera
 //   114.5,106,22,55,0,160,170, joined with montage and labels
 //   solder_stand_steps.png: six renders (-D 'part="assembly"' -D pass_no=1 or 2 -D explode=40 / 15 / 0, Tomorrow colour scheme, camera
-//   114.5,108,38,60,0,200,250; variant a): pass_no=3 and -D band=true / 'band="across"', four pictures; variant b): the top row the first pass, the bottom row the second), joined with ImageMagick montage; the last picture with -D band=true (the rubber bands), black frames and captions under the pictures; solder_stand_steps_b.png is the same with -D variant=\"b\" (variant a is the default)
+//   114.5,108,38,60,0,200,250; variant a): pass_no=3 and -D band=true / 'band="across"', four pictures; variant b): the top row the first pass, the bottom row the second), joined with ImageMagick montage; the last picture with -D band=true (the rubber bands), black frames and captions under the pictures; the same with -D xray=true goes to xray/ (title 'X-ray'); solder_stand_steps_b.png is the same with -D variant=\"b\" (variant a is the default)
 
 part = "stand";      // "stand", "j1_insert" (the loose insert for J1) or "preview" (stand with the board and the Zero as ghosts)
 
@@ -123,6 +123,7 @@ module ghosts() {
 // upside down, lifted by `explode` mm above its place; the foam lifted by explode / 2.
 explode = 0;
 variant = "a";   // "a": J1 pins out (insert in socket A), "b": pins in (insert and J1 turned by 180 degrees, socket B); for the assembly pictures
+xray = false;   // semi-transparent stand, board and foam, so that hidden parts show (pictures in xray/); J1, the insert and the Zero stay opaque
 band = false;   // draw the rubber bands (second pass, explode = 0)
 pass_no = 2;   // 3: variant a), ONE pass: J1 on the insert, the Zero with the strips and the foam, all together (as photographed 2026-11-23)
 // (pass_no 1 and 2 are the two passes of variant b)   // 1: first pass (J1, board top side up, the loose insert, no foam), 2: second pass (J3/J4 with the Zero and the foam; the insert only in variant a)
@@ -139,7 +140,7 @@ module j1_on_board(top) {
 
 module board_assembly() {
   top = base_t + post_h;
-  color("darkgreen") difference() {
+  color("darkgreen", xray ? 0.35 : 1) difference() {
     translate([bx0, by0, top]) cube([bx1 - bx0, by1 - by0, board_t]);
     for (h = holes) translate([h[0], h[1], top - 1]) cylinder(d = 2.7, h = 5);
   }
@@ -166,7 +167,7 @@ module board_assembly() {
 }
 
 module foam() {
-  color([0.95, 0.75, 0.8]) translate([cx - 9, cy - 11, base_t]) cube([18, 22, foam_t]);
+  color([0.95, 0.75, 0.8], xray ? 0.35 : 1) translate([cx - 9, cy - 11, base_t]) cube([18, 22, foam_t]);
 }
 
 // the loose insert, shown in socket A (outside the board edge, y = row_y - u); for socket B turn it by 180 degrees about (cx, row_y).
@@ -239,7 +240,7 @@ if (part == "use_a" || part == "use_b") {
   turn = part == "use_b" ? 180 : 0;
   translate([cx, row_y, 0]) rotate([0, 0, turn]) translate([-cx, -row_y, 0]) { color("orange") j1_insert(); j1_header(); }
 } else if (part == "assembly") {
-  color("orange") stand();
+  color("orange", xray ? 0.2 : 1) stand();
   if (pass_no == 1 || variant == "a") translate([cx, row_y, 0]) rotate([0, 0, variant == "b" ? 180 : 0]) translate([-cx, -row_y, 0]) color("orange") j1_insert();
   // first pass: J1 lies on the insert (the board comes over its short pins and ends up above it)
   if (pass_no == 1 || pass_no == 3) translate([cx, row_y, 0]) rotate([0, 0, variant == "b" ? 180 : 0]) translate([-cx, -row_y, 0]) j1_header();
