@@ -89,9 +89,6 @@ def panel(vid, title, sub, tx_px=None):
     j2 = next(q for q in L.PARTS if q["ref"] == "J2")
     o.append(rect(j2["x"] - 2.0, L.BOARD_H, j2["x"] + 2.0, L.BOARD_H + 5.0, fill="none", stroke=MUTED, stroke_width=1.2, stroke_dasharray="5 4"))
     o.append(text(j2["x"], L.BOARD_H + 2.5, "speaker plug", 12, "middle", fill=MUTED))
-    # USB-C of the Zero (above, for orientation)
-    o.append(rect(4.53, -0.15, 13.47, 7.15, fill="none", stroke="#8d949c", stroke_width=1.2, stroke_dasharray="2 4"))
-    o.append(text(9.0, 7.7, "USB-C of the Zero (above)", 11, "middle", fill="#8d949c"))
 
     # header strips
     for hx in L.HDR_X:
