@@ -58,7 +58,8 @@ Start with `docs/project-overview.md` (the whole project on one page) and `docs/
 
 | File | What it covers |
 |---|---|
-| `docs/shield-pcb.md` | the shield PCB: scope, schematic, routed board, mounting holes, connectors, ordering at JLCPCB, decided and open points |
+| `docs/shield-pcb.md` | the shield PCB rev A (the board that exists): scope, schematic, routed board, mounting holes, connectors, ordering at JLCPCB, first power-up, decided and open points |
+| `docs/shield-pcb-rev-b.md` | the planned next revisions (rev B prepared, not ordered; ideas such as the servo connector deeper under the Zero): future state, may be out of date |
 | `docs/soldering.md` | soldering the hand-fitted parts of the shield (J1, J3, J4): the two ways of fitting J1, the printed stand with its insert, the procedure (one pass for J1 pins out, two for pins in) |
 | `docs/shield-cost-comparison.md` | price of 5 assembled boards: PCBWay, JLCPCB with the original parts, JLCPCB with basic parts |
 | `docs/speaker-measurement.md` | how the speaker response is measured (`speaker_sweep`), results bare and in the boxes, the speaker EQ |
@@ -94,7 +95,7 @@ A short map of every directory: `docs/contents.md`.
 - `docs/` - documentation (see above), wiring pictures, measurements (`docs/measurements/`)
 - `hardware/shield/` - KiCad project of the shield board: schematic, routed PCB, manufacturing files. Versioned by
   revision letters with git tags `hw-shield-revA`, ... on the ordered files (rev A ordered; rev B, silkscreen only, is
-  prepared and not ordered; `docs/shield-pcb.md`, "Revisions");
+  prepared and not ordered; `docs/shield-pcb.md`, "Revisions", and `docs/shield-pcb-rev-b.md`);
   the firmware has its own numbers and tags `v0.1.0`, ... (see "Firmware version")
 - `hardware/speaker_box/` - the sealed speaker box: OpenSCAD source, Fusion 360 script, Bambu Studio project
 - `hardware/solder_stand/` - printed stand for soldering the socket strips and the servo header onto the shield
