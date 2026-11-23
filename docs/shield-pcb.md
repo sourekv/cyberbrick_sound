@@ -246,7 +246,7 @@ To connect the finished board in the model, whichever service makes it:
 strips straight) in a pocket on a piece of foam and the J1 body on a ledge: `hardware/solder_stand/` (OpenSCAD, the
 steps are in the header of `solder_stand.scad`).
 
-The solder jumpers JP1/JP2 need no work for the default setting (9 dB gain, JP2 bridged in copper).
+The solder jumpers JP1/JP2 need no work for the default setting (9 dB gain, JP2 bridged in copper). If a quieter speaker is used (an 8 Ohm one plays about 3 dB quieter than a 4 Ohm one), bridge JP1 with a blob of solder for 15 dB (6 dB more); the picture and the steps are in `speaker-measurement.md`, "Speaker impedance: 4 Ohm or 8 Ohm".
 
 **Ordered at GM Electronic (gme.cz) on 2026-11-13, order [number removed]**, 187.50 CZK incl. VAT plus shipping: **The whole order has arrived (reported by the owner on 2026-11-20): the male header 832-539, the three socket strips 832-093 and the five servo cables 775-123.**
 
