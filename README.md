@@ -141,6 +141,8 @@ Source: `docs/wiring-current.svg`. Earlier development stages (module on USB, on
 then power from the servo port): `docs/wiring-overview.png`, `docs/wiring-stage2.png`, `docs/wiring-test-tone.png`.
 Pins, test order and measurements: `docs/bringup.md`.
 
+**Note on old version strings:** on 2026-11-24 the git history was rewritten before the repository was made public, so every commit hash changed. Version strings that the module reported before that date (in `docs/ble-link.md`, `docs/shield-pcb.md` and `docs/bringup.md`, for example `0.1.0+7890eb9`) are the hashes of the old history and no longer exist in the repository; the dates next to them identify the commits.
+
 ## Licence
 
 The work of this project (firmware, web app, tools, documentation, hardware design files) is under the **GNU GPL v3 or later**, see `LICENSE`. The third-party sounds in `assets/samples/` keep their own licences, listed file by file in `assets/samples/LICENSE-SAMPLES.md`.
