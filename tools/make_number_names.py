@@ -4,7 +4,7 @@ number, "One." ... "Ninety nine.", spoken by Piper (en_US-ljspeech, public domai
 sets. They are stored compressed (Opus in Ogg, 24 kbit/s, about 0.2 MB for all) as base64 in web/number_names.js, which
 the page decodes and converts to the module's WAV format, so the page needs no download for the number.
 
-    python tools/make_number_names.py --piper C:/path/to/piper_tts/piper --model C:/path/to/piper_tts/en_US-ljspeech-medium.onnx
+    python tools/make_number_names.py --piper C:\path\to\piper_tts\piper --model C:\path\to\piper_tts\en_US-ljspeech-medium.onnx
 
 Needs piper.exe (downloaded by the user, see "Making the name" in docs/user-sounds.md) and ffmpeg with libopus on the PATH.
 The output is committed (small); regenerate only to change the voice. The sounds are Piper output of a public-domain

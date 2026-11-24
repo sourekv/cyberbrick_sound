@@ -77,7 +77,7 @@ about 0.14 Ohm, negligible against the 4 Ohm speaker. Also sold: 50 mm (IC005), 
 
 ### Order of 2026-11-13
 
-- JLCPCB order [order number removed], paid 2026-11-13: PCB [number removed] and Economic PCBA [number removed],
+- JLCPCB order (number not recorded here), paid 2026-11-13: PCB and Economic PCBA,
   5 boards, files from `fab/jlcpcb_basic/`. **LED1 is therefore red** (Kento KT-0603R, C2286), not green: the
   board files and `shield_bom.csv` still say "green" (the design value, rev A tag), the files that were ordered say
   red. Its drop is lower than a green one's, so with the 1 k resistor it takes a little more than the 3 mA estimated
@@ -246,7 +246,7 @@ To connect the finished board in the model, whichever service makes it:
 
 The solder jumpers JP1/JP2 need no work for the default setting (9 dB gain, JP2 bridged in copper). If a quieter speaker is used (an 8 Ohm one plays about 3 dB quieter than a 4 Ohm one), bridge JP1 with a blob of solder for 15 dB (6 dB more); the picture and the steps are in `speaker-measurement.md`, "Speaker impedance: 4 Ohm or 8 Ohm".
 
-**Ordered at GM Electronic (gme.cz) on 2026-11-13, order [number removed]**, 187.50 CZK incl. VAT plus shipping: **The whole order has arrived (reported by the owner on 2026-11-20): the male header 832-539, the three socket strips 832-093 and the five servo cables 775-123.**
+**Ordered at GM Electronic (gme.cz) on 2026-11-13**, 187.50 CZK incl. VAT plus shipping: **The whole order has arrived (reported by the owner on 2026-11-20): the male header 832-539, the three socket strips 832-093 and the five servo cables 775-123.**
 
 | GME code | Part | Qty | For |
 |---|---|---|---|
