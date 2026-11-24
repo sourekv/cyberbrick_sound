@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Builds a small test sound set for the `engine_sets` firmware and the web page (docs/user-sounds.md): a sample set
 made of synthetic sounds that are easy to tell apart, so that writing a set to the module, playing it and the demo can
-be checked by ear. Everything is generated here (no recordings, no third-party sound), so the files are ours (MIT).
+be checked by ear. Everything is generated here (no recordings, no third-party sound), so the files are ours (GNU GPL v3 or later).
 
     python tools/make_test_set.py            writes assets/test_set/09_test/ (about 0.3 MB)
 

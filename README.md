@@ -143,4 +143,4 @@ Pins, test order and measurements: `docs/bringup.md`.
 
 ## Licence
 
-The work of this project (firmware, web app, tools, documentation, hardware design files) is under the MIT licence, see `LICENSE`. The third-party sounds in `assets/samples/` keep their own licences, listed file by file in `assets/samples/LICENSE-SAMPLES.md`.
+The work of this project (firmware, web app, tools, documentation, hardware design files) is under the **GNU GPL v3 or later**, see `LICENSE`. The third-party sounds in `assets/samples/` keep their own licences, listed file by file in `assets/samples/LICENSE-SAMPLES.md`.

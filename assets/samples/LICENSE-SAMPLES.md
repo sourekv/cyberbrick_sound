@@ -14,7 +14,7 @@ or it is polite, it is in the last column; the details of each sound are in the 
 | Per-gear loops (`gear_a_r03-29.wav`, `gear_b_r03-32.wav`) | Freesound [487151](https://freesound.org/s/487151/), [487152](https://freesound.org/s/487152/), pack [Vintage Trucks (Red Lib)](https://freesound.org/people/craigsmith/packs/27529/) | craigsmith (Red Library, digitised 1930s-40s optical sound effects) | CC0 | Thanks to craigsmith |
 | Gear shift grind (`shift_grind.wav`, in every set) | [Freesound 438031](https://freesound.org/s/438031/) | craigsmith (a digitised copy of Hollywood sound effects, transferred by USC Cinema) | CC0 | Thanks to craigsmith and USC Cinema |
 | Spoken names and numbers (`firmware/include/voice_prompts.h`, `web/number_names.js`, `name.wav` of the default sets) | made with [Piper](https://github.com/rhasspy/piper) and the voice `en_US-ljspeech-medium` ([model card](https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/ljspeech/medium)), trained on the LJ Speech dataset | Piper: rhasspy; the voice: LJ Speech (public domain) | Piper MIT; voice public domain | Thanks to the Piper project and the LJ Speech dataset |
-| Synthesised engines, starter, horn, test set (`assets/test_set/`, the synth presets) | made by this project's own code from formulas | this project | MIT (our own) | none |
+| Synthesised engines, starter, horn, test set (`assets/test_set/`, the synth presets) | made by this project's own code from formulas | this project | GNU GPL v3 or later (our own) | none |
 
 The CC0 of the craigsmith sounds is the digitiser's declaration: the rights to the original 1930s-60s Hollywood effects cannot be verified.
 

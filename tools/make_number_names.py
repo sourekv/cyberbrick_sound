@@ -8,7 +8,7 @@ the page decodes and converts to the module's WAV format, so the page needs no d
 
 Needs piper.exe (downloaded by the user, see "Making the name" in docs/user-sounds.md) and ffmpeg with libopus on the PATH.
 The output is committed (small); regenerate only to change the voice. The sounds are Piper output of a public-domain
-voice, ours (MIT, like the rest).
+voice, ours (GNU GPL v3 or later, like the rest).
 """
 import argparse, base64, json, os, subprocess, sys, tempfile, wave
 import numpy as np
