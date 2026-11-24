@@ -140,3 +140,7 @@ in `@info`.
 Source: `docs/wiring-current.svg`. Earlier development stages (module on USB, only signal and GND from the receiver;
 then power from the servo port): `docs/wiring-overview.png`, `docs/wiring-stage2.png`, `docs/wiring-test-tone.png`.
 Pins, test order and measurements: `docs/bringup.md`.
+
+## Licence
+
+The work of this project (firmware, web app, tools, documentation, hardware design files) is under the MIT licence, see `LICENSE`. The third-party sounds in `assets/samples/` keep their own licences, listed file by file in `assets/samples/LICENSE-SAMPLES.md`.
