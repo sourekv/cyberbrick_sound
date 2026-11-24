@@ -258,7 +258,7 @@ GME has no breakable 8.5 mm female strip (the breakable "precision" strips are 7
 for the Zero's square pins), so the 1x9 pieces are cut: pull out the 10th contact, cut through the empty place,
 file the end. The jumper cable's wire colours are not the JR ones; check pin 1 to pin 1 with a multimeter before
 the first use. The speaker cables (Bambu Lab IC007, 200 mm, one pack of 5 pieces, one per board) were ordered at the Bambu Lab EU store on 2026-11-13,
-order [order number removed]; shipped on 2026-11-14 by DHL ([tracking number removed]); **delivered, five pieces (reported by the owner on 2026-11-20)**. The first board gets the Zero and the speaker of the breadboard prototype (plan of
+shipped on 2026-11-14 by DHL; **delivered, five pieces (reported by the owner on 2026-11-20)**. The first board gets the Zero and the speaker of the breadboard prototype (plan of
 2026-11-13); more Zeros and speakers are ordered after that board works.
 
 **Ordered at Allegro.cz on 2026-11-13** (one parcel per seller, paid):
