@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="660" viewBox="0 0 1000 660" font-family="Arial, Helvetica, sans-serif">
+  <rect width="1000" height="660" fill="#ffffff"/>
+  <text x="500" y="38" text-anchor="middle" font-size="26" font-weight="bold" fill="#1b2530">Servo cable: shield J1 to the receiver S4</text>
+  <text x="500" y="64" text-anchor="middle" font-size="15" fill="#5a6572">Keep the wire order the same on both ends: S, V, G. The yellow wire is S (GME cable 775-123).</text>
+
+  <!-- shield -->
+  <rect x="40" y="100" width="280" height="250" rx="14" fill="#2f9150" stroke="#1d6b38" stroke-width="3"/>
+  <text x="60" y="130" font-size="17" font-weight="bold" fill="#ffffff">Shield, rev A</text>
+  <text x="60" y="152" font-size="13" fill="#d9efe0">J1 sits at the USB end of the board</text>
+  <!-- J1 body (drawn upright for clarity) and pins -->
+  <rect x="268" y="170" width="30" height="150" fill="#222" stroke="#000" stroke-width="2"/>
+  <text x="283" y="338" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">J1</text>
+  <rect x="298" y="181" width="22" height="22" fill="#d8b04a" stroke="#7a5b12" stroke-width="2"/>
+  <circle cx="309" cy="245" r="11" fill="#d8b04a" stroke="#7a5b12" stroke-width="2"/>
+  <circle cx="309" cy="289" r="11" fill="#d8b04a" stroke="#7a5b12" stroke-width="2"/>
+  <text x="248" y="199" text-anchor="end" font-size="22" font-weight="bold" fill="#ffffff">S</text>
+  <text x="248" y="253" text-anchor="end" font-size="22" font-weight="bold" fill="#ffffff">V</text>
+  <text x="248" y="297" text-anchor="end" font-size="22" font-weight="bold" fill="#ffffff">G</text>
+  <text x="248" y="222" text-anchor="end" font-size="12" fill="#ffd7d2">square pad</text>
+
+  <!-- receiver -->
+  <rect x="680" y="100" width="280" height="250" rx="14" fill="#e9eef3" stroke="#6b7785" stroke-width="3"/>
+  <text x="700" y="130" font-size="17" font-weight="bold" fill="#1b2530">CyberBrick receiver</text>
+  <text x="700" y="152" font-size="13" fill="#5a6572">servo header S4 (PWM4)</text>
+  <rect x="682" y="170" width="30" height="150" fill="#222" stroke="#000" stroke-width="2"/>
+  <circle cx="681" cy="192" r="10" fill="#d8b04a" stroke="#7a5b12" stroke-width="2"/>
+  <circle cx="681" cy="245" r="10" fill="#d8b04a" stroke="#7a5b12" stroke-width="2"/>
+  <circle cx="681" cy="289" r="10" fill="#d8b04a" stroke="#7a5b12" stroke-width="2"/>
+  <text x="730" y="199" font-size="22" font-weight="bold" fill="#1b2530">S</text>
+  <text x="730" y="253" font-size="22" font-weight="bold" fill="#1b2530">V</text>
+  <text x="730" y="297" font-size="22" font-weight="bold" fill="#1b2530">G</text>
+
+  <!-- the three wires of the flat cable, parallel -->
+  <line x1="320" y1="192" x2="671" y2="192" stroke="#f2c500" stroke-width="12" stroke-linecap="round"/>
+  <line x1="320" y1="245" x2="671" y2="245" stroke="#8a929c" stroke-width="12" stroke-linecap="round"/>
+  <line x1="320" y1="289" x2="671" y2="289" stroke="#5a6572" stroke-width="12" stroke-linecap="round"/>
+  <text x="500" y="178" text-anchor="middle" font-size="17" font-weight="bold" fill="#8a6d00">S: the YELLOW wire</text>
+  <text x="500" y="232" text-anchor="middle" font-size="14" fill="#5a6572">V: the middle wire</text>
+  <text x="500" y="276" text-anchor="middle" font-size="14" fill="#5a6572">G: the other outer wire</text>
+
+  <!-- correct orientation box -->
+  <rect x="40" y="390" width="440" height="240" rx="12" fill="#e8f5ea" stroke="#2e7d32" stroke-width="3"/>
+  <text x="60" y="422" font-size="22" font-weight="bold" fill="#2e7d32">RIGHT</text>
+  <text x="60" y="452" font-size="15" fill="#1b2530">The yellow wire is on S at both ends:</text>
+  <text x="60" y="476" font-size="15" fill="#1b2530">- on the shield: the pin with the square pad (S)</text>
+  <text x="60" y="500" font-size="15" fill="#1b2530">- on the receiver: the S pin of S4</text>
+  <text x="60" y="534" font-size="15" fill="#1b2530">Seen from the bottom of the board (USB end up),</text>
+  <text x="60" y="558" font-size="16" font-weight="bold" fill="#1b2530">the yellow wire is on the right.</text>
+  <text x="60" y="590" font-size="13" fill="#5a6572">Rev A has no S V G letters on the board (the square</text>
+  <text x="60" y="608" font-size="13" fill="#5a6572">pad marks S); rev B prints the letters next to J1.</text>
+
+  <!-- wrong orientation box -->
+  <rect x="520" y="390" width="440" height="240" rx="12" fill="#fdecea" stroke="#b3261e" stroke-width="3"/>
+  <text x="540" y="422" font-size="22" font-weight="bold" fill="#b3261e">WRONG: cable turned by 180 degrees</text>
+  <text x="540" y="452" font-size="15" fill="#1b2530">S and G swap (the yellow wire lands on G).</text>
+  <text x="540" y="476" font-size="15" fill="#1b2530">The module does not start; the supply at J1 falls</text>
+  <text x="540" y="500" font-size="15" fill="#1b2530">to about 2.6 to 3.1 V (turned right: 4.8 V).</text>
+  <text x="540" y="534" font-size="16" font-weight="bold" fill="#1b2530">Nothing is damaged: turn the cable round.</text>
+  <text x="540" y="574" font-size="14" fill="#5a6572">Also use the port S4 only: in another port the shield</text>
+  <text x="540" y="594" font-size="14" fill="#5a6572">is powered but no channel data arrive (no start, no horn).</text>
+</svg>
