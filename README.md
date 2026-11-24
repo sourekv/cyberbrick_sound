@@ -5,6 +5,8 @@ cable from the CyberBrick receiver, gets all transmitter channels from it as ser
 through an I2S amplifier and a speaker: idle, rpm following the throttle, a virtual gearbox, ignition with starter,
 engine stop and horn. It never touches the original signal path: if the module fails, the model still drives.
 
+**Web app for the sound sets (Chrome or Edge): https://sourekv.github.io/cyberbrick_sound/**
+
 ## Status
 
 State of 2026-11-08; what is still open: `docs/roadmap.md`.
