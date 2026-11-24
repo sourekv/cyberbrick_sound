@@ -11,7 +11,7 @@
 //   @hello                 @ok cbsound <protocol version>
 //   @info                  @ok free=<bytes> total=<bytes> set=<folder or -> psram=<bytes> fw=<version> built=<date> layers=1
 //                                           default=<folder the module starts with, or ->
-//                                           (fw: include/version.h, for example 0.1.0+115518f)
+//                                           (fw: include/version.h, for example 0.1.0+7da2aa8)
 //                          (layers=1: the firmware plays layered sets, docs/layers-design.md; absent in older firmware)
 //   @ls                    @set <bytes> <folder>   (every folder in /sets)          @ok <count>
 //   @files <folder>        @file <bytes> <name>    (every file of /sets/<folder>)   @ok <count>

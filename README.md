@@ -44,7 +44,7 @@ USB tests. Connect GND first and disconnect it last (`docs/bringup.md`).
 
 ## Documentation
 
-Start with `docs/project-overview.md` (the whole project on one page) and `docs/roadmap.md` (everything still open).
+New here? **`docs/getting-started.md`** goes from the parts to the engine sound in the truck, step by step. Start with `docs/project-overview.md` (the whole project on one page) and `docs/roadmap.md` (everything still open).
 
 **Using it: controls, wiring, configuration**
 
@@ -108,8 +108,8 @@ Open `firmware/` in VS Code with the PlatformIO extension, or run `pio run -e <e
 
 **Firmware version**: `FW_VERSION` in `firmware/include/version.h` (now 0.1.0), raised by hand for every release,
 which gets the git tag `v<version>`. At build time `firmware/version.py` adds the short hash of the commit (with
-`-dirty` for uncommitted changes) and the date, so the full version reads like `0.1.0+115518f`. `engine_sets`
-prints it at boot (`cyberbrick_sound engine_sets 0.1.0+115518f, built 2026-11-14`) and reports it to the web app
+`-dirty` for uncommitted changes) and the date, so the full version reads like `0.1.0+7da2aa8`. `engine_sets`
+prints it at boot (`cyberbrick_sound engine_sets 0.1.0+7da2aa8, built 2026-11-14`) and reports it to the web app
 in `@info`.
 
 | Env | What it does |
