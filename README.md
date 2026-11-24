@@ -147,4 +147,12 @@ Pins, test order and measurements: `docs/bringup.md`.
 
 ## Licence
 
-The work of this project (firmware, web app, tools, documentation, hardware design files) is under the **GNU GPL v3 or later**, see `LICENSE`. The third-party sounds in `assets/samples/` keep their own licences, listed file by file in `assets/samples/LICENSE-SAMPLES.md`.
+The project has three licences, by kind of work:
+
+| What | Licence | Where |
+|---|---|---|
+| Software: firmware, web app, tools (and the sounds the project synthesises from its own code) | **GNU GPL v3 or later** | `LICENSE` |
+| Hardware design files: the shield board (KiCad), the printed solder stand and the speaker box (OpenSCAD) | **CERN-OHL-S v2** (strongly reciprocal open hardware licence) | `hardware/LICENSE`, `hardware/README.md` |
+| Documentation and its pictures (`docs/`) | **CC BY-SA 4.0** | `docs/LICENSE` |
+
+The third-party sounds in `assets/samples/` keep their own licences, listed file by file in `assets/samples/LICENSE-SAMPLES.md`.
