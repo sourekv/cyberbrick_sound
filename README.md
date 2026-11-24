@@ -88,7 +88,7 @@ the header of `speaker_box.scad`.
 A short map of every directory: `docs/contents.md`.
 
 - `firmware/` - PlatformIO (Arduino) project; pins and all tunable constants in `firmware/include/config.h`
-- `web/index.html` - the PC tool for the sound sets: open it in Chrome or Edge, connect the module over USB
+- `web/index.html` - the PC tool for the sound sets, also online at https://sourekv.github.io/cyberbrick_sound/ (GitHub Pages): open it in Chrome or Edge, connect the module over USB
 - `tools/` - Python and C++ helpers: sound generation and rendering (`engine_lab.py`, `speaker_model.py`), header
   generators, the speaker-measurement analysis, the shield PCB generators and checks, host tests
 - `assets/samples/` - the CC0 recordings and derived loops (`LICENSE-SAMPLES.md`)
