@@ -55,6 +55,34 @@ Details and the reasoning in `start-stop-horn.md`; the code is `firmware/include
   loss of data the engine keeps its state (a running engine keeps running, a stopped one stays silent) and only the
   throttle, as a servo pulse if there is one, can start it; ignition and horn need the data.
 
+## All sound effects: which ones the user controls
+
+The module has five effects that the user triggers directly, and several that happen by themselves from the situation. Each set of sounds
+holds the files for them (`user-sounds.md`, "Files of a set").
+
+**The user controls these directly:**
+
+| Effect | What triggers it |
+|---|---|
+| **Start of the engine**: the starter (`start.wav`, or synthesised), the engine catches with a short rev and settles to idle | the ignition switch (L1) moved from the middle to either side |
+| **Stop of the engine**: it winds down below idle and goes silent (1.4 s) | the ignition switch back to the middle |
+| **Running engine**: the rpm follows the throttle | left stick up / down (L3) |
+| **Horn** (`horn.wav`, a loop for as long as the control is held) | right shoulder stick (R1), pushed either way |
+| **Spoken name of the set** ("One. Truck.") | choosing a set with the BOOT button or in the web app |
+
+**These happen by themselves, the user does not control them:**
+
+| Effect | What causes it |
+|---|---|
+| **Loaded layer**: the "under load" sound is blended into the idle one | the size of the throttle, worked out by the module |
+| **Gear shift**: on a shift to a higher gear the shift sound (`shift.wav`) and a short dip of the pitch, on a shift down a jump of the pitch | the virtual gearbox (five gears), worked out from the throttle |
+| **Reverse**: no shift | the stick pushed the other way from forward |
+| **The engine starts without the starter** | the throttle moved while the engine is off, so that the truck never moves in silence |
+| **The shape of the stop** | the rpm at the moment of the stop: from full throttle it sounds different from one at idle |
+| **Status LED** (not a sound): a blue flash after power-up, red without data, dim green at rest, brightening cyan with the throttle | the state of the data and the throttle |
+
+Not effects, but worth knowing: the engine state is held over a data gap of up to 2 s, and the speaker EQ corrects the sound for the box.
+
 ## The program on the receiver ("Sound data")
 
 The program runs on the receiver in the model (CyberBrick Remote Control Receiver Shield - XA003 XA004; an ESP32-C3
