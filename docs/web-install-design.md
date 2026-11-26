@@ -88,4 +88,4 @@ the job is the same as on a developer's computer.
 ## Open questions
 
 - Publish on a version tag (proposed) or on every change of the firmware?
-- Is a spare, blank ESP32-S3-Zero-N8R8 available for the tests? A working module can be used too, with its sets lost.
+- No spare blank module is available (owner, 2026-11-26). The tests use a working module whose flash is erased first (`pio run -e engine_sets -t erase`), which makes it behave like a new one. Its own sound sets, name and volume are lost, so save what matters with the page first; the cable install (`first-install.md`) brings the default state back. A bought spare module (a few EUR) would avoid this and also covers the 2 MB PSRAM test only if it is the basic variant.
