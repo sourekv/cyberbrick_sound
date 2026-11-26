@@ -41,6 +41,7 @@ Where to start, by what you want to do. Every document is in English; the files 
 |---|---|
 | [Roadmap](roadmap.md) | everything that is still open |
 | [Rejected ideas](rejected-ideas.md) | what was considered and dropped, and why |
+| [First install from the web page](web-install-design.md) | design, not built: flashing a new module from the browser |
 | [Next revisions of the board](shield-pcb-rev-b.md) | rev B (prepared, not ordered) and ideas; future state, may be out of date |
 | [Price comparison of assembled boards](shield-cost-comparison.md) | PCBWay and JLCPCB |
 | [Ideal against ordered parts](shield-bom-compare.md) | the differences between the full and the ordered bill of materials |

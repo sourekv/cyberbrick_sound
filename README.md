@@ -87,6 +87,7 @@ the header of `speaker_box.scad`.
 | File | What it covers |
 |---|---|
 | `docs/roadmap.md` | everything open: next steps, checks on hardware, missing sound features, the development outlook |
+| `docs/web-install-design.md` | design (not built): the first install of a new module from the web page |
 | `docs/rejected-ideas.md` | ideas that were considered and dropped (shield, receiver link, sound, speaker box, USB audio), why, and what is used instead |
 
 ## Structure
