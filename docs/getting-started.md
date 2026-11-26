@@ -56,9 +56,9 @@ The servo cable goes from **J1** on the shield to the receiver's **S4** header. 
 - **The cable turned round:** S and G swap. The module does not start, but nothing is damaged. The wire with the colour mark is S. With the
   GME cable 775-123 the yellow wire is S, on the right seen from the bottom of the board (`shield-pcb.md`).
 
-![Servo cable from J1 to S4, the right and the wrong orientation](wiring-cable.png)
+![The servo cable from the shield's J1 to port S4 of the receiver, a photo with the pin order marked](wiring-cable-photo.jpg)
 
-Source of the picture: `wiring-cable.svg`.
+The photo shows the connection the right way (variant a of J1, the pins out). On this cable the white wire is S, red is V and black is G; other cables use other colours, so go by the order: **S, V, G on both ends**.
 
 The shield's diode D2 lets USB and the receiver's 5 V be connected at the same time. With only USB connected the amplifier is silent by
 design (it takes its power from the servo port); sound needs the receiver.
