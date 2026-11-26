@@ -1,7 +1,7 @@
 # CyberBrick configuration: Truck with Engine Sound
 
 **Current configuration (use this one): `Truck_with_Engine_Sound_Data.json`** (tested on the truck on 2026-11-06)
-together with the `engine_lab` firmware. Send it to both the transmitter and the receiver; the module's servo cable
+today used with the `engine_sets` firmware. Send it to both the transmitter and the receiver; the module's servo cable
 goes to the receiver's **S4** port. The other files are kept for reference:
 
 | File | Status |
@@ -58,8 +58,9 @@ Restore the truck afterwards with `Truck_stock.json` or `Truck_with_Engine_Sound
   starts as "at mid", which is why the mid is moved instead of using an event at mid. Pushing the left stick
   fully left and back restarts the snippet (a short gap in the data).
 - **L Shoulder Button**: short press = lights as in the stock truck; long press = start the snippet again (backup).
-- The data goes out on the **PWM4** servo port (S4): S orange, G brown to the module; V stays disconnected while the
-  Zero is on USB. PWM4 has no servo in this config (the earlier "Sound" servo there, which carried the throttle
-  pulse until the long press, was removed).
-- Sound module: `engine_lab` is silent after power-up; the ignition switch or the throttle starts the engine
-  (`docs/start-stop-horn.md`).
+- The data goes out on the **PWM4** servo port (S4). The servo cable to the module has the order S, V, G on both ends
+  (colours differ between cables, `docs/getting-started.md`, step 6). With the shield board USB may be connected at the
+  same time; on the breadboard prototype see `docs/bringup.md` (the USB power rule). PWM4 has no servo in this config
+  (the earlier "Sound" servo there, which carried the throttle pulse until the long press, was removed).
+- Sound module: the engine is silent after power-up; the ignition switch or the throttle starts it
+  (`docs/controls.md`).

@@ -2,7 +2,7 @@
 
 What every control of the CyberBrick transmitter does in the truck with the sound module, and what our program on
 the receiver does. Valid for the current configuration `docs/cyberbrick-config/Truck_with_Engine_Sound_Data.json`
-with the `engine_lab` firmware (state of 2026-11-08). The module's servo cable goes to the receiver's **S4** header.
+with the `engine_sets` firmware (state of 2026-11-26). The module's servo cable goes to the receiver's **S4** header.
 
 ## What we added where
 
@@ -39,18 +39,23 @@ Not used yet and free for later sound functions: R3, K2..K4 (L2 is taken by the 
 
 ## Engine sound: ignition, starter, stop, horn
 
-Details and the reasoning in `start-stop-horn.md`; the code is `firmware/include/engine_events.h`.
+Details and the reasoning in `start-stop-horn.md`; the engine's states are in `firmware/include/engine_events.h`. The
+sounds of the starter and of the horn come from the chosen sound set (`user-sounds.md`).
 
-- **After power-up the engine is silent.**
-- **Ignition on** (switch from the middle to either side): the starter cranks for 1.1 s, the engine catches with a
-  short rev and settles to idle. If the switch is already on a side when the data arrives, the starter runs at once.
-- **Ignition off** (switch back to the middle): the engine winds down below idle in 1.4 s and goes silent.
+- **After power-up the engine is silent.** The module speaks the name of the set and, shortly after, the PIN for
+  Bluetooth (`ble-link.md`).
+- **Ignition on** (switch from the middle to either side): the starter cranks (the set's `start.wav`, as long as the
+  file), the engine catches with a short rev and settles to idle. If the switch is already on a side when the data
+  arrives, the starter runs at once.
+- **Ignition off** (switch back to the middle): the engine winds down below idle and goes silent, in 1.4 s unless the
+  set says otherwise (`stop_s`).
 - A new switch position must hold for 250 ms, so flipping from left to right through the middle does not stop the
   engine.
 - **Throttle while the engine is off**: the engine runs at once without the starter, so the truck never moves in
   silence. It keeps running until the ignition goes on and off again.
-- **Horn**: two tones (415 + 523 Hz), works with the engine on or off.
-- All these sounds are synthesised in the firmware (no recordings).
+- **Horn**: the set's `horn.wav`, a loop for as long as the control is held; works with the engine on or off.
+- Without a usable set (none on the module, all broken, or no PSRAM) the firmware beeps once and plays a built-in
+  engine with a synthesised starter (1.1 s) and two-tone horn (415 + 523 Hz).
 - Data gaps: the frames sometimes pause for about 0.4 s; the engine state holds over gaps up to 2 s. After a longer
   loss of data the engine keeps its state (a running engine keeps running, a stopped one stays silent) and only the
   throttle, as a servo pulse if there is one, can start it; ignition and horn need the data.
@@ -65,7 +70,7 @@ holds the files for them (`user-sounds.md`, "Files of a set").
 | Effect | What triggers it |
 |---|---|
 | **Start of the engine**: the starter (`start.wav`, or synthesised), the engine catches with a short rev and settles to idle | the ignition switch (L1) moved from the middle to either side |
-| **Stop of the engine**: it winds down below idle and goes silent (1.4 s) | the ignition switch back to the middle |
+| **Stop of the engine**: it winds down below idle and goes silent (1.4 s, or the set's `stop_s`) | the ignition switch back to the middle |
 | **Running engine**: the rpm follows the throttle | left stick up / down (L3) |
 | **Horn** (`horn.wav`, a loop for as long as the control is held) | right shoulder stick (R1), pushed either way |
 | **Spoken name of the set** ("One. Truck.") | choosing a set with the BOOT button or in the web app |
@@ -74,11 +79,12 @@ holds the files for them (`user-sounds.md`, "Files of a set").
 
 | Effect | What causes it |
 |---|---|
-| **Loaded layer**: the "under load" sound is blended into the idle one | the size of the throttle, worked out by the module |
-| **Gear shift**: on a shift to a higher gear the shift sound (`shift.wav`) and a short dip of the pitch, on a shift down a jump of the pitch | the virtual gearbox (five gears), worked out from the throttle |
+| **Loaded layer**: the "under load" sound is blended into the idle one (sets with `idle.wav` and `loaded.wav`; layered sets have none) | the size of the throttle, worked out by the module |
+| **Gear shift**: on a shift to a higher gear the shift sound (`shift.wav`) and a short dip of the pitch, on a shift down a jump of the pitch (not in a set with `"gearbox": false`) | the virtual gearbox (five gears), worked out from the throttle |
 | **Reverse**: no shift | the stick pushed the other way from forward |
 | **The engine starts without the starter** | the throttle moved while the engine is off, so that the truck never moves in silence |
 | **The shape of the stop** | the rpm at the moment of the stop: from full throttle it sounds different from one at idle |
+| **Spoken name of the set** at power-up, and the **Bluetooth PIN** | the power-up of the module; the PIN again while a web page is connected and has not entered it |
 | **Status LED** (not a sound): a blue flash after power-up, red without data, dim green at rest, brightening cyan with the throttle | the state of the data and the throttle |
 
 Not effects, but worth knowing: the engine state is held over a data gap of up to 2 s, and the speaker EQ corrects the sound for the box.
@@ -126,9 +132,10 @@ Side effects:
 2. The data start by themselves within about a second; the engine stays silent.
 3. Turn the ignition on (switch to either side), or just drive off.
 
-The sound module is powered from the receiver's servo header. USB (flashing, tests) may stay connected with the
-receiver on, thanks to the 1N5819 in the breadboard's V wire; without that diode the V wire must be disconnected
-first (`bringup.md`).
+The sound module is powered from the receiver's servo header. With the shield board (rev A) USB (flashing, the web
+page) may be connected while the receiver is on, thanks to the diode D2 on the board (`shield-pcb.md`). The amplifier
+takes its power from the servo header, so with USB alone the module is silent. On the breadboard prototype the same
+needs a 1N5819 diode in the V wire; without it the V wire must be disconnected first (`bringup.md`).
 
 ## Files
 
@@ -137,6 +144,7 @@ first (`bringup.md`).
 | `docs/cyberbrick-config/Truck_with_Engine_Sound_Data.json` | the configuration to send to the transmitter and the receiver |
 | `docs/cyberbrick-code/uart_forward.py` | the receiver program (readable version with comments; the config holds the same code without comments) |
 | `firmware/include/rc_link.h` | reading the frames on the module |
-| `firmware/include/engine_events.h` | ignition, starter, stop, horn |
+| `firmware/include/engine_events.h` | the engine's states (ignition, starter, stop) and the built-in starter and horn |
+| `firmware/src/engine_sets/main.cpp` | the sound firmware: which channel does what, the sets, the playback |
 | `firmware/include/config.h` | thresholds: `RC_IGNITION_*`, `RC_HORN_*`, `RC_THROTTLE_*`, timeouts |
 | `start-stop-horn.md` | design of start, stop and horn |
