@@ -66,4 +66,7 @@ Parts under (or partly under) the Zero, tallest first: J2 2.96, J1 2.54, D1 1.26
 | Socket strip | Zero underside (mm) | Tallest part under it | Room left (mm) |
 |---|---|---|---|
 | 8.5 mm | 11.00 | 2.96 (J2) | 8.04 |
+| 3.5 mm (low strip, short pins) | 6.00 | 2.96 (J2) | 3.04 |
+
+The 3.5 mm row assumes pins short enough for the plastic to seat on the strip; with the Zero's own pins of about 6 mm the underside stays at about 8.5 mm.
 

@@ -21,6 +21,7 @@ other documents describe what exists and link here for what is missing. Ideas th
 - **MAX98357A at 22.05 kHz:** the datasheet does not list 22.05 kHz as a supported sample rate, yet the prototype
   plays fine at it, and so does the bare chip on the first rev A shield (checked by ear on 2026-11-21, not measured).
   Keep an eye on it in the long run; 44.1 kHz would be the fallback.
+- **Lower sockets** (option, open): 3.5 mm female strips with short pins would make the stack about 5 mm lower; try one pair first (`shield-pcb.md`, "lower sockets").
 - **The loaded layer** of the truck sound (`LOADED_GAIN`, `LOADED_RATE_SCALE`): set from measured values, not by ear.
 - **`engine_diesel`** (an earlier variant): never run on hardware.
 

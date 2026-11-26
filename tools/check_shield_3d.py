@@ -222,9 +222,11 @@ def main():
     out("| Socket strip | Zero underside (mm) | Tallest part under it | Room left (mm) |")
     out("|---|---|---|---|")
     top_h = under[0][1] if under else 0.0
-    for name, h in (("8.5 mm", args.socket_h),):
+    for name, h in (("8.5 mm", args.socket_h), ("3.5 mm (low strip, short pins)", 3.5)):
         u = h + args.male_body
         out(f"| {name} | {u:.2f} | {top_h:.2f} ({under[0][0] if under else '-'}) | {u - top_h:.2f} |")
+    out("")
+    out("The 3.5 mm row assumes pins short enough for the plastic to seat on the strip; with the Zero's own pins of about 6 mm the underside stays at about 8.5 mm.")
     out("")
 
     text = "\n".join(lines)
