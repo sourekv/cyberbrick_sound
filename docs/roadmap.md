@@ -1,6 +1,6 @@
 # Roadmap: what is open
 
-Status: 2026-11-22. The one place for everything that is still open: decisions, checks on hardware and the plans for
+Status: 2026-11-26. The one place for everything that is still open: decisions, checks on hardware and the plans for
 later. What has been done is in the short list at the end ("Done"), with a pointer to the document that describes it. The
 other documents describe what exists and link here for what is missing. Ideas that were dropped, with the reasons (among them Wi-Fi for the sets and the firmware, in favour of Bluetooth), are in
 `rejected-ideas.md`.
@@ -40,6 +40,18 @@ other documents describe what exists and link here for what is missing. Ideas th
 
 Not started; recorded so the design does not block them.
 
+- **First install of a new module from the web page** (design 2026-11-26, nothing built): flashing a blank module from Chrome or Edge, without
+  PlatformIO (`web-install-design.md`). The trial waits until a spare blank ESP32-S3-Zero-N8R8 is available. Its build job could also supply the
+  online firmware file of the next item.
+- **Learning the controls of the transmitter** (idea, noted 2026-11-25; not designed, nothing built or measured): today the channels of the throttle,
+  the ignition and the horn are constants in `firmware/include/config.h` (`controls.md`). The module would instead watch all ten channels while the
+  user moves a control, and keep the channel, the rest value and the threshold in NVS; the web app could show the result on a page "Controls". The
+  idea for entering it: **one** setup mode for the learning and for the sound programming over Bluetooth, started by one gesture on the transmitter,
+  so that a power-up without the gesture stays quiet (today the Bluetooth window and the spoken PIN come after every power-up, `ble-link.md`).
+  Learning the controls would need no computer; programming the sounds still needs the web page and the PIN. The gesture must not depend on the
+  ignition or the throttle, which may not be learned yet. Candidates: three short presses of a free button K2..K4 (needs one more momentary button
+  module if only K1 is fitted), or three long presses of K1 (no new part, but a long press of K1 restarts the receiver program, so the gaps in the
+  data have to be measured first).
 - **Firmware file for the page, online** (the open part of the firmware update): where the page gets `firmware.bin` from instead of a file the user
   chooses. From git once the repo is public: the built `firmware.bin` attached to a GitHub release, fetched through a host that allows it from the
   page (raw.githubusercontent.com or cdn.jsdelivr.net/gh/..., by the release tag; GitHub's own release downloads do not allow a page to read them),
