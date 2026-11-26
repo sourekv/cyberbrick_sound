@@ -7,6 +7,8 @@ engine stop and horn. It never touches the original signal path: if the module f
 
 **Web app for the sound sets (Chrome or Edge): https://sourekv.github.io/cyberbrick_sound/**
 
+**Documentation, grouped by what you want to do: [`docs/README.md`](docs/README.md)**
+
 ## Status
 
 State of 2026-11-08; what is still open: `docs/roadmap.md`.
