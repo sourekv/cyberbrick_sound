@@ -44,6 +44,8 @@ USB tests. Connect GND first and disconnect it last (`docs/bringup.md`).
 
 ## Documentation
 
+The documents grouped by what you want to do: **[`docs/README.md`](docs/README.md)**. The full table of every document is below.
+
 New here? **`docs/getting-started.md`** goes from the parts to the engine sound in the truck, step by step. Start with `docs/project-overview.md` (the whole project on one page) and `docs/roadmap.md` (everything still open).
 
 **Using it: controls, wiring, configuration**
