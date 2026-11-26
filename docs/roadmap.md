@@ -40,6 +40,12 @@ other documents describe what exists and link here for what is missing. Ideas th
 
 Not started; recorded so the design does not block them.
 
+- **A guide to the CyberBrick app, two ways** (noted 2026-11-24, not written). Today there is only the import of the ready configuration
+  `Truck_with_Engine_Sound_Data.json` (`getting-started.md`, step 5). The guide would offer (a) that import, and (b) for someone who wants to keep
+  their own configuration, the two things to add by hand: on the receiver the **Code** module "Sound data" (`cyberbrick-code/uart_forward.py`),
+  which sends from the servo port **S4**, and the event that starts it after power-up (left stick left / right, L2: centre 600, dead zone 100;
+  `controls.md`, "How the program starts by itself"). It should name what the transmitter and the receiver need to have free: S4, the L2 channel,
+  and the controls of the ignition (3-position switch, L1) and of the horn (R1). It should use pictures of the app.
 - **First install of a new module from the web page** (design 2026-11-26, nothing built): flashing a blank module from Chrome or Edge, without
   PlatformIO (`web-install-design.md`). The trial waits until a spare blank ESP32-S3-Zero-N8R8 is available. Its build job could also supply the
   online firmware file of the next item.
