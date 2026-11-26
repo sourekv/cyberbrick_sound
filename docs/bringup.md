@@ -1,7 +1,7 @@
 # Bring-up plan
 
 Status: done for the breadboard prototype (2026-11-01..06). The checklists below are kept as the record; the results
-are in the measurements table at the bottom. The current wiring is a single servo cable to S4 (`wiring-current.png`).
+are in the measurements table at the bottom. The last breadboard wiring is a single servo cable to S4 (`wiring-current.png`).
 
 > **Safety rule for every test: the ESP32-S3-Zero may be powered from the model and from USB at the same time only through a diode in the V wire.** The Zero's 5V pad is the USB VBUS net with no diode (measured 5.135 V on it with USB only), so without a diode the receiver's 5 V would be tied straight to the computer's USB 5 V. Since 2026-11-12 the breadboard has a 1N5819 Schottky in the V wire (anode to the receiver, cathode to the Zero's 5V), like D2 on the shield; see "OR-ing diode on the breadboard" below for the check. Without that diode: whenever USB is plugged in, the servo cable's V (red) wire must be disconnected (signal and GND may stay), and USB is unplugged before V is connected.
 > **GND stays connected** in USB tests: the signal needs the common ground as its reference, and without it the return current would flow through the signal pin and the ESP's protection diodes. A common ground ties no supplies together (the receiver runs from a floating battery). Connect GND first and disconnect it last.
@@ -56,7 +56,7 @@ Only after stage 1 works. See `docs/wiring-stage2.png` (source `.svg`): unplug U
 
 Test-tone wiring only (no CyberBrick yet): `docs/wiring-test-tone.png`.
 
-Current wiring (2026-11-08: one servo cable to the receiver's S4 header, data and power; 1N5819 in the V wire since
+Last breadboard wiring (2026-11-08: one servo cable to the receiver's S4 header, data and power; 1N5819 in the V wire since
 2026-11-12): `docs/wiring-current.png` (source `.svg`).
 
 ### OR-ing diode on the breadboard (2026-11-12)

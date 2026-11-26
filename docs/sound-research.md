@@ -1,6 +1,6 @@
 # Engine sound research
 
-Status: 2026-11-08. The current firmware is `engine_lab` with seven candidates (section "Speaker-tuned candidates"); the winner is still being judged by ear. Until 2026-11-05 the default was the synthesised "a_diesel6" preset (`engine_pulse`). This page records what was tried and measured; what is open is in `roadmap.md`.
+Status: 2026-11-26. The current firmware is `engine_sets`. The seven candidates of the earlier `engine_lab` (section "Speaker-tuned candidates") are its default sound sets, and which one to use is the user's choice (2026-11-14). Until 2026-11-05 the default was the synthesised "a_diesel6" preset (`engine_pulse`). This page records what was tried and measured; what is open is in `roadmap.md`.
 
 ## Constraints that shape everything
 
@@ -16,7 +16,7 @@ Status: 2026-11-08. The current firmware is `engine_lab` with seven candidates (
 |---|---|---|---|
 | 1 | `engine` (first version) | CC0 loops from OpenGameArt (domasx2), pitch-shifted by playback rate | Almost pure 40-80 Hz tones (99.99 % of the energy below 500 Hz), nearly inaudible on the small speaker, hissy. Replaced. |
 | 2 | `engine` | One synthesised firing-pulse loop (`tools/make_engine_synth.py`), played back 0.7x-2.0x | Audible, "less pretty but better heard". Changing the rate also shifts the timbre, so the sound tends toward a siren. |
-| 3 | `engine_pulse` | Real-time synthesis: RPM only sets how often a short combustion grain is triggered; the grain's timbre stays fixed (`include/engine_synth.h`, grains from `tools/make_engine_grains.py`) | Deeper and "bubbly" diesel chug. Chosen as the current default (preset a_diesel6). |
+| 3 | `engine_pulse` | Real-time synthesis: RPM only sets how often a short combustion grain is triggered; the grain's timbre stays fixed (`include/engine_synth.h`, grains from `tools/make_engine_grains.py`) | Deeper and "bubbly" diesel chug. Was the default until `engine_lab` (preset a_diesel6). |
 | 4 | `engine_real` | Start-up and an idle loop from a user-supplied recording | Pulsates and was not clearly better than the synthesised sound. Parked, see below. |
 
 ### Synthesised grain engine (`engine_pulse`)

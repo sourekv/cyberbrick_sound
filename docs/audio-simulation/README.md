@@ -1,7 +1,8 @@
 # Engine sound simulation
 
 Status: offline previews. The first sections belong to earlier firmware (`engine`, `engine_pulse`, `engine_real`); the
-current candidates are in "Speaker-tuned candidates" below (`engine_lab`).
+candidates in "Speaker-tuned candidates" below (rendered for `engine_lab`) are today the default sound sets of the
+current firmware, `engine_sets`.
 
 Simulation of the intended end result: what the `engine` firmware should sound like as the throttle changes.
 It is rendered offline with the same algorithm as `firmware/src/engine/main.cpp` (loop `loop_2.wav`, smoothed RPM,

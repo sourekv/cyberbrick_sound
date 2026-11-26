@@ -2,7 +2,7 @@
 
 All documents, grouped by what you want to do: [documentation index](README.md).
 
-Status: 2026-11-22. The prototype works in the truck with the `engine_lab` firmware; the first rev A shield board (JLCPCB, delivered 2026-11-20) works with the `engine_sets` firmware:
+Status: 2026-11-26. The current firmware is `engine_sets`; it runs on the first rev A shield board (JLCPCB, delivered 2026-11-20, working since 2026-11-21). The breadboard prototype before it ran in the truck with the earlier `engine_lab` firmware. `engine_sets` has
 sound sets, a web page that manages them over USB or Bluetooth, the firmware update and the volume from the page. This page describes the current state; what is open is in `roadmap.md`.
 
 ## Goal
@@ -15,7 +15,7 @@ The CyberBrick receiver has four servo headers (S, V, G: signal, 5 V, ground). T
 
 - A small program of ours on the receiver in the model (CyberBrick Remote Control Receiver Shield - XA003 XA004; "Sound data", `cyberbrick-code/uart_forward.py`, stored in the config as a Code module) reads all ten channels every 20 ms and sends them from S4 (GPIO0) at 115200 baud 8N1: a 23-byte frame `A5 5A`, ten 16-bit values little endian `[L1 L2 L3 R1 R2 R3 K1 K2 K3 K4]`, XOR. Measured: about 27 frames per second, no checksum errors.
 - The program is started by the transmitter (CyberBrick Remote Control Transmitter Shield - XA003 XA005): a moved stick centre in the transmitter's part of the config (L2) fires its event right after power-up; a long press of the left shoulder button starts it again. Bambu's firmware is unchanged on both boards, only the configuration was changed. What we added where: `controls.md`.
-- The module reads the frames on GPIO1 through a 1 kOhm resistor. The throttle is the left stick (L3) as the deflection from its centre with a dead band (`RC_THROTTLE_*` in `config.h`), so forward and reverse both raise the sound. In `engine_lab` the sign of the deflection gives the direction (`RC_REVERSE_SIGN`: stick away from you = forward, checked on the truck 2026-11-08); while reversing the virtual gearbox stays in gear 1, so it does not shift. The direction holds while the stick is at rest. The other channels give the ignition (L1 switch) and the horn (R1).
+- The module reads the frames on GPIO1 through a 1 kOhm resistor. The throttle is the left stick (L3) as the deflection from its centre with a dead band (`RC_THROTTLE_*` in `config.h`), so forward and reverse both raise the sound. The sign of the deflection gives the direction (`RC_REVERSE_SIGN`: stick away from you = forward, checked on the truck 2026-11-08); while reversing the virtual gearbox stays in gear 1, so it does not shift. The direction holds while the stick is at rest. The other channels give the ignition (L1 switch) and the horn (R1).
 - Supply on the V pin: about 4.94 V. The module draws about 57 mA idle and 105 mA at full throttle (`MASTER_VOLUME` 0.6, 40 mm speaker).
 - Because the original path to the motor (M1) is untouched, **no pass-through connector is needed**. S4 is dedicated to the sound module.
 
@@ -41,7 +41,7 @@ input): `prototype.jpg`.*
 | 40 mm speaker (4 Ohm) | prototype speaker |
 
 Power on the breadboard: a 1N5819 in the V wire (since 2026-11-12, measured in `bringup.md`) lets USB and the
-servo-port 5 V be connected together; without it they must never be. Current wiring: `wiring-current.png` (one servo cable to S4, data and power); earlier stages: `wiring-overview.png`, `wiring-stage2.png`, `wiring-test-tone.png`.
+servo-port 5 V be connected together; without it they must never be. Breadboard wiring in its last state: `wiring-current.png` (one servo cable to S4, data and power); earlier stages: `wiring-overview.png`, `wiring-stage2.png`, `wiring-test-tone.png`.
 
 ### Shield PCB (iteration 2: KiCad schematic and routed board exist, reviewed 2026-11-12, ordered at JLCPCB 2026-11-13, delivered 2026-11-20 12:14)
 
@@ -63,8 +63,9 @@ Every firmware shares the pins and constants in `include/config.h`. Environments
 
 | Env | What it does |
 |---|---|
-| `engine_lab` | **the current firmware**: all seven engine-sound candidates (the BOOT button switches 1..7 and announces the name), ignition, starter, stop and horn from the channel data, the virtual gearbox with a shift sound on every upshift, no upshift while reversing, speaker EQ for the 30 ml box |
-| `engine_demo` | the same, plays every sound through the whole rpm range by itself with a spoken announcement (no receiver needed) |
+| `engine_sets` | **the current firmware**: sound sets in the data partition (`user-sounds.md`; BOOT steps through them and speaks the name), ignition, starter, stop and horn from the channel data, the virtual gearbox with a shift sound on every upshift, no upshift while reversing; the web app over USB and Bluetooth (`ble-link.md`) |
+| `engine_lab` | earlier: all seven engine-sound candidates compiled in (the BOOT button switches 1..7), the same controls, speaker EQ for the 30 ml box |
+| `engine_demo` | `engine_lab` playing every sound through the whole rpm range by itself with a spoken announcement (no receiver needed) |
 | `test_tone` | 440 Hz sine over I2S; checks amplifier and speaker |
 | `speaker_sweep` | slow sine sweep for measuring the speaker (`speaker-measurement.md`) |
 | `pulse_measure`, `uart_probe` | print the servo pulse width or the receiver's channel frames to serial |
@@ -81,8 +82,9 @@ Extras in the `engine*` firmware:
 
 ## Sound: why it is built this way
 
-Research and measurements are in `sound-research.md`. Current state: `engine_lab` holds seven candidates (CC0 truck
-loops, the old grain synth and four presets of a newer synth tuned to the speaker); which one wins is judged by ear.
+Research and measurements are in `sound-research.md`. Current state: the seven candidates of `engine_lab` (CC0 truck
+loops, the old grain synth and four presets of a newer synth tuned to the speaker) are the default sound sets; which one
+to use is the user's choice (2026-11-14).
 The constraints that decided everything:
 
 - The speaker is small (40 mm prototype, 21 mm production candidates) and reproduces almost nothing below about 300 Hz. Sound that lives below 150 Hz is nearly inaudible and turns into hiss. The first CC0 car loops were almost pure 40 to 80 Hz tones and failed for exactly this reason.

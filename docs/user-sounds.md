@@ -1,7 +1,7 @@
 # User sounds: what a sample must meet
 
-Planned 2026-11-08, sets decided 2026-11-14. The firmware loads sound sets from files in the flash data partition,
-uploaded over USB by a PC tool (see "Later" in `roadmap.md`).
+Planned 2026-11-08, sets decided 2026-11-14. The firmware `engine_sets` loads sound sets from files in the flash data
+partition; the web app writes them over USB or Bluetooth (see "The web app" and `user-guide.md`).
 
 **State 2026-11-15:** step 1 is built and works on the module (flashed with `upload` and `uploadfs` on 2026-11-15: boot, 7 sets found, `@hello`/`@info`/`@ls` answered, the web app connects, lists the sets, plays the sounds and runs the Demo (`@demo`), checked by the owner on 2026-11-15; Copy and Delete work too (the owner, 2026-11-15; Copy writes a new set, so writing sets from the app works); a set made from scratch is written too: the test set (`tools/make_test_set.py`, `assets/test_set/09_test/`) was saved to the module from the app (the owner, 2026-11-15); Speak (the name made with Piper) works too (the owner, 2026-11-15); not tried yet: recording the name with the microphone, how the module reacts when the port is opened; the first `uploadfs` stopped at 17 % with "The chip stopped responding", the second went through): the firmware env `engine_sets`
 (`firmware/src/engine_sets/`, `firmware/include/sound_sets.h`), the partition table `firmware/partitions_sets.csv`
@@ -11,8 +11,8 @@ The sets go to the module with `pio run -e engine_sets -t uploadfs`, or one by o
 prompts ("One. Truck."); without Piper the script falls back to those prompts. See "Trying it" at the end.
 
 This page says how
-the sets are organised and what a sample has to meet so it sounds right on the module. The numbers come from the current firmware (`engine_lab`) and the
-speaker measurement (`speaker-measurement.md`).
+the sets are organised and what a sample has to meet so it sounds right on the module. The numbers come from the firmware (first `engine_lab`, today
+`engine_sets`) and the speaker measurement (`speaker-measurement.md`).
 
 ## One kind of set (decided 2026-11-14)
 
@@ -461,4 +461,4 @@ From the repo root, then from `firmware/`:
    speaks its name. After a power cycle the module starts with the set chosen last with BOOT, or with the active set of the web app.
 
 Going back to `engine_lab` is just `pio run -e engine_lab -t upload` (it brings its own partition table).
-Flash with the USB power rule in mind (`bringup.md`).
+On the breadboard prototype, flash with the USB power rule in mind (`bringup.md`); the shield board needs no care here.

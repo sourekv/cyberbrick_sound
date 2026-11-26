@@ -11,9 +11,13 @@ engine stop and horn. It never touches the original signal path: if the module f
 
 ## Status
 
-State of 2026-11-08; what is still open: `docs/roadmap.md`.
+State of 2026-11-26; what is still open: `docs/roadmap.md`.
 
-- **Prototype works** on a breadboard in the truck: Waveshare ESP32-S3-Zero-N8R8-M, MAX98357A, 40 mm 4 Ohm speaker
+- **The shield board works** (2026-11-21): the first assembled rev A board with a Waveshare ESP32-S3-Zero-N8R8-M and
+  the firmware `engine_sets`; USB and the receiver may be connected at the same time.
+- **Sound sets**: seven default sets on the module, and a web app that tests, writes and renames them, sets the volume
+  and updates the firmware, over USB or Bluetooth (2026-11-22).
+- **Prototype** on a breadboard in the truck before it: MAX98357A module, 40 mm 4 Ohm speaker
   in a printed 30 ml sealed box, with a speaker EQ tuned for the box (2026-11-07).
 - **Channel data link works** (2026-11-06): about 27 frames per second, no checksum errors; ignition, starter,
   stop and horn from the transmitter.
@@ -21,7 +25,7 @@ State of 2026-11-08; what is still open: `docs/roadmap.md`.
   shift.
 - **Shield PCB**: KiCad schematic, routed board and assembly files for JLCPCB and PCBWay exist (`hardware/shield/`);
   reviewed in KiCad by a colleague of the owner on 2026-11-12 (no remarks), quoted by both services, ordered at JLCPCB on 2026-11-13 (5 assembled boards), production file and parts placement confirmed on 2026-11-14, delivered on 2026-11-20 at 12:14 (photo of the five boards: SMD parts fitted, J1/J3/J4 not yet soldered; the owner calls them "rev. 0", in the repository they are rev A).
-- Which engine sound wins is still being judged by ear (`engine_lab` holds all candidates).
+- Which engine sound to use is the user's choice: the seven candidates became the default sets (2026-11-14).
 
 ## How it works
 
@@ -119,8 +123,8 @@ in `@info`.
 
 | Env | What it does |
 |---|---|
-| `engine_lab` | **the current firmware**: all seven engine-sound candidates (the BOOT button switches 1..7 and announces the name), ignition, starter, stop and horn from the channel data, shift sound, no upshift while reversing, speaker EQ for the 30 ml box |
-| `engine_sets` | **tried on the module and the web app on 2026-11-15** (works): the sounds as sets in the data partition (`docs/user-sounds.md`): BOOT steps through them and speaks the name, sample and synth sets, fallback set compiled in; sets built by `tools/make_default_sets.py`, written with `-t uploadfs` or one by one with the web page `web/index.html` over USB or over Bluetooth (`docs/ble-link.md`: a window of 3 minutes after power-up, a spoken PIN); the page also updates the firmware and sets the overall volume |
+| `engine_sets` | **the current firmware** (first tried on the module and the web app on 2026-11-15): ignition, starter, stop and horn from the channel data, shift sound, no upshift while reversing; the sounds as sets in the data partition (`docs/user-sounds.md`): BOOT steps through them and speaks the name, sample and synth sets, fallback set compiled in; sets built by `tools/make_default_sets.py`, written with `-t uploadfs` or one by one with the web page `web/index.html` over USB or over Bluetooth (`docs/ble-link.md`: a window of 3 minutes after power-up, a spoken PIN); the page also updates the firmware and sets the overall volume |
+| `engine_lab` | earlier: all seven engine-sound candidates compiled in (the BOOT button switches 1..7 and announces the name), the same controls, speaker EQ for the 30 ml box |
 | `engine_demo` | the same, plays every sound through the whole rpm range by itself with a spoken announcement (no receiver needed) |
 | `engine_pulse` | real-time grain synthesis (preset a_diesel6) |
 | `engine`, `engine_diesel`, `engine_truck`, `engine_gears` | earlier variants: synthesised loop, CC0 diesel and truck loops with the virtual gearbox, one loop per gear |
@@ -138,11 +142,14 @@ in `@info`.
 
 ## Wiring
 
+With the shield board there is only the servo cable (J1 to S4) and the speaker: `docs/getting-started.md`, with a photo.
+Below is the wiring of the breadboard prototype that came before it.
+
 ![The whole setup on 2026-11-12: battery, CyberBrick receiver with the motor, the breadboard with the ESP32-S3-Zero and the MAX98357A, and the 40 mm speaker in its printed box](docs/prototype-2026-11-12.jpg)
 
 *The breadboard prototype with the receiver, battery, motor and speaker box (2026-11-12).*
 
-![Current wiring: one servo cable from the receiver's S4 header carries the data and the 5 V supply](docs/wiring-current.png)
+![Breadboard wiring: one servo cable from the receiver's S4 header carries the data and the 5 V supply](docs/wiring-current.png)
 
 Source: `docs/wiring-current.svg`. Earlier development stages (module on USB, only signal and GND from the receiver;
 then power from the servo port): `docs/wiring-overview.png`, `docs/wiring-stage2.png`, `docs/wiring-test-tone.png`.

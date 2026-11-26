@@ -1,7 +1,9 @@
 # Engine start, stop and horn
 
-Status: implemented in `engine_lab` and working on the truck (2026-11-08). The first section is the current design;
-the sections after it are earlier notes kept as history. What is still open: `roadmap.md`.
+Status: implemented in `engine_lab` and working on the truck (2026-11-08). The first section is the current design of
+the controls; the sections after it are earlier notes kept as history. Today's firmware, `engine_sets`, keeps these
+controls but takes the starter, the horn and the length of the stop from the sound set (`controls.md`); the
+synthesised sounds named below are its fallback. What is still open: `roadmap.md`.
 
 ## Implemented with the channel data (2026-11-06)
 

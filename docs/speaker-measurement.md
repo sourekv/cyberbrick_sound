@@ -1,7 +1,7 @@
 # Measuring the speaker
 
 Status: 2026-11-08. The 40 mm prototype speaker was measured bare and in 30 ml and 15 ml sealed boxes; the speaker EQ
-for the 30 ml box is in `engine_lab`. Choosing the speaker for the model is open (`roadmap.md`).
+for the 30 ml box is in the firmware (built into `engine_lab`; in `engine_sets` the EQ `speaker_box` of a sound set). Choosing the speaker for the model is open (`roadmap.md`).
 
 Generic speakers come without a datasheet, so the response is measured on the real hardware: the firmware
 `speaker_sweep` plays a slow sine sweep through the MAX98357A and the speaker, a phone records it, and
