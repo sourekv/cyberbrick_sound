@@ -43,9 +43,10 @@ Not started; recorded so the design does not block them.
 - **First install of a new module from the web page** (design 2026-11-26, nothing built): flashing a blank module from Chrome or Edge, without
   PlatformIO (`web-install-design.md`). The trial waits until a spare blank ESP32-S3-Zero-N8R8 is available. Its build job could also supply the
   online firmware file of the next item.
-- **Learning the controls of the transmitter** (idea, noted 2026-11-25; not designed, nothing built or measured): today the channels of the throttle,
-  the ignition and the horn are constants in `firmware/include/config.h` (`controls.md`). The module would instead watch all ten channels while the
-  user moves a control, and keep the channel, the rest value and the threshold in NVS; the web app could show the result on a page "Controls". The
+- **Learning the controls of the transmitter** (idea, noted 2026-11-25; not designed, nothing built or measured): today the throttle, the ignition and
+  the horn are fixed in the firmware (the channels L3, L1 and R1 in `firmware/src/engine_sets/main.cpp`, their rest values and thresholds in
+  `firmware/include/config.h`; `controls.md`). The module would instead watch all ten channels while the user moves a control, and keep the channel,
+  the rest value and the threshold in NVS; the web app could show the result on a page "Controls". The
   idea for entering it: **one** setup mode for the learning and for the sound programming over Bluetooth, started by one gesture on the transmitter,
   so that a power-up without the gesture stays quiet (today the Bluetooth window and the spoken PIN come after every power-up, `ble-link.md`).
   Learning the controls would need no computer; programming the sounds still needs the web page and the PIN. The gesture must not depend on the
