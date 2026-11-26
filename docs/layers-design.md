@@ -79,8 +79,8 @@ CPU: two `playLoop` calls per sample instead of one (two with the loaded blend t
   and a Play button (a layer at its own speed), and lets the user add, remove and reorder them (sorted by `ratio`).
 - Drop a file on a layer row: the page measures the `ratio` against the first layer (same method as the
   prototype), the user may change it.
-- A preview of the sweep (idle, up, down) like `AB_porovnani.wav`, rendered by the page with the same maths as the
-  firmware, so the set can be judged before writing it.
+- A preview of the sweep (idle, up, down), rendered by the page with the same maths as the firmware, so the set can
+  be judged before writing it.
 - The check "a set is complete" accepts layers in place of `idle.wav` and `loaded.wav`.
 - **A page that does not know layers must not damage a layered set.** The page that knows them is released together
   with the firmware; the page also shows the firmware version, so a layered set with an old firmware gets a warning.

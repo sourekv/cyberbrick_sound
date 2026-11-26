@@ -1,7 +1,7 @@
 #pragma once
 // The USB link of the `engine_sets` firmware: the web page (web/index.html) lists, reads, writes and deletes the
 // sound sets in the data partition over the USB serial port (Web Serial). Protocol: docs/user-sounds.md,
-// "The USB protocol".
+// "The protocol (USB and Bluetooth)".
 //
 // Text lines both ways, binary data as base64, so log lines of the firmware can share the port: the page reads only
 // lines that start with '@'. Every command gets exactly one final line, "@ok ..." or "@err <why>", sometimes after
