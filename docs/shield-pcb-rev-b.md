@@ -24,8 +24,19 @@ finds 0 violations (rev A: 53 silkscreen warnings) and 0 unconnected items. The 
   The colour is set in the board's physical stackup (`tools/shield_stackup.py`, also run by `make_shield_rev_b.py`); in
   KiCad's 3D viewer switch on the board stackup colours to see it. A custom blue is used, because KiCad's own "Blue"
   looks violet. The gerbers and the drill file do not change (only the colour fields of the gerber job file; `fab/` was
-  not regenerated for it). The colour of the real board is chosen in the order form; check there whether blue changes
-  the price, the delivery time or the assembly options. The picture above is made by `tools/render_shield_rev_b.py`.
+  not regenerated for it). The colour of the real board is chosen in the order form. The picture above is made by
+  `tools/render_shield_rev_b.py`.
+- **Blue at JLCPCB (checked 2026-11-27, nothing uploaded or ordered):**
+  - Economic PCBA takes blue on a 2-layer 1.6 mm board with HASL only (leaded, as on rev A, or lead-free; no ENIG) and
+    for **5 to 30 pieces** (green: 2 to 50, HASL or ENIG); the table "PCB Specs for Economic PCB Assembly" on
+    <https://jlcpcb.com/capabilities/pcb-assembly-capabilities>.
+  - The bare boards cost the same in the quote calculator (29 x 30 mm, 5 pieces, HASL with lead: 4.10 USD for green
+    and for blue, before shipping and without assembly).
+  - Build time of the bare boards: 3 days instead of 2 (the calculator's hint on blue says two days more than green),
+    and the 24 hour option for bare boards disappears. With assembly switched on, a free 24 hour option was offered for
+    blue too.
+  - **Not checked:** the assembly price and the total build and delivery time (the calculator shows them only after the
+    gerbers are uploaded). Prices and rules change; look again when ordering.
 - **Size**: every text is 1.0 mm high with a 0.15 mm stroke (JLCPCB's advice, 1 mm and 0.15 mm; to be checked in their
   rules before the order). The labels of rev A were 0.8 mm / 0.12 mm.
 - **Files**: the title block says rev B (board and schematic) and the gerbers carry `Revision: B`. The board is saved
