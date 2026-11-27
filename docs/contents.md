@@ -54,7 +54,7 @@ A short map of the repository. What each document says is in the table in `READM
 |---|---|
 | Sound | `engine_lab.py`, `simulate_engine.py`, `speaker_model.py`, `make_engine_*.py`, `make_*_loop.py`, `make_shift_sound.py`, `make_sample.py` |
 | Sets and web app | `make_default_sets.py`, `make_user_sounds.py`, `make_test_set.py`, `make_number_names.py`, `make_voice_*`, `make_guide_images.py` |
-| Shield | `make_shield_*.py`, `shield_*.py`, `place_shield.py`, `check_shield_netlist.py`, `check_shield_3d.py` (3D sizes, collisions, room under the Zero), `make_shield_3d_kicad.py` (the 3D page from KiCad), `render_pcb.py` |
+| Shield | `make_shield_*.py`, `shield_*.py`, `place_shield.py`, `check_shield_netlist.py`, `check_shield_3d.py` (3D sizes, collisions, room under the Zero), `make_shield_3d_kicad.py` (the 3D page from KiCad), `render_pcb.py`, `render_shield_rev_b.py` (the picture of rev B) |
 | Shield, placement trial | `extract_board_for_trial.py` (run with KiCad's Python: writes `work/board_full.json`, the courtyards and pads of the shield parts) and `trial_place_j1.py` (re-places the 22 movable parts by simulated annealing and counts overlaps; written for the test of a J1 moved deeper into the board, `trial_place_j1.py <YJ in mm> <seed> <iterations> [check]`; an area test only, without routing; can be reused for any change of the part layout) |
 | Measurement | `analyze_speaker_sweep.py` |
 | Documentation | `check_links.py` (links, anchors, pictures, named sections and file names in the documents; `python tools/check_links.py`, with `--external` also the web addresses; run it after moving or renaming anything) |

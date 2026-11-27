@@ -20,6 +20,12 @@ finds 0 violations (rev A: 53 silkscreen warnings) and 0 unconnected items. The 
 - **Gone**: the reference labels (R1, C3, ...), the outlines of the small parts (they moved to the fab layer, so the
   assembly drawing keeps them) and the outline of J1, which hung over the board edge. The references stay in the
   schematic, the BOM and the placement files; JLCPCB places the parts from those, not from the silkscreen.
+- **Colour (decided 2026-11-27): a blue solder mask**, the same as the ESP32-S3-Zero on top of it (rev A is green).
+  The colour is set in the board's physical stackup (`tools/shield_stackup.py`, also run by `make_shield_rev_b.py`); in
+  KiCad's 3D viewer switch on the board stackup colours to see it. A custom blue is used, because KiCad's own "Blue"
+  looks violet. The gerbers and the drill file do not change (only the colour fields of the gerber job file; `fab/` was
+  not regenerated for it). The colour of the real board is chosen in the order form; check there whether blue changes
+  the price, the delivery time or the assembly options. The picture above is made by `tools/render_shield_rev_b.py`.
 - **Size**: every text is 1.0 mm high with a 0.15 mm stroke (JLCPCB's advice, 1 mm and 0.15 mm; to be checked in their
   rules before the order). The labels of rev A were 0.8 mm / 0.12 mm.
 - **Files**: the title block says rev B (board and schematic) and the gerbers carry `Revision: B`. The board is saved

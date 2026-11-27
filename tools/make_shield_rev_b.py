@@ -8,7 +8,8 @@ What changes:
     them; J2, J3, J4 and JP1 keep theirs, J1's outline (it hangs over the edge) goes;
   - new text, all 1.0 mm high with a 0.15 mm stroke (JLCPCB's advice for silkscreen): S V G below the pads of the servo header
     J1, "+" at C1, "CB SND" and "rev B" in the right margin; a dot at pin 1 of U1;
-  - title block of the board: revision B, date, title.
+  - title block of the board: revision B, date, title;
+  - the physical stackup with a blue solder mask (tools/shield_stackup.py, decided 2026-11-27).
 
 Run with KiCad's own Python (it has the pcbnew module), on the rev A board:
 
@@ -22,6 +23,8 @@ import sys
 from pathlib import Path
 
 import pcbnew
+
+from shield_stackup import set_stackup
 
 ROOT = Path(__file__).resolve().parent.parent
 PCB = ROOT / "hardware" / "shield" / "shield.kicad_pcb"
@@ -109,6 +112,7 @@ def main():
     tb.SetComment(0, "Engine sound module: ESP32-S3-Zero + MAX98357A, throttle from the servo port PWM2")
     tb.SetComment(1, "Rev B: silkscreen only, electrically the same as rev A (tag hw-shield-revA)")
     pcbnew.SaveBoard(str(PCB), board)
+    set_stackup(PCB)
     print(f"rev {REV} written to {PCB}")
 
 
